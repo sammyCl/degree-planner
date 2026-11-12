@@ -41,3 +41,9 @@ Collected data follows the format the backend owner sets.
 - Work on a branch and merge through a pull request; never commit straight to `main`.
 - Never force-push, and ask before pushing or opening a pull request.
 - Keep `.env` and secrets out of git (`.gitignore` covers `.env`).
+
+## Plans and tracking
+
+- `plans/MASTER-PLAN.md` is the overall plan; `plans/FRONTEND-PLAN.md`, `plans/BACKEND-PLAN.md`, and `plans/AGENT-PLAN.md` are each member's plan, with task IDs, dependencies (Needs), priorities, and status boxes.
+- When asked what to work on next or what someone is waiting on, read all four plans, find unchecked tasks whose Needs are done, and name the owner of any task that blocks another person's work.
+- Tick a box only when the team member says it is done or the code and tests show it, and add a line to that plan's status log.
