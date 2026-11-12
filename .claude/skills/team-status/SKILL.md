@@ -23,11 +23,11 @@ If a plan file is missing, new, or shaped differently than expected, work with w
 
 ## 2. Parse the tasks
 
-A task is a row in any markdown table that has an ID column and a status column. Other columns are usually Task, Priority, Due, and Needs, but take whatever is there.
+A task is a row in any markdown table that has a name (or ID) column and a status column. Other columns are usually Task, Priority, Due, and Needs, but take whatever is there.
 
 - **Status marks:** use the master plan's legend. If there is none, use `[ ]` not started, `[~]` in progress, `[x]` done, `[!]` blocked.
-- **Needs:** a list of task IDs. A Need is met only when that task is `[x]` in its own row.
-- **Duplicates:** the same ID can appear in the master plan and in a member plan (a whole-team task listed under one member). Treat it as one task. If the two rows disagree on status, report that as a mismatch.
+- **Needs:** a list of task names (or IDs). A Need is met only when that task is `[x]` in its own row.
+- **Duplicates:** the same task name can appear in the master plan and in a member plan (a whole-team task listed under one member). Treat it as one task. If the two rows disagree on status, report that as a mismatch.
 - **Owner:** the owner of the file the row is in. A row in the master plan's whole-team table belongs to the whole team unless its text names a lead.
 - **Due dates:** dates without a year are in the current year of the course, taken from the master plan.
 
@@ -47,7 +47,7 @@ Run these, all read-only:
 
 Match evidence to tasks in two ways:
 
-- **By ID:** a task ID in a commit message, branch name, or PR title.
+- **By name:** a task name or ID in a commit message, branch name, or PR title.
 - **By what the task names:** for example, a task about a data format and a new schema file, an eval runner task and a script that runs the examples, a GitHub Actions task and a workflow file, or a filled-in `<placeholder>` in README.md, DECISIONS.md, or EVAL.md.
 
 Name the evidence precisely: a commit hash, a file path, or a PR number.
@@ -83,7 +83,7 @@ Use this order. Keep it to what a teammate can read in a minute.
    - Overdue, if any.
 4. **Whole-team tasks**: ready, waiting, and overdue, briefly.
 5. **Blockers**: overdue or unstarted tasks on the master plan's critical path, and the tasks that block the most other tasks. Say who unblocks whom.
-6. **Marks to check**: the mismatches from step 5, written as suggestions, for example "B1 may be done: commit abc1234 added `docs/data-format.md`. If so, Midhat can tick it in BACKEND-PLAN.md."
+6. **Marks to check**: the mismatches from step 5, written as suggestions, for example "Data format may be done: commit abc1234 added `docs/data-format.md`. If so, Midhat can tick it in BACKEND-PLAN.md."
 7. **Not read**: anything in the plans you could not parse, if there was any.
 
 If nothing is ticked and there is no evidence yet, say that plainly and focus the report on what is ready to start and what is blocking the critical path.
