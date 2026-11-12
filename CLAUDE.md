@@ -1,12 +1,19 @@
 # degree-planner
 
-This is our team's P4 project (the full-stack agent project) for CSCI 498E/598E at Colorado School of Mines.
-The brief is `projects/p4-full-stack-agent/README.md` in the course repository; presentations are Thu Dec 3 and Tue Dec 8, 2026.
-The repository is public on GitHub, so nothing private (keys, the user's personal data) is ever committed.
+This is Group 9's P4 project (the full-stack agent project) for CSCI 498E/598E at Colorado School of Mines: a degree planner for Mines students covering bachelor's, master's, combined BS+MS, minors, and ASIs.
+The brief is `projects/p4-full-stack-agent/README.md` in the course repository; `README.md` here summarizes our proposal.
+The repository is public on GitHub, so nothing private (keys, real student transcripts) is ever committed.
+
+## Architecture
+
+- Frontend (web UI): a setup page (degree level, major, minor/ASI, transcript upload, number of semesters) and a planner page (flowchart with prerequisite arrows, drag and drop, chatbot panel, plan download).
+- Backend API: request router, transcript parser, plan validator (rules code, no LLM), plan store, and the data-loading pipeline.
+- Agent: Sonnet 5.5 in a plan, check, revise loop, with the tools `search_catalog`, `get_prerequisites`, `get_program_requirements`, `get_forms`, and `check_plan` (which calls the backend's validator).
+- Data layer: the course catalog, forms and policies, and program rules (BS/MS/minor/ASI/combined), filled by a scheduled scraper of the Mines online catalog and department pages.
 
 ## Stack
 
-Python. <version, package manager, and framework, once decided>
+Python. <version, package manager, and web framework, once decided>
 
 ## Commands
 
@@ -14,13 +21,20 @@ Python. <version, package manager, and framework, once decided>
 
 ## Who owns what
 
-Every team member owns one named part (see the table in `README.md`).
+| Part | Owner |
+|---|---|
+| Frontend | Abdallah Salhi |
+| Backend, data format, validator | Midhat Sajad |
+| Agent, tools, chatbot logic, evaluation | Samantha Clapp |
+| Data collection | All three (bachelor's: Samantha; graduate and combined: Midhat; minors, ASIs, forms: Abdallah) |
+
 Before changing code, ask whose part the change touches, and mention it in the commit message.
+Collected data follows the format the backend owner sets.
 
 ## What Claude does and does not write
 
 - Claude builds code and tests when asked, one step at a time, and says what it changed and why.
-- Claude does not write the content of `DECISIONS.md` or `EVAL.md`, invent eval results or costs, or fill in the team's placeholders; the team writes those.
+- Claude does not write the team's judgments in `DECISIONS.md` or `EVAL.md`, invent eval results or costs, or fill in placeholders the proposal does not answer; the team writes those.
 
 ## Git
 
