@@ -4,3 +4,6 @@ __pycache__/
 .pytest_cache/
 .env
 .DS_Store
+
+# Team proposal, kept out of the public repo
+Group 9_Project 4_Proposal.pdf
