@@ -40,7 +40,7 @@ If you just pulled and the skill does not show up, start a new Claude Code sessi
 ## Help it work well
 
 - Keep the status marks current: `[ ]` not started, `[~]` in progress, `[x]` done, `[!]` blocked (with the reason).
-- Put the task ID in commit messages, branch names, or PR titles (for example `B1: add data format doc`), so the skill can match the work to the task.
+- Put the task name in commit messages, branch names, or PR titles (for example `Data format: add schema doc`), so the skill can match the work to the task.
 - Keep the table shape the plans use now: an ID column, a status column, and ideally Priority, Due, and Needs.
 
 The instructions Claude follows are in [SKILL.md](SKILL.md).
