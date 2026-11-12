@@ -5,5 +5,8 @@ __pycache__/
 .env
 .DS_Store
 
+# Private team notes
+p4-notes/
+
 # Team proposal, kept out of the public repo
 Group 9_Project 4_Proposal.pdf
