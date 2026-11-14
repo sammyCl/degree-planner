@@ -1,0 +1,177 @@
+{
+  "courses": [
+    {
+      "code": "MATH201",
+      "subject": "MATH",
+      "number": "201",
+      "title": "Introduction to Statistics",
+      "credits": 3.0,
+      "description": "Probability and statistics for engineers.",
+      "prerequisites": { "type": "course", "code": "MATH112" },
+      "corequisites": [],
+      "catalog_year": "2026-2027",
+      "source": { "url": "https://catalog.mines.edu/coursesaz/math/", "page": 4 }
+    },
+    {
+      "code": "MATH223",
+      "subject": "MATH",
+      "number": "223",
+      "title": "Linear Algebra",
+      "credits": 3.0,
+      "description": "Vector spaces, matrices, eigenvalues.",
+      "prerequisites": { "type": "course", "code": "MATH112" },
+      "corequisites": [],
+      "catalog_year": "2026-2027",
+      "source": { "url": "https://catalog.mines.edu/coursesaz/math/", "page": 5 }
+    },
+    {
+      "code": "CSCI306",
+      "subject": "CSCI",
+      "number": "306",
+      "title": "Algorithms",
+      "credits": 3.0,
+      "description": "Design and analysis of algorithms.",
+      "prerequisites": { "type": "course", "code": "CSCI200" },
+      "corequisites": [],
+      "catalog_year": "2026-2027",
+      "source": { "url": "https://catalog.mines.edu/coursesaz/computerscience/", "page": 2 }
+    },
+    {
+      "code": "CSCI400",
+      "subject": "CSCI",
+      "number": "400",
+      "title": "Database Management",
+      "credits": 3.0,
+      "description": "Relational database design and implementation.",
+      "prerequisites": {
+        "type": "AND",
+        "of": [
+          { "type": "course", "code": "CSCI306" },
+          {
+            "type": "OR",
+            "of": [
+              { "type": "course", "code": "MATH201" },
+              { "type": "course", "code": "MATH223" }
+            ]
+          }
+        ]
+      },
+      "corequisites": [],
+      "catalog_year": "2026-2027",
+      "source": { "url": "https://catalog.mines.edu/coursesaz/computerscience/", "page": 3 }
+    },
+    {
+      "code": "MNGN501",
+      "subject": "MNGN",
+      "number": "501",
+      "title": "Advanced Mine Design",
+      "credits": 3.0,
+      "description": "Graduate-level mine planning and design.",
+      "prerequisites": { "type": "exception", "label": "instructor approval" },
+      "corequisites": [],
+      "catalog_year": "2026-2027",
+      "source": { "url": "https://catalog.mines.edu/coursesaz/mining/", "page": 11 }
+    },
+    {
+      "code": "MNGN502",
+      "subject": "MNGN",
+      "number": "502",
+      "title": "Rock Mechanics for Mine Design",
+      "credits": 3.0,
+      "description": "Applied rock mechanics for underground and surface mines.",
+      "prerequisites": null,
+      "corequisites": [],
+      "catalog_year": "2026-2027",
+      "source": { "url": "https://catalog.mines.edu/coursesaz/mining/", "page": 12 }
+    }
+  ],
+
+  "programs": [
+    {
+      "program_id": "cs-bs-general-track",
+      "name": "Computer Science, General Track",
+      "degree_level": "bachelor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 130,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Requirements",
+          "kind": "all",
+          "courses": ["CSCI200", "CSCI306", "CSCI400"]
+        },
+        {
+          "group_id": "math_science",
+          "label": "Math and Science",
+          "kind": "choose_credits",
+          "courses": ["MATH201", "MATH223"],
+          "credits_required": 6
+        },
+        {
+          "group_id": "free_electives",
+          "label": "Free Electives",
+          "kind": "choose_credits",
+          "credits_required": 9
+        }
+      ]
+    },
+    {
+      "program_id": "mining-bs",
+      "name": "Mining Engineering",
+      "degree_level": "bachelor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 128,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Requirements",
+          "kind": "all",
+          "courses": ["MNGN502"]
+        }
+      ]
+    },
+    {
+      "program_id": "mining-ms",
+      "name": "Mining Engineering, M.S.",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 36,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Requirements",
+          "kind": "all",
+          "courses": ["MNGN501", "MNGN502"]
+        }
+      ],
+      "double_counts_with": [
+        {
+          "program_id": "mining-bs",
+          "shared_courses": ["MNGN502"],
+          "shared_credit_limit": 12
+        }
+      ]
+    },
+    {
+      "program_id": "mining-bs-ms-combined",
+      "name": "Mining Engineering, Combined B.S./M.S.",
+      "degree_level": "combined",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 164,
+      "requirement_groups": [],
+      "combines": ["mining-bs", "mining-ms"]
+    }
+  ],
+
+  "forms": [
+    {
+      "form_id": "independent-study-credit",
+      "name": "Independent Study Credit Form",
+      "applies_to": ["any"],
+      "max_credits": 6,
+      "requires": "instructor approval",
+      "url": "https://www.mines.edu/registrar/forms/",
+      "notes": "Counts as a free elective unless a department approves it toward a specific requirement."
+    }
+  ]
+}

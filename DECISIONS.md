@@ -15,6 +15,14 @@ Add an entry whenever the team picks between real options; copy the template bel
 
 ## Entries
 
+### Stack: Python 3.12, uv, FastAPI, SQLite
+
+- Date: 2026-11-13
+- Owner: Midhat Sajad (backend)
+- Decision: Python 3.12, `uv` for env and dependency management, FastAPI for the API, SQLite for storage.
+- Options considered: Package manager: `uv` vs Poetry vs pip+venv. Framework: FastAPI vs Flask vs Django. Database: SQLite vs Postgres vs flat JSON files.
+- Why:  We picked uv for one fast tool covering env, deps, and the lockfile across three people's machines. We picked FastAPI because Pydantic models let us define the course/program schema once and reuse it for API validation and the Data format doc, instead of three separate definitions; its auto-generated docs also help since the team build against our API before it's finished. We picked SQLite because the data loader rebuilds the catalog from scratch each run, and a single file is trivial to wipe and reload, with no server or secrets to manage at this scale.
+
 The first entries are the decisions recorded in our proposal (submitted Fri Nov 6, 2026).
 
 ### What to cut first if we run short
@@ -38,8 +46,8 @@ The first entries are the decisions recorded in our proposal (submitted Fri Nov 
 - Date: 2026-11-06
 - Owner: Midhat Sajad (backend)
 - Decision: The plan validator (prerequisites, credits, requirement overlap) is plain rules code with no LLM, used both by the frontend's broken-prerequisite flags and by the agent's `check_plan` tool.
-- Options considered: <fill in>
-- Why: <fill in>
+- Options considered:  Let the LLM check the plan itself vs. write the validator as plain rules code (prerequisites, credit totals, requirement overlap, transfer credits).
+- Why:  An LLM check can miss or hallucinate a broken prerequisite and give a different answer on the same plan twice. Rules code gives one deterministic answer, and both the frontend's drag-and-drop flag and the agent's check_plan tool can call the exact same function.
 
 ### Model: Sonnet 5.5
 

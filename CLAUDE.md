@@ -13,7 +13,7 @@ The repository is public on GitHub, so nothing private (keys, real student trans
 
 ## Stack
 
-Python. <version, package manager, and web framework, once decided>
+Python 3.12, managed with `uv`. FastAPI for the API (Pydantic models double as the data format schema). SQLite for storage.
 
 ## Commands
 
