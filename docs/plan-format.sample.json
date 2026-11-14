@@ -1,0 +1,68 @@
+{
+  "plan_id": null,
+  "student": {
+    "degree_level": "bachelor",
+    "programs": ["cs-bs-general-track"],
+    "catalog_year": "2026-2027",
+    "completed_courses": [
+      { "code": "MATH111", "credits": 4.0, "term": "transfer", "transfer_from": "Front Range Community College" }
+    ]
+  },
+  "semesters": [
+    {
+      "semester_id": "sem-1",
+      "label": "Fall 2026",
+      "courses": [
+        {
+          "course_id": "sem-1-csci200",
+          "code": "CSCI200",
+          "title": "Computer Science I",
+          "credits": 4.0,
+          "status": "planned"
+        }
+      ],
+      "total_credits": 4.0
+    },
+    {
+      "semester_id": "sem-2",
+      "label": "Spring 2027",
+      "courses": [
+        {
+          "course_id": "sem-2-csci306",
+          "code": "CSCI306",
+          "title": "Algorithms",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-2-csci400",
+          "code": "CSCI400",
+          "title": "Database Management",
+          "credits": 3.0,
+          "status": "planned"
+        }
+      ],
+      "total_credits": 6.0
+    }
+  ],
+  "prerequisite_edges": [
+    { "from": "sem-1-csci200", "to": "sem-2-csci306" },
+    { "from": "sem-2-csci306", "to": "sem-2-csci400" }
+  ],
+  "flags": [
+    {
+      "flag_id": "flag-1",
+      "type": "broken_prerequisite",
+      "severity": "error",
+      "course_id": "sem-2-csci400",
+      "message": "CSCI400 requires CSCI306 and one of MATH201/MATH223 to be completed in an earlier semester. CSCI306 is scheduled in the same semester (Spring 2027), and neither math course is in the plan yet.",
+      "overridable": false,
+      "overridden": false
+    }
+  ],
+  "summary": {
+    "total_credits": 14.0,
+    "total_credits_required": 130,
+    "requirements_met": false
+  }
+}
