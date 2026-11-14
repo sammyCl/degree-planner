@@ -31,7 +31,7 @@ Master plan: [MASTER-PLAN.md](MASTER-PLAN.md). Status marks, priorities and how 
 | Data format | **Common data format**: schema for courses (code, title, credits, description, prerequisites incl. and/or and corequisites), program requirements (required courses, elective groups, credit minimums, catalog year), forms and policies. Written as a short doc plus a sample file; shared with the team | P0 | Nov 13 | Stack decision | [ ] |
 | Plan format | **Plan JSON format**: semesters, courses in each, credits, prerequisite edges, validator flags. Used by the frontend, agent and validator | P0 | Nov 13 | | [ ] |
 | Graduate list | Data: list the master's, combined and PhD programs needed for Examples 2, 3, 5 (EE master's, Mining BS+MS, non-thesis CS master's Project Track) and their combined-credit rules | P0 | Nov 13 | Five examples | [ ] |
-| Stack decision | Lead the stack decision (language version, web framework, database); update CLAUDE.md Stack and Commands sections | P0 | Nov 13 | | [ ] |
+| Stack decision | Lead the stack decision (language version, web framework, database); update CLAUDE.md Stack and Commands sections | P0 | Nov 13 | | [x] |
 
 ### Week 2: Nov 16-20 (first end-to-end)
 
@@ -79,3 +79,4 @@ Never cut Data format, Plan format, Data loader, Lookups, Plan validator and API
 ## Status log
 
 - 2026-11-12: Plan created. Nothing started.
+- 2026-11-13: Stack decision done: Python 3.12, `uv`, FastAPI, SQLite. Recorded in DECISIONS.md and CLAUDE.md's Stack section.
