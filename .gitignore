@@ -4,6 +4,7 @@ __pycache__/
 .pytest_cache/
 .env
 .DS_Store
+*.db
 
 # Private team notes
 p4-notes/

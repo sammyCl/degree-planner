@@ -37,7 +37,7 @@ Master plan: [MASTER-PLAN.md](MASTER-PLAN.md). Status marks, priorities and how 
 
 | Name | Task | Priority | Due | Needs | Status |
 |---|---|---|---|---|---|
-| Backend scaffold | Project scaffold and database set up; one command to start the API; tests run with one command | P0 | Nov 16 | Stack decision | [ ] |
+| Backend scaffold | Project scaffold and database set up; one command to start the API; tests run with one command | P0 | Nov 16 | Stack decision | [x] |
 | Graduate data | Data: collect the master's/combined/PhD programs for the examples into the Data format format | P0 | Nov 18 | Data format, Graduate list | [ ] |
 | Data loader | **Data loader**: one command loads and refreshes all collected data into the database; reports errors per file | P0 | Nov 17 | Data format, Backend scaffold | [ ] |
 | Lookups | Lookups: course -> credits and prerequisites; program (and catalog year) -> required courses and elective groups; forms for a course. Agent tools wrap these | P0 | Nov 17 | Data loader | [ ] |
@@ -82,3 +82,4 @@ Never cut Data format, Plan format, Data loader, Lookups, Plan validator and API
 - 2026-11-13: Stack decision done: Python 3.12, `uv`, FastAPI, SQLite. Recorded in DECISIONS.md and CLAUDE.md's Stack section.
 - 2026-11-13: Data format done: schema doc and sample file at `docs/data-format.md` and `docs/data-format.sample.json` (courses with AND/OR prerequisites, program requirement groups, combined/double-counted credits, forms). Pending push/PR to actually share with the team.
 - 2026-11-13: Plan format done: schema doc and sample file at `docs/plan-format.md` and `docs/plan-format.sample.json` (semesters, per-placement course ids, prerequisite edges, validator flags with override support). Sample includes a deliberately broken prerequisite. Pending push/PR to actually share with the team.
+- 2026-11-13: Backend scaffold done: `backend/` is a uv project (Python 3.12, FastAPI, SQLite). `uv sync` installs, `uv run uvicorn degree_planner_backend.main:app --reload` starts the API, `uv run pytest` runs tests (1 passing, checks the DB connection via `/health`). Commands recorded in CLAUDE.md and README.md. Pending push/PR.

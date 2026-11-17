@@ -17,7 +17,10 @@ Python 3.12, managed with `uv`. FastAPI for the API (Pydantic models double as t
 
 ## Commands
 
-<install, run, test, and eval commands, added once there is code>
+Backend (run from `backend/`):
+- Install: `uv sync`
+- Run the API: `uv run uvicorn degree_planner_backend.main:app --reload`
+- Test: `uv run pytest`
 
 ## Who owns what
 

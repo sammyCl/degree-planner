@@ -46,9 +46,14 @@ All three members share data collection; each also owns one part.
 
 ## How to run it
 
-Requires Python <version>.
+Requires Python 3.12 and [uv](https://docs.astral.sh/uv/).
 
-<install and run steps, added once there is code>
+Backend (from `backend/`):
+```
+uv sync
+uv run uvicorn degree_planner_backend.main:app --reload
+uv run pytest
+```
 
 ## Demo
 
