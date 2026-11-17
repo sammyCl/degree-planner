@@ -22,6 +22,13 @@ Backend (run from `backend/`):
 - Run the API: `uv run uvicorn degree_planner_backend.main:app --reload`
 - Test: `uv run pytest`
 
+Frontend (run from `frontend/`; Node 20 or newer; React + Vite + TypeScript):
+- Install: `npm install`
+- Run the dev server: `npm run dev` (http://localhost:5173; `/api/*` is proxied to the FastAPI backend at 127.0.0.1:8000 with the `/api` prefix removed)
+- Test: `npm test`
+- Type check and build: `npm run build`
+- Lint: `npm run lint`
+
 ## Who owns what
 
 | Part | Owner |

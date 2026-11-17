@@ -1,0 +1,17 @@
+.app {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.status {
+  font-size: 0.9rem;
+}
+
+.status-up {
+  color: #1a7f37;
+}
+
+.status-down {
+  color: #b42318;
+}
