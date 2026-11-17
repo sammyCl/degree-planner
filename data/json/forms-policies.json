@@ -1,0 +1,115 @@
+{
+  "catalog_year": "2026-2027",
+  "forms": [
+    {
+      "form_id": "independent-study-credit",
+      "name": "Independent Study Credit Form",
+      "applies_to": [
+        "any"
+      ],
+      "requires": "signatures of the student, the instructor and the department head; submit to the Registrar's Office",
+      "url": "https://www.mines.edu/registrar/forms/",
+      "notes": "Used for x99 independent study courses (e.g. CSCI499, CSCI599). Submit to the Registrar's Office no later than Census Day (the last day of registration) for the term in which the study is completed; the registrar form (updated 3/25) and the graduate catalog both say this. Expect about 25 contact hours plus 30 hours of independent work per credit hour (1 credit = 55 hours; 3 credits = 165 hours, about 11 hours per week). Graduate students also say whether it duplicates an existing graduate course. The registrar's own title for the form is 'Independent Study Registration Form'. max_credits 6 is per course: every independent study course (x99) in the course CSVs is 0.5-6 or 1-6 credits, and the registrar's hours table stops at 6 credits. No cap on total independent study credits per degree was found in the catalog text; a department may set one.",
+      "max_credits": 6
+    },
+    {
+      "form_id": "double-degree-declaration",
+      "name": "Double Degree Declaration",
+      "applies_to": [
+        "any"
+      ],
+      "requires": "signatures of the student, advisor, department head and Registrar",
+      "url": "https://www.mines.edu/registrar/forms/",
+      "notes": "For a second bachelor's degree: list at least 30 credit hours unique to the second degree. They cannot be free electives or credits counted toward the first degree, any other degree, or a minor."
+    },
+    {
+      "form_id": "transfer-course-approval",
+      "name": "Transfer Course Approval (TCA) Form (Undergraduate)",
+      "applies_to": [
+        "any"
+      ],
+      "requires": "approval for how the course will be applied (free elective, HASS elective, or a specific requirement)",
+      "url": "https://www.mines.edu/registrar/forms/",
+      "notes": "For taking a course at another regionally accredited institution. Not needed for ordinary free-elective transfer courses unless the student is unsure."
+    },
+    {
+      "form_id": "ten-year-course-approval",
+      "name": "10 Year Transfer Course Approval Form (Undergraduate)",
+      "applies_to": [
+        "any"
+      ],
+      "requires": "signatures of the department head of the courses and the department head of the degree program; email to transfer@mines.edu",
+      "url": "https://www.mines.edu/registrar/forms/",
+      "notes": "Courses more than 10 years old before the start of the Mines program cannot transfer unless the academic department reviews and approves them. One form per Mines department."
+    },
+    {
+      "form_id": "decline-ap-ib-transfer-credit",
+      "name": "Decline Credit Form (AP, IB, or Transfer Credit)",
+      "applies_to": [
+        "any"
+      ],
+      "requires": "email to transfer@mines.edu from the student's Mines email",
+      "url": "https://www.mines.edu/registrar/forms/",
+      "notes": "Lets a student decline AP, IB or prior-institution credit, for example to take the Mines course instead."
+    },
+    {
+      "form_id": "graduate-residency-petition",
+      "name": "Graduate Student Petition (Colorado residency for tuition)",
+      "applies_to": [
+        "any"
+      ],
+      "url": "https://www.mines.edu/registrar/forms/",
+      "notes": "About in-state tuition residency, not degree requirements. Kept because it is on the registrar forms page; the agent should not use it for planning."
+    },
+    {
+      "form_id": "minor-declaration",
+      "name": "Minor Declaration Form",
+      "applies_to": [
+        "any"
+      ],
+      "requires": "Registrar's Office approval",
+      "url": "https://www.mines.edu/registrar/forms/",
+      "notes": "No PDF collected; the catalog only says it is available from the Registrar's Office. Submit when applying to graduate; if the minor is added later, by the first day of the graduating term. Minors cannot be added after the BS is posted."
+    },
+    {
+      "form_id": "policy-minor-requirements",
+      "name": "Minimum requirements for every undergraduate minor",
+      "applies_to": [
+        "any"
+      ],
+      "notes": "At least 18 credit hours; at least 9 of them not used for any other part of the degree except free electives; at least 9 at the 300 level or above; at least 2.0 GPA in Mines minor courses (transfer credit not counted); passing grade in each course, unless the minor sets a higher one; no more than half the minor hours may be transferred (AP, IB and other non-Mines credit included) unless the minor has an articulation agreement. A minor cannot have the same name as the student's degree; some degrees exclude certain minors. Source: 2026-2027 undergraduate catalog, Degree Information and Graduation Information."
+    },
+    {
+      "form_id": "policy-second-bachelors",
+      "name": "Two bachelor's degrees",
+      "applies_to": [
+        "any"
+      ],
+      "notes": "Complete all requirements for both degrees; at least 30 credits unique to the second degree (not free electives, not counted toward any other degree or minor, and not counted toward a master's degree). The first degree is the one with fewer total hours. Cannot earn two degrees in the same content area. Courses shared between a bachelor's and a master's follow the combined-degree policy."
+    },
+    {
+      "form_id": "policy-thorson-first-year-honors",
+      "name": "Thorson First-Year Honors (IDEAS)",
+      "applies_to": [
+        "any"
+      ],
+      "notes": "Two-semester sequence HNRS105 (3 credits) and HNRS115 (4 credits, prerequisite HNRS105; HNRS105 needs a C- or better to continue). Replaces the core courses HASS100 (Nature and Human Values) and EDNS151 (Design I) for all majors. Both HNRS courses must be passed; if either is dropped, the student must take HASS100 and EDNS151 (or equivalents) instead. A Thorson-abroad cohort takes a hybrid-online IDEAS in the fall. HNRS105 + HNRS115 total 7 credits while HASS100 + EDNS151 total 6; the catalog text does not say how the extra credit counts, so confirm with the Honors office."
+    },
+    {
+      "form_id": "policy-independent-study-hours",
+      "name": "Independent study hours per credit",
+      "applies_to": [
+        "any"
+      ],
+      "notes": "Each semester credit hour of independent study (x99 course) means about 25 instructor contact hours plus 30 hours of independent work; table in the registration form runs from 1 to 6 credits. A syllabus must exist and be reviewed by the department."
+    },
+    {
+      "form_id": "policy-asi-requirements",
+      "name": "Minimum requirements for every Area of Special Interest (ASI)",
+      "applies_to": [
+        "any"
+      ],
+      "notes": "At least 12 credit hours; at least 9 of them not used for any other part of the degree except free electives; at least 9 at the 300 level or above; at least 2.0 GPA in Mines ASI courses (transfer credit not counted); no more than half the hours may be transferred. Source: 2025-2026 undergraduate catalog, p. 24 (the 2026-2027 catalog site could not be reached). The 18 ASIs found in that catalog are in data/json/asis.json (catalog year 2025-2026). The 2026-2027 minors list has no ASIs and no longer lists some 2025-2026 programs (for example Additive Manufacturing), so ASIs may have been discontinued or moved; confirm in the live 2026-2027 catalog."
+    }
+  ]
+}

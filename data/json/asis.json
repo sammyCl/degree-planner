@@ -1,0 +1,611 @@
+{
+  "programs": [
+    {
+      "program_id": "civil-engineering-asi",
+      "name": "Area of Special Interest in Civil Engineering",
+      "degree_level": "asi",
+      "catalog_year": "2025-2026",
+      "total_credits_required": 12,
+      "requirement_groups": [
+        {
+          "group_id": "required",
+          "label": "CEEN312, CEEN314",
+          "kind": "all",
+          "courses": [
+            "CEEN312",
+            "CEEN314"
+          ]
+        },
+        {
+          "group_id": "electives",
+          "label": "Select two of CEEN301, CEEN331, CEEN360, CEEN381",
+          "kind": "choose_credits",
+          "courses": [
+            "CEEN301",
+            "CEEN331",
+            "CEEN360",
+            "CEEN381"
+          ],
+          "credits_required": 6
+        }
+      ]
+    },
+    {
+      "program_id": "environmental-engineering-asi",
+      "name": "Area of Special Interest in Environmental Engineering",
+      "degree_level": "asi",
+      "catalog_year": "2025-2026",
+      "total_credits_required": 12,
+      "requirement_groups": [
+        {
+          "group_id": "four-of-five",
+          "label": "Complete 4 of the 5 listed courses",
+          "kind": "choose_credits",
+          "courses": [
+            "CEEN301",
+            "CEEN302",
+            "CEEN381",
+            "CEEN470",
+            "CEEN480"
+          ],
+          "credits_required": 12
+        }
+      ]
+    },
+    {
+      "program_id": "economics-asi",
+      "name": "Area of Special Interest in Economics",
+      "degree_level": "asi",
+      "catalog_year": "2025-2026",
+      "total_credits_required": 12,
+      "requirement_groups": [
+        {
+          "group_id": "principles",
+          "label": "EBGN201",
+          "kind": "all",
+          "courses": [
+            "EBGN201"
+          ]
+        },
+        {
+          "group_id": "electives",
+          "label": "Three other EBGN courses (not usable toward the degree except as free electives)",
+          "kind": "choose_credits",
+          "courses": [
+            "EBGN198",
+            "EBGN199",
+            "EBGN201",
+            "EBGN280",
+            "EBGN298",
+            "EBGN299",
+            "EBGN301",
+            "EBGN302",
+            "EBGN303",
+            "EBGN304",
+            "EBGN305",
+            "EBGN307",
+            "EBGN308",
+            "EBGN309",
+            "EBGN310",
+            "EBGN315",
+            "EBGN320",
+            "EBGN321",
+            "EBGN330",
+            "EBGN340",
+            "EBGN345",
+            "EBGN346",
+            "EBGN351",
+            "EBGN360",
+            "EBGN381",
+            "EBGN382",
+            "EBGN397",
+            "EBGN398",
+            "EBGN399",
+            "EBGN403",
+            "EBGN430",
+            "EBGN431",
+            "EBGN434",
+            "EBGN435",
+            "EBGN436",
+            "EBGN437",
+            "EBGN441",
+            "EBGN443",
+            "EBGN447",
+            "EBGN453",
+            "EBGN455",
+            "EBGN458",
+            "EBGN459",
+            "EBGN460",
+            "EBGN461",
+            "EBGN470",
+            "EBGN472",
+            "EBGN474",
+            "EBGN477",
+            "EBGN485",
+            "EBGN490",
+            "EBGN495",
+            "EBGN497",
+            "EBGN498",
+            "EBGN499"
+          ],
+          "credits_required": 9
+        }
+      ]
+    },
+    {
+      "program_id": "entrepreneurship-asi",
+      "name": "Area of Special Interest in Entrepreneurship",
+      "degree_level": "asi",
+      "catalog_year": "2025-2026",
+      "total_credits_required": 12,
+      "requirement_groups": [
+        {
+          "group_id": "required",
+          "label": "EBGN201, EBGN360, EBGN460",
+          "kind": "all",
+          "courses": [
+            "EBGN201",
+            "EBGN360",
+            "EBGN460"
+          ]
+        },
+        {
+          "group_id": "one-more",
+          "label": "One of EBGN280, EBGN304, EBGN321, EBGN345, EBGN346, EBGN485",
+          "kind": "choose_credits",
+          "courses": [
+            "EBGN280",
+            "EBGN304",
+            "EBGN321",
+            "EBGN345",
+            "EBGN346",
+            "EBGN485"
+          ],
+          "credits_required": 3
+        }
+      ]
+    },
+    {
+      "program_id": "humanitarian-engineering-asi",
+      "name": "Area of Special Interest in Humanitarian Engineering",
+      "degree_level": "asi",
+      "catalog_year": "2025-2026",
+      "total_credits_required": 12,
+      "requirement_groups": [
+        {
+          "group_id": "intro",
+          "label": "EDNS315",
+          "kind": "all",
+          "courses": [
+            "EDNS315"
+          ]
+        },
+        {
+          "group_id": "one-of",
+          "label": "One of EDNS301, EDNS401, EDNS430",
+          "kind": "choose_credits",
+          "courses": [
+            "EDNS301",
+            "EDNS401",
+            "EDNS430"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "two-of",
+          "label": "Two of EDNS477, EDNS478, EDNS479, EDNS480, HASS425, CEEN493",
+          "kind": "choose_credits",
+          "courses": [
+            "EDNS477",
+            "EDNS478",
+            "EDNS479",
+            "EDNS480",
+            "HASS425",
+            "CEEN493"
+          ],
+          "credits_required": 6
+        }
+      ]
+    },
+    {
+      "program_id": "electrical-engineering-asi",
+      "name": "Area of Special Interest in Electrical Engineering",
+      "degree_level": "asi",
+      "catalog_year": "2025-2026",
+      "total_credits_required": 12,
+      "requirement_groups": [
+        {
+          "group_id": "circuits",
+          "label": "EENG281 or PHGN215",
+          "kind": "choose_credits",
+          "courses": [
+            "EENG281",
+            "PHGN215"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "controls",
+          "label": "EENG307",
+          "kind": "all",
+          "courses": [
+            "EENG307"
+          ]
+        },
+        {
+          "group_id": "eeng-electives",
+          "label": "6 credits of any EENG course at the 300 or 400 level",
+          "kind": "choose_credits",
+          "courses": [
+            "EENG307",
+            "EENG310",
+            "EENG311",
+            "EENG340",
+            "EENG350",
+            "EENG383",
+            "EENG385",
+            "EENG386",
+            "EENG389",
+            "EENG391",
+            "EENG393",
+            "EENG394",
+            "EENG395",
+            "EENG398",
+            "EENG399",
+            "EENG411",
+            "EENG415",
+            "EENG417",
+            "EENG421",
+            "EENG423",
+            "EENG424",
+            "EENG425",
+            "EENG427",
+            "EENG428",
+            "EENG430",
+            "EENG433",
+            "EENG437",
+            "EENG470",
+            "EENG475",
+            "EENG480",
+            "EENG484",
+            "EENG495",
+            "EENG497",
+            "EENG498",
+            "EENG499"
+          ],
+          "credits_required": 6
+        }
+      ]
+    },
+    {
+      "program_id": "aerospace-engineering-asi",
+      "name": "Area of Special Interest in Aerospace Engineering",
+      "degree_level": "asi",
+      "catalog_year": "2025-2026",
+      "total_credits_required": 12,
+      "requirement_groups": [
+        {
+          "group_id": "choose-12",
+          "label": "At least 12 credits from MEGN451, MEGN471, MEGN414, MEGN453",
+          "kind": "choose_credits",
+          "courses": [
+            "MEGN451",
+            "MEGN471",
+            "MEGN414",
+            "MEGN453"
+          ],
+          "credits_required": 12
+        }
+      ]
+    },
+    {
+      "program_id": "mechanical-engineering-asi",
+      "name": "Area of Special Interest in Mechanical Engineering",
+      "degree_level": "asi",
+      "catalog_year": "2025-2026",
+      "total_credits_required": 12,
+      "requirement_groups": [
+        {
+          "group_id": "required",
+          "label": "MEGN212, MEGN261, MEGN315, MEGN351",
+          "kind": "all",
+          "courses": [
+            "MEGN212",
+            "MEGN261",
+            "MEGN315",
+            "MEGN351"
+          ]
+        }
+      ]
+    },
+    {
+      "program_id": "additive-manufacturing-asi",
+      "name": "Area of Special Interest in Additive Manufacturing",
+      "degree_level": "asi",
+      "catalog_year": "2025-2026",
+      "total_credits_required": 12,
+      "requirement_groups": [
+        {
+          "group_id": "required",
+          "label": "AMFG401",
+          "kind": "all",
+          "courses": [
+            "AMFG401"
+          ]
+        },
+        {
+          "group_id": "electives",
+          "label": "9 credits of electives from Table 1 (AMFG531, AMFG511, FEGN526 need program director approval)",
+          "kind": "choose_credits",
+          "courses": [
+            "MEGN381",
+            "MEGN412",
+            "AMFG421",
+            "AMFG531",
+            "AMFG498",
+            "AMFG511",
+            "FEGN525",
+            "FEGN526"
+          ],
+          "credits_required": 9
+        }
+      ]
+    },
+    {
+      "program_id": "energy-asi",
+      "name": "Area of Special Interest in Energy",
+      "degree_level": "asi",
+      "catalog_year": "2025-2026",
+      "total_credits_required": 12,
+      "requirement_groups": [
+        {
+          "group_id": "required",
+          "label": "ENGY200, EBGN330",
+          "kind": "all",
+          "courses": [
+            "ENGY200",
+            "EBGN330"
+          ]
+        },
+        {
+          "group_id": "energy-courses",
+          "label": "Two additional energy-related courses",
+          "kind": "choose_credits",
+          "courses": [
+            "EBGN310",
+            "EBGN340",
+            "HASS419",
+            "HASS464",
+            "PEGN430",
+            "CBEN469",
+            "MTGN469",
+            "MEGN469",
+            "CBEN472",
+            "EENG389",
+            "ENGY497",
+            "ENGY498",
+            "GEOL315",
+            "ENGY340",
+            "NUGN506",
+            "NUGN510",
+            "ENGY320",
+            "ENGY350",
+            "CEEN493",
+            "CHGN311",
+            "EENG475",
+            "EENG589",
+            "PHGN419",
+            "PEGN201",
+            "ENGY310",
+            "CBEN480",
+            "MNGN438",
+            "PEGN251",
+            "PEGN305",
+            "PEGN308",
+            "PEGN450"
+          ],
+          "credits_required": 6
+        }
+      ]
+    },
+    {
+      "program_id": "space-and-planetary-science-and-engineering-asi",
+      "name": "Area of Special Interest in Space and Planetary Science and Engineering",
+      "degree_level": "asi",
+      "catalog_year": "2025-2026",
+      "total_credits_required": 12,
+      "requirement_groups": [
+        {
+          "group_id": "approved-courses",
+          "label": "12 credits from the SPSE-approved list (or other courses approved by the SPSE ASI advisor)",
+          "kind": "choose_credits",
+          "courses": [
+            "EDNS251",
+            "EDNS491",
+            "EDNS492",
+            "GEGN469",
+            "GEOL410",
+            "GPGN438",
+            "GPGN470",
+            "PHGN418",
+            "PHGN324",
+            "PHGN423",
+            "PHGN471",
+            "PHGN481",
+            "PHGN472",
+            "PHGN482",
+            "MEGN451",
+            "MEGN453",
+            "MEGN454",
+            "MEGN452",
+            "MEGN456",
+            "MEGN455"
+          ],
+          "credits_required": 12
+        }
+      ]
+    },
+    {
+      "program_id": "underground-construction-and-tunneling-asi",
+      "name": "Area of Special Interest in Underground Construction and Tunneling",
+      "degree_level": "asi",
+      "catalog_year": "2025-2026",
+      "total_credits_required": 12,
+      "requirement_groups": [
+        {
+          "group_id": "required",
+          "label": "CEEN312, MNGN321, MNGN404",
+          "kind": "all",
+          "courses": [
+            "CEEN312",
+            "MNGN321",
+            "MNGN404"
+          ]
+        },
+        {
+          "group_id": "elective",
+          "label": "One elective course from the minor's elective list",
+          "kind": "choose_credits",
+          "courses": [
+            "CEEN314",
+            "CEEN301",
+            "CEEN331",
+            "CEEN360",
+            "CEEN381",
+            "CEEN302",
+            "CEEN470",
+            "CEEN480",
+            "CEEN406",
+            "CEEN430",
+            "CEEN433",
+            "CEEN442",
+            "CEEN443",
+            "CEEN445",
+            "CEEN449",
+            "CEEN310",
+            "EBGN321",
+            "CHGN311",
+            "CHGN403",
+            "CHGN409",
+            "CHGN441",
+            "CHGN445",
+            "CHGN462",
+            "CHGN495",
+            "CBEN304",
+            "CBEN305",
+            "CBEN311",
+            "CBEN320",
+            "CBEN321",
+            "CBEN322",
+            "CBEN411",
+            "CBEN431",
+            "CHGN111",
+            "CHGN121",
+            "CHGN122",
+            "CHGN125",
+            "EBGN345",
+            "EBGN308",
+            "EBGN309",
+            "EBGN381",
+            "EBGN303",
+            "EBGN382",
+            "EBGN453",
+            "EBGN490",
+            "EBGN485"
+          ],
+          "credits_required": 3
+        }
+      ]
+    },
+    {
+      "program_id": "geological-engineering-asi",
+      "name": "Area of Special Interest in Geological Engineering",
+      "degree_level": "asi",
+      "catalog_year": "2025-2026",
+      "total_credits_required": 12,
+      "requirement_groups": [
+        {
+          "group_id": "approved-sequence",
+          "label": "12 credits in a sequence approved by the Geology and Geological Engineering department",
+          "kind": "choose_credits",
+          "credits_required": 12
+        }
+      ]
+    },
+    {
+      "program_id": "chemistry-asi",
+      "name": "Area of Special Interest in Chemistry",
+      "degree_level": "asi",
+      "catalog_year": "2025-2026",
+      "total_credits_required": 12,
+      "requirement_groups": [
+        {
+          "group_id": "approved-sequence",
+          "label": "12 credits designed with and approved by the Chemistry department",
+          "kind": "choose_credits",
+          "credits_required": 12
+        }
+      ]
+    },
+    {
+      "program_id": "polymer-chemistry-asi",
+      "name": "Area of Special Interest in Polymer Chemistry",
+      "degree_level": "asi",
+      "catalog_year": "2025-2026",
+      "total_credits_required": 12,
+      "requirement_groups": [
+        {
+          "group_id": "approved-sequence",
+          "label": "12 credits designed with and approved by the Chemistry department",
+          "kind": "choose_credits",
+          "credits_required": 12
+        }
+      ]
+    },
+    {
+      "program_id": "environmental-chemistry-asi",
+      "name": "Area of Special Interest in Environmental Chemistry",
+      "degree_level": "asi",
+      "catalog_year": "2025-2026",
+      "total_credits_required": 12,
+      "requirement_groups": [
+        {
+          "group_id": "approved-sequence",
+          "label": "12 credits designed with and approved by the Chemistry department",
+          "kind": "choose_credits",
+          "credits_required": 12
+        }
+      ]
+    },
+    {
+      "program_id": "biochemistry-asi",
+      "name": "Area of Special Interest in Biochemistry",
+      "degree_level": "asi",
+      "catalog_year": "2025-2026",
+      "total_credits_required": 12,
+      "requirement_groups": [
+        {
+          "group_id": "approved-sequence",
+          "label": "12 credits designed with and approved by the Chemistry department",
+          "kind": "choose_credits",
+          "credits_required": 12
+        }
+      ]
+    },
+    {
+      "program_id": "music-technology-asi",
+      "name": "Area of Special Interest in Music Technology",
+      "degree_level": "asi",
+      "catalog_year": "2025-2026",
+      "total_credits_required": 12,
+      "requirement_groups": [
+        {
+          "group_id": "approved-sequence",
+          "label": "12 credits of music technology courses; course list not published, confirm with the program advisor",
+          "kind": "choose_credits",
+          "credits_required": 12
+        }
+      ]
+    }
+  ]
+}

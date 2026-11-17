@@ -31,14 +31,14 @@ Until Plan format and API endpoints land, build against a hand-written sample pl
 |---|---|---|---|---|---|
 | UI mockup | UI mockup of both pages (setup, planner with chat panel) and review with team | P0 | Nov 13 | | [ ] |
 | Sample plan | Sample plan JSON (one degree, a few semesters, a deliberate broken prerequisite) to develop against; swap for the real format once Plan format exists | P0 | Nov 13 | | [ ] |
-| Minors list | Data: list which minors, ASIs, certifications and forms are needed for the five examples (CS minor, Geophysical Engineering minor, Independent Study Credit form, Thorson's honors program notes) | P0 | Nov 13 | Five examples | [ ] |
+| Minors list | Data: list which minors, ASIs, certifications and forms are needed for the five examples (CS minor, Geophysical Engineering minor, Independent Study Credit form, Thorson's honors program notes) | P0 | Nov 13 | Five examples | [x] |
 | Stack decision | Join the stack decision (frontend framework, how it talks to the backend) | P0 | Nov 13 | | [ ] |
 
 ### Week 2: Nov 16-20 (first end-to-end)
 
 | Name | Task | Priority | Due | Needs | Status |
 |---|---|---|---|---|---|
-| Minors data | Data: collect the minors/ASIs/forms for the five examples into the agreed format | P0 | Nov 18 | Data format, Minors list | [ ] |
+| Minors data | Data: collect the minors/ASIs/forms for the five examples into the agreed format | P0 | Nov 18 | Data format, Minors list | [x] |
 | Frontend scaffold | Project scaffold in the repo, running locally, with run command added to CLAUDE.md and README | P0 | Nov 16 | Stack decision | [ ] |
 | Setup page | Page 1, setup form: degree level, major, optional minor/ASI, start year, number of semesters; validates inputs | P0 | Nov 17 | Frontend scaffold | [ ] |
 | Planner page | Page 2, planner: semester columns with course boxes (title, credits, description), electives shown, prerequisite arrows, rendering from sample plan JSON | P0 | Nov 18 | Sample plan, Frontend scaffold | [ ] |
@@ -84,3 +84,4 @@ Never cut Setup page, Planner page, Connect setup to backend: they are the core 
 ## Status log
 
 - 2026-11-12: Plan created. Nothing started.
+- 2026-11-17: Minors list and Minors data done (Abdallah says done; data and tests show it). Minors, ASIs, forms and policies collected under data/ and converted to JSON (data/json/); conflicts and decisions in data/CONFLICT-LOG.md. Open: ASIs are from the 2025-2026 catalog, confirm for 2026-2027; course codes missing from the CSV for Samantha to check.

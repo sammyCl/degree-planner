@@ -1,0 +1,2577 @@
+{
+  "programs": [
+    {
+      "program_id": "aerospace-engineering-minor",
+      "name": "Minor in Aerospace Engineering",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "choose-six",
+          "label": "Choose 6 of the listed courses (not for Mechanical Engineering Aerospace Track students)",
+          "kind": "choose_credits",
+          "courses": [
+            "MEGN412",
+            "MEGN416",
+            "MEGN451",
+            "MEGN461",
+            "MEGN414",
+            "MEGN423",
+            "MEGN523",
+            "MEGN452",
+            "MEGN453",
+            "MEGN454",
+            "MEGN554",
+            "MEGN455",
+            "MEGN456",
+            "MEGN553",
+            "FEGN525"
+          ],
+          "credits_required": 18
+        }
+      ]
+    },
+    {
+      "program_id": "applied-mathematics-and-statistics-ams-minor",
+      "name": "Minor in Applied Mathematics and Statistics (AMS)",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "stats",
+          "label": "MATH201",
+          "kind": "all",
+          "courses": [
+            "MATH201"
+          ]
+        },
+        {
+          "group_id": "diff-eq",
+          "label": "MATH225 or MATH235 (honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "MATH225",
+            "MATH235"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "lin-alg",
+          "label": "MATH332 or MATH342 (honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "MATH332",
+            "MATH342"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "math-400",
+          "label": "At least 3 credits in a MATH course at the 400 level or above",
+          "kind": "choose_credits",
+          "courses": [
+            "MATH408",
+            "MATH431",
+            "MATH432",
+            "MATH433",
+            "MATH436",
+            "MATH437",
+            "MATH438",
+            "MATH439",
+            "MATH440",
+            "MATH443",
+            "MATH454",
+            "MATH455",
+            "MATH457",
+            "MATH458",
+            "MATH459",
+            "MATH470",
+            "MATH472",
+            "MATH482",
+            "MATH484",
+            "MATH491",
+            "MATH498",
+            "MATH499",
+            "MATH500",
+            "MATH501",
+            "MATH503",
+            "MATH506",
+            "MATH510",
+            "MATH514",
+            "MATH515",
+            "MATH530",
+            "MATH531",
+            "MATH532",
+            "MATH533",
+            "MATH534",
+            "MATH535",
+            "MATH536",
+            "MATH537",
+            "MATH538",
+            "MATH539",
+            "MATH540",
+            "MATH543",
+            "MATH547",
+            "MATH550",
+            "MATH551",
+            "MATH552",
+            "MATH557",
+            "MATH559",
+            "MATH560",
+            "MATH561",
+            "MATH570",
+            "MATH572",
+            "MATH582",
+            "MATH588",
+            "MATH589",
+            "MATH598",
+            "MATH599",
+            "MATH691",
+            "MATH692",
+            "MATH693",
+            "MATH698",
+            "MATH699",
+            "MATH707"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "math-300",
+          "label": "6 more credits: MATH courses at the 300 level or above, or the listed CSCI courses",
+          "kind": "choose_credits",
+          "courses": [
+            "MATH300",
+            "MATH301",
+            "MATH307",
+            "MATH310",
+            "MATH324",
+            "MATH332",
+            "MATH334",
+            "MATH335",
+            "MATH342",
+            "MATH398",
+            "MATH399",
+            "MATH408",
+            "MATH431",
+            "MATH432",
+            "MATH433",
+            "MATH436",
+            "MATH437",
+            "MATH438",
+            "MATH439",
+            "MATH440",
+            "MATH443",
+            "MATH454",
+            "MATH455",
+            "MATH457",
+            "MATH458",
+            "MATH459",
+            "MATH470",
+            "MATH472",
+            "MATH482",
+            "MATH484",
+            "MATH491",
+            "MATH498",
+            "MATH499",
+            "MATH500",
+            "MATH501",
+            "MATH503",
+            "MATH506",
+            "MATH510",
+            "MATH514",
+            "MATH515",
+            "MATH530",
+            "MATH531",
+            "MATH532",
+            "MATH533",
+            "MATH534",
+            "MATH535",
+            "MATH536",
+            "MATH537",
+            "MATH538",
+            "MATH539",
+            "MATH540",
+            "MATH543",
+            "MATH547",
+            "MATH550",
+            "MATH551",
+            "MATH552",
+            "MATH557",
+            "MATH559",
+            "MATH560",
+            "MATH561",
+            "MATH570",
+            "MATH572",
+            "MATH582",
+            "MATH588",
+            "MATH589",
+            "MATH598",
+            "MATH599",
+            "MATH691",
+            "MATH692",
+            "MATH693",
+            "MATH698",
+            "MATH699",
+            "MATH707",
+            "CSCI303",
+            "CSCI406",
+            "CSCI441",
+            "CSCI444",
+            "CSCI470",
+            "CSCI474"
+          ],
+          "credits_required": 6
+        }
+      ]
+    },
+    {
+      "program_id": "biology-minor",
+      "name": "Minor in Biology",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "required",
+          "label": "CBEN110, CBEN120",
+          "kind": "all",
+          "courses": [
+            "CBEN110",
+            "CBEN120"
+          ]
+        },
+        {
+          "group_id": "electives",
+          "label": "10 credits of biology electives (special topics may be approved case by case)",
+          "kind": "choose_credits",
+          "courses": [
+            "BIOL300",
+            "BIOL301",
+            "BIOL499",
+            "CBEN304",
+            "CBEN311",
+            "CBEN320",
+            "CBEN321",
+            "CBEN322",
+            "CBEN324",
+            "CBEN411",
+            "CBEN412",
+            "CBEN413",
+            "CBEN431",
+            "CEEN460",
+            "CEEN461",
+            "CHGN409",
+            "CHGN428",
+            "CHGN429",
+            "CHGN441",
+            "CHGN462",
+            "CSCI303",
+            "MATH431",
+            "MEGN330",
+            "MTGN472"
+          ],
+          "credits_required": 10
+        }
+      ]
+    },
+    {
+      "program_id": "biomechanical-engineering-minor",
+      "name": "Minor in Biomechanical Engineering",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "required",
+          "label": "CBEN110, MEGN330",
+          "kind": "all",
+          "courses": [
+            "CBEN110",
+            "MEGN330"
+          ]
+        },
+        {
+          "group_id": "electives",
+          "label": "Electives from the list (at least 11 credits)",
+          "kind": "choose_credits",
+          "courses": [
+            "MEGN430",
+            "MEGN435",
+            "MEGN535",
+            "MEGN532",
+            "MEGN536",
+            "MEGN553",
+            "MTGN472",
+            "MTGN572",
+            "MTGN570",
+            "CBEN311",
+            "CBEN304",
+            "CBEN305",
+            "CBEN320",
+            "CBEN454",
+            "CBEN554",
+            "MATH431",
+            "PHGN433",
+            "CBEN120"
+          ],
+          "credits_required": 11
+        }
+      ]
+    },
+    {
+      "program_id": "biomedical-engineering-bme-minor",
+      "name": "Minor in Biomedical Engineering (BME)",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "required",
+          "label": "CBEN110, CBEN120, CBEN310",
+          "kind": "all",
+          "courses": [
+            "CBEN110",
+            "CBEN120",
+            "CBEN310"
+          ]
+        },
+        {
+          "group_id": "engineering-elective",
+          "label": "At least 3 credits of engineering electives related to BME",
+          "kind": "choose_credits",
+          "courses": [
+            "BIOL300",
+            "CBEN360",
+            "CBEN413",
+            "CBEN432",
+            "CBEN470",
+            "CBEN555",
+            "CSCI478",
+            "MATH472",
+            "MEGN330",
+            "MEGN430",
+            "MEGN435",
+            "MEGN535",
+            "MTGN472",
+            "MEGN532"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "more-electives",
+          "label": "At least 4 more credits from the engineering and additional lists",
+          "kind": "choose_credits",
+          "courses": [
+            "BIOL300",
+            "CBEN304",
+            "CBEN305",
+            "CBEN311",
+            "CBEN320",
+            "CBEN321",
+            "CBEN322",
+            "CBEN331",
+            "CBEN360",
+            "CBEN411",
+            "CBEN412",
+            "CBEN413",
+            "CBEN431",
+            "CBEN432",
+            "CBEN454",
+            "CBEN470",
+            "CBEN531",
+            "CBEN554",
+            "CBEN555",
+            "CHGN409",
+            "CHGN428",
+            "CHGN429",
+            "CHGN431",
+            "CHGN441",
+            "CHGN462",
+            "CSCI478",
+            "MATH431",
+            "MATH472",
+            "MEGN330",
+            "MEGN430",
+            "MEGN435",
+            "MEGN532",
+            "MEGN535",
+            "MTGN472",
+            "MTGN572",
+            "PHGN433"
+          ],
+          "credits_required": 4
+        }
+      ]
+    },
+    {
+      "program_id": "business-minor",
+      "name": "Minor in Business",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "required",
+          "label": "EBGN321",
+          "kind": "all",
+          "courses": [
+            "EBGN321"
+          ]
+        },
+        {
+          "group_id": "choose-five",
+          "label": "Select 5 of the listed EBGN courses",
+          "kind": "choose_credits",
+          "courses": [
+            "EBGN201",
+            "EBGN280",
+            "EBGN305",
+            "EBGN307",
+            "EBGN308",
+            "EBGN309",
+            "EBGN315",
+            "EBGN345",
+            "EBGN346",
+            "EBGN351",
+            "EBGN360",
+            "EBGN453",
+            "EBGN477"
+          ],
+          "credits_required": 15
+        }
+      ]
+    },
+    {
+      "program_id": "chemistry-minor",
+      "name": "Minor in Chemistry",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "approved-sequence",
+          "label": "18 credits designed with and approved by the Chemistry department",
+          "kind": "choose_credits",
+          "credits_required": 18
+        }
+      ]
+    },
+    {
+      "program_id": "computer-engineering-minor",
+      "name": "Minor in Computer Engineering",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "choose-18",
+          "label": "At least 18 credits from the list",
+          "kind": "choose_credits",
+          "courses": [
+            "CSCI200",
+            "CSCI210",
+            "CSCI220",
+            "CSCI341",
+            "CSCI442",
+            "EENG281",
+            "EENG282",
+            "EENG284",
+            "EENG383"
+          ],
+          "credits_required": 18
+        }
+      ]
+    },
+    {
+      "program_id": "computer-science-minor",
+      "name": "Minor in Computer Science",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "CSCI200, CSCI210, CSCI220",
+          "kind": "all",
+          "courses": [
+            "CSCI200",
+            "CSCI210",
+            "CSCI220"
+          ]
+        },
+        {
+          "group_id": "discrete-or-probability",
+          "label": "CSCI358 or MATH334",
+          "kind": "choose_credits",
+          "courses": [
+            "CSCI358",
+            "MATH334"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "software-eng-or-elective",
+          "label": "CSCI306, or a CSCI elective",
+          "kind": "choose_credits",
+          "courses": [
+            "CSCI306",
+            "CSCI400",
+            "CSCI403",
+            "CSCI404",
+            "CSCI406",
+            "CSCI410",
+            "CSCI413",
+            "CSCI421",
+            "CSCI422",
+            "CSCI423",
+            "CSCI425",
+            "CSCI432",
+            "CSCI436",
+            "CSCI437",
+            "CSCI440",
+            "CSCI441",
+            "CSCI442",
+            "CSCI443",
+            "CSCI444",
+            "CSCI445",
+            "CSCI446",
+            "CSCI448",
+            "CSCI455",
+            "CSCI456",
+            "CSCI460",
+            "CSCI470",
+            "CSCI471",
+            "CSCI473",
+            "CSCI474",
+            "CSCI475",
+            "CSCI476",
+            "CSCI477",
+            "CSCI478",
+            "CSCI480",
+            "CSCI490",
+            "CSCI498",
+            "CSCI499",
+            "CSCI500",
+            "CSCI507",
+            "CSCI508",
+            "CSCI519",
+            "CSCI520",
+            "CSCI521",
+            "CSCI532",
+            "CSCI533",
+            "CSCI534",
+            "CSCI536",
+            "CSCI537",
+            "CSCI538",
+            "CSCI542",
+            "CSCI544",
+            "CSCI555",
+            "CSCI560",
+            "CSCI561",
+            "CSCI562",
+            "CSCI563",
+            "CSCI564",
+            "CSCI565",
+            "CSCI568",
+            "CSCI571",
+            "CSCI572",
+            "CSCI573",
+            "CSCI574",
+            "CSCI575",
+            "CSCI576",
+            "CSCI577",
+            "CSCI578",
+            "CSCI580",
+            "CSCI581",
+            "CSCI582",
+            "CSCI583",
+            "CSCI584",
+            "CSCI585",
+            "CSCI587",
+            "CSCI588",
+            "CSCI597",
+            "CSCI598",
+            "CSCI599",
+            "CSCI691",
+            "CSCI698",
+            "CSCI699",
+            "CSCI700",
+            "CSCI707",
+            "MATH307",
+            "EENG383"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "csci-elective",
+          "label": "CSCI elective: any 400/500-level CSCI course, MATH307, or EENG383",
+          "kind": "choose_credits",
+          "courses": [
+            "CSCI400",
+            "CSCI403",
+            "CSCI404",
+            "CSCI406",
+            "CSCI410",
+            "CSCI413",
+            "CSCI421",
+            "CSCI422",
+            "CSCI423",
+            "CSCI425",
+            "CSCI432",
+            "CSCI436",
+            "CSCI437",
+            "CSCI440",
+            "CSCI441",
+            "CSCI442",
+            "CSCI443",
+            "CSCI444",
+            "CSCI445",
+            "CSCI446",
+            "CSCI448",
+            "CSCI455",
+            "CSCI456",
+            "CSCI460",
+            "CSCI470",
+            "CSCI471",
+            "CSCI473",
+            "CSCI474",
+            "CSCI475",
+            "CSCI476",
+            "CSCI477",
+            "CSCI478",
+            "CSCI480",
+            "CSCI490",
+            "CSCI498",
+            "CSCI499",
+            "CSCI500",
+            "CSCI507",
+            "CSCI508",
+            "CSCI519",
+            "CSCI520",
+            "CSCI521",
+            "CSCI532",
+            "CSCI533",
+            "CSCI534",
+            "CSCI536",
+            "CSCI537",
+            "CSCI538",
+            "CSCI542",
+            "CSCI544",
+            "CSCI555",
+            "CSCI560",
+            "CSCI561",
+            "CSCI562",
+            "CSCI563",
+            "CSCI564",
+            "CSCI565",
+            "CSCI568",
+            "CSCI571",
+            "CSCI572",
+            "CSCI573",
+            "CSCI574",
+            "CSCI575",
+            "CSCI576",
+            "CSCI577",
+            "CSCI578",
+            "CSCI580",
+            "CSCI581",
+            "CSCI582",
+            "CSCI583",
+            "CSCI584",
+            "CSCI585",
+            "CSCI587",
+            "CSCI588",
+            "CSCI597",
+            "CSCI598",
+            "CSCI599",
+            "CSCI691",
+            "CSCI698",
+            "CSCI699",
+            "CSCI700",
+            "CSCI707",
+            "MATH307",
+            "EENG383"
+          ],
+          "credits_required": 3
+        }
+      ]
+    },
+    {
+      "program_id": "culture-creativity-and-communication-minor",
+      "name": "Minor in Culture, Creativity, and Communication",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "upper",
+          "label": "At least two 400-level courses",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS400",
+            "HASS401",
+            "HASS404",
+            "HASS406",
+            "HASS407",
+            "HASS408",
+            "HASS410",
+            "HASS411",
+            "HASS412",
+            "HASS415",
+            "HASS416",
+            "HASS418",
+            "HASS419",
+            "HASS423",
+            "HASS425"
+          ],
+          "credits_required": 6
+        },
+        {
+          "group_id": "rest",
+          "label": "12 more credits from the midlevel and 400-level lists, with an advisor",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS300",
+            "HASS301",
+            "HASS302",
+            "HASS305",
+            "HASS307",
+            "HASS309",
+            "HASS320",
+            "HASS323",
+            "HASS400",
+            "HASS401",
+            "HASS404",
+            "HASS406",
+            "HASS407",
+            "HASS408",
+            "HASS410",
+            "HASS411",
+            "HASS412",
+            "HASS415",
+            "HASS416",
+            "HASS418",
+            "HASS419",
+            "HASS423",
+            "HASS425"
+          ],
+          "credits_required": 12
+        }
+      ]
+    },
+    {
+      "program_id": "data-science-minor-option-1",
+      "name": "Minor in Data Science (option 1)",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "CSCI200, CSCI220, CSCI413, MATH201",
+          "kind": "all",
+          "courses": [
+            "CSCI200",
+            "CSCI220",
+            "CSCI413",
+            "MATH201"
+          ]
+        },
+        {
+          "group_id": "choose-two",
+          "label": "Choose 2 of CSCI403, CSCI404, CSCI470, CSCI478",
+          "kind": "choose_credits",
+          "courses": [
+            "CSCI403",
+            "CSCI404",
+            "CSCI470",
+            "CSCI478"
+          ],
+          "credits_required": 6
+        }
+      ]
+    },
+    {
+      "program_id": "data-science-minor-option-2",
+      "name": "Minor in Data Science (option 2)",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "CSCI200, CSCI220, CSCI413, MATH201, MATH334, MATH335",
+          "kind": "all",
+          "courses": [
+            "CSCI200",
+            "CSCI220",
+            "CSCI413",
+            "MATH201",
+            "MATH334",
+            "MATH335"
+          ]
+        }
+      ]
+    },
+    {
+      "program_id": "economics-minor",
+      "name": "Minor in Economics",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "principles",
+          "label": "EBGN201",
+          "kind": "all",
+          "courses": [
+            "EBGN201"
+          ]
+        },
+        {
+          "group_id": "intermediate",
+          "label": "EBGN301 or EBGN302",
+          "kind": "choose_credits",
+          "courses": [
+            "EBGN301",
+            "EBGN302"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "electives",
+          "label": "Four more EBGN courses",
+          "kind": "choose_credits",
+          "courses": [
+            "EBGN198",
+            "EBGN199",
+            "EBGN201",
+            "EBGN280",
+            "EBGN298",
+            "EBGN299",
+            "EBGN301",
+            "EBGN302",
+            "EBGN303",
+            "EBGN304",
+            "EBGN305",
+            "EBGN307",
+            "EBGN308",
+            "EBGN309",
+            "EBGN310",
+            "EBGN315",
+            "EBGN320",
+            "EBGN321",
+            "EBGN330",
+            "EBGN340",
+            "EBGN345",
+            "EBGN346",
+            "EBGN351",
+            "EBGN360",
+            "EBGN381",
+            "EBGN382",
+            "EBGN397",
+            "EBGN398",
+            "EBGN399",
+            "EBGN403",
+            "EBGN430",
+            "EBGN431",
+            "EBGN434",
+            "EBGN435",
+            "EBGN436",
+            "EBGN437",
+            "EBGN441",
+            "EBGN443",
+            "EBGN447",
+            "EBGN453",
+            "EBGN455",
+            "EBGN458",
+            "EBGN459",
+            "EBGN460",
+            "EBGN461",
+            "EBGN470",
+            "EBGN472",
+            "EBGN474",
+            "EBGN477",
+            "EBGN485",
+            "EBGN490",
+            "EBGN495",
+            "EBGN497",
+            "EBGN498",
+            "EBGN499"
+          ],
+          "credits_required": 12
+        }
+      ]
+    },
+    {
+      "program_id": "electrical-engineering-minor-iss-track",
+      "name": "Minor in Electrical Engineering (Information Systems and Science (ISS) track)",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Information Systems and Science track",
+          "kind": "all",
+          "courses": [
+            "EENG281",
+            "EENG282",
+            "EENG307",
+            "EENG284",
+            "EENG310",
+            "EENG311",
+            "EENG391"
+          ]
+        }
+      ]
+    },
+    {
+      "program_id": "electrical-engineering-minor-pes-track",
+      "name": "Minor in Electrical Engineering (Power and Energy Systems (PES) track)",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Power and Energy Systems track",
+          "kind": "all",
+          "courses": [
+            "EENG281",
+            "EENG282",
+            "EENG307",
+            "EENG385",
+            "EENG386",
+            "EENG389"
+          ]
+        }
+      ]
+    },
+    {
+      "program_id": "electrical-engineering-minor-ice-track",
+      "name": "Minor in Electrical Engineering (Integrated Circuits and Electronics (ICE) track)",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Integrated Circuits and Electronics track",
+          "kind": "all",
+          "courses": [
+            "EENG281",
+            "EENG307",
+            "EENG284",
+            "EENG383"
+          ]
+        },
+        {
+          "group_id": "lab",
+          "label": "EENG282, or MEGN300",
+          "kind": "choose_credits",
+          "courses": [
+            "EENG282",
+            "MEGN300"
+          ],
+          "credits_required": 1
+        },
+        {
+          "group_id": "device",
+          "label": "EENG421 or EENG423",
+          "kind": "choose_credits",
+          "courses": [
+            "EENG421",
+            "EENG423"
+          ],
+          "credits_required": 3
+        }
+      ]
+    },
+    {
+      "program_id": "electrical-engineering-minor-general-track",
+      "name": "Minor in Electrical Engineering (General Electrical Engineering track)",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 19,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "General Electrical Engineering track",
+          "kind": "all",
+          "courses": [
+            "EENG281",
+            "EENG307",
+            "EENG284",
+            "EENG310",
+            "EENG385",
+            "EENG391"
+          ]
+        },
+        {
+          "group_id": "lab",
+          "label": "EENG282, or MEGN300",
+          "kind": "choose_credits",
+          "courses": [
+            "EENG282",
+            "MEGN300"
+          ],
+          "credits_required": 1
+        }
+      ]
+    },
+    {
+      "program_id": "energy-minor",
+      "name": "Minor in Energy",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "required",
+          "label": "EBGN330",
+          "kind": "all",
+          "courses": [
+            "EBGN330"
+          ]
+        },
+        {
+          "group_id": "policy",
+          "label": "At least one policy course: HASS490 or HASS491",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS490",
+            "HASS491"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "electives",
+          "label": "Remaining electives from the energy lists",
+          "kind": "choose_credits",
+          "courses": [
+            "EBGN310",
+            "EBGN340",
+            "HASS419",
+            "HASS464",
+            "PEGN430",
+            "EBGN430",
+            "ENGY200",
+            "CBEN469",
+            "MTGN469",
+            "MEGN469",
+            "CBEN472",
+            "EENG389",
+            "ENGY497",
+            "ENGY498",
+            "GEOL315",
+            "ENGY340",
+            "ENGY475",
+            "NUGN506",
+            "NUGN510",
+            "ENGY320",
+            "ENGY350",
+            "CEEN493",
+            "CHGN311",
+            "EENG475",
+            "EENG589",
+            "PHGN419",
+            "PEGN201",
+            "ENGY310",
+            "CBEN480",
+            "MNGN438",
+            "PEGN251",
+            "PEGN305",
+            "PEGN308",
+            "PEGN450"
+          ],
+          "credits_required": 12
+        }
+      ]
+    },
+    {
+      "program_id": "engineering-physics-minor",
+      "name": "Minor in Engineering Physics",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "required",
+          "label": "PHGN200",
+          "kind": "all",
+          "courses": [
+            "PHGN200"
+          ]
+        },
+        {
+          "group_id": "modern-physics",
+          "label": "PHGN300 or PHGN310 (honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "PHGN300",
+            "PHGN310"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "electives",
+          "label": "Select at least 11 credits from the list",
+          "kind": "choose_credits",
+          "courses": [
+            "PHGN215",
+            "PHGN315",
+            "PHGN317",
+            "PHGN324",
+            "PHGN326",
+            "PHGN384",
+            "PHGN399",
+            "PHGN417",
+            "PHGN419",
+            "PHGN422",
+            "PHGN424",
+            "PHGN433",
+            "PHGN435",
+            "PHGN466"
+          ],
+          "credits_required": 11
+        }
+      ]
+    },
+    {
+      "program_id": "environment-and-sustainability-studies-minor",
+      "name": "Minor in Environment and Sustainability Studies",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "hass",
+          "label": "At least three HASS courses (one at 400 level)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS323",
+            "HASS412",
+            "HASS421",
+            "HASS464",
+            "HASS419",
+            "HASS423",
+            "HASS427",
+            "HASS448",
+            "HASS460",
+            "HASS467",
+            "HASS468",
+            "HASS484",
+            "HASS487",
+            "HASS488",
+            "HASS490",
+            "HASS491"
+          ],
+          "credits_required": 9
+        },
+        {
+          "group_id": "cas-more",
+          "label": "Two more CAS courses from the HASS, EBGN, EDNS, GEOC and PEGN lists",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS323",
+            "HASS412",
+            "HASS421",
+            "HASS464",
+            "HASS419",
+            "HASS423",
+            "HASS427",
+            "HASS448",
+            "HASS460",
+            "HASS467",
+            "HASS468",
+            "HASS484",
+            "HASS487",
+            "HASS488",
+            "HASS490",
+            "HASS491",
+            "EBGN310",
+            "EBGN330",
+            "EBGN340",
+            "EBGN434",
+            "EBGN435",
+            "EBGN470",
+            "EDNS315",
+            "EDNS430",
+            "EDNS477",
+            "EDNS478",
+            "GEOC407",
+            "GEOC408",
+            "PEGN430"
+          ],
+          "credits_required": 6
+        },
+        {
+          "group_id": "stem",
+          "label": "One restricted environmental science and engineering elective",
+          "kind": "choose_credits",
+          "courses": [
+            "CBEN469",
+            "CEEN301",
+            "CEEN302",
+            "CEEN303",
+            "CEEN381",
+            "CEEN401",
+            "CEEN460",
+            "CEEN461",
+            "CEEN472",
+            "CEEN475",
+            "CEEN480",
+            "CEEN482",
+            "CEEN492",
+            "ENGY320",
+            "ENGY340",
+            "PHGN419"
+          ],
+          "credits_required": 3
+        }
+      ]
+    },
+    {
+      "program_id": "explosive-engineering-minor",
+      "name": "Minor in Explosive Engineering",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "required",
+          "label": "MNGN333, MNGN407, MNGN444",
+          "kind": "all",
+          "courses": [
+            "MNGN333",
+            "MNGN407",
+            "MNGN444"
+          ]
+        },
+        {
+          "group_id": "electives",
+          "label": "At least three courses from the list",
+          "kind": "choose_credits",
+          "courses": [
+            "MNGN210",
+            "MNGN308",
+            "MNGN309",
+            "MNGN312",
+            "MNGN314",
+            "MNGN316",
+            "MNGN321",
+            "MNGN404",
+            "MNGN405",
+            "MNGN406",
+            "MNGN408",
+            "MNGN499"
+          ],
+          "credits_required": 9
+        }
+      ]
+    },
+    {
+      "program_id": "geological-engineering-minor",
+      "name": "Minor in Geological Engineering",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "approved-sequence",
+          "label": "18 credits in a sequence approved by the Geology and Geological Engineering department",
+          "kind": "choose_credits",
+          "credits_required": 18
+        }
+      ]
+    },
+    {
+      "program_id": "geophysics-geophysical-engineering-minor",
+      "name": "Minor in Geophysics/Geophysical Engineering",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "GPGN229, GPGN328, GPGN329, GPGN318, GPGN319",
+          "kind": "all",
+          "courses": [
+            "GPGN229",
+            "GPGN328",
+            "GPGN329",
+            "GPGN318",
+            "GPGN319"
+          ]
+        },
+        {
+          "group_id": "approved-elective",
+          "label": "3 credits in geophysics, geology, math or computer science; the Geophysics department must approve it",
+          "kind": "choose_credits",
+          "credits_required": 3
+        }
+      ]
+    },
+    {
+      "program_id": "global-politics-and-society-minor",
+      "name": "Minor in Global Politics and Society",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "required",
+          "label": "HASS460 or HASS344",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS460",
+            "HASS344"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "electives",
+          "label": "Remaining 15 credits from the elective lists",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS339",
+            "HASS411",
+            "HASS437",
+            "HASS439",
+            "HASS307",
+            "HASS431",
+            "HASS490",
+            "HASS486",
+            "HASS488",
+            "HASS491",
+            "LIFL113",
+            "LIFL115",
+            "LIFL119",
+            "LIFL123",
+            "LIFL125",
+            "LIFL129",
+            "LIFL213"
+          ],
+          "credits_required": 15
+        }
+      ]
+    },
+    {
+      "program_id": "guy-t-mcbride-jr-honors-program-in-public-affairs-minor",
+      "name": "Minor in Guy T. McBride, Jr. Honors Program in Public Affairs",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 21,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "HNRS305, HNRS315",
+          "kind": "all",
+          "courses": [
+            "HNRS305",
+            "HNRS315"
+          ]
+        },
+        {
+          "group_id": "practicum",
+          "label": "HNRS405 McBride Practicum (3 credits)",
+          "kind": "choose_credits",
+          "courses": [
+            "HNRS405"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "electives",
+          "label": "12 credits of honors electives",
+          "kind": "choose_credits",
+          "courses": [
+            "HNRS425",
+            "HNRS430",
+            "HNRS435",
+            "HNRS440",
+            "HNRS445",
+            "HNRS450",
+            "HNRS398",
+            "HNRS498",
+            "HNRS499"
+          ],
+          "credits_required": 12
+        }
+      ]
+    },
+    {
+      "program_id": "humanitarian-engineering-minor",
+      "name": "Minor in Humanitarian Engineering",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "introductory",
+          "label": "EDNS315, EDNS430, EDNS477, EDNS479",
+          "kind": "all",
+          "courses": [
+            "EDNS315",
+            "EDNS430",
+            "EDNS477",
+            "EDNS479"
+          ]
+        },
+        {
+          "group_id": "cas",
+          "label": "One CAS elective",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS419",
+            "HASS425",
+            "HASS427",
+            "HASS468",
+            "HASS490",
+            "HNRS405",
+            "HNRS425",
+            "HNRS430",
+            "HNRS435",
+            "HNRS440",
+            "HNRS445",
+            "HNRS450",
+            "HNRS455",
+            "HNRS476",
+            "HNRS496",
+            "HNRS497",
+            "HNRS498",
+            "HNRS499"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "elective",
+          "label": "One elective from the list",
+          "kind": "choose_credits",
+          "courses": [
+            "EDNS401",
+            "PEGN430",
+            "CEEN401",
+            "CEEN472",
+            "CEEN493",
+            "CEEN479",
+            "CEEN475",
+            "CEEN556",
+            "MNGN470",
+            "EBGN340"
+          ],
+          "credits_required": 3
+        }
+      ]
+    },
+    {
+      "program_id": "individualized-minor-in-humanities-arts-and-social-sciences",
+      "name": "Individualized Minor in Humanities, Arts, and Social Sciences",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "approved-rationale",
+          "label": "18 restricted-elective HASS credits approved by a HASS faculty advisor",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "HASS101",
+            "HASS110",
+            "HASS111",
+            "HASS125",
+            "HASS198",
+            "HASS199",
+            "HASS200",
+            "HASS202",
+            "HASS215",
+            "HASS220",
+            "HASS226",
+            "HASS227",
+            "HASS298",
+            "HASS299",
+            "HASS300",
+            "HASS301",
+            "HASS302",
+            "HASS305",
+            "HASS307",
+            "HASS309",
+            "HASS314",
+            "HASS315",
+            "HASS316",
+            "HASS317",
+            "HASS318",
+            "HASS319",
+            "HASS320",
+            "HASS323",
+            "HASS324",
+            "HASS326",
+            "HASS327",
+            "HASS328",
+            "HASS329",
+            "HASS330",
+            "HASS339",
+            "HASS344",
+            "HASS360",
+            "HASS365",
+            "HASS366",
+            "HASS370",
+            "HASS372",
+            "HASS376",
+            "HASS398",
+            "HASS399",
+            "HASS400",
+            "HASS401",
+            "HASS404",
+            "HASS406",
+            "HASS407",
+            "HASS408",
+            "HASS410",
+            "HASS411",
+            "HASS412",
+            "HASS413",
+            "HASS415",
+            "HASS416",
+            "HASS417",
+            "HASS418",
+            "HASS419",
+            "HASS420",
+            "HASS421",
+            "HASS422",
+            "HASS423",
+            "HASS425",
+            "HASS427",
+            "HASS429",
+            "HASS430",
+            "HASS431",
+            "HASS432",
+            "HASS435",
+            "HASS437",
+            "HASS439",
+            "HASS441",
+            "HASS448",
+            "HASS460",
+            "HASS461",
+            "HASS462",
+            "HASS463",
+            "HASS464",
+            "HASS465",
+            "HASS466",
+            "HASS467",
+            "HASS468",
+            "HASS469",
+            "HASS470",
+            "HASS482",
+            "HASS483",
+            "HASS484",
+            "HASS485",
+            "HASS486",
+            "HASS487",
+            "HASS488",
+            "HASS490",
+            "HASS491",
+            "HASS498",
+            "HASS499"
+          ],
+          "credits_required": 18
+        }
+      ]
+    },
+    {
+      "program_id": "mechanical-engineering-minor-robotics-automation-design-track",
+      "name": "Minor in Mechanical Engineering (Robotics, Automation and Design track)",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "required",
+          "label": "Choose three of MEGN212, MEGN261, MEGN315, MEGN351",
+          "kind": "choose_credits",
+          "courses": [
+            "MEGN212",
+            "MEGN261",
+            "MEGN315",
+            "MEGN351"
+          ],
+          "credits_required": 9
+        },
+        {
+          "group_id": "track",
+          "label": "MEGN324, MEGN441",
+          "kind": "all",
+          "courses": [
+            "MEGN324",
+            "MEGN441"
+          ]
+        },
+        {
+          "group_id": "track-choice",
+          "label": "MEGN481, or MEGN416, or MEGN485",
+          "kind": "choose_credits",
+          "courses": [
+            "MEGN481",
+            "MEGN416",
+            "MEGN485"
+          ],
+          "credits_required": 3
+        }
+      ]
+    },
+    {
+      "program_id": "mechanical-engineering-minor-solid-materials-track",
+      "name": "Minor in Mechanical Engineering (Solid Materials track)",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "required",
+          "label": "Choose three of MEGN212, MEGN261, MEGN315, MEGN351",
+          "kind": "choose_credits",
+          "courses": [
+            "MEGN212",
+            "MEGN261",
+            "MEGN315",
+            "MEGN351"
+          ],
+          "credits_required": 9
+        },
+        {
+          "group_id": "track",
+          "label": "MEGN324, MEGN412",
+          "kind": "all",
+          "courses": [
+            "MEGN324",
+            "MEGN412"
+          ]
+        },
+        {
+          "group_id": "track-choice",
+          "label": "MEGN416 or MEGN481",
+          "kind": "choose_credits",
+          "courses": [
+            "MEGN416",
+            "MEGN481"
+          ],
+          "credits_required": 3
+        }
+      ]
+    },
+    {
+      "program_id": "mechanical-engineering-minor-thermal-fluids-track",
+      "name": "Minor in Mechanical Engineering (Thermal-Fluids track)",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "required",
+          "label": "Choose three of MEGN212, MEGN261, MEGN315, MEGN351",
+          "kind": "choose_credits",
+          "courses": [
+            "MEGN212",
+            "MEGN261",
+            "MEGN315",
+            "MEGN351"
+          ],
+          "credits_required": 9
+        },
+        {
+          "group_id": "track",
+          "label": "MEGN451, MEGN461, MEGN471",
+          "kind": "all",
+          "courses": [
+            "MEGN451",
+            "MEGN461",
+            "MEGN471"
+          ]
+        }
+      ]
+    },
+    {
+      "program_id": "metallurgical-and-materials-engineering-minor",
+      "name": "Minor in Metallurgical and Materials Engineering",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "sequence",
+          "label": "18 credits of MTGN courses in a logical sequence (recommended list in the catalog)",
+          "kind": "choose_credits",
+          "courses": [
+            "MTGN198",
+            "MTGN199",
+            "MTGN202",
+            "MTGN211",
+            "MTGN219",
+            "MTGN251",
+            "MTGN272",
+            "MTGN281",
+            "MTGN298",
+            "MTGN299",
+            "MTGN300",
+            "MTGN310",
+            "MTGN315",
+            "MTGN319",
+            "MTGN333",
+            "MTGN334",
+            "MTGN340",
+            "MTGN345",
+            "MTGN348",
+            "MTGN348L",
+            "MTGN350",
+            "MTGN352",
+            "MTGN398",
+            "MTGN399",
+            "MTGN403",
+            "MTGN410",
+            "MTGN414",
+            "MTGN419",
+            "MTGN429",
+            "MTGN430",
+            "MTGN431",
+            "MTGN432",
+            "MTGN435",
+            "MTGN440",
+            "MTGN441",
+            "MTGN442",
+            "MTGN445",
+            "MTGN445L",
+            "MTGN451",
+            "MTGN456",
+            "MTGN457",
+            "MTGN461",
+            "MTGN462",
+            "MTGN464",
+            "MTGN465",
+            "MTGN467",
+            "MTGN468",
+            "MTGN469",
+            "MTGN472",
+            "MTGN473",
+            "MTGN475",
+            "MTGN480",
+            "MTGN497",
+            "MTGN498",
+            "MTGN499"
+          ],
+          "credits_required": 18
+        }
+      ]
+    },
+    {
+      "program_id": "mineral-processing-extractive-metallurgy-mpem-minor",
+      "name": "Minor in Mineral Processing & Extractive Metallurgy (MPEM)",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "required",
+          "label": "MNGN210, MNGN322, MNGN323",
+          "kind": "all",
+          "courses": [
+            "MNGN210",
+            "MNGN322",
+            "MNGN323"
+          ]
+        },
+        {
+          "group_id": "electives",
+          "label": "At least three courses from the list",
+          "kind": "choose_credits",
+          "courses": [
+            "MNGN426",
+            "MNGN432",
+            "MNGN452",
+            "MNGN461",
+            "MNGN462"
+          ],
+          "credits_required": 9
+        }
+      ]
+    },
+    {
+      "program_id": "mining-engineering-minor",
+      "name": "Minor in Mining Engineering",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "required",
+          "label": "MNGN210",
+          "kind": "all",
+          "courses": [
+            "MNGN210"
+          ]
+        },
+        {
+          "group_id": "select-two",
+          "label": "Select two of MNGN312, MNGN314, MNGN316",
+          "kind": "choose_credits",
+          "courses": [
+            "MNGN312",
+            "MNGN314",
+            "MNGN316"
+          ],
+          "credits_required": 6
+        },
+        {
+          "group_id": "other-mining",
+          "label": "Other mining engineering courses (list kept by the department office)",
+          "kind": "choose_credits",
+          "courses": [
+            "MNGN198",
+            "MNGN199",
+            "MNGN203",
+            "MNGN205",
+            "MNGN209",
+            "MNGN210",
+            "MNGN298",
+            "MNGN299",
+            "MNGN301",
+            "MNGN308",
+            "MNGN309",
+            "MNGN310",
+            "MNGN311",
+            "MNGN312",
+            "MNGN314",
+            "MNGN316",
+            "MNGN317",
+            "MNGN318",
+            "MNGN320",
+            "MNGN321",
+            "MNGN322",
+            "MNGN323",
+            "MNGN333",
+            "MNGN335",
+            "MNGN340",
+            "MNGN350",
+            "MNGN398",
+            "MNGN399",
+            "MNGN404",
+            "MNGN405",
+            "MNGN406",
+            "MNGN407",
+            "MNGN408",
+            "MNGN412",
+            "MNGN414",
+            "MNGN418",
+            "MNGN421",
+            "MNGN422",
+            "MNGN423",
+            "MNGN425",
+            "MNGN426",
+            "MNGN427",
+            "MNGN428",
+            "MNGN429",
+            "MNGN430",
+            "MNGN431",
+            "MNGN432",
+            "MNGN433",
+            "MNGN436",
+            "MNGN438",
+            "MNGN440",
+            "MNGN444",
+            "MNGN445",
+            "MNGN452",
+            "MNGN460",
+            "MNGN461",
+            "MNGN462",
+            "MNGN470",
+            "MNGN482",
+            "MNGN490",
+            "MNGN498",
+            "MNGN499"
+          ],
+          "credits_required": 9
+        }
+      ]
+    },
+    {
+      "program_id": "music-audio-engineering-and-the-recording-arts-minor",
+      "name": "Minor in Music, Audio Engineering, and the Recording Arts",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "required",
+          "label": "Audio/acoustical engineering, music technology, western music traditions, music technology capstone",
+          "kind": "all",
+          "courses": [
+            "HASS324",
+            "HASS327",
+            "HASS315",
+            "HASS330"
+          ]
+        },
+        {
+          "group_id": "recording-seminar",
+          "label": "One 400-level required course (PDF says LAIS422 Real World Recording Seminar; resolved to HASS429, see CONFLICT-LOG)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS429"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "additional",
+          "label": "3 more credits: HASS326 Music Theory or Performance Enhancement",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS326"
+          ],
+          "credits_required": 3
+        }
+      ]
+    },
+    {
+      "program_id": "operations-research-minor",
+      "name": "Minor in Operations Research",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "deterministic",
+          "label": "At least one deterministic modeling course",
+          "kind": "choose_credits",
+          "courses": [
+            "MATH332",
+            "CSCI220",
+            "CSCI404",
+            "CSCI406",
+            "EENG307",
+            "EENG417",
+            "MEGN485",
+            "MEGN486",
+            "MEGN487",
+            "MEGN488"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "stochastic",
+          "label": "At least one stochastic modeling course",
+          "kind": "choose_credits",
+          "courses": [
+            "MATH332",
+            "CSCI220",
+            "CSCI404",
+            "CSCI406",
+            "EENG307",
+            "EENG417",
+            "MEGN485",
+            "MEGN486",
+            "MEGN487",
+            "MEGN488",
+            "CSCI423",
+            "MTGN350",
+            "EBGN458",
+            "EBGN461",
+            "EBGN528",
+            "MATH324",
+            "MATH438",
+            "MNGN438",
+            "PEGN438"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "remaining",
+          "label": "12 more credits from any of the three lists (at most one survey course)",
+          "kind": "choose_credits",
+          "courses": [
+            "MATH332",
+            "CSCI220",
+            "CSCI404",
+            "CSCI406",
+            "EENG307",
+            "EENG417",
+            "MEGN485",
+            "MEGN486",
+            "MEGN487",
+            "MEGN488",
+            "MATH332",
+            "CSCI220",
+            "CSCI404",
+            "CSCI406",
+            "EENG307",
+            "EENG417",
+            "MEGN485",
+            "MEGN486",
+            "MEGN487",
+            "MEGN488",
+            "CSCI423",
+            "MTGN350",
+            "EBGN458",
+            "EBGN461",
+            "EBGN528",
+            "MATH324",
+            "MATH438",
+            "MNGN438",
+            "PEGN438",
+            "MATH332",
+            "CSCI220",
+            "CSCI404",
+            "CSCI406",
+            "EENG307",
+            "EENG417",
+            "MEGN485",
+            "MEGN486",
+            "MEGN487",
+            "MEGN488",
+            "CSCI423",
+            "MTGN350",
+            "EBGN458",
+            "EBGN461",
+            "EBGN528",
+            "MATH324",
+            "MATH438",
+            "MNGN438",
+            "PEGN438",
+            "EBGN381",
+            "EBGN382",
+            "EBGN459",
+            "MNGN433"
+          ],
+          "credits_required": 12
+        }
+      ]
+    },
+    {
+      "program_id": "petroleum-data-analytics-minor",
+      "name": "Minor in Petroleum Data Analytics",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "required",
+          "label": "MATH201, CSCI128, CSCI303, PEGN440, PEGN438",
+          "kind": "all",
+          "courses": [
+            "MATH201",
+            "CSCI128",
+            "CSCI303",
+            "PEGN440",
+            "PEGN438"
+          ]
+        },
+        {
+          "group_id": "technical-elective",
+          "label": "One 3-credit technical elective",
+          "kind": "choose_credits",
+          "courses": [
+            "EBGN461",
+            "GEGN475",
+            "MATH334"
+          ],
+          "credits_required": 3
+        }
+      ]
+    },
+    {
+      "program_id": "petroleum-engineering-minor",
+      "name": "Minor in Petroleum Engineering",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "required",
+          "label": "PEGN201, PEGN308",
+          "kind": "all",
+          "courses": [
+            "PEGN201",
+            "PEGN308"
+          ]
+        },
+        {
+          "group_id": "pegn",
+          "label": "12 more credits of PEGN courses (sequence approved by the department)",
+          "kind": "choose_credits",
+          "courses": [
+            "PEGN198",
+            "PEGN199",
+            "PEGN201",
+            "PEGN251",
+            "PEGN282",
+            "PEGN298",
+            "PEGN299",
+            "PEGN305",
+            "PEGN308",
+            "PEGN311",
+            "PEGN312",
+            "PEGN315",
+            "PEGN316",
+            "PEGN340",
+            "PEGN350",
+            "PEGN361",
+            "PEGN382",
+            "PEGN398",
+            "PEGN399",
+            "PEGN411",
+            "PEGN414",
+            "PEGN419",
+            "PEGN422",
+            "PEGN423",
+            "PEGN424",
+            "PEGN426",
+            "PEGN428",
+            "PEGN430",
+            "PEGN438",
+            "PEGN439",
+            "PEGN440",
+            "PEGN450",
+            "PEGN460",
+            "PEGN461",
+            "PEGN462",
+            "PEGN463",
+            "PEGN481",
+            "PEGN482",
+            "PEGN490",
+            "PEGN497",
+            "PEGN498",
+            "PEGN499"
+          ],
+          "credits_required": 12
+        }
+      ]
+    },
+    {
+      "program_id": "physics-minor",
+      "name": "Minor in Physics",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "required",
+          "label": "PHGN200, MATH332, PHGN311",
+          "kind": "all",
+          "courses": [
+            "PHGN200",
+            "MATH332",
+            "PHGN311"
+          ]
+        },
+        {
+          "group_id": "modern-physics",
+          "label": "PHGN300 or PHGN310 (honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "PHGN300",
+            "PHGN310"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "electives",
+          "label": "Select at least 5 credits from the list",
+          "kind": "choose_credits",
+          "courses": [
+            "PHGN320",
+            "PHGN341",
+            "PHGN350",
+            "PHGN361",
+            "PHGN418",
+            "PHGN423",
+            "PHGN440",
+            "PHGN450"
+          ],
+          "credits_required": 5
+        }
+      ]
+    },
+    {
+      "program_id": "quantum-engineering-minor",
+      "name": "Minor in Quantum Engineering",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "linear-algebra",
+          "label": "MATH342 (honors) or MATH332",
+          "kind": "choose_credits",
+          "courses": [
+            "MATH342",
+            "MATH332"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "core-three",
+          "label": "Three of the quantum core courses",
+          "kind": "choose_credits",
+          "courses": [
+            "CSCI481",
+            "CSCI581",
+            "EENG432",
+            "EENG532",
+            "PHGN441",
+            "PHGN435",
+            "PHGN417",
+            "PHGN519"
+          ],
+          "credits_required": 9
+        },
+        {
+          "group_id": "specialization",
+          "label": "Two more courses from the core or the specialization list",
+          "kind": "choose_credits",
+          "courses": [
+            "CSCI423",
+            "CSCI440",
+            "CSCI470",
+            "CSCI474",
+            "CSCI481",
+            "CSCI581",
+            "EENG307",
+            "EENG383",
+            "EENG385",
+            "EENG411",
+            "EENG421",
+            "EENG428",
+            "EENG430",
+            "EENG432",
+            "EENG532",
+            "MATH436",
+            "MATH438",
+            "MATH454",
+            "MATH458",
+            "MTGN211",
+            "MTGN315",
+            "MTGN350",
+            "MTGN352",
+            "MTGN456",
+            "MTGN473",
+            "PHGN417",
+            "PHGN435",
+            "PHGN440",
+            "PHGN441",
+            "PHGN466",
+            "PHGN480",
+            "PHGN519"
+          ],
+          "credits_required": 6
+        }
+      ]
+    },
+    {
+      "program_id": "robotics-and-intelligent-systems-minor",
+      "name": "Minor in Robotics and Intelligent Systems",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "CSCI200, CSCI220, MATH334, MEGN441",
+          "kind": "all",
+          "courses": [
+            "CSCI200",
+            "CSCI220",
+            "MATH334",
+            "MEGN441"
+          ]
+        },
+        {
+          "group_id": "ai-vision-ml",
+          "label": "one of CSCI404, CSCI437, CSCI470",
+          "kind": "choose_credits",
+          "courses": [
+            "CSCI404",
+            "CSCI437",
+            "CSCI470"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "robot-programming",
+          "label": "one of CSCI473, CSCI436, CSCI534",
+          "kind": "choose_credits",
+          "courses": [
+            "CSCI473",
+            "CSCI436",
+            "CSCI534"
+          ],
+          "credits_required": 3
+        }
+      ]
+    },
+    {
+      "program_id": "space-mining-minor",
+      "name": "Minor in Space Mining",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "required",
+          "label": "MNGN210, GEOL410, SPRS401",
+          "kind": "all",
+          "courses": [
+            "MNGN210",
+            "GEOL410",
+            "SPRS401"
+          ]
+        },
+        {
+          "group_id": "electives",
+          "label": "At least three courses from the list",
+          "kind": "choose_credits",
+          "courses": [
+            "EBGN310",
+            "EBGN321",
+            "EDNS430",
+            "GEGN403",
+            "GEOL470",
+            "MNGN312",
+            "MNGN321",
+            "MNGN322",
+            "MNGN333",
+            "MNGN335",
+            "MNGN407",
+            "MNGN427",
+            "MTGN461",
+            "MTGN462",
+            "MNGN470",
+            "MNGN498",
+            "MNGN502",
+            "MNGN567",
+            "MNGN570",
+            "MEGN441"
+          ],
+          "credits_required": 9
+        }
+      ]
+    },
+    {
+      "program_id": "structural-engineering-minor",
+      "name": "Minor in Structural Engineering",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "required",
+          "label": "CEEN314",
+          "kind": "all",
+          "courses": [
+            "CEEN314"
+          ]
+        },
+        {
+          "group_id": "electives",
+          "label": "Select five of the seven listed courses",
+          "kind": "choose_credits",
+          "courses": [
+            "CEEN406",
+            "CEEN430",
+            "CEEN433",
+            "CEEN442",
+            "CEEN443",
+            "CEEN445",
+            "CEEN449"
+          ],
+          "credits_required": 15
+        }
+      ]
+    },
+    {
+      "program_id": "teaching-minor",
+      "name": "Minor in Teaching",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "required",
+          "label": "SCED262, SCED333, SCED363",
+          "kind": "all",
+          "courses": [
+            "SCED262",
+            "SCED333",
+            "SCED363"
+          ]
+        },
+        {
+          "group_id": "capstone",
+          "label": "One of SCED464, MAED464, CSED464",
+          "kind": "choose_credits",
+          "courses": [
+            "SCED464",
+            "MAED464",
+            "CSED464"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "practices",
+          "label": "One practices course",
+          "kind": "choose_credits",
+          "courses": [
+            "MAED405",
+            "SCED415",
+            "CSED430"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "techniques",
+          "label": "One teaching techniques course",
+          "kind": "choose_credits",
+          "courses": [
+            "SCED445",
+            "MAED425",
+            "CSED435"
+          ],
+          "credits_required": 3
+        }
+      ]
+    },
+    {
+      "program_id": "teaching-minor-with-licensure",
+      "name": "Minor in Teaching with Licensure",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 24,
+      "requirement_groups": [
+        {
+          "group_id": "required",
+          "label": "SCED262, SCED333, SCED363",
+          "kind": "all",
+          "courses": [
+            "SCED262",
+            "SCED333",
+            "SCED363"
+          ]
+        },
+        {
+          "group_id": "capstone-1",
+          "label": "One of SCED464, MAED464, CSED464",
+          "kind": "choose_credits",
+          "courses": [
+            "SCED464",
+            "MAED464",
+            "CSED464"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "capstone-2",
+          "label": "One of SCED465, MAED465, CSED465 (6 credits)",
+          "kind": "choose_credits",
+          "courses": [
+            "SCED465",
+            "MAED465",
+            "CSED465"
+          ],
+          "credits_required": 6
+        },
+        {
+          "group_id": "practices",
+          "label": "One practices course",
+          "kind": "choose_credits",
+          "courses": [
+            "MAED405",
+            "SCED415",
+            "CSED430"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "techniques",
+          "label": "One teaching techniques course",
+          "kind": "choose_credits",
+          "courses": [
+            "SCED445",
+            "MAED425",
+            "CSED435"
+          ],
+          "credits_required": 3
+        }
+      ]
+    },
+    {
+      "program_id": "underground-construction-and-tunneling-minor",
+      "name": "Minor in Underground Construction and Tunneling",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "required",
+          "label": "CEEN312, MNGN321, MNGN404",
+          "kind": "all",
+          "courses": [
+            "CEEN312",
+            "MNGN321",
+            "MNGN404"
+          ]
+        },
+        {
+          "group_id": "electives",
+          "label": "9 credits from the elective list",
+          "kind": "choose_credits",
+          "courses": [
+            "CEEN314",
+            "CEEN320",
+            "CEEN350",
+            "CEEN499",
+            "GEGN466",
+            "GEGN468",
+            "GEGN473",
+            "GEGN499",
+            "MNGN314",
+            "MNGN499"
+          ],
+          "credits_required": 9
+        }
+      ]
+    },
+    {
+      "program_id": "water-sustainability-minor",
+      "name": "Minor in Water Sustainability",
+      "degree_level": "minor",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 18,
+      "requirement_groups": [
+        {
+          "group_id": "required",
+          "label": "CEEN301, CEEN310, CEEN381, CEEN470",
+          "kind": "all",
+          "courses": [
+            "CEEN301",
+            "CEEN310",
+            "CEEN381",
+            "CEEN470"
+          ]
+        },
+        {
+          "group_id": "electives",
+          "label": "Two of the listed elective courses",
+          "kind": "choose_credits",
+          "courses": [
+            "CEEN472",
+            "CEEN475",
+            "CEEN478",
+            "CEEN480",
+            "CEEN482"
+          ],
+          "credits_required": 6
+        }
+      ]
+    }
+  ]
+}
