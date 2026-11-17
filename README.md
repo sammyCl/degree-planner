@@ -55,6 +55,14 @@ uv run uvicorn degree_planner_backend.main:app --reload
 uv run pytest
 ```
 
+Frontend (from `frontend/`; needs Node 20 or newer):
+```
+npm install
+npm run dev      # http://localhost:5173, forwards /api to the backend on port 8000
+npm test
+npm run build
+```
+
 ## Demo
 
 <link to the recorded demo>
