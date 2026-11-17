@@ -6,7 +6,12 @@ requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.115",
     "uvicorn[standard]>=0.32",
+    "pydantic>=2.9",
+    "pypdf>=7.1.0",
 ]
+
+[project.scripts]
+load-data = "degree_planner_backend.data_loader:main"
 
 [dependency-groups]
 dev = [

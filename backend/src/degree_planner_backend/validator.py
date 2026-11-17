@@ -1,0 +1,213 @@
+"""Plan validator (docs/plan-format.md): rules code, no LLM.
+
+Checks prerequisite order, credit totals, program requirements, double-counted
+credits, and claimed exceptions. Returns a new Plan with `prerequisite_edges`,
+`flags`, and `summary` filled in. Used by the frontend's drag-and-drop check and
+by the agent's `check_plan` tool.
+"""
+
+from __future__ import annotations
+
+import sqlite3
+
+from degree_planner_backend.lookups import NotFoundError, get_course, get_program
+from degree_planner_backend.models import Program, Requirement
+from degree_planner_backend.plan_models import Edge, Flag, FlagSeverity, FlagType, Plan, Semester, Summary
+
+
+def _resolve(requirement: Requirement | None, satisfied_codes: set[str]) -> bool:
+    if requirement is None:
+        return True
+    if requirement.type == "course":
+        return requirement.code in satisfied_codes
+    if requirement.type == "exception":
+        return True
+    if requirement.type == "AND":
+        return all(_resolve(sub, satisfied_codes) for sub in requirement.of)
+    return any(_resolve(sub, satisfied_codes) for sub in requirement.of)  # OR
+
+
+def _describe(requirement: Requirement) -> str:
+    if requirement.type == "course":
+        return requirement.code
+    if requirement.type == "exception":
+        return f"an exception ({requirement.label})"
+    if requirement.type == "AND":
+        return " and ".join(_describe(sub) for sub in requirement.of)
+    return "(" + " or ".join(_describe(sub) for sub in requirement.of) + ")"
+
+
+def _course_codes(requirement: Requirement | None) -> list[str]:
+    if requirement is None or requirement.type == "exception":
+        return []
+    if requirement.type == "course":
+        return [requirement.code]
+    return [code for sub in requirement.of for code in _course_codes(sub)]
+
+
+def _exception_labels(requirement: Requirement | None) -> list[str]:
+    if requirement is None or requirement.type == "course":
+        return []
+    if requirement.type == "exception":
+        return [requirement.label]
+    return [label for sub in requirement.of for label in _exception_labels(sub)]
+
+
+def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
+    student = plan.student
+    catalog_year = student.catalog_year
+
+    previously_overridden = {(flag.type, flag.course_id) for flag in plan.flags if flag.overridden}
+
+    semesters = [
+        Semester(
+            semester_id=semester.semester_id,
+            label=semester.label,
+            courses=semester.courses,
+            total_credits=sum(course.credits for course in semester.courses),
+        )
+        for semester in plan.semesters
+    ]
+
+    code_to_course_ids: dict[str, list[tuple[int, str]]] = {}
+    for index, semester in enumerate(semesters):
+        for course in semester.courses:
+            code_to_course_ids.setdefault(course.code, []).append((index, course.course_id))
+
+    flags: list[Flag] = []
+    edges: list[Edge] = []
+    flag_count = 0
+
+    def add_flag(flag_type: FlagType, severity: FlagSeverity, course_id: str | None, message: str, overridable: bool) -> None:
+        nonlocal flag_count
+        flag_count += 1
+        flags.append(
+            Flag(
+                flag_id=f"flag-{flag_count}",
+                type=flag_type,
+                severity=severity,
+                course_id=course_id,
+                message=message,
+                overridable=overridable,
+                overridden=(flag_type, course_id) in previously_overridden,
+            )
+        )
+
+    satisfied_before = {completed.code for completed in student.completed_courses}
+    for semester in semesters:
+        for course in semester.courses:
+            try:
+                requirement = get_course(connection, course.code, catalog_year).prerequisites
+            except NotFoundError:
+                requirement = None
+
+            for code in _course_codes(requirement):
+                candidates = [(i, cid) for i, cid in code_to_course_ids.get(code, []) if cid != course.course_id]
+                if candidates:
+                    _, from_id = min(candidates, key=lambda pair: pair[0])
+                    edges.append(Edge(**{"from": from_id, "to": course.course_id}))
+
+            for label in _exception_labels(requirement):
+                add_flag(
+                    "exception_claimed",
+                    "warning",
+                    course.course_id,
+                    f"{course.code} relies on a claimed exception ({label}); confirm it still applies.",
+                    True,
+                )
+
+            if course.status == "planned" and not _resolve(requirement, satisfied_before):
+                assert requirement is not None  # _resolve(None, ...) is always True
+                add_flag(
+                    "broken_prerequisite",
+                    "error",
+                    course.course_id,
+                    f"{course.code} requires {_describe(requirement)} to be completed in an earlier semester.",
+                    False,
+                )
+
+        satisfied_before |= {course.code for course in semester.courses}
+
+    plan_codes = set(satisfied_before)
+    code_credits: dict[str, float] = {completed.code: completed.credits for completed in student.completed_courses}
+    for semester in semesters:
+        for course in semester.courses:
+            code_credits.setdefault(course.code, course.credits)
+
+    total_credits_required = 0.0
+    for program_id in student.programs:
+        program = get_program(connection, program_id, catalog_year)
+        total_credits_required += program.total_credits_required
+
+        requirement_programs: list[Program] = (
+            [get_program(connection, component_id, catalog_year) for component_id in program.combines]
+            if program.combines
+            else [program]
+        )
+
+        for req_program in requirement_programs:
+            for double_count in req_program.double_counts_with:
+                shared_used = sum(
+                    code_credits.get(code, 0.0) for code in double_count.shared_courses if code in plan_codes
+                )
+                if shared_used > double_count.shared_credit_limit:
+                    add_flag(
+                        "double_count_exceeded",
+                        "error",
+                        None,
+                        f"{req_program.name} and {double_count.program_id} share {shared_used} credits, "
+                        f"over the {double_count.shared_credit_limit}-credit cap.",
+                        False,
+                    )
+
+            for group in req_program.requirement_groups:
+                if group.kind == "all":
+                    missing = [code for code in (group.courses or []) if code not in plan_codes]
+                    if missing:
+                        add_flag(
+                            "requirement_unmet",
+                            "error",
+                            None,
+                            f"{req_program.name}: {group.label} is missing {', '.join(missing)}.",
+                            False,
+                        )
+                else:
+                    candidates = group.courses if group.courses else list(plan_codes)
+                    earned = sum(code_credits.get(code, 0.0) for code in candidates if code in plan_codes)
+                    credits_required = group.credits_required or 0.0
+                    if earned < credits_required:
+                        add_flag(
+                            "credit_shortfall",
+                            "error",
+                            None,
+                            f"{req_program.name}: {group.label} needs {credits_required} credits, "
+                            f"only {earned} completed or planned.",
+                            False,
+                        )
+
+    total_credits = sum(semester.total_credits for semester in semesters) + sum(
+        completed.credits for completed in student.completed_courses
+    )
+    if total_credits < total_credits_required:
+        add_flag(
+            "credit_shortfall",
+            "error",
+            None,
+            f"Plan has {total_credits} credits; needs {total_credits_required}.",
+            False,
+        )
+
+    requirements_met = not any(flag.severity == "error" and not flag.overridden for flag in flags)
+
+    return Plan(
+        plan_id=plan.plan_id,
+        student=student,
+        semesters=semesters,
+        prerequisite_edges=edges,
+        flags=flags,
+        summary=Summary(
+            total_credits=total_credits,
+            total_credits_required=total_credits_required,
+            requirements_met=requirements_met,
+        ),
+    )
