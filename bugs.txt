@@ -466,3 +466,82 @@ BUG-023  Catalog years are not checked at load, and the "several years" error
   Fix idea:  (a) catalog_year: str = Field(pattern=r"^[0-9]{4}-[0-9]{4}$");
              (b) give AmbiguousLookupError a years: list[str] attribute set in
              _resolve_catalog_year; the agent tool then uses exc.years.
+
+BUG-024  The validator applies overrides to flags that are not overridable
+  Status:    Open
+  Owner:     Midhat Sajad (validator)
+  Where:     backend/src/degree_planner_backend/validator.py (check_plan,
+             previously_overridden)
+  Found:     2026-11-19 by check_plan adversarial test agent, reproduced by
+             Samantha
+  Steps:     send /plans/check (or validator.check_plan) a plan whose flags
+             include {"type": "credit_shortfall", "course_id": null,
+             "overridden": true} and {"type": "requirement_unmet", "course_id":
+             null, "overridden": true}, for a plan that misses its core courses
+  Actual:    every flag of those types is marked overridden, so
+             requirements_met is true while "Core is missing CSCI100, CSCI200".
+             One (credit_shortfall, null) entry hides every group shortfall and
+             the plan total at once. The override is matched on (type,
+             course_id) only; overridable is never checked.
+  Expected:  only flags with overridable true (exception_claimed) can be
+             overridden; anything else stays an error
+  Fix idea:  in add_flag, set overridden only when overridable is true. (The
+             agent's check_plan tool now passes only exception_claimed
+             overrides, but the frontend calls /plans/check directly.)
+
+BUG-025  One course can count toward several requirement groups
+  Status:    Open
+  Owner:     Midhat Sajad (validator)
+  Where:     backend/src/degree_planner_backend/validator.py (requirement
+             groups loop)
+  Found:     2026-11-19 by check_plan adversarial test agent, reproduced by
+             Samantha
+  Steps:     program with groups Core (all: CSCI100, CSCI200) and Free
+             (choose_credits 6, courses omitted), total 6; plan CSCI100 then
+             CSCI200. Also: groups A [MATH201, CSCI100] and B [MATH201, CSCI200],
+             3 credits each, plan MATH201 only.
+  Actual:    both pass. The free-elective group counts CSCI100 and CSCI200,
+             already used for Core; A and B are both satisfied by MATH201.
+  Expected:  a course counts toward one group of a program (unless a rule
+             says otherwise), and free electives count only courses not used
+             elsewhere
+  Fix idea:  assign courses to groups once per program (fixed lists first,
+             then choose_credits with lists, then free electives from what is
+             left); double counting across programs stays governed by
+             double_counts_with.
+
+BUG-026  Validator gaps: no credit cap per semester, no corequisite check,
+         empty "all" groups always met, OR-with-exception still flagged
+  Status:    Open
+  Owner:     Midhat Sajad (validator, data format)
+  Where:     backend/src/degree_planner_backend/validator.py, docs/plan-format.md
+  Found:     2026-11-19 by check_plan adversarial test agent, reproduced by
+             Samantha (credit cap)
+  Steps:     (a) plan 36 credits in one semester; (b) plan a course without its
+             corequisite; (c) program with an "all" group whose courses list is
+             []; (d) course with prerequisites OR(CSCI100, exception) and
+             CSCI100 in an earlier semester
+  Actual:    (a), (b), (c) pass with no flag; (d) still raises
+             exception_claimed although CSCI100 satisfies the OR
+  Expected:  (a) a flag above the Mines per-term credit limit (look up the
+             number in the catalog); (b) a flag for a missing corequisite
+             (needs BUG-012's corequisite cleanup first); (c) a data error, not
+             "met"; (d) no exception flag when another branch is satisfied
+  Fix idea:  one new flag type each for (a) and (b); treat (c) as malformed
+             data; only collect exception labels from branches that are
+             actually needed.
+
+BUG-027  Courses that may be repeated for credit cannot be marked
+  Status:    Open
+  Owner:     Midhat Sajad (data format)
+  Where:     docs/data-format.md, backend/src/degree_planner_backend/models.py
+             (Course)
+  Found:     2026-11-19 by check_plan adversarial test agent (reasoned)
+  Steps:     plan a seminar or research course that the catalog allows to be
+             repeated in two semesters
+  Actual:    the format has no way to say a course is repeatable, so the agent
+             tool keeps only the first and warns "planned more than once"
+  Expected:  repeatable courses (and their credit limit) can be planned more
+             than once
+  Fix idea:  add repeatable: bool = false and max_repeat_credits to Course;
+             the tool then allows repeats up to that limit.
