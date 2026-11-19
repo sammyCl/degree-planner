@@ -15,12 +15,14 @@ import re
 import sqlite3
 import unicodedata
 import urllib.parse
+from dataclasses import dataclass
 from typing import Any, Callable
 
 from pydantic import ValidationError
 
-from degree_planner_backend import lookups
+from degree_planner_backend import lookups, validator
 from degree_planner_backend.models import CourseRequirement, ExceptionRequirement, Requirement
+from degree_planner_backend.plan_models import Flag, Plan, PlannedCourse, Semester, Student, Summary
 
 logger = logging.getLogger(__name__)
 
@@ -95,11 +97,11 @@ def _tool_handler(tool_name: str) -> Callable[[Callable[..., ToolResult]], Calla
 
     def decorate(body: Callable[..., ToolResult]) -> Callable[..., ToolResult]:
         @functools.wraps(body)
-        def handler(connection: sqlite3.Connection, tool_input: dict[str, Any]) -> ToolResult:
+        def handler(connection: sqlite3.Connection, tool_input: dict[str, Any], *context: Any) -> ToolResult:
             if not isinstance(tool_input, dict):
                 return {"error": f"tool input must be a JSON object with the fields in the {tool_name} schema."}
             try:
-                return body(connection, tool_input)
+                return body(connection, tool_input, *context)
             except _BadInput as exc:
                 return {"error": str(exc)}
             except sqlite3.Error:
@@ -882,3 +884,344 @@ def get_program_requirements(connection: sqlite3.Connection, tool_input: dict[st
             )
         }
     return _program_to_dict(connection, program)
+
+
+# --- check_plan -----------------------------------------------------------------
+
+SEMESTERS_MAX = 16
+COURSES_PER_SEMESTER_MAX = 12
+SEMESTER_LABEL_MAX = 40
+FLAG_MESSAGE_MAX = 600
+FLAGS_SHOWN_MAX = 30
+# Only these flag types may be overridden by the student (docs/plan-format.md, DECISIONS.md).
+# Any other override in the record is ignored and logged: it must never hide a real error.
+OVERRIDABLE_FLAG_TYPES = frozenset({"exception_claimed"})
+
+
+@dataclass(frozen=True)
+class StudentContext:
+    """What the agent loop knows about the student, passed to check_plan by the loop, never by the model.
+
+    overrides holds (flag type, course code or None) pairs the student chose to override in the
+    frontend, e.g. ("exception_claimed", "MNGN501"). They are keyed by course code, not course id,
+    so an override survives the model moving the course to another semester.
+    """
+
+    student: Student
+    overrides: frozenset[tuple[str, str | None]] = frozenset()
+
+    def __post_init__(self) -> None:
+        # Checked here, when the loop builds the context, so a wiring bug fails loudly in the loop
+        # instead of reaching the model as "catalog unavailable".
+        if not isinstance(self.student, Student):
+            raise TypeError("StudentContext.student must be a plan_models.Student")
+        if not isinstance(self.overrides, (set, frozenset)):
+            raise TypeError("StudentContext.overrides must be a set of (flag type, course code or None) pairs")
+        cleaned = set()
+        for item in self.overrides:
+            if not (isinstance(item, tuple) and len(item) == 2 and isinstance(item[0], str)
+                    and (item[1] is None or isinstance(item[1], str))):
+                raise ValueError(f"bad override {item!r}: expected (flag type, course code or None)")
+            flag_type, code = item
+            cleaned.add((flag_type, None if code is None else _clean_stored_code(code)))
+        # Codes cleaned up like plan codes, so an override stored as 'mngn 501' matches MNGN501.
+        object.__setattr__(self, "overrides", frozenset(cleaned))
+
+
+def _clean_stored_code(code: str) -> str:
+    """A course code from the student's record, cleaned up like model input ('csci 100' -> 'CSCI100').
+    Text that cannot be cleaned (lone surrogates) is returned unchanged and simply never matches."""
+    if not _is_valid_text(code):
+        return code
+    return _normalize_code(unicodedata.normalize("NFKC", code).strip())
+
+
+CHECK_PLAN_TOOL: dict[str, Any] = {
+    "name": "check_plan",
+    "description": (
+        "Check a proposed semester-by-semester plan against the rules: prerequisite order, program "
+        "requirements, credit totals, and credits shared between programs. Send only semesters and "
+        "course codes; credits and titles come from the catalog, and the student's programs, catalog "
+        "year, and completed courses come from their record (you cannot change those). "
+        "Returns requirements_met, total_credits, total_credits_required, semesters (label, credits, and "
+        "the courses kept), errors, warnings, unknown_courses, and open_exceptions. Each error or warning "
+        "has type, course, message, and overridable, plus overridden: true when the student already "
+        "overrode it. What to do: broken_prerequisite means move the course later or add "
+        "the missing course in an earlier semester; requirement_unmet means add the missing courses; "
+        "credit_shortfall means add courses from that group (or any courses, for the total); "
+        "double_count_exceeded means fewer shared courses; unknown_course means the code is not in the "
+        "catalog for the student's year, so remove it or find the right code with search_catalog, never "
+        "keep an invented course; program_not_loaded means that program's requirements could not be "
+        "checked, so tell the student; no_programs means the student's record names no program, so tell "
+        "the student their programs must be chosen first; transcript_duplicate means the record lists a "
+        "completed course twice with different credits and the smaller was used, so ask the student to "
+        "check their transcript. "
+        "already_completed and duplicate_course warnings mean that course was left out of the plan; "
+        "a final 'more' entry means the list was cut, so fix the ones shown first. "
+        "exception_claimed is a warning only the student can override, and open_exceptions lists the "
+        "courses whose exception the student has not decided yet: requirements_met can be true while "
+        "open_exceptions is not empty, but the plan is not final until you have asked the student about "
+        "each one. Never decide an exception for them; if the student says they do not have it, remove "
+        "that course or replace it. Call again after every change until "
+        "requirements_met is true, or tell the student why it cannot be."
+    ),
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "semesters": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": SEMESTERS_MAX,
+                "description": "Semesters in order, earliest first.",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "label": {"type": "string", "description": "Such as 'Fall 2027'."},
+                        "courses": {
+                            "type": "array",
+                            "maxItems": COURSES_PER_SEMESTER_MAX,
+                            "items": {"type": "string"},
+                            "description": "Course codes such as 'CSCI200'.",
+                        },
+                    },
+                    "required": ["label", "courses"],
+                },
+            },
+        },
+        "required": ["semesters"],
+    },
+}
+
+_SEMESTERS_MESSAGE = (
+    f"semesters must be a list of 1 to {SEMESTERS_MAX} objects, each "
+    '{"label": "Fall 2027", "courses": ["CSCI200", ...]} with at most '
+    f"{COURSES_PER_SEMESTER_MAX} course codes."
+)
+
+
+def _issue(issue_type: str, course: str | None, message: str, overridable: bool = False) -> dict[str, Any]:
+    return {"type": issue_type, "course": course, "message": clean_text(message, FLAG_MESSAGE_MAX), "overridable": overridable}
+
+
+def _capped_issues(issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    if len(issues) <= FLAGS_SHOWN_MAX:
+        return issues
+    rest = len(issues) - FLAGS_SHOWN_MAX + 1
+    return issues[: FLAGS_SHOWN_MAX - 1] + [_issue("more", None, f"and {rest} more; fix the ones above first")]
+
+
+@dataclass
+class BuiltPlan:
+    """A Plan built from the model's semesters, plus what the tool found while building it.
+
+    plan keeps the student's record exactly as given, for saving as the final plan.
+    validation_plan is the same plan with the record cleaned up for checking: transcript codes
+    normalized and deduped, programs deduped, and programs that are not loaded left out. Run the
+    validator on validation_plan, then save its result with student=plan.student.
+    """
+
+    plan: Plan
+    validation_plan: Plan
+    course_codes: dict[str, str]  # course_id -> code
+    errors: list[dict[str, Any]]
+    warnings: list[dict[str, Any]]
+    unknown_courses: list[str]
+    missing_programs: list[str]
+
+
+def _parse_semesters(tool_input: dict[str, Any]) -> list[tuple[str, list[str]]]:
+    raw = tool_input.get("semesters")
+    if not isinstance(raw, list) or not 1 <= len(raw) <= SEMESTERS_MAX:
+        raise _BadInput(_SEMESTERS_MESSAGE)
+    semesters = []
+    for index, item in enumerate(raw, start=1):
+        if not isinstance(item, dict):
+            raise _BadInput(_SEMESTERS_MESSAGE)
+        label_raw = item.get("label")
+        label = clean_text(label_raw, SEMESTER_LABEL_MAX) if isinstance(label_raw, str) and _is_valid_text(label_raw) else ""
+        courses = item.get("courses")
+        if not isinstance(courses, list) or len(courses) > COURSES_PER_SEMESTER_MAX:
+            raise _BadInput(_SEMESTERS_MESSAGE)
+        codes = []
+        for entry in courses:
+            if not isinstance(entry, str) or not _is_valid_text(entry):
+                raise _BadInput("every course must be a course code such as 'CSCI200'.")
+            code = _normalize_code(unicodedata.normalize("NFKC", entry).strip())
+            if not _COURSE_CODE.fullmatch(code):
+                # Do not echo the input back: it can be long or carry text aimed at the model.
+                raise _BadInput(
+                    f"semester {index} has an entry that is not a course code such as 'CSCI200' "
+                    "(3-4 letters, 3 digits, optional letter suffix). Use search_catalog to find the code."
+                )
+            codes.append(code)
+        semesters.append((label or f"Semester {index}", codes))
+    return semesters
+
+
+def build_plan(connection: sqlite3.Connection, context: StudentContext, semesters: list[tuple[str, list[str]]]) -> BuiltPlan:
+    """Turn semesters of course codes into a Plan: catalog titles and credits, generated course ids,
+    the student's record, and their overrides. Unknown courses, already-completed courses, and repeats
+    are left out and reported. Shared by check_plan and the agent loop (for the final plan)."""
+    student = context.student
+    year = student.catalog_year
+    errors: list[dict[str, Any]] = []
+    warnings: list[dict[str, Any]] = []
+    unknown: list[str] = []
+    # Transcript codes are cleaned up like model input ('csci 100' -> 'CSCI100') and deduped, so a
+    # completed course is never counted twice, once from the record and once from the plan.
+    # When the record lists a course twice with different credits, the smaller is kept: the larger
+    # could let a plan pass that does not have the credits.
+    by_code: dict[str, Any] = {}
+    for done in student.completed_courses:
+        code = _clean_stored_code(done.code)
+        earlier = by_code.get(code)
+        if earlier is None:
+            by_code[code] = done.model_copy(update={"code": code})
+            continue
+        if earlier.credits != done.credits:
+            warnings.append(
+                _issue(
+                    "transcript_duplicate",
+                    code if _COURSE_CODE.fullmatch(code) else None,
+                    f"The record lists {code if _COURSE_CODE.fullmatch(code) else 'a completed course'} more than "
+                    f"once with different credits; the smaller ({_format_credits(min(earlier.credits, done.credits))}) was used.",
+                )
+            )
+            if done.credits < earlier.credits:
+                by_code[code] = done.model_copy(update={"code": code})
+    completed_courses = list(by_code.values())
+    completed = set(by_code)
+    seen: set[str] = set()
+    course_codes: dict[str, str] = {}
+    plan_semesters: list[Semester] = []
+
+    for index, (label, codes) in enumerate(semesters, start=1):
+        planned: list[PlannedCourse] = []
+        for code in codes:
+            if code in completed:
+                warnings.append(_issue("already_completed", code, f"{code} is already completed; left out of the plan."))
+                continue
+            if code in seen:
+                warnings.append(_issue("duplicate_course", code, f"{code} is planned more than once; only the first counts."))
+                continue
+            seen.add(code)
+            try:
+                course = lookups.get_course(connection, code, year)
+            except lookups.NotFoundError:
+                unknown.append(code)
+                errors.append(_issue("unknown_course", code, f"{code} is not in the {_shown_year(year)} catalog; left out of the plan."))
+                continue
+            course_id = f"sem-{index}-{code.lower()}"
+            course_codes[course_id] = code
+            planned.append(
+                PlannedCourse(
+                    course_id=course_id,
+                    code=code,
+                    title=clean_text(course.title, PROGRAM_NAME_MAX) or code,
+                    credits=course.credits,
+                    status="planned",
+                )
+            )
+        plan_semesters.append(Semester(semester_id=f"sem-{index}", label=label, courses=planned))
+
+    missing: list[str] = []
+    checkable_programs: list[str] = []
+    program_errors: list[dict[str, Any]] = []
+    if not student.programs:
+        program_errors.append(_issue("no_programs", None, "The student's record names no program, so nothing can be checked."))
+    for program_id in dict.fromkeys(student.programs):  # deduped, order kept
+        shown = clean_text(program_id, _PROGRAM_ID_MAX)
+        missing_part: str | None = None
+        try:
+            program = lookups.get_program(connection, program_id, year)
+        except lookups.NotFoundError:
+            missing_part = shown
+        else:
+            for component in program.combines:
+                try:
+                    lookups.get_program(connection, component, year)
+                except lookups.NotFoundError:
+                    missing_part = f"{clean_text(component, _PROGRAM_ID_MAX)}, a component of {shown},"
+                    break
+        if missing_part is not None:
+            missing.append(shown)
+            program_errors.append(
+                _issue(
+                    "program_not_loaded",
+                    None,
+                    f"{missing_part} is not in the loaded {_shown_year(year)} program data, so the requirements "
+                    f"of {shown} were not checked. Do not plan against it; tell the student.",
+                )
+            )
+            continue
+        checkable_programs.append(program_id)
+    errors[:0] = program_errors
+
+    code_to_ids: dict[str, list[str]] = {}
+    for course_id, code in course_codes.items():
+        code_to_ids.setdefault(code, []).append(course_id)
+    override_flags: list[Flag] = []
+    for flag_type, code in sorted(context.overrides, key=str):
+        if flag_type not in OVERRIDABLE_FLAG_TYPES:
+            logger.warning("check_plan: ignored an override of %r, which is not overridable", flag_type)
+            continue
+        ids = code_to_ids.get(code, []) if code is not None else [None]
+        for course_id in ids:
+            override_flags.append(
+                Flag(flag_id="override", type=flag_type, severity="warning", course_id=course_id,
+                     message="", overridable=True, overridden=True)
+            )
+
+    plan = Plan(
+        student=student,
+        semesters=plan_semesters,
+        flags=override_flags,
+        summary=Summary(total_credits=0, total_credits_required=0, requirements_met=False),
+    )
+    validation_plan = plan.model_copy(
+        update={"student": student.model_copy(update={"programs": checkable_programs, "completed_courses": completed_courses})}
+    )
+    return BuiltPlan(plan, validation_plan, course_codes, errors, warnings, unknown, missing)
+
+
+@_tool_handler("check_plan")
+def check_plan(connection: sqlite3.Connection, tool_input: dict[str, Any], context: StudentContext | None = None) -> ToolResult:
+    if not isinstance(context, StudentContext):
+        # A wiring bug in the agent loop, not something the model can fix.
+        logger.error("check_plan called without a StudentContext")
+        return {"error": CATALOG_UNAVAILABLE}
+    built = build_plan(connection, context, _parse_semesters(tool_input))
+    checked = validator.check_plan(connection, built.validation_plan)
+
+    errors = list(built.errors)
+    warnings = list(built.warnings)
+    for flag in checked.flags:
+        course = built.course_codes.get(flag.course_id) if flag.course_id else None
+        issue = _issue(flag.type, course, flag.message, flag.overridable)
+        if flag.overridden:
+            issue["overridden"] = True
+            warnings.append(issue)
+        elif flag.severity == "error":
+            errors.append(issue)
+        else:
+            warnings.append(issue)
+
+    open_exceptions = sorted(
+        {built.course_codes[f.course_id] for f in checked.flags
+         if f.type == "exception_claimed" and not f.overridden and f.course_id in built.course_codes}
+    )
+    # Any problem found while building (unknown course, program not loaded, no programs) blocks a pass.
+    requirements_met = checked.summary.requirements_met and not built.errors
+    return {
+        "requirements_met": requirements_met,
+        "total_credits": checked.summary.total_credits,
+        "total_credits_required": checked.summary.total_credits_required,
+        "semesters": [
+            {"label": semester.label, "credits": semester.total_credits, "courses": [c.code for c in semester.courses]}
+            for semester in checked.semesters
+        ],
+        "errors": _capped_issues(errors),
+        "warnings": _capped_issues(warnings),
+        "unknown_courses": built.unknown_courses,
+        "open_exceptions": open_exceptions,
+    }
