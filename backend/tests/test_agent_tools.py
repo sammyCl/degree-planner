@@ -9,11 +9,19 @@ import pytest
 from degree_planner_backend.agent.tools import (
     _CATALOG_YEAR_MESSAGE,
     CATALOG_UNAVAILABLE,
+    FORM_ID_MAX,
+    FORM_NAME_MAX,
+    FORM_NOTES_MAX,
+    FORM_REQUIRES_MAX,
+    PROGRAM_NOT_LOADED_NOTE,
+    GET_FORMS_TOOL,
     GET_PREREQUISITES_TOOL,
     SEARCH_CATALOG_TOOL,
     get_prerequisites,
     LABEL_MAX,
     clean_label,
+    clean_text,
+    get_forms,
     search_catalog,
     summarize_requirement,
 )
@@ -556,3 +564,468 @@ def test_summary_and_tree_use_cleaned_labels(tmp_path: Path) -> None:
 def test_non_ascii_label_kept_readable() -> None:
     tree = ExceptionRequirement(type="exception", label="approbation du professeur é")
     assert summarize_requirement(tree) == 'exception: "approbation du professeur é"'
+
+
+# --- get_forms ------------------------------------------------------------------------
+
+
+def make_form(form_id: str, applies_to: list[str], **extra: object) -> dict:
+    return {"form_id": form_id, "name": f"{form_id} form", "applies_to": applies_to} | extra
+
+
+@pytest.fixture
+def forms_connection(tmp_path: Path) -> sqlite3.Connection:
+    """The sample data (programs cs-bs-general-track, mining-bs, ...) plus forms for one program only."""
+    shutil.copy(REPO_ROOT / "docs" / "data-format.sample.json", tmp_path / "sample.json")
+    (tmp_path / "forms.json").write_text(
+        json.dumps({"forms": [make_form("mining-field-camp", ["mining-bs"]), make_form("zz-any-form", ["any"])]})
+    )
+    conn = sqlite3.connect(":memory:")
+    refresh_database(tmp_path, conn)
+    return conn
+
+
+def form_ids(result: dict) -> list[str]:
+    return [form["form_id"] for form in result["forms"]]
+
+
+def test_forms_real_data_file(tmp_path: Path) -> None:
+    shutil.copy(REPO_ROOT / "data" / "json" / "forms-policies.json", tmp_path / "forms-policies.json")
+    conn = sqlite3.connect(":memory:")
+    report = refresh_database(tmp_path, conn)
+    assert report.errors == {}
+    result = get_forms(conn, {})
+    assert result["count"] == 12
+    assert "independent-study-credit" in form_ids(result)
+    assert form_ids(result) == sorted(form_ids(result))
+    for form in result["forms"]:
+        assert set(form) == {"form_id", "name", "applies_to", "max_credits", "requires", "url", "notes"}
+        assert form["notes"] is not None and len(form["notes"]) <= FORM_NOTES_MAX
+        assert not form["notes"].endswith("...")
+    json.dumps(result, allow_nan=False)
+
+
+def test_forms_all_without_program(forms_connection: sqlite3.Connection) -> None:
+    assert form_ids(get_forms(forms_connection, {})) == [
+        "independent-study-credit",
+        "mining-field-camp",
+        "zz-any-form",
+    ]
+
+
+def test_forms_for_program_includes_its_own_and_any(forms_connection: sqlite3.Connection) -> None:
+    result = get_forms(forms_connection, {"program_id": "mining-bs"})
+    assert form_ids(result) == ["independent-study-credit", "mining-field-camp", "zz-any-form"]
+
+
+def test_forms_for_other_program_excludes_mining_only(forms_connection: sqlite3.Connection) -> None:
+    result = get_forms(forms_connection, {"program_id": "cs-bs-general-track"})
+    assert form_ids(result) == ["independent-study-credit", "zz-any-form"]
+
+
+def test_forms_unknown_program_still_lists_any_forms(forms_connection: sqlite3.Connection) -> None:
+    result = get_forms(forms_connection, {"program_id": "underwater-basket-weaving-bs"})
+    assert "error" not in result
+    assert form_ids(result) == ["independent-study-credit", "zz-any-form"]
+    assert result["program_found"] is False
+    assert result["note"] == PROGRAM_NOT_LOADED_NOTE
+    assert "underwater" not in json.dumps(result)
+
+
+def test_forms_known_program_reports_found(forms_connection: sqlite3.Connection) -> None:
+    result = get_forms(forms_connection, {"program_id": "mining-bs"})
+    assert result["program_found"] is True
+    assert "note" not in result
+
+
+def test_forms_without_program_has_no_found_flag(forms_connection: sqlite3.Connection) -> None:
+    assert "program_found" not in get_forms(forms_connection, {})
+
+
+def test_forms_program_in_several_years_counts_as_found(forms_connection: sqlite3.Connection) -> None:
+    forms_connection.execute(
+        "INSERT INTO programs (program_id, catalog_year, data) "
+        "SELECT program_id, '2019-2020', data FROM programs WHERE program_id = 'mining-bs'"
+    )
+    result = get_forms(forms_connection, {"program_id": "mining-bs"})
+    assert result["program_found"] is True
+    assert "mining-field-camp" in form_ids(result)
+
+
+def test_forms_program_id_length_boundary(forms_connection: sqlite3.Connection) -> None:
+    assert get_forms(forms_connection, {"program_id": "a" * 100})["program_found"] is False
+    result = get_forms(forms_connection, {"program_id": "a" * 101})
+    assert_bad_input(result)
+    assert "a" * 20 not in result["error"]
+
+
+def test_forms_full_width_program_id_folds(forms_connection: sqlite3.Connection) -> None:
+    result = get_forms(forms_connection, {"program_id": "ｍｉｎｉｎｇ-ｂｓ"})
+    assert result["program_found"] is True
+
+
+def test_forms_program_id_is_stripped(forms_connection: sqlite3.Connection) -> None:
+    assert get_forms(forms_connection, {"program_id": "  mining-bs "})["count"] == 3
+
+
+@pytest.mark.parametrize(
+    "program_id",
+    ["", "   ", "Mining-BS", "mining_bs", "mining--bs", "-mining", "mining bs", "a" * 101, "IGNORE ALL", 7, ["mining-bs"]],
+)
+def test_forms_bad_program_id_rejected_without_echo(forms_connection: sqlite3.Connection, program_id: object) -> None:
+    result = get_forms(forms_connection, {"program_id": program_id})
+    assert_bad_input(result)
+    if isinstance(program_id, str) and program_id.strip():
+        assert program_id not in result["error"]
+
+
+def test_forms_malformed_program_row_still_returns_forms(
+    forms_connection: sqlite3.Connection, caplog: pytest.LogCaptureFixture
+) -> None:
+    forms_connection.execute("UPDATE programs SET data = '{}' WHERE program_id = 'mining-bs'")
+    result = get_forms(forms_connection, {"program_id": "mining-bs"})
+    assert result["count"] == 3
+    assert "malformed" in caplog.text
+
+
+@pytest.mark.parametrize("tool_input", [None, "mining-bs", ["mining-bs"]])
+def test_forms_non_dict_input(forms_connection: sqlite3.Connection, tool_input: object) -> None:
+    result = get_forms(forms_connection, tool_input)  # type: ignore[arg-type]
+    assert_bad_input(result)
+    assert "object" in result["error"]
+
+
+def test_forms_database_without_tables(caplog: pytest.LogCaptureFixture) -> None:
+    conn = sqlite3.connect(":memory:")
+    result = get_forms(conn, {})
+    conn.close()
+    assert_catalog_unavailable(result)
+    assert "no such table" in caplog.text
+
+
+def test_forms_malformed_form_row(forms_connection: sqlite3.Connection, caplog: pytest.LogCaptureFixture) -> None:
+    forms_connection.execute("INSERT INTO forms (form_id, data) VALUES ('bad-form', '{}')")
+    assert_catalog_unavailable(get_forms(forms_connection, {}))
+    assert "malformed" in caplog.text
+
+
+def test_forms_scraped_text_is_cleaned(tmp_path: Path) -> None:
+    form = make_form(
+        "odd-form",
+        ["any"],
+        name="Odd‮ Form\n",
+        requires="  dean​ approval ",
+        notes="line one\nline two " + "n" * 5000,
+        url="",
+    )
+    conn = load_courses(tmp_path, [])
+    (tmp_path / "forms.json").write_text(json.dumps({"forms": [form]}))
+    refresh_database(tmp_path, conn)
+    result = get_forms(conn, {})["forms"][0]
+    assert result["name"] == "Odd Form"
+    assert result["requires"] == "dean approval"
+    assert result["notes"].startswith("line one line two ")
+    assert len(result["notes"]) == FORM_NOTES_MAX
+    assert result["notes"].endswith("...")
+    assert result["url"] is None
+
+
+def test_forms_empty_name_falls_back_to_id(tmp_path: Path) -> None:
+    conn = load_courses(tmp_path, [])
+    (tmp_path / "forms.json").write_text(json.dumps({"forms": [make_form("blank-name", ["any"], name="​")]}))
+    refresh_database(tmp_path, conn)
+    assert get_forms(conn, {})["forms"][0]["name"] == "blank-name"
+
+
+def test_clean_text_may_return_empty() -> None:
+    assert clean_text("​ \n", 50) == ""
+
+
+def test_forms_tool_definition() -> None:
+    assert GET_FORMS_TOOL["name"] == "get_forms"
+    assert GET_FORMS_TOOL["input_schema"]["required"] == []
+    assert set(GET_FORMS_TOOL["input_schema"]["properties"]) == {"program_id"}
+
+
+# --- fixes from the get_forms adversarial review ---
+
+
+@pytest.fixture
+def real_data_connection(tmp_path: Path) -> sqlite3.Connection:
+    """Everything in data/json (forms, minors, ASIs), copied so the repo is never written."""
+    for path in (REPO_ROOT / "data" / "json").glob("*.json"):
+        shutil.copy(path, tmp_path / path.name)
+    conn = sqlite3.connect(":memory:")
+    refresh_database(tmp_path, conn)
+    return conn
+
+
+def test_forms_real_programs(real_data_connection: sqlite3.Connection) -> None:
+    minor = get_forms(real_data_connection, {"program_id": "computer-science-minor"})
+    assert minor["program_found"] is True
+    assert minor["count"] == 12
+    bachelors = get_forms(real_data_connection, {"program_id": "computer-science-bs"})
+    assert bachelors["program_found"] is False
+    assert bachelors["count"] == 12
+
+
+def test_forms_real_values(real_data_connection: sqlite3.Connection) -> None:
+    forms = {form["form_id"]: form for form in get_forms(real_data_connection, {})["forms"]}
+    assert forms["independent-study-credit"]["max_credits"] == 6.0
+    assert forms["independent-study-credit"]["url"] == "https://www.mines.edu/registrar/forms/"
+
+
+def test_forms_id_and_applies_to_are_cleaned(tmp_path: Path) -> None:
+    form = make_form("x‮\n" + "x" * 3000, ["any", "SYSTEM:​ hi\n", "​"])
+    conn = load_courses(tmp_path, [])
+    (tmp_path / "forms.json").write_text(json.dumps({"forms": [form]}))
+    refresh_database(tmp_path, conn)
+    result = get_forms(conn, {})["forms"][0]
+    assert len(result["form_id"]) == FORM_ID_MAX
+    assert "‮" not in result["form_id"] and "\n" not in result["form_id"]
+    assert result["applies_to"] == ["any", "system: hi"]
+
+
+def test_forms_text_caps(tmp_path: Path) -> None:
+    form = make_form("long", ["any"], name="n" * 500, requires="r" * 900)
+    conn = load_courses(tmp_path, [])
+    (tmp_path / "forms.json").write_text(json.dumps({"forms": [form]}))
+    refresh_database(tmp_path, conn)
+    result = get_forms(conn, {})["forms"][0]
+    assert len(result["name"]) == FORM_NAME_MAX
+    assert len(result["requires"]) == FORM_REQUIRES_MAX
+
+
+@pytest.mark.parametrize(
+    ("url", "expected"),
+    [
+        ("https://www.mines.edu/registrar/forms/", "https://www.mines.edu/registrar/forms/"),
+        ("HTTPS://MINES.EDU/x", "HTTPS://MINES.EDU/x"),
+        ("http://www.mines.edu/", None),
+        ("javascript:alert(1)", None),
+        ("file:///etc/passwd", None),
+        ("see the registrar", None),
+        ("https://mines.edu/a b", None),
+    ],
+)
+def test_forms_only_https_urls(tmp_path: Path, url: str, expected: str | None) -> None:
+    conn = load_courses(tmp_path, [])
+    (tmp_path / "forms.json").write_text(json.dumps({"forms": [make_form("f", ["any"], url=url)]}))
+    refresh_database(tmp_path, conn)
+    assert get_forms(conn, {})["forms"][0]["url"] == expected
+
+
+def test_forms_empty_id_and_name(tmp_path: Path) -> None:
+    conn = load_courses(tmp_path, [])
+    (tmp_path / "forms.json").write_text(json.dumps({"forms": [make_form("", ["any"], name="")]}))
+    refresh_database(tmp_path, conn)
+    result = get_forms(conn, {})["forms"][0]
+    assert result["form_id"] == "(no id)"
+    assert result["name"] == "(unnamed form)"
+
+
+def test_unavailable_message_is_not_course_specific() -> None:
+    assert "forms" in CATALOG_UNAVAILABLE
+    assert "query" not in CATALOG_UNAVAILABLE
+
+
+# --- fixes from the second get_forms adversarial review ---
+
+
+def forms_db(tmp_path: Path, forms: list[dict]) -> sqlite3.Connection:
+    """The real data/json (so real program ids exist) plus extra forms."""
+    for path in (REPO_ROOT / "data" / "json").glob("*.json"):
+        shutil.copy(path, tmp_path / path.name)
+    (tmp_path / "extra-forms.json").write_text(json.dumps({"forms": forms}))
+    conn = sqlite3.connect(":memory:")
+    refresh_database(tmp_path, conn)
+    return conn
+
+
+def extra_ids(result: dict) -> list[str]:
+    return [form["form_id"] for form in result["forms"] if form["form_id"].startswith("x-")]
+
+
+def test_forms_unloaded_program_keeps_exact_matches(tmp_path: Path) -> None:
+    conn = forms_db(tmp_path, [make_form("x-bs-only", ["computer-science-bs"])])
+    result = get_forms(conn, {"program_id": "computer-science-bs"})
+    assert result["program_found"] is False
+    assert extra_ids(result) == ["x-bs-only"]
+    assert "mistyped" in result["note"]
+
+
+def test_forms_filter_uses_cleaned_applies_to(tmp_path: Path) -> None:
+    conn = forms_db(
+        tmp_path,
+        [
+            make_form("x-zw-any", ["any​"]),
+            make_form("x-space-any", [" any"]),
+            make_form("x-upper-any", ["ANY"]),
+            make_form("x-zw-minor", ["computer-science-minor​"]),
+            make_form("x-other", ["biology-minor"]),
+        ],
+    )
+    shown = {form["form_id"]: form["applies_to"] for form in get_forms(conn, {})["forms"]}
+    assert shown["x-zw-any"] == shown["x-space-any"] == shown["x-upper-any"] == ["any"]
+    for program_id in ["computer-science-minor", "not-a-loaded-program"]:
+        ids = extra_ids(get_forms(conn, {"program_id": program_id}))
+        assert {"x-zw-any", "x-space-any", "x-upper-any"} <= set(ids)
+        assert "x-other" not in ids
+    assert "x-zw-minor" in extra_ids(get_forms(conn, {"program_id": "computer-science-minor"}))
+
+
+def test_forms_duplicate_cleaned_ids_are_numbered(tmp_path: Path) -> None:
+    conn = forms_db(
+        tmp_path,
+        [make_form("x-dup", ["any"]), make_form("x-dup​", ["any"]), make_form("x-dup\n", ["any"])],
+    )
+    ids = extra_ids(get_forms(conn, {}))
+    assert ids == ["x-dup", "x-dup#2", "x-dup#3"]
+
+
+def test_forms_truncated_ids_stay_distinct(tmp_path: Path) -> None:
+    long_a, long_b = "x-" + "a" * 100 + "A", "x-" + "a" * 100 + "B"
+    conn = forms_db(tmp_path, [make_form(long_a, ["any"]), make_form(long_b, ["any"])])
+    ids = extra_ids(get_forms(conn, {}))
+    assert len(ids) == 2 and len(set(ids)) == 2
+
+
+def test_forms_sorted_by_shown_id(tmp_path: Path) -> None:
+    conn = forms_db(tmp_path, [make_form("x-b", ["any"]), make_form("​x-a", ["any"])])
+    assert extra_ids(get_forms(conn, {})) == ["x-a", "x-b"]
+
+
+def test_forms_no_program_has_no_note(forms_connection: sqlite3.Connection) -> None:
+    assert "note" not in get_forms(forms_connection, {})
+
+
+def test_forms_empty_requires_is_none(tmp_path: Path) -> None:
+    conn = load_courses(tmp_path, [])
+    (tmp_path / "forms.json").write_text(json.dumps({"forms": [make_form("f", ["any"], requires=" ​ ")]}))
+    refresh_database(tmp_path, conn)
+    assert get_forms(conn, {})["forms"][0]["requires"] is None
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://www.mines.edu/registrar/forms/",
+        "https://mines.edu/",
+        "https://catalog.mines.edu/coursesaz/math/",
+        "https://www.mines.edu:443/registrar/",
+        "https://www.mines.edu/forms?id=1&x=2#top",
+    ],
+)
+def test_forms_mines_urls_pass(tmp_path: Path, url: str) -> None:
+    conn = load_courses(tmp_path, [])
+    (tmp_path / "forms.json").write_text(json.dumps({"forms": [make_form("f", ["any"], url=url)]}))
+    refresh_database(tmp_path, conn)
+    assert get_forms(conn, {})["forms"][0]["url"] == url
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://",
+        "https://evil.com/",
+        "https://evil.com@mines.edu/",
+        "https://user:pw@www.mines.edu/",
+        "https://mines.edu.evil.com/",
+        "https://notmines.edu/",
+        "https://mіnes.edu/",
+        "https://‮evil.com",
+        "https://www.mines.edu/[x](javascript:1)",
+        'https://www.mines.edu/"><b>',
+        "https://www.mines.edu:8443/",
+        "https://www.mines.edu:99999/",
+        "https://www.mines.edu/" + "a" * 600,
+        "http://www.mines.edu/",
+    ],
+)
+def test_forms_unsafe_urls_refused(tmp_path: Path, url: str) -> None:
+    conn = load_courses(tmp_path, [])
+    (tmp_path / "forms.json").write_text(json.dumps({"forms": [make_form("f", ["any"], url=url)]}))
+    refresh_database(tmp_path, conn)
+    assert get_forms(conn, {})["forms"][0]["url"] is None
+
+
+@pytest.mark.parametrize(("max_len", "expected"), [(0, ""), (2, "ab"), (3, "abc"), (4, "a...")])
+def test_clean_text_small_caps_never_exceed(max_len: int, expected: str) -> None:
+    assert clean_text("abcdef", max_len) == expected
+
+
+def test_clean_text_does_not_split_accents() -> None:
+    text = "abcde\u0301fghij"  # e + combining acute accent at index 5
+    # A cap of 8 would cut at index 5, between the e and its accent; it backs up to index 4.
+    assert clean_text(text, 8) == "abcd..."
+    assert clean_text(text, 9) == "abcde\u0301..."
+
+
+# --- fixes from the third get_forms adversarial review ---
+
+
+def test_forms_ids_are_the_same_in_every_call(tmp_path: Path) -> None:
+    conn = forms_db(tmp_path, [make_form("x-a", ["computer-science-minor"]), make_form("x-a​", ["any"])])
+
+    def id_of_any_form(result: dict) -> str:
+        return next(f["form_id"] for f in result["forms"] if f["form_id"].startswith("x-a") and f["applies_to"] == ["any"])
+
+    ids = {
+        id_of_any_form(get_forms(conn, tool_input))
+        for tool_input in [{}, {"program_id": "computer-science-minor"}, {"program_id": "biology-minor"}]
+    }
+    assert len(ids) == 1
+
+
+def test_forms_numbering_skips_real_ids(tmp_path: Path) -> None:
+    conn = forms_db(tmp_path, [make_form("x-b#2", ["any"]), make_form("x-b", ["any"]), make_form("x-b​", ["any"])])
+    ids = extra_ids(get_forms(conn, {}))
+    assert sorted(ids) == ["x-b", "x-b#2", "x-b#3"]
+
+
+def test_forms_numbered_ids_stay_within_cap(tmp_path: Path) -> None:
+    conn = forms_db(tmp_path, [make_form("x-" + "c" * 118, ["any"]), make_form("x-" + "c" * 119, ["any"])])
+    ids = extra_ids(get_forms(conn, {}))
+    assert len(set(ids)) == 2
+    assert all(len(form_id) <= FORM_ID_MAX for form_id in ids)
+
+
+def test_forms_program_id_any_rejected(forms_connection: sqlite3.Connection) -> None:
+    result = get_forms(forms_connection, {"program_id": "any"})
+    assert_bad_input(result)
+    assert "not a program id" in result["error"]
+
+
+def test_forms_full_width_any_counts_as_any(tmp_path: Path) -> None:
+    conn = forms_db(tmp_path, [make_form("x-fw", ["ａｎｙ"])])
+    assert "x-fw" in extra_ids(get_forms(conn, {"program_id": "biology-minor"}))
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://evil.com%2F.mines.edu/",
+        "https://evil.com%23.mines.edu/",
+        "https://evil.com;.mines.edu/",
+        "https://.mines.edu/",
+        "https://a..mines.edu/",
+        "https://-.mines.edu/",
+        "https://mines.edu:/",
+        "https://mines.edu:0443/",
+        "https://www.mines.edu/\nx",
+        "https://www.mines.edu/é",
+        "https://www.mines.edu\\@evil.com/",
+    ],
+)
+def test_forms_malformed_hosts_and_paths_refused(tmp_path: Path, url: str) -> None:
+    conn = load_courses(tmp_path, [])
+    (tmp_path / "forms.json").write_text(json.dumps({"forms": [make_form("f", ["any"], url=url)]}))
+    refresh_database(tmp_path, conn)
+    assert get_forms(conn, {})["forms"][0]["url"] is None
+
+
+def test_every_real_url_still_passes(real_data_connection: sqlite3.Connection) -> None:
+    raw = json.loads((REPO_ROOT / "data" / "json" / "forms-policies.json").read_text())["forms"]
+    expected = {form["form_id"]: form.get("url") for form in raw}
+    shown = {form["form_id"]: form["url"] for form in get_forms(real_data_connection, {})["forms"]}
+    assert shown == expected

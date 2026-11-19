@@ -13,6 +13,7 @@ import logging
 import re
 import sqlite3
 import unicodedata
+import urllib.parse
 from typing import Any, Callable
 
 from pydantic import ValidationError
@@ -25,8 +26,8 @@ logger = logging.getLogger(__name__)
 # Fixed text on purpose: the real exception goes to the log, never to the model,
 # so database internals (table names, thread ids, file paths) stay out of the chat.
 CATALOG_UNAVAILABLE = (
-    "The course catalog could not be read. This is a server problem, not a problem with your query: "
-    "do not retry with a different query; tell the student the catalog is unavailable right now."
+    "The catalog data (courses, programs, forms) could not be read. This is a server problem, not a problem with your request: "
+    "do not retry with different input; tell the student the catalog is unavailable right now."
 )
 
 ToolResult = dict[str, Any]
@@ -217,23 +218,34 @@ GET_PREREQUISITES_TOOL: dict[str, Any] = {
 LABEL_MAX = 200
 
 
-def clean_label(label: str) -> str:
-    """Exception label as the model should see it: no invisible or control characters, one line, capped.
+def clean_text(text: str, max_len: int) -> str:
+    """Scraped text as the model should see it: no invisible or control characters, one line, capped.
 
-    Labels come from scraped catalog text, so they are untrusted: format characters (bidi overrides,
+    Catalog and form text is scraped, so it is untrusted: format characters (bidi overrides,
     zero-width spaces) are dropped, control characters such as newlines become spaces, runs of
-    whitespace collapse, and anything past LABEL_MAX characters is cut with '...'.
+    whitespace collapse, and anything past max_len characters is cut with '...'. May return "".
     """
     kept = []
-    for char in label:
+    for char in text:
         category = unicodedata.category(char)
         if category == "Cf":
             continue
         kept.append(" " if category == "Cc" else char)
-    text = " ".join("".join(kept).split())
-    if not text:
-        return "(no label)"
-    return text if len(text) <= LABEL_MAX else text[: LABEL_MAX - 3] + "..."
+    cleaned = " ".join("".join(kept).split())
+    if len(cleaned) <= max_len:
+        return cleaned
+    if max_len < 4:
+        return cleaned[: max(max_len, 0)]
+    cut = max_len - 3
+    # Back up so an accent (a combining mark) is not split from the letter it belongs to.
+    while cut > 0 and unicodedata.combining(cleaned[cut]):
+        cut -= 1
+    return cleaned[:cut] + "..."
+
+
+def clean_label(label: str) -> str:
+    """Exception label, cleaned and capped at LABEL_MAX; an empty label shows as '(no label)'."""
+    return clean_text(label, LABEL_MAX) or "(no label)"
 
 
 def requirement_to_dict(requirement: Requirement) -> dict[str, Any]:
@@ -324,3 +336,194 @@ def get_prerequisites(connection: sqlite3.Connection, tool_input: dict[str, Any]
         "summary": summarize_requirement(prerequisites),
         "corequisites": list(course.corequisites),
     }
+
+
+# --- get_forms ----------------------------------------------------------------
+
+FORM_ID_MAX = 100
+FORM_NAME_MAX = 200
+FORM_REQUIRES_MAX = 500
+FORM_NOTES_MAX = 1000
+FORM_URL_MAX = 500
+
+# Program ids are lowercase slugs such as 'computer-science-minor' or 'mining-bs-ms-combined'.
+_PROGRAM_ID = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
+_PROGRAM_ID_MAX = 100
+_PROGRAM_ID_MESSAGE = (
+    "program_id must be a program id such as 'computer-science-minor' "
+    "(lowercase letters, digits, and hyphens), or omitted to list every form."
+)
+
+GET_FORMS_TOOL: dict[str, Any] = {
+    "name": "get_forms",
+    "description": (
+        "List the Colorado School of Mines registrar forms and catalog policies that apply to a program, "
+        "such as independent study credit, transfer course approval, minor declaration, a second "
+        "bachelor's degree, or honors programs. Entries whose form_id starts with 'policy-' are policies "
+        "(rules to follow), not forms to submit. "
+        "Returns forms: a list with form_id, name, applies_to, max_credits, requires, url, and notes. "
+        "applies_to lists program ids, and 'any' means every program. "
+        "max_credits is a credit cap when the form has one; it is not a degree-wide total unless notes "
+        "say so (for independent study it is per course). requires says whose approval or signature is "
+        "needed. url is an https link on mines.edu, or null. Read notes before telling the student what to do: they "
+        "hold deadlines and limits. Forms are not courses: never put them in the plan as courses. "
+        "program_id must be an id from the loaded program data (such as a minor or ASI id the student "
+        "chose); do not guess ids or pass 'any' or a subject code. "
+        "With program_id, returns that program's forms plus every 'any' form, and program_found. "
+        "If program_found is false, the id is mistyped or that program is not loaded yet: the forms "
+        "are still listed and note explains what to do. "
+        "Without program_id, returns every form."
+    ),
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "program_id": {
+                "type": "string",
+                "description": "Program id such as 'computer-science-minor'. Omit to list every form.",
+            },
+        },
+        "required": [],
+    },
+}
+
+
+def _program_exists(connection: sqlite3.Connection, program_id: str) -> bool:
+    """True if any catalog year holds the program. A malformed program row still counts as existing:
+    the forms are what was asked for, so a broken program row must not hide them."""
+    try:
+        lookups.get_program(connection, program_id)
+    except lookups.NotFoundError:
+        return False
+    except lookups.AmbiguousLookupError:
+        return True
+    except ValidationError:
+        logger.exception("get_forms: program row for %s is malformed", program_id)
+        return True
+    return True
+
+
+def _optional_text(value: str | None, max_len: int) -> str | None:
+    if value is None:
+        return None
+    return clean_text(value, max_len) or None
+
+
+def _safe_url(value: str | None) -> str | None:
+    """Only well-formed https links on mines.edu reach the model; anything else becomes None.
+
+    The stored text is checked as it is, never cleaned first: removing a hidden character could
+    change where the link points. Too-long URLs are refused rather than cut, since a cut URL is
+    a different (broken) link.
+    """
+    if value is None:
+        return None
+    url = value.strip()
+    if not url or len(url) > FORM_URL_MAX or not url.isascii():
+        return None
+    if any(unicodedata.category(char) == "Cc" or char in _URL_FORBIDDEN for char in url):
+        return None
+    try:
+        parts = urllib.parse.urlsplit(url)
+        port = parts.port
+    except ValueError:
+        return None
+    host = (parts.hostname or "").lower()
+    if parts.scheme.lower() != "https" or port not in (None, 443):
+        return None
+    # The whole netloc must be a plain hostname with an optional ":443": no userinfo ('@'),
+    # no percent-escapes or ';' in the host, no empty labels ('.mines.edu', 'a..mines.edu').
+    if not _URL_NETLOC.fullmatch(parts.netloc.lower()):
+        return None
+    if host != _URL_DOMAIN and not host.endswith("." + _URL_DOMAIN):
+        return None
+    return url
+
+
+_URL_DOMAIN = "mines.edu"
+_URL_LABEL = r"[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"
+_URL_NETLOC = re.compile(rf"{_URL_LABEL}(?:\.{_URL_LABEL})*(?::443)?")
+# Characters that have no business in a catalog link and could break out of Markdown or HTML.
+_URL_FORBIDDEN = set(' "<>`\\{}|^[]\'')
+
+
+PROGRAM_NOT_LOADED_NOTE = (
+    "This program id is not in the loaded program data. Forms whose applies_to lists this id and forms for "
+    "every program are listed, but forms for this program may be missing. Either the id is mistyped or the "
+    "program's data is not loaded yet: check the id against the program the student chose before "
+    "saying anything to the student about their program."
+)
+
+
+def _form_to_dict(form: Any) -> dict[str, Any]:
+    form_id = clean_text(form.form_id, FORM_ID_MAX)
+    return {
+        "form_id": form_id or "(no id)",
+        "name": clean_text(form.name, FORM_NAME_MAX) or form_id or "(unnamed form)",
+        # Lowercased so the filter below and the model see the same values ("ANY" -> "any").
+        "applies_to": [
+            c.lower() for c in (clean_text(unicodedata.normalize("NFKC", a), FORM_ID_MAX) for a in form.applies_to) if c
+        ],
+        "max_credits": form.max_credits,
+        "requires": _optional_text(form.requires, FORM_REQUIRES_MAX),
+        "url": _safe_url(form.url),
+        "notes": _optional_text(form.notes, FORM_NOTES_MAX),
+    }
+
+
+def _number_duplicate_ids(raw_forms: list[Any]) -> list[dict[str, Any]]:
+    """Clean every form, sort by the shown id, and give repeated ids a '#N' suffix.
+
+    Two raw ids can clean to the same text (hidden characters, truncation). The first form with
+    an id keeps it; later ones get the lowest '#N' that no other shown id uses (including a real
+    id such as 'x#2'), cut so the whole id stays within FORM_ID_MAX. Ties are broken by the raw
+    id, so the numbering does not depend on the database's row order.
+    """
+    pairs = sorted(((_form_to_dict(form), form.form_id) for form in raw_forms), key=lambda p: (p[0]["form_id"], p[1]))
+    forms = [form for form, _raw in pairs]
+    reserved = {form["form_id"] for form in forms}
+    used: set[str] = set()
+    for form in forms:
+        base = form["form_id"]
+        if base in used:
+            n = 2
+            while True:
+                suffix = f"#{n}"
+                candidate = base[: FORM_ID_MAX - len(suffix)] + suffix
+                if candidate not in used and candidate not in reserved:
+                    break
+                n += 1
+            form["form_id"] = candidate
+        used.add(form["form_id"])
+    return forms
+
+
+@_tool_handler("get_forms")
+def get_forms(connection: sqlite3.Connection, tool_input: dict[str, Any]) -> ToolResult:
+    program_id = _text_field(tool_input, "program_id", required=False, message=_PROGRAM_ID_MESSAGE)
+    program_found: bool | None = None
+    if program_id is not None:
+        if len(program_id) > _PROGRAM_ID_MAX or not _PROGRAM_ID.fullmatch(program_id):
+            # Do not echo the input back: it can be very long or carry text aimed at the model.
+            raise _BadInput(_PROGRAM_ID_MESSAGE)
+        if program_id == "any":
+            raise _BadInput(
+                "'any' is not a program id: forms for every program are always included. "
+                "Pass a real program id, or omit program_id to list every form."
+            )
+        program_found = _program_exists(connection, program_id)
+
+    # Number the full catalog first, then filter: a form's id must be the same in every call,
+    # whatever program_id is, so the model can refer to it later.
+    forms = _number_duplicate_ids(lookups.get_forms(connection))
+    # Filter on the cleaned values the model is shown, not the raw ones, so a form that reads
+    # "applies_to": ["any"] is always in every program's list. Matches are kept even when the
+    # program is not loaded (bachelor's programs, for now).
+    if program_id is not None:
+        forms = [form for form in forms if program_id in form["applies_to"] or "any" in form["applies_to"]]
+
+    result: ToolResult = {"forms": forms, "count": len(forms)}
+    if program_found is not None:
+        result["program_found"] = program_found
+    if program_found is False:
+        result["note"] = PROGRAM_NOT_LOADED_NOTE
+    return result
