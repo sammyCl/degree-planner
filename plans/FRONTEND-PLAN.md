@@ -30,7 +30,7 @@ Until Plan format and API endpoints land, build against a hand-written sample pl
 | Name | Task | Priority | Due | Needs | Status |
 |---|---|---|---|---|---|
 | UI mockup | UI mockup of both pages (setup, planner with chat panel) and review with team | P0 | Nov 13 | | [ ] |
-| Sample plan | Sample plan JSON (one degree, a few semesters, a deliberate broken prerequisite) to develop against; swap for the real format once Plan format exists | P0 | Nov 13 | | [ ] |
+| Sample plan | Sample plan JSON (one degree, a few semesters, a deliberate broken prerequisite) to develop against; swap for the real format once Plan format exists | P0 | Nov 13 | | [x] |
 | Minors list | Data: list which minors, ASIs, certifications and forms are needed for the five examples (CS minor, Geophysical Engineering minor, Independent Study Credit form, Thorson's honors program notes) | P0 | Nov 13 | Five examples | [x] |
 | Stack decision | Join the stack decision (frontend framework, how it talks to the backend) | P0 | Nov 13 | | [ ] |
 
@@ -86,3 +86,4 @@ Never cut Setup page, Planner page, Connect setup to backend: they are the core 
 - 2026-11-12: Plan created. Nothing started.
 - 2026-11-17: Minors list and Minors data done (Abdallah says done; data and tests show it). Minors, ASIs, forms and policies collected under data/ and converted to JSON (data/json/); conflicts and decisions in data/CONFLICT-LOG.md. Open: ASIs are from the 2025-2026 catalog, confirm for 2026-2027; course codes missing from the CSV for Samantha to check.
 - 2026-11-17: Frontend scaffold done (code and tests show it): Vite + React + TypeScript in frontend/, /api proxied to the FastAPI backend, 2 passing tests, run commands in CLAUDE.md and README.md. Checked against Midhat's backend /health through the proxy.
+- 2026-11-19: Sample plan done (code and tests show it): frontend/src/samplePlan.json in Midhat's plan format (8 semesters of CS BS, real catalog courses, prerequisite edges, 3 deliberate flags), typed in src/types.ts, 5 integrity tests. Note: docs/plan-format.sample.json has wrong titles for CSCI306 and CSCI400 (catalog: Software Engineering, Principles of Programming Languages) for Midhat to fix.

@@ -1,0 +1,63 @@
+// TypeScript shape of the plan JSON. Mirrors docs/plan-format.md (owner: Midhat); keep the two in sync.
+
+export interface CompletedCourse {
+  code: string
+  credits: number
+  term: string // "transfer", "aplcredit", or a semester label
+  transfer_from: string | null
+}
+
+export interface PlannedCourse {
+  course_id: string
+  code: string
+  title: string
+  credits: number
+  status: 'planned' | 'completed'
+}
+
+export interface Semester {
+  semester_id: string
+  label: string
+  courses: PlannedCourse[]
+  total_credits: number
+}
+
+export interface PrerequisiteEdge {
+  from: string
+  to: string
+}
+
+export type FlagType =
+  | 'broken_prerequisite'
+  | 'credit_shortfall'
+  | 'requirement_unmet'
+  | 'double_count_exceeded'
+  | 'exception_claimed'
+
+export interface Flag {
+  flag_id: string
+  type: FlagType
+  severity: 'error' | 'warning'
+  course_id: string | null
+  message: string
+  overridable: boolean
+  overridden: boolean
+}
+
+export interface Plan {
+  plan_id: string | null
+  student: {
+    degree_level: string
+    programs: string[]
+    catalog_year: string
+    completed_courses: CompletedCourse[]
+  }
+  semesters: Semester[]
+  prerequisite_edges: PrerequisiteEdge[]
+  flags: Flag[]
+  summary: {
+    total_credits: number
+    total_credits_required: number
+    requirements_met: boolean
+  }
+}
