@@ -7,10 +7,31 @@ can hand the message back to the model and let it retry.
 
 from __future__ import annotations
 
+import logging
 import sqlite3
 from typing import Any
 
+from pydantic import ValidationError
+
 from degree_planner_backend import lookups
+
+logger = logging.getLogger(__name__)
+
+# Fixed text on purpose: the real exception goes to the log, never to the model,
+# so database internals (table names, thread ids, file paths) stay out of the chat.
+CATALOG_UNAVAILABLE = (
+    "The course catalog could not be read. This is a server problem, not a problem with your query: "
+    "do not retry with a different query; tell the student the catalog is unavailable right now."
+)
+
+
+def _is_valid_text(value: str) -> bool:
+    """False for strings holding lone surrogates (e.g. from a JSON '\\ud800' escape), which SQLite cannot encode."""
+    try:
+        value.encode("utf-8")
+    except UnicodeEncodeError:
+        return False
+    return True
 
 SEARCH_LIMIT_MAX = 50
 SEARCH_LIMIT_DEFAULT = 20
@@ -49,19 +70,31 @@ SEARCH_CATALOG_TOOL: dict[str, Any] = {
 
 
 def search_catalog(connection: sqlite3.Connection, tool_input: dict[str, Any]) -> dict[str, Any]:
+    if not isinstance(tool_input, dict):
+        return {"error": 'tool input must be an object such as {"query": "CSCI"}.'}
+
     query = tool_input.get("query")
     if not isinstance(query, str) or not query.strip():
         return {"error": "query is required and must be non-empty text, such as 'CSCI' or 'linear algebra'."}
+    if not _is_valid_text(query):
+        return {"error": "query contains characters that are not valid text; use plain letters and digits."}
 
     catalog_year = tool_input.get("catalog_year")
-    if catalog_year is not None and not isinstance(catalog_year, str):
+    if catalog_year is not None and (not isinstance(catalog_year, str) or not _is_valid_text(catalog_year)):
         return {"error": "catalog_year must be text like '2026-2027', or omitted."}
 
     limit = tool_input.get("limit", SEARCH_LIMIT_DEFAULT)
     if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= SEARCH_LIMIT_MAX:
         return {"error": f"limit must be a whole number from 1 to {SEARCH_LIMIT_MAX}."}
 
-    courses = lookups.search_catalog(connection, query, catalog_year=catalog_year, limit=limit)
+    try:
+        courses = lookups.search_catalog(connection, query, catalog_year=catalog_year, limit=limit)
+    except sqlite3.Error:
+        logger.exception("search_catalog: database error")
+        return {"error": CATALOG_UNAVAILABLE}
+    except ValidationError:
+        logger.exception("search_catalog: a stored course row is malformed")
+        return {"error": CATALOG_UNAVAILABLE}
     return {
         "courses": [
             {"code": c.code, "title": c.title, "credits": c.credits, "catalog_year": c.catalog_year}
