@@ -5,6 +5,7 @@ import pytest
 from pydantic import ValidationError
 
 from degree_planner_backend.agent.request_models import (
+    OVERRIDES_MAX,
     SEMESTERS_MAX_BACHELOR,
     SEMESTERS_MAX_GRADUATE,
     AgentRequest,
@@ -26,8 +27,12 @@ def _student() -> dict:
 
 
 def _plan(requirements_met: bool) -> Plan:
+    """The plan-format sample. A passing plan has no flags; a failing one keeps the sample's
+    broken CSCI400 prerequisite."""
     sample = json.loads((DOCS / "plan-format.sample.json").read_text())
     sample["summary"]["requirements_met"] = requirements_met
+    if requirements_met:
+        sample["flags"] = []
     return Plan.model_validate(sample)
 
 
@@ -121,14 +126,104 @@ def test_request_rejects_unknown_fields():
         )
 
 
-def test_override_types_must_be_flag_types():
-    base = {"student": _student(), "semesters": 8, "start_term": "Fall 2026"}
-    ok = AgentRequest.model_validate({**base, "overrides": [{"type": "exception_claimed", "code": "MNGN501"}]})
-    assert ok.overrides[0].code == "MNGN501"
-    plan_wide = AgentRequest.model_validate({**base, "overrides": [{"type": "requirement_unmet"}]})
-    assert plan_wide.overrides[0].code is None
+def _with_overrides(overrides: list) -> dict:
+    return {"student": _student(), "semesters": 8, "start_term": "Fall 2026", "overrides": overrides}
+
+
+def test_override_accepted_and_code_cleaned():
+    request = AgentRequest.model_validate(_with_overrides([{"type": "exception_claimed", "code": " mngn 501 "}]))
+    assert request.overrides[0].code == "MNGN501"
+
+
+@pytest.mark.parametrize(
+    "flag_type",
+    ["broken_prerequisite", "credit_shortfall", "requirement_unmet", "double_count_exceeded", "not_a_flag"],
+)
+def test_override_rejects_flag_types_that_cannot_be_overridden(flag_type):
     with pytest.raises(ValidationError):
-        AgentRequest.model_validate({**base, "overrides": [{"type": "not_a_flag", "code": "MNGN501"}]})
+        AgentRequest.model_validate(_with_overrides([{"type": flag_type, "code": "CSCI400"}]))
+
+
+@pytest.mark.parametrize("code", ["", "   ", "not a course!!", "A" * 10000, "MNGN501; DROP", "МNGN501"])
+def test_override_rejects_bad_codes(code):
+    with pytest.raises(ValidationError):
+        AgentRequest.model_validate(_with_overrides([{"type": "exception_claimed", "code": code}]))
+
+
+def test_override_needs_a_code():
+    with pytest.raises(ValidationError):
+        AgentRequest.model_validate(_with_overrides([{"type": "exception_claimed"}]))
+    with pytest.raises(ValidationError):
+        AgentRequest.model_validate(_with_overrides([{"type": "exception_claimed", "code": None}]))
+
+
+def test_override_duplicates_are_dropped():
+    request = AgentRequest.model_validate(
+        _with_overrides(
+            [
+                {"type": "exception_claimed", "code": "MNGN501"},
+                {"type": "exception_claimed", "code": "mngn 501"},
+                {"type": "exception_claimed", "code": "CSCI400"},
+            ]
+        )
+    )
+    assert [o.code for o in request.overrides] == ["MNGN501", "CSCI400"]
+
+
+def test_override_list_is_capped():
+    many = [{"type": "exception_claimed", "code": f"CSCI{i:03d}"} for i in range(OVERRIDES_MAX + 1)]
+    with pytest.raises(ValidationError):
+        AgentRequest.model_validate(_with_overrides(many))
+    assert len(AgentRequest.model_validate(_with_overrides(many[:OVERRIDES_MAX])).overrides) == OVERRIDES_MAX
+
+
+@pytest.mark.parametrize("term", ["Fall ２０２６", "Fall ٢٠٢٦"])
+def test_request_rejects_non_ascii_digits_in_start_term(term):
+    with pytest.raises(ValidationError):
+        AgentRequest.model_validate({"student": _student(), "semesters": 8, "start_term": term})
+
+
+@pytest.mark.parametrize(
+    "term, ok",
+    [
+        ("Fall 1999", False),
+        ("Fall 0001", False),
+        ("Spring 2000", True),
+        ("Fall 2026", True),
+        ("Summer 2500", True),
+        ("Fall 2501", False),
+        ("Fall 9999", False),
+    ],
+)
+def test_request_start_year_is_2000_to_2500(term, ok):
+    body = {"student": _student(), "semesters": 8, "start_term": term}
+    if ok:
+        AgentRequest.model_validate(body)
+    else:
+        with pytest.raises(ValidationError):
+            AgentRequest.model_validate(body)
+
+
+@pytest.mark.parametrize("value", [True, False, 8.0, "8"])
+def test_request_semesters_must_be_a_real_integer(value):
+    with pytest.raises(ValidationError):
+        AgentRequest.model_validate({"student": _student(), "semesters": value, "start_term": "Fall 2026"})
+
+
+@pytest.mark.parametrize("value", ["yes", "false", 1, 0])
+def test_request_include_summers_must_be_a_real_boolean(value):
+    with pytest.raises(ValidationError):
+        AgentRequest.model_validate(
+            {"student": _student(), "semesters": 8, "start_term": "Fall 2026", "include_summers": value}
+        )
+
+
+def test_request_strict_types_still_parse_from_json():
+    raw = json.dumps({"student": _student(), "semesters": 8, "start_term": "Fall 2026", "include_summers": True})
+    request = AgentRequest.model_validate_json(raw)
+    assert request.semesters == 8 and request.include_summers is True
+    with pytest.raises(ValidationError):
+        AgentRequest.model_validate_json(raw.replace('"semesters": 8', '"semesters": "8"'))
 
 
 def test_response_ok():
@@ -163,6 +258,61 @@ def test_response_cannot_work_keeps_best_attempt():
 def test_response_cannot_work_needs_a_problem():
     with pytest.raises(ValidationError):
         AgentResponse(status="cannot_work", plan=_plan(False), explanation="x", usage=_usage())
+
+
+def test_response_ok_rejects_open_error_flags():
+    # requirements_met says true, but the sample's broken prerequisite flag is still open.
+    plan = _plan(False)
+    plan = plan.model_copy(update={"summary": plan.summary.model_copy(update={"requirements_met": True})})
+    with pytest.raises(ValidationError):
+        AgentResponse(status="ok", plan=plan, explanation="x", usage=_usage())
+    # The sample's broken prerequisite cannot be overridden, so marking it overridden does not help.
+    forged = plan.model_copy(update={"flags": [f.model_copy(update={"overridden": True}) for f in plan.flags]})
+    with pytest.raises(ValidationError):
+        AgentResponse(status="ok", plan=forged, explanation="x", usage=_usage())
+    # An overridable error that the student overrode does count as handled.
+    allowed = plan.model_copy(
+        update={"flags": [f.model_copy(update={"overridden": True, "overridable": True}) for f in plan.flags]}
+    )
+    assert AgentResponse(status="ok", plan=allowed, explanation="x", usage=_usage()).status == "ok"
+
+
+def test_bachelor_limit_is_shared_with_check_plan():
+    from degree_planner_backend.agent.tools import SEMESTERS_MAX
+
+    assert SEMESTERS_MAX_BACHELOR == SEMESTERS_MAX == 18
+
+
+@pytest.mark.parametrize("explanation", ["", "   ", "\n"])
+def test_response_rejects_empty_explanation(explanation):
+    with pytest.raises(ValidationError):
+        AgentResponse(status="cannot_work", plan=None, explanation=explanation, problems=["y"], usage=_usage())
+
+
+@pytest.mark.parametrize("problems", [[""], ["  "], ["real reason", ""]])
+def test_response_rejects_empty_problems(problems):
+    with pytest.raises(ValidationError):
+        AgentResponse(status="cannot_work", plan=None, explanation="x", problems=problems, usage=_usage())
+
+
+def test_usage_steps_must_match_tokens():
+    with pytest.raises(ValidationError):
+        AgentResponse(
+            status="cannot_work",
+            plan=None,
+            explanation="x",
+            problems=["y"],
+            usage={"input_tokens": 500, "output_tokens": 50, "steps": 0},
+        )
+    # No model call at all (for example, a program that is not loaded) is fine.
+    none_used = AgentResponse(
+        status="cannot_work",
+        plan=None,
+        explanation="x",
+        problems=["program not loaded"],
+        usage={"input_tokens": 0, "output_tokens": 0, "steps": 0},
+    )
+    assert none_used.usage.steps == 0
 
 
 def test_usage_rejects_negative_counts():

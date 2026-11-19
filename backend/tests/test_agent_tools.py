@@ -23,6 +23,7 @@ from degree_planner_backend.agent.tools import (
     GET_PROGRAM_REQUIREMENTS_TOOL,
     PROGRAM_NOT_FOUND,
     SEARCH_CATALOG_TOOL,
+    SEMESTERS_MAX,
     get_prerequisites,
     LABEL_MAX,
     clean_label,
@@ -1590,6 +1591,16 @@ def issue_types(issues: list[dict]) -> list[str]:
     return [issue["type"] for issue in issues]
 
 
+def test_check_plan_accepts_the_bachelor_semester_limit(plan_db: sqlite3.Connection) -> None:
+    # 18 semesters is the longest a request can ask for (request_models.SEMESTERS_MAX_BACHELOR).
+    assert SEMESTERS_MAX == 18
+    filler = [[] for _ in range(SEMESTERS_MAX - 2)]
+    result = check_plan(plan_db, sems(["CSCI100", "MATH201"], ["CSCI200"], *filler), StudentContext(student(["t-minor"])))
+    assert "error" not in result
+    assert len(result["semesters"]) == SEMESTERS_MAX
+    assert result["requirements_met"] is True
+
+
 def test_check_plan_valid_plan_passes(plan_db: sqlite3.Connection) -> None:
     result = check_plan(plan_db, sems(["CSCI100", "MATH201"], ["CSCI200"]), StudentContext(student(["t-minor"])))
     assert result["requirements_met"] is True
@@ -1715,7 +1726,7 @@ def test_build_plan_is_reusable(plan_db: sqlite3.Connection) -> None:
         {"semesters": [{"label": "T"}]},
         {"semesters": [{"label": "T", "courses": [7]}]},
         {"semesters": [{"label": "T", "courses": ["CSCI100"] * 13}]},
-        {"semesters": [{"label": "T", "courses": ["CSCI100"]}] * 17},
+        {"semesters": [{"label": "T", "courses": ["CSCI100"]}] * (SEMESTERS_MAX + 1)},
     ],
 )
 def test_check_plan_bad_input(plan_db: sqlite3.Connection, tool_input: dict) -> None:

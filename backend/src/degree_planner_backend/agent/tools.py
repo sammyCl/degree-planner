@@ -888,7 +888,9 @@ def get_program_requirements(connection: sqlite3.Connection, tool_input: dict[st
 
 # --- check_plan -----------------------------------------------------------------
 
-SEMESTERS_MAX = 16
+# The most semesters any request can ask for (the bachelor's limit). request_models.py reads its
+# bachelor's limit from here, so the request format and check_plan never disagree.
+SEMESTERS_MAX = 18
 COURSES_PER_SEMESTER_MAX = 12
 SEMESTER_LABEL_MAX = 40
 FLAG_MESSAGE_MAX = 600
