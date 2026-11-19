@@ -163,3 +163,139 @@ BUG-008  One malformed course row blocks every catalog search
              When fixed, tell Samantha: test_malformed_course_row_returns_error
              in backend/tests/test_agent_tools.py expects the old behavior and
              must change with it.
+
+BUG-009  Deeply nested prerequisites load fine but can never be read back
+  Status:    Open
+  Owner:     Midhat Sajad (data format, data loader)
+  Where:     backend/src/degree_planner_backend/data_loader.py, models.py
+  Found:     2026-11-18 by get_prerequisites adversarial test agent, reproduced
+             by Samantha
+  Steps:     load one course whose prerequisites nest 100 levels deep
+             (alternating AND/OR around one course) plus a normal MATH100, with
+             refresh_database; then search_catalog(conn, {"query": "MATH"}).
+             Repeat with 150 levels.
+  Actual:    100 levels: LoadReport(courses_loaded=2, errors={}), then every
+             search fails ("recursion limit exceeded" from model_validate_json;
+             the agent tool shows "catalog could not be read", see BUG-008).
+             150 levels: refresh_database itself raises
+             PydanticSerializationError and the whole load stops.
+  Expected:  the loader rejects that course and lists it in LoadReport.errors
+  Fix idea:  at load, round-trip each course through
+             Course.model_validate_json(course.model_dump_json()) inside the
+             per-row error handling, or cap nesting depth in the format.
+
+BUG-010  Empty AND/OR groups are allowed in the data format
+  Status:    Open
+  Owner:     Midhat Sajad (data format)
+  Where:     backend/src/degree_planner_backend/models.py (AndRequirement.of,
+             OrRequirement.of), docs/data-format.md
+  Found:     2026-11-18 by get_prerequisites adversarial test agent, reproduced
+             by Samantha
+  Steps:     load a course with prerequisites
+             {"type": "AND", "of": [{"type": "course", "code": "MATH111"},
+                                    {"type": "OR", "of": []}]}
+  Actual:    loads with errors={}. An OR of nothing can never be satisfied and
+             an AND of nothing means nothing; the validator and agent have to
+             guess which the data author meant. (The agent tool now shows it
+             as "MATH111 AND (empty OR group)" instead of hiding it.)
+  Expected:  the loader rejects empty groups
+  Fix idea:  of: list[Requirement] = Field(min_length=1) on both models, and
+             say so in docs/data-format.md.
+
+BUG-011  Course codes are not checked or normalized when data is loaded
+  Status:    Open
+  Owner:     Midhat Sajad (data format, data loader)
+  Where:     backend/src/degree_planner_backend/models.py (Course.code),
+             data_loader.py
+  Found:     2026-11-18 by get_prerequisites adversarial test agent, reproduced
+             by Samantha
+  Steps:     load a course with "code": "math101" (or "CSCI 200"), then
+             get_prerequisites(conn, {"code": "math101"})
+  Actual:    loads with errors={}, but the course can never be found:
+             {"error": "no course MATH101 in the catalog. ..."}. The agent tool
+             uppercases and removes spaces from the code it is asked for, so a
+             stored code in any other form is unreachable.
+  Expected:  codes are stored in one form (CSCI400), and anything else is
+             normalized or rejected at load
+  Fix idea:  validate Course.code against ^[A-Z]{3,4}\d{3}[A-Z]{0,2}$ (the shape
+             of every real code in the CSVs), uppercase and strip spaces first.
+
+BUG-012  The catalog CSVs hold placeholder codes and free-text corequisites
+  Status:    Open
+  Owner:     Samantha Clapp (bachelor's data: mines-courses.csv) and
+             Midhat Sajad (graduate data: mines-graduate-courses.csv)
+  Where:     data/Academic Catalog/mines-courses.csv,
+             data/Academic Catalog/mines-graduate-courses.csv
+  Found:     2026-11-18 by get_prerequisites adversarial test agent; counts
+             measured by Samantha
+  Steps:     read the course_number and corequisites columns of both CSVs
+  Actual:    mines-courses.csv has 14 placeholder codes that are not real
+             courses: BIOLADD, CHGN1XX, CSCI1XX, EBGN1XX, HASS1XX, HASS2XX,
+             HASS4XX, LIFL1XX, LIFL2XX, LIFL3XX, MATH1XX, PAGN1XX, PAGN2XX,
+             PHGN1XX. Of 234 corequisite cells, 68 are not one course code
+             ("AMFG 501, AMFG 521, AMFG 531", "Senior or graduate standing in
+             QBE, BIOL301"). In the graduate CSV all 5 corequisite cells are
+             text ("GEGN462 or GEGN561.").
+             Converted as-is, placeholders would show up in search_catalog as
+             real courses, and corequisites would reach the model as text.
+             (get_prerequisites already refuses placeholder codes.)
+  Expected:  only real courses in the catalog; corequisites as a list of codes,
+             with "or" and standing rules expressed some other way
+  Fix idea:  during CSV-to-JSON conversion (BUG-003), drop or flag the
+             placeholder rows and parse corequisites into codes; decide with
+             Midhat how the format should carry "X or Y" corequisites.
+
+BUG-013  A catalog year that is not loaded looks like "no match" in search_catalog
+  Status:    Open
+  Owner:     Midhat Sajad (lookups), then Samantha Clapp (agent tools)
+  Where:     backend/src/degree_planner_backend/lookups.py,
+             backend/src/degree_planner_backend/agent/tools.py
+  Found:     2026-11-18 by second get_prerequisites adversarial test agent,
+             reproduced by Samantha
+  Steps:     load docs/data-format.sample.json (only 2026-2027), then
+             search_catalog(conn, {"query": "CSCI", "catalog_year": "0000-0000"})
+             (also "2027-2026", "2019-2020")
+  Actual:    {"courses": [], "count": 0}. The year has the right shape, so
+             the tool accepts it, and the tool description tells the model
+             that an empty list means "try a different query", so it rewrites
+             a query that was fine.
+  Expected:  {"error": "no courses loaded for catalog year 0000-0000; loaded
+             years: 2026-2027"}
+  Fix idea:  Midhat: add lookups.catalog_years(connection) -> list[str]
+             (SELECT DISTINCT catalog_year FROM courses). Samantha: call it in
+             search_catalog when catalog_year is given and not in the list.
+
+BUG-014  Exception labels are not checked when data is loaded
+  Status:    Open
+  Owner:     Midhat Sajad (data format, data loader)
+  Where:     backend/src/degree_planner_backend/models.py
+             (ExceptionRequirement.label), data_loader.py
+  Found:     2026-11-18 by second get_prerequisites adversarial test agent,
+             reproduced by Samantha
+  Steps:     load a course with prerequisites {"type": "exception", "label": L}
+             where L is "", or 100,000 characters, or contains U+202E (a
+             right-to-left override) or a newline
+  Actual:    all load with errors={}. Labels are scraped text that reaches
+             the model. (The agent tool now cleans them: drops invisible
+             characters, joins lines, cuts at 200 characters, shows "" as
+             "(no label)". The validator and frontend still see the raw text.)
+  Expected:  the loader rejects or cleans empty, very long, and control-
+             character labels, so every consumer gets the same clean text
+  Fix idea:  label: str = Field(min_length=1, max_length=200) plus a validator
+             that strips Unicode categories Cc/Cf; say so in docs/data-format.md.
+
+BUG-015  Design note: tool errors carry no machine-readable kind
+  Status:    Open (decide when building the agent loop)
+  Owner:     Samantha Clapp (agent tools, agent loop)
+  Where:     backend/src/degree_planner_backend/agent/tools.py
+  Found:     2026-11-18 by second get_prerequisites adversarial test agent
+             (reasoned, not a crash)
+  Steps:     compare the error from get_prerequisites for {"code": 400} (bad
+             input), {"code": "NOPE999"} (not found), and a closed database
+             (server problem)
+  Actual:    all three are {"error": "<sentence>"}; the model and the agent
+             loop can tell them apart only by the wording
+  Expected:  the loop can decide retry / ask the student / stop without
+             parsing English
+  Fix idea:  add "kind": "bad_input" | "not_found" | "unavailable" to every
+             error in both tools, at the same time as the loop that uses it.
