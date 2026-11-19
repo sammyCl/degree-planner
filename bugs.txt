@@ -299,3 +299,102 @@ BUG-015  Design note: tool errors carry no machine-readable kind
              parsing English
   Fix idea:  add "kind": "bad_input" | "not_found" | "unavailable" to every
              error in both tools, at the same time as the loop that uses it.
+
+BUG-016  No bachelor's or graduate programs are loaded, only minors and ASIs
+  Status:    Open
+  Owner:     Samantha Clapp (bachelor's data) and Midhat Sajad (graduate and
+             combined data)
+  Where:     data/json/ (has minors.json, asis.json, forms-policies.json only)
+  Found:     2026-11-18 by get_forms adversarial test agent, reproduced by
+             Samantha
+  Steps:     from backend/:  load ../data/json with refresh_database and list
+             program_id from the programs table
+  Actual:    64 programs: 35 minors, 18 ASIs, 7 tracks, and 4 others; none
+             ending in -bs, -ms, or a combined BS+MS. Every example in EVAL.md
+             needs a bachelor's or master's program, so get_program_requirements
+             and the validator have nothing to work with for them yet.
+             (get_forms no longer fails on these ids: it lists the "any" forms
+             and says program_found: false.)
+  Expected:  the programs for the five examples are in data/json
+  Fix idea:  part of the Bachelor's data and Graduate data tasks; see also
+             BUG-003 (course catalog not loaded).
+
+BUG-017  Form fields are not checked when data is loaded
+  Status:    Open
+  Owner:     Midhat Sajad (data format, data loader); tell Abdallah Salhi
+             (forms data) what the rules become
+  Where:     backend/src/degree_planner_backend/models.py (Form),
+             data_loader.py, docs/data-format.md
+  Found:     2026-11-18 by get_forms adversarial test agent, reproduced by
+             Samantha
+  Steps:     load forms with: max_credits NaN; max_credits -5; applies_to
+             ["Any"]; applies_to []; then get_forms(conn, {}) and
+             get_forms(conn, {"program_id": "anything"})
+  Actual:    all load with errors={}. NaN is stored as null, so a broken cap
+             reads as "no cap"; -5 comes back as -5.0. "Any" (capital A) is not
+             treated as "any", so that form is missing from every program's
+             list, and the [] form shows only in the full list. form_id and
+             applies_to can hold any text (the agent tool now cleans them, but
+             the validator and frontend still see the raw text), and url can
+             be any scheme (the tool now passes only https).
+  Expected:  the loader rejects or normalizes these, so every consumer sees
+             the same valid forms
+  Fix idea:  form_id and applies_to entries as lowercase slugs (lowercase and
+             strip first), applies_to min_length=1, max_credits finite and > 0
+             (allow_inf_nan=False, gt=0), url must start with https://.
+
+BUG-018  Duplicate form_ids replace each other silently, and one bad form row
+         blocks every form
+  Status:    Open
+  Owner:     Midhat Sajad (data loader, lookups)
+  Where:     backend/src/degree_planner_backend/data_loader.py
+             (INSERT OR REPLACE into forms), lookups.py (get_forms)
+  Found:     2026-11-18 by get_forms adversarial test agent, reproduced by
+             Samantha
+  Steps:     (a) put form_id "dup" in a.json (notes "first file") and in b.json
+             (notes "second file"), load the folder; (b) insert a forms row
+             with data '{}' and call get_forms(conn, {})
+  Actual:    (a) LoadReport(forms_loaded=2, errors={}), but only one form
+             remains, with notes "second file". (b) every get_forms call
+             returns "The catalog data ... could not be read" (same pattern as
+             BUG-008 for courses).
+  Expected:  (a) the loader reports the duplicate; (b) the bad row is skipped
+             and logged, and the other forms are still listed
+  Fix idea:  track seen form_ids in refresh_database and add an error entry;
+             validate per row in lookups.get_forms and skip failures.
+
+BUG-019  Forms have no catalog year; the file's catalog_year is dropped
+  Status:    Open
+  Owner:     Midhat Sajad (data format); Abdallah Salhi (forms data)
+  Where:     backend/src/degree_planner_backend/models.py (Form, DataFile),
+             data/json/forms-policies.json, docs/data-format.md
+  Found:     2026-11-18 by get_forms adversarial test agent (reasoned);
+             confirmed by Samantha from the models
+  Steps:     data/json/forms-policies.json has a top-level
+             "catalog_year": "2026-2027"; DataFile has no catalog_year field,
+             so pydantic ignores it, and Form has none either
+  Actual:    get_forms cannot say which catalog year a policy comes from, while
+             minors are 2026-2027 and ASIs are 2025-2026. A rule that changed
+             between years cannot be told apart.
+  Expected:  each form or policy carries the catalog year it was taken from
+  Fix idea:  add catalog_year to Form (and to the forms table key), filled from
+             the file or per entry; then the agent tool can return it.
+
+BUG-020  No way to list program ids, so a mistyped id cannot be corrected
+  Status:    Open
+  Owner:     Midhat Sajad (lookups), then Samantha Clapp (agent tools)
+  Where:     backend/src/degree_planner_backend/lookups.py,
+             backend/src/degree_planner_backend/agent/tools.py (get_forms)
+  Found:     2026-11-18 by second get_forms adversarial test agent,
+             reproduced by Samantha
+  Steps:     load data/json, then get_forms(conn, {"program_id":
+             "computer-science-minr"}) (a typo for computer-science-minor)
+  Actual:    program_found: false, the forms for every program, and a note
+             saying the id is mistyped or not loaded. The model cannot tell
+             which, because no lookup lists the loaded program ids.
+  Expected:  a short "did_you_mean": ["computer-science-minor"] when a loaded
+             id is close
+  Fix idea:  Midhat: add lookups.program_ids(connection) -> list[str]
+             (SELECT DISTINCT program_id FROM programs). Samantha: in get_forms,
+             add up to 3 difflib.get_close_matches when program_found is false
+             (stored ids only, so nothing the model sent is echoed).
