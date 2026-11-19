@@ -39,7 +39,7 @@ Until Lookups and Plan validator exist, build the agent against stub tools that 
 | Name | Task | Priority | Due | Needs | Status |
 |---|---|---|---|---|---|
 | Bachelor's data | Data: collect the bachelor's degrees and course catalog entries for the examples into the Data format format | P0 | Nov 18 | Data format, Bachelor's list | [ ] |
-| Agent tools | Agent tools: `search_catalog`, `get_prerequisites`, `get_program_requirements`, `get_forms`, each with clear descriptions and error returns, wrapping the backend lookups. Start with stubs | P0 | Nov 17 | Plan format, Lookups (stubs first) | [ ] |
+| Agent tools | Agent tools: `search_catalog`, `get_prerequisites`, `get_program_requirements`, `get_forms`, each with clear descriptions and error returns, wrapping the backend lookups. Start with stubs | P0 | Nov 17 | Plan format, Lookups (stubs first) | [x] |
 | Check-plan tool | `check_plan` tool calling the backend validator, returning flags the agent can act on | P0 | Nov 18 | Plan validator (stub first) | [ ] |
 | Agent loop | Agent loop: plan, check, revise, with a step limit and a clear "cannot work" answer; system prompt covers: student stays in the loop, never invent courses not in the data. First target: Example 1 gives a valid plan | P0 | Nov 19 | Agent tools, Check-plan tool | [ ] |
 | Chat logic | Chat endpoint logic: the student asks for electives or applies a granted exception; the agent returns a reply and an updated plan. API key from environment only, never in git | P2 | Nov 19 | Agent loop, API endpoints | [ ] |
@@ -83,3 +83,4 @@ Never cut Agent tools, Check-plan tool, Agent loop, Eval runner and Eval runs: t
 ## Status log
 
 - 2026-11-12: Plan created. Nothing started.
+- 2026-11-19: Agent tools done (Samantha): all four tools in backend/src/degree_planner_backend/agent/tools.py, built against the real lookups (no stubs), 294 tests in backend/tests/test_agent_tools.py after nine adversarial reviews; data and lookup problems found on the way are in bugs.txt (BUG-001 to BUG-023). On branch agent/tools, not yet merged.
