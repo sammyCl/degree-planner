@@ -23,21 +23,21 @@
         {
           "course_id": "sem-1-csci128",
           "code": "CSCI128",
-          "title": "Computer Science For Stem",
+          "title": "Computer Science for STEM",
           "credits": 3.0,
           "status": "planned"
         },
         {
           "course_id": "sem-1-math112",
           "code": "MATH112",
-          "title": "Calculus For Scientists And Engineers Ii",
+          "title": "Calculus for Scientists and Engineers II",
           "credits": 4.0,
           "status": "planned"
         },
         {
           "course_id": "sem-1-chgn121",
           "code": "CHGN121",
-          "title": "Principles Of Chemistry I",
+          "title": "Principles of Chemistry I",
           "credits": 4.0,
           "status": "planned"
         },
@@ -72,7 +72,7 @@
         {
           "course_id": "sem-2-math213",
           "code": "MATH213",
-          "title": "Calculus For Scientists And Engineers Iii",
+          "title": "Calculus for Scientists and Engineers III",
           "credits": 4.0,
           "status": "planned"
         },
@@ -86,7 +86,7 @@
         {
           "course_id": "sem-2-hass100",
           "code": "HASS100",
-          "title": "Nature And Human Values",
+          "title": "Nature and Human Values",
           "credits": 3.0,
           "status": "planned"
         },
@@ -121,21 +121,21 @@
         {
           "course_id": "sem-3-phgn200",
           "code": "PHGN200",
-          "title": "Physics Ii-Electromagnetism And Optics",
+          "title": "Physics II-Electromagnetism and Optics",
           "credits": 4.0,
           "status": "planned"
         },
         {
           "course_id": "sem-3-math201",
           "code": "MATH201",
-          "title": "Introduction To Statistics",
+          "title": "Introduction to Statistics",
           "credits": 3.0,
           "status": "planned"
         },
         {
           "course_id": "sem-3-cben110",
           "code": "CBEN110",
-          "title": "Fundamentals Of Biology I",
+          "title": "Fundamentals of Biology I",
           "credits": 4.0,
           "status": "planned"
         }
@@ -149,7 +149,7 @@
         {
           "course_id": "sem-4-csci220",
           "code": "CSCI220",
-          "title": "Data Structures And Algorithms",
+          "title": "Data Structures and Algorithms",
           "credits": 3.0,
           "status": "planned"
         },
@@ -170,14 +170,14 @@
         {
           "course_id": "sem-4-math334",
           "code": "MATH334",
-          "title": "Introduction To Probability",
+          "title": "Introduction to Probability",
           "credits": 3.0,
           "status": "planned"
         },
         {
           "course_id": "sem-4-ebgn201",
           "code": "EBGN201",
-          "title": "Principles Of Economics",
+          "title": "Principles of Economics",
           "credits": 3.0,
           "status": "planned"
         }
@@ -198,7 +198,7 @@
         {
           "course_id": "sem-5-csci400",
           "code": "CSCI400",
-          "title": "Principles Of Programming Languages",
+          "title": "Principles of Programming Languages",
           "credits": 3.0,
           "status": "planned"
         },
@@ -254,7 +254,7 @@
         {
           "course_id": "sem-6-chgn122",
           "code": "CHGN122",
-          "title": "Principles Of Chemistry Ii (SC1)",
+          "title": "Principles of Chemistry II (SC1)",
           "credits": 4.0,
           "status": "planned"
         }
@@ -268,21 +268,21 @@
         {
           "course_id": "sem-7-csci475",
           "code": "CSCI475",
-          "title": "Information Security And Privacy",
+          "title": "Information Security and Privacy",
           "credits": 3.0,
           "status": "planned"
         },
         {
           "course_id": "sem-7-csci250",
           "code": "CSCI250",
-          "title": "Python-Based Computing: Building A Sensor System",
+          "title": "Python-Based Computing: Building a Sensor System",
           "credits": 3.0,
           "status": "planned"
         },
         {
           "course_id": "sem-7-csci303",
           "code": "CSCI303",
-          "title": "Introduction To Data Science",
+          "title": "Introduction to Data Science",
           "credits": 3.0,
           "status": "planned"
         },
@@ -303,14 +303,14 @@
         {
           "course_id": "sem-8-csci437",
           "code": "CSCI437",
-          "title": "Introduction To Computer Vision",
+          "title": "Introduction to Computer Vision",
           "credits": 3.0,
           "status": "planned"
         },
         {
           "course_id": "sem-8-csci410",
           "code": "CSCI410",
-          "title": "Elements Of Computing Systems",
+          "title": "Elements of Computing Systems",
           "credits": 3.0,
           "status": "planned"
         }
