@@ -1,0 +1,165 @@
+BUGS - Group 9 degree planner
+==============================
+
+One list of every bug we find, in any part of the project. Each entry says
+whose part it is in, how to make it happen, and what should happen instead,
+so the owner can fix it without asking.
+
+How to use this file
+--------------------
+- Found a bug? Add an entry at the bottom with the next number. Copy the
+  template below and fill in every field.
+- Steps must be exact: the command, the input, and the real output you saw.
+  If you only suspect a bug and have not reproduced it, say so in "Found by".
+- Owner comes from "Who owns what" in CLAUDE.md:
+    Frontend ................................... Abdallah Salhi
+    Backend, data format, validator ............ Midhat Sajad
+    Agent, tools, chatbot logic, evaluation .... Samantha Clapp
+    Data: bachelor's ........................... Samantha Clapp
+    Data: graduate and combined ................ Midhat Sajad
+    Data: minors, ASIs, forms .................. Abdallah Salhi
+- Only the owner (or someone they ask) changes the status. When you fix a
+  bug, set Status to "Fixed", add the branch or PR, and name the test that
+  now covers it. Do not delete entries; fixed ones show what was tested.
+- Never paste private data here (keys, real student transcripts). This file
+  is public on GitHub.
+
+Statuses: Open, In progress, Fixed, Won't fix (say why).
+
+Template
+--------
+BUG-NNN  <one-line title>
+  Status:    Open
+  Owner:     <name> (<part>)
+  Where:     <file or screen>
+  Found:     <YYYY-MM-DD> by <who or what>
+  Steps:     <exact steps, input, command>
+  Actual:    <what happened, real output>
+  Expected:  <what should happen>
+  Fix idea:  <optional, one or two lines>
+  Fixed in:  <branch / PR, and the test that covers it>
+
+
+==============================================================================
+Entries
+==============================================================================
+
+BUG-001  search_catalog crashed when the tool input was not a dict
+  Status:    Fixed
+  Owner:     Samantha Clapp (agent tools)
+  Where:     backend/src/degree_planner_backend/agent/tools.py
+  Found:     2026-11-18 by adversarial test agent, reproduced by Samantha
+  Steps:     search_catalog(connection, None)   (also "MATH", ["MATH"], 42)
+  Actual:    AttributeError: 'NoneType' object has no attribute 'get'
+  Expected:  {"error": ...} so the agent loop never crashes
+  Fixed in:  branch agent/tools; test_non_dict_input_returns_error
+
+BUG-002  search_catalog crashed on database errors and bad stored rows
+  Status:    Fixed
+  Owner:     Samantha Clapp (agent tools)
+  Where:     backend/src/degree_planner_backend/agent/tools.py
+  Found:     2026-11-18 by adversarial test agent, reproduced by Samantha
+  Steps:     search_catalog on (a) a database with no tables, (b) a closed
+             connection, (c) a courses row whose data column is '{}'
+  Actual:    (a) OperationalError: no such table: courses
+             (b) ProgrammingError: Cannot operate on a closed database.
+             (c) pydantic ValidationError: 7 validation errors for Course
+  Expected:  {"error": ...} telling the model it is a server problem
+  Fixed in:  branch agent/tools; test_database_without_tables_returns_error,
+             test_closed_connection_returns_error,
+             test_malformed_course_row_returns_error
+
+BUG-003  The real course catalog is not loaded: search finds 0 courses
+  Status:    Open
+  Owner:     Samantha Clapp (bachelor's data: mines-courses.csv) and
+             Midhat Sajad (graduate data: mines-graduate-courses.csv; data format)
+  Where:     data/Academic Catalog/*.csv, backend data_loader.py
+  Found:     2026-11-18 by adversarial test agent, reproduced by Samantha
+  Steps:     from backend/:  uv run python -c "
+               import sqlite3, pathlib
+               from degree_planner_backend.data_loader import refresh_database
+               from degree_planner_backend.agent.tools import search_catalog
+               c = sqlite3.connect(':memory:'); refresh_database(pathlib.Path('../data'), c)
+               print(c.execute('select count(*) from courses').fetchone()[0])
+               print(search_catalog(c, {'query': 'CSCI'}))"
+  Actual:    0 courses; {'courses': [], 'count': 0}. The loader reads only
+             *.json files, and the ~3,100 courses exist only as CSV.
+  Expected:  the catalog courses load, and a CSCI search finds CSCI courses
+  Fix idea:  convert each CSV into data-format JSON (docs/data-format.md).
+             Until then the agent tool cannot tell "empty catalog" from
+             "no match" and tells the model to keep trying other queries.
+
+BUG-004  The two catalog CSVs overlap and would silently overwrite each other
+  Status:    Open
+  Owner:     Midhat Sajad (graduate data, data format), with Samantha Clapp
+             (bachelor's data)
+  Where:     data/Academic Catalog/mines-courses.csv,
+             data/Academic Catalog/mines-graduate-courses.csv,
+             data_loader.py (INSERT OR REPLACE on code + catalog_year)
+  Found:     2026-11-18 by adversarial test agent; counts re-measured by Samantha
+  Steps:     read both CSVs and compare the course_number column
+  Actual:    mines-courses.csv: 2,131 rows, 2,131 codes.
+             mines-graduate-courses.csv: 1,037 rows but 953 distinct codes
+             (84 repeated rows). 947 codes are in both files, and 463 of
+             those differ in description or credits. Loaded into the same
+             catalog year, the second file replaces the first with no warning.
+  Expected:  one row per course per catalog year, chosen on purpose
+  Fix idea:  decide which file wins for shared codes (or merge them) before
+             converting; have the loader report duplicates instead of
+             replacing quietly.
+
+BUG-005  search_catalog crashed on a lone surrogate character in the input
+  Status:    Fixed
+  Owner:     Samantha Clapp (agent tools)
+  Where:     backend/src/degree_planner_backend/agent/tools.py
+  Found:     2026-11-18 by second adversarial test agent, reproduced by Samantha
+  Steps:     search_catalog(conn, json.loads('{"query":"MATH","catalog_year":"\ud800"}'))
+  Actual:    UnicodeEncodeError (json.loads accepts the escape; SQLite cannot
+             encode it)
+  Expected:  {"error": ...} as bad input
+  Fixed in:  branch agent/tools; test_lone_surrogate_returns_error
+
+BUG-006  search_catalog error messages showed database internals to the model
+  Status:    Fixed
+  Owner:     Samantha Clapp (agent tools)
+  Where:     backend/src/degree_planner_backend/agent/tools.py
+  Found:     2026-11-18 by second adversarial test agent
+  Steps:     search_catalog on a database with no tables, or with a connection
+             used from another thread
+  Actual:    the error text included "no such table: courses" and
+             "...thread id 8521671040..."
+  Expected:  one fixed message for the model; details only in the server log
+  Fixed in:  branch agent/tools; test_database_without_tables_returns_error,
+             test_other_thread_hides_thread_ids
+
+BUG-007  A course with infinite or NaN credits loads fine, then breaks every search
+  Status:    Open
+  Owner:     Midhat Sajad (data format, data loader)
+  Where:     backend/src/degree_planner_backend/models.py (Course.credits),
+             data_loader.py
+  Found:     2026-11-18 by second adversarial test agent, reproduced by Samantha
+  Steps:     put two courses in a data JSON file: MATH201 with credits 3 and
+             ZZZZ999 with credits 1e400 (JSON for infinity). Load the folder
+             with refresh_database, then search_catalog(conn, {"query": "MATH"}).
+  Actual:    LoadReport(... courses_loaded=2, errors={}). The row is stored
+             with "credits": null. Every search afterwards returns "The course
+             catalog could not be read", even for courses that are fine.
+  Expected:  the loader rejects ZZZZ999 and lists it in LoadReport.errors
+  Fix idea:  Field(allow_inf_nan=False) on credits, or
+             model_config = ConfigDict(allow_inf_nan=False) on the models
+
+BUG-008  One malformed course row blocks every catalog search
+  Status:    Open
+  Owner:     Midhat Sajad (lookups)
+  Where:     backend/src/degree_planner_backend/lookups.py (search_catalog)
+  Found:     2026-11-18 by second adversarial test agent
+  Steps:     insert a courses row with data '{}' (code BAD100), then search
+             for "MATH", which does not match BAD100
+  Actual:    lookups.search_catalog validates every row before filtering, so
+             the one bad row raises ValidationError and the search fails.
+             The agent tool now turns this into "catalog unavailable".
+  Expected:  the bad row is skipped (and logged); the MATH search still works
+  Fix idea:  validate per row in lookups.search_catalog and skip failures.
+             When fixed, tell Samantha: test_malformed_course_row_returns_error
+             in backend/tests/test_agent_tools.py expects the old behavior and
+             must change with it.
