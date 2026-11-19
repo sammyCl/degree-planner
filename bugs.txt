@@ -545,3 +545,102 @@ BUG-027  Courses that may be repeated for credit cannot be marked
              than once
   Fix idea:  add repeatable: bool = false and max_repeat_credits to Course;
              the tool then allows repeats up to that limit.
+
+BUG-028  Student accepts an empty programs list
+  Status:    Open
+  Owner:     Midhat Sajad (data format)
+  Where:     backend/src/degree_planner_backend/plan_models.py (Student)
+  Found:     2026-11-19 by Samantha, probing the agent request format
+  Steps:     AgentRequest.model_validate({"student": {"degree_level":
+             "bachelor", "programs": [], "catalog_year": "2026-2027",
+             "completed_courses": []}, "semesters": 8, "start_term":
+             "Fall 2026"})
+  Actual:    accepted; the empty list is only caught later, when build_plan
+             reports no programs
+  Expected:  rejected when the request comes in: a student always has at
+             least one program
+  Fix idea:  programs: list[str] = Field(min_length=1)
+
+BUG-029  Completed courses accept negative (or zero) credits
+  Status:    Open
+  Owner:     Midhat Sajad (data format, transcript parser)
+  Where:     backend/src/degree_planner_backend/plan_models.py (CompletedCourse)
+  Found:     2026-11-19 by Samantha, probing the agent request format
+  Steps:     a request whose student has completed_courses [{"code":
+             "MATH111", "credits": -4, "term": "transfer"}]
+  Actual:    accepted, so -4 credits can reach the validator's credit totals
+  Expected:  rejected; credits are positive (check whether the catalog has
+             0-credit courses that a transcript could list before choosing
+             gt=0 or ge=0)
+  Fix idea:  credits: float = Field(gt=0)
+
+BUG-030  Unknown fields inside student are silently dropped
+  Status:    Open
+  Owner:     Midhat Sajad (data format)
+  Where:     backend/src/degree_planner_backend/plan_models.py (Student and
+             the other plan-format models)
+  Found:     2026-11-19 by Samantha, probing the agent request format
+  Steps:     a request whose student has an extra field, e.g. "notes":
+             "no Fridays"
+  Actual:    accepted and the field is thrown away with no error, while the
+             same field at the top level of the request is rejected
+  Expected:  rejected, so a frontend that sends a misspelled or unsupported
+             field finds out. Not a security problem: the dropped text never
+             reaches the model
+  Fix idea:  model_config = ConfigDict(extra="forbid") on the plan-format
+             models (check that saved plans in the plan store still load)
+
+BUG-031  Prerequisite edges are written as "from_" unless dumped by alias
+  Status:    Open
+  Owner:     Midhat Sajad (data format)
+  Where:     backend/src/degree_planner_backend/plan_models.py (Edge)
+  Found:     2026-11-19 by Samantha, probing the agent request format
+  Steps:     AgentResponse.model_validate_json(
+             open("docs/agent-response.sample.json").read()).model_dump_json()
+  Actual:    edges come out as {"from_": ..., "to": ...}
+  Expected:  {"from": ..., "to": ...} as in docs/plan-format.md. FastAPI
+             responses are fine (it dumps by alias); files saved by our own
+             code, such as the eval runner's, are not
+  Fix idea:  model_config = ConfigDict(populate_by_name=True,
+             serialize_by_alias=True) on Edge (Pydantic 2.11 or newer), or
+             always dump with by_alias=True and say so in plan-format.md
+
+BUG-032  Validator keeps "overridden" on flags that cannot be overridden
+  Status:    Open
+  Owner:     Midhat Sajad (validator)
+  Where:     backend/src/degree_planner_backend/validator.py (check_plan,
+             previously_overridden), reached through POST /plans/check
+  Found:     2026-11-19 by Samantha, reviewing override handling
+  Steps:     load docs/data-format.sample.json; run check_plan on
+             docs/plan-format.sample.json; set overridden: true on every
+             flag it returns; run check_plan again
+  Actual:    before: broken_prerequisite, credit_shortfall, credit_shortfall
+             (all errors, overridable false), requirements_met false.
+             after: the same three flags with overridden true, and
+             requirements_met true. A plan with a broken prerequisite passes
+  Expected:  overridden is only carried forward for flags that are
+             overridable (today only exception_claimed); requirements_met
+             stays false. The agent path is not affected (StudentContext
+             drops overrides of other types) but drag and drop is
+  Fix idea:  overridden=overridable and (flag_type, course_id) in
+             previously_overridden; a test that forges overridden on a
+             broken_prerequisite. AgentResponse in agent/request_models.py
+             already ignores such overrides
+
+BUG-033  Transcript term headings accept non-ASCII digits and any year
+  Status:    Open
+  Owner:     Midhat Sajad (transcript parser)
+  Where:     backend/src/degree_planner_backend/transcript_parser.py
+             (_TERM_HEADING)
+  Found:     2026-11-19 by Samantha, comparing it with the agent request
+             format's start_term rule
+  Steps:     _TERM_HEADING.match(x) for "Fall ２０２４" (full-width
+             digits), "fall 1850", "SUMMER 0001"
+  Actual:    all three match, so they become semester headings and the
+             courses under them get that term
+  Expected:  only ASCII digits (\d also matches other scripts' digits);
+             possibly a sensible year range (the request format uses 2000
+             or later). Low impact: a real Mines transcript will not have
+             these, but a crafted PDF could
+  Fix idea:  [0-9]{4} instead of \d{4}; normalize the term label to
+             "Fall 2024" form so it matches the request format
