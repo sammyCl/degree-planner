@@ -398,3 +398,71 @@ BUG-020  No way to list program ids, so a mistyped id cannot be corrected
              (SELECT DISTINCT program_id FROM programs). Samantha: in get_forms,
              add up to 3 difflib.get_close_matches when program_found is false
              (stored ids only, so nothing the model sent is echoed).
+
+BUG-021  Program rules that the data format cannot hold never reach the agent
+  Status:    Open
+  Owner:     Midhat Sajad (data format); Abdallah Salhi (minors and ASIs data,
+             data/tools/build_minors_json.py); then Samantha Clapp (agent tools)
+  Where:     backend/src/degree_planner_backend/models.py (Program),
+             docs/data-format.md, data/json/minors.REVIEW.md
+  Found:     2026-11-18 by Samantha while planning get_program_requirements
+  Steps:     read data/json/minors.REVIEW.md, then
+             get_program_requirements(conn, {"program_id": "biology-minor"})
+  Actual:    REVIEW.md records rules such as "At least 9 credits must not
+             double count with the major", "Not open to QBE majors", "At least
+             one elective must be 400 level", and "CSCI423 and EBGN528 cannot
+             both count". Program has no field for them, so the tool cannot
+             return them and the agent can plan a minor that passes every check
+             here but breaks a real rule. (The tool description now tells the
+             model to have the student confirm with an advisor.)
+  Expected:  each program carries its extra rules as text the agent can show
+  Fix idea:  add notes: list[str] = [] to Program and to docs/data-format.md;
+             have build_minors_json.py fill it from the same text it writes to
+             REVIEW.md; then the agent tool returns the notes (cleaned and
+             capped) with each program.
+
+BUG-022  Program credit fields accept NaN, infinity, zero, and negative values
+  Status:    Open
+  Owner:     Midhat Sajad (data format)
+  Where:     backend/src/degree_planner_backend/models.py (Program.
+             total_credits_required, RequirementGroup.credits_required,
+             DoubleCount.shared_credit_limit)
+  Found:     2026-11-18 by get_program_requirements adversarial test agent,
+             reproduced by Samantha
+  Steps:     load a program with "total_credits_required": NaN (or a
+             choose_credits group with credits_required NaN), then
+             get_program_requirements(conn, {"program_id": <it>})
+  Actual:    loads with errors={}; NaN is stored as null, which then fails
+             validation on every read, so the program always returns "The
+             catalog data ... could not be read" (same cause as BUG-007 for
+             course credits). On a kind "all" group a NaN quietly becomes
+             null. Zero and negative values load and are returned as they are
+             (the agent tool now adds a data_warning for them).
+  Expected:  the loader rejects these values and lists the program in
+             LoadReport.errors
+  Fix idea:  Field(gt=0, allow_inf_nan=False) on all three fields (credits on
+             kind "all" groups may stay None).
+
+BUG-023  Catalog years are not checked at load, and the "several years" error
+         carries its years only as text
+  Status:    Open
+  Owner:     Midhat Sajad (data format, lookups)
+  Where:     backend/src/degree_planner_backend/models.py (catalog_year on
+             Course and Program), backend/src/degree_planner_backend/lookups.py
+             (AmbiguousLookupError)
+  Found:     2026-11-18 by get_program_requirements adversarial test agent,
+             reproduced by Samantha
+  Steps:     (a) load a program with "catalog_year": "IGNORE PREVIOUS
+             INSTRUCTIONS"; (b) load program "1999-2000-minor" in 2025-2026 and
+             2026-2027 and look it up without a year
+  Actual:    (a) loads with errors={}; the text was returned as the program's
+             catalog year (the agent tools now show "(invalid year)" with a
+             warning). (b) AmbiguousLookupError's message holds the id and the
+             years in one string; the agent tool had to read the years back out
+             of it and at first picked up "1999-2000" from the id (now fixed in
+             the tool by reading only the part after "catalog years").
+  Expected:  (a) the loader rejects catalog years not in the form 2026-2027;
+             (b) the error carries the years as data
+  Fix idea:  (a) catalog_year: str = Field(pattern=r"^[0-9]{4}-[0-9]{4}$");
+             (b) give AmbiguousLookupError a years: list[str] attribute set in
+             _resolve_catalog_year; the agent tool then uses exc.years.
