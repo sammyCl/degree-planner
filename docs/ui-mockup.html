@@ -1,0 +1,1481 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Degree Planner Mockup</title>
+<!-- UI mockup for team review. Static: no backend calls. Data is frontend/src/samplePlan.json and data/json, baked in. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+/* ---------- Tokens (Mines palette; scale idea from Vercel Geist, elevation idea from Linear) ---------- */
+:root {
+  --bg: #F6F7F9; --surface: #FFFFFF; --col: #EEF1F5; --raised: #FFFFFF;
+  --border: #DDE2EA; --border-strong: #C3CAD6;
+  --text: #0F1A2E; --mut: #5B6472;
+  --acc: #1D4289; --acc-h: #09396C; --acc-bright: #0272DE; --fill: #1D4289;
+  --acc-tint: rgba(29,66,137,.08);
+  --navy: #21314D; --navy-2: #09396C;
+  --err: #B42318; --err-bg: #FEF3F2; --warn: #9A5B00; --warn-bg: #FFF8E6; --ok: #12795A; --ok-bg: #ECFDF5;
+  --arrow: #9AA4B2;
+  --glass: rgba(246,247,249,.72);
+  --sh-1: 0 1px 2px rgba(15,26,46,.06);
+  --sh-2: 0 6px 16px -4px rgba(15,26,46,.14);
+  --sh-3: 0 16px 32px -8px rgba(15,26,46,.25);
+  --dot: #D3D9E2;
+  --ease-out: cubic-bezier(.2,.8,.2,1); --spring: cubic-bezier(.34,1.56,.64,1);
+  --t1: 120ms; --t2: 200ms; --t3: 350ms;
+  --sub-csci: #1D4289; --sub-math: #0E7C86; --sub-phgn: #9A5B00; --sub-chgn: #A1366B; --sub-other: #81848A;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0B1220; --surface: #111A2B; --col: #111A2B; --raised: #162238;
+    --border: rgba(255,255,255,.08); --border-strong: rgba(255,255,255,.16);
+    --text: #E6EAF2; --mut: #93A0B4;
+    --acc: #7EA6F2; --acc-h: #A3C0F6; --acc-bright: #7EA6F2; --fill: #1D4289;
+    --acc-tint: rgba(126,166,242,.10);
+    --err: #F87171; --err-bg: rgba(248,113,113,.12); --warn: #F5B54A; --warn-bg: rgba(245,181,74,.12); --ok: #4ADE9A; --ok-bg: rgba(74,222,154,.12);
+    --arrow: #4A5872; --glass: rgba(11,18,32,.72); --dot: rgba(255,255,255,.07);
+    --sh-1: 0 1px 2px rgba(0,0,0,.3); --sh-2: 0 8px 20px -6px rgba(0,0,0,.5); --sh-3: 0 18px 36px -8px rgba(0,0,0,.6);
+    --sub-csci: #7EA6F2; --sub-math: #4FC7CF; --sub-phgn: #F5B54A; --sub-chgn: #E68AB8; --sub-other: #93A0B4;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0B1220; --surface: #111A2B; --col: #111A2B; --raised: #162238;
+  --border: rgba(255,255,255,.08); --border-strong: rgba(255,255,255,.16);
+  --text: #E6EAF2; --mut: #93A0B4;
+  --acc: #7EA6F2; --acc-h: #A3C0F6; --acc-bright: #7EA6F2; --fill: #1D4289;
+  --acc-tint: rgba(126,166,242,.10);
+  --err: #F87171; --err-bg: rgba(248,113,113,.12); --warn: #F5B54A; --warn-bg: rgba(245,181,74,.12); --ok: #4ADE9A; --ok-bg: rgba(74,222,154,.12);
+  --arrow: #4A5872; --glass: rgba(11,18,32,.72); --dot: rgba(255,255,255,.07);
+  --sh-1: 0 1px 2px rgba(0,0,0,.3); --sh-2: 0 8px 20px -6px rgba(0,0,0,.5); --sh-3: 0 18px 36px -8px rgba(0,0,0,.6);
+  --sub-csci: #7EA6F2; --sub-math: #4FC7CF; --sub-phgn: #F5B54A; --sub-chgn: #E68AB8; --sub-other: #93A0B4;
+  color-scheme: dark;
+}
+
+/* ---------- Base ---------- */
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; font: 400 14px/1.5 Inter, system-ui, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--acc-bright); outline-offset: 2px; border-radius: 6px; }
+.mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+.num { font-variant-numeric: tabular-nums; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+/* ---------- Header ---------- */
+.top {
+  position: relative; overflow: hidden; color: #fff;
+  background: linear-gradient(120deg, var(--navy) 0%, var(--navy-2) 100%);
+  display: flex; align-items: center; gap: 16px; padding: 12px 20px;
+}
+.top::before { /* soft glow */
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(900px 300px at 15% -40%, rgba(2,114,222,.35), transparent 60%),
+              radial-gradient(500px 200px at 95% 140%, rgba(135,158,195,.25), transparent 60%);
+}
+.top::after { /* faint noise */
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .06;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.brand { position: relative; display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+.logo { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2); }
+.brand h1 { margin: 0; font: 700 16px/1.2 'Inter Tight', Inter, sans-serif; letter-spacing: -.01em; white-space: nowrap; }
+.brand small { display: block; font: 500 11.5px/1.2 Inter; color: #CFDCE9; letter-spacing: .02em; }
+
+.steps { position: relative; display: flex; align-items: center; gap: 6px; }
+.step { display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border-radius: 999px; border: 1px solid transparent; background: transparent; color: #CFDCE9; font-weight: 500; transition: background var(--t2) var(--ease-out), color var(--t2); }
+.step .n { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 600; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.25); transition: all var(--t3) var(--spring); }
+.step:hover { background: rgba(255,255,255,.08); color: #fff; }
+.step.on { color: #fff; background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.18); }
+.step.on .n { background: #fff; color: var(--navy); border-color: #fff; transform: scale(1.06); }
+.step.done .n { background: #879EC3; color: var(--navy); border-color: #879EC3; }
+.steps .line { width: 28px; height: 2px; border-radius: 2px; background: rgba(255,255,255,.2); overflow: hidden; }
+.steps .line i { display: block; height: 100%; width: 0; background: #fff; transition: width 500ms var(--ease-out); }
+.steps.at2 .line i { width: 100%; }
+.icon-btn { position: relative; width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.08); color: #fff; transition: background var(--t1), transform 80ms; }
+.icon-btn:hover { background: rgba(255,255,255,.16); }
+.icon-btn:active { transform: scale(.94); }
+.mock-tag { position: relative; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; background: rgba(245,181,74,.18); color: #FBD38D; border: 1px solid rgba(245,181,74,.35); }
+
+/* ---------- Views ---------- */
+.view { display: none; }
+.view.on { display: block; animation: viewIn 420ms var(--ease-out) both; }
+@keyframes viewIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+/* ---------- Setup page ---------- */
+.setup-wrap { max-width: 1040px; margin: 0 auto; padding: 36px 20px 60px; display: grid; grid-template-columns: minmax(0,1fr) 340px; gap: 24px; align-items: start; }
+.hero h2 { margin: 0 0 6px; font: 700 30px/1.15 'Inter Tight', Inter, sans-serif; letter-spacing: -.02em; }
+.hero p { margin: 0 0 22px; color: var(--mut); font-size: 15px; }
+.hero .grad { background: linear-gradient(90deg, var(--acc), var(--acc-bright)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--sh-1); }
+.form { padding: 22px; }
+.field { padding: 14px 0; border-top: 1px solid var(--border); animation: rise 420ms var(--ease-out) both; animation-delay: calc(var(--i) * 60ms + 80ms); }
+.field:first-child { border-top: 0; padding-top: 0; }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.lbl { display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px; font-weight: 600; font-size: 13.5px; }
+.lbl .opt { font-weight: 400; color: var(--mut); font-size: 12.5px; }
+
+.seg { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); background: var(--col); border: 1px solid var(--border); border-radius: 10px; padding: 3px; }
+.seg button { position: relative; z-index: 1; border: 0; background: none; padding: 8px 6px; border-radius: 8px; font-weight: 500; color: var(--mut); transition: color var(--t2); }
+.seg button[aria-pressed="true"] { color: var(--text); }
+.seg .pill { position: absolute; z-index: 0; top: 3px; bottom: 3px; left: 3px; width: calc((100% - 6px) / 3); border-radius: 8px; background: var(--raised); box-shadow: var(--sh-2); transition: transform var(--t3) var(--spring); }
+
+.select { position: relative; }
+.select select { appearance: none; width: 100%; padding: 10px 36px 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--raised); transition: border-color var(--t1), box-shadow var(--t2); }
+.select select:hover { border-color: var(--border-strong); }
+.select select:focus { outline: none; border-color: var(--acc-bright); box-shadow: 0 0 0 4px var(--acc-tint); }
+.select::after { content: ""; position: absolute; right: 14px; top: 50%; width: 7px; height: 7px; border-right: 2px solid var(--mut); border-bottom: 2px solid var(--mut); transform: translateY(-70%) rotate(45deg); pointer-events: none; }
+
+.combo { position: relative; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; min-height: 44px; padding: 6px; border: 1px solid var(--border); border-radius: 10px; background: var(--raised); transition: border-color var(--t1), box-shadow var(--t2); }
+.chips:focus-within { border-color: var(--acc-bright); box-shadow: 0 0 0 4px var(--acc-tint); }
+.chips input { flex: 1; min-width: 160px; border: 0; outline: 0; background: transparent; padding: 4px 6px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 6px 4px 10px; border-radius: 999px; background: var(--acc-tint); color: var(--acc); font-weight: 500; font-size: 12.5px; border: 1px solid color-mix(in srgb, var(--acc) 25%, transparent); animation: pop 260ms var(--spring) both; }
+.chip.out { animation: popOut 180ms var(--ease-out) forwards; }
+.chip button { width: 18px; height: 18px; border-radius: 50%; border: 0; background: transparent; color: inherit; display: grid; place-items: center; }
+.chip button:hover { background: color-mix(in srgb, var(--acc) 18%, transparent); }
+@keyframes pop { from { opacity: 0; transform: scale(.7); } to { opacity: 1; transform: none; } }
+@keyframes popOut { to { opacity: 0; transform: scale(.7); } }
+.menu { position: absolute; z-index: 30; left: 0; right: 0; top: calc(100% + 6px); max-height: 260px; overflow: auto; padding: 6px; background: var(--raised); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--sh-3); transform-origin: top; animation: menuIn 160ms var(--ease-out); }
+@keyframes menuIn { from { opacity: 0; transform: translateY(-4px) scale(.98); } }
+.menu button { display: flex; width: 100%; align-items: center; gap: 8px; text-align: left; border: 0; background: none; padding: 8px 10px; border-radius: 8px; }
+.menu button:hover, .menu button.hl { background: var(--acc-tint); }
+.menu .kind { margin-left: auto; font-size: 11px; color: var(--mut); text-transform: uppercase; letter-spacing: .05em; }
+.menu mark { background: none; color: var(--acc); font-weight: 600; }
+.menu .empty { padding: 10px; color: var(--mut); }
+
+.drop { position: relative; display: flex; align-items: center; gap: 14px; padding: 18px; border-radius: 12px; border: 1.5px dashed var(--border-strong); background: var(--col); transition: border-color var(--t2), background var(--t2), transform var(--t2) var(--ease-out); cursor: pointer; }
+.drop:hover { border-color: var(--acc-bright); background: var(--acc-tint); }
+.drop.over { border-color: var(--acc-bright); background: var(--acc-tint); transform: scale(1.01); }
+.drop .ico { width: 42px; height: 42px; flex: none; border-radius: 10px; display: grid; place-items: center; background: var(--raised); border: 1px solid var(--border); color: var(--acc); transition: transform var(--t3) var(--spring); }
+.drop:hover .ico, .drop.over .ico { transform: translateY(-3px); }
+.drop b { display: block; font-weight: 600; }
+.drop span { color: var(--mut); font-size: 12.5px; }
+.parsed { margin-top: 10px; display: none; padding: 10px 12px; border-radius: 10px; background: var(--ok-bg); color: var(--ok); font-size: 13px; animation: rise 300ms var(--ease-out); }
+.parsed.on { display: flex; gap: 8px; align-items: center; }
+
+.stepper { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.stepper .ctl { display: inline-flex; align-items: center; border: 1px solid var(--border); border-radius: 10px; background: var(--raised); overflow: hidden; }
+.stepper .ctl button { width: 38px; height: 38px; border: 0; background: none; font-size: 18px; transition: background var(--t1); }
+.stepper .ctl button:hover { background: var(--acc-tint); }
+.stepper .ctl button:active { transform: scale(.92); }
+.stepper .ctl output { min-width: 34px; text-align: center; font: 600 16px 'Inter Tight'; }
+.terms { display: flex; gap: 4px; flex-wrap: wrap; }
+.terms i { width: 10px; height: 26px; border-radius: 4px; background: linear-gradient(var(--acc), var(--acc-bright)); opacity: .85; animation: pop 240ms var(--spring) both; }
+.terms i.sp { background: linear-gradient(#879EC3, #CFDCE9); }
+
+.cta { position: relative; overflow: hidden; width: 100%; margin-top: 18px; padding: 13px 16px; border: 0; border-radius: 11px; background: var(--fill); color: #fff; font-weight: 600; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 6px 18px -6px rgba(29,66,137,.6); transition: background var(--t1), transform 80ms, box-shadow var(--t2); }
+.cta:hover { background: #09396C; box-shadow: 0 10px 24px -8px rgba(29,66,137,.7); }
+.cta:active { transform: scale(.98); }
+.cta .arr { transition: transform var(--t2) var(--ease-out); }
+.cta:hover .arr { transform: translateX(4px); }
+.cta.loading { pointer-events: none; }
+.cta.loading::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 20%, rgba(255,255,255,.25) 50%, transparent 80%); animation: shimmer 900ms linear infinite; }
+@keyframes shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+.spin { width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(255,255,255,.35); border-top-color: #fff; animation: rot 700ms linear infinite; }
+@keyframes rot { to { transform: rotate(360deg); } }
+
+.preview { position: sticky; top: 20px; padding: 20px; overflow: hidden; }
+.preview::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 120px; pointer-events: none; background: radial-gradient(400px 120px at 30% -20%, var(--acc-tint), transparent 70%); }
+.preview h3 { position: relative; margin: 0 0 14px; font: 600 12px/1 Inter; text-transform: uppercase; letter-spacing: .06em; color: var(--mut); }
+.pv-row { position: relative; display: flex; gap: 12px; padding: 10px 0; border-top: 1px solid var(--border); }
+.pv-row:first-of-type { border-top: 0; }
+.pv-row .k { width: 92px; flex: none; color: var(--mut); font-size: 12.5px; }
+.pv-row .v { font-weight: 500; min-width: 0; }
+.pv-row .v.flash { animation: flashTxt 600ms var(--ease-out); }
+@keyframes flashTxt { 0% { color: var(--acc-bright); } 100% { color: inherit; } }
+.grad-card { position: relative; margin-top: 14px; padding: 14px; border-radius: 12px; color: #fff; background: linear-gradient(135deg, #21314D, #1D4289 60%, #0272DE); overflow: hidden; }
+.grad-card::after { content: ""; position: absolute; width: 140px; height: 140px; right: -40px; top: -60px; border-radius: 50%; background: rgba(255,255,255,.08); }
+.grad-card small { color: #CFDCE9; font-size: 12px; }
+.grad-card b { display: block; font: 700 22px/1.2 'Inter Tight'; }
+.tip { position: relative; margin-top: 12px; font-size: 12.5px; color: var(--mut); display: flex; gap: 8px; }
+
+/* ---------- Planner: summary bar ---------- */
+.bar { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 10px 20px; background: var(--glass); backdrop-filter: blur(12px) saturate(140%); -webkit-backdrop-filter: blur(12px) saturate(140%); border-bottom: 1px solid var(--border); }
+@supports not (backdrop-filter: blur(1px)) { .bar { background: var(--surface); } }
+.prog { display: flex; align-items: center; gap: 12px; }
+.ring { width: 46px; height: 46px; transform: rotate(-90deg); }
+.ring circle { fill: none; stroke-width: 5; }
+.ring .bg { stroke: var(--border); }
+.ring .fg { stroke: url(#ringGrad); stroke-linecap: round; transition: stroke-dashoffset 900ms var(--ease-out); }
+.prog .t1 { font: 600 16px/1.1 'Inter Tight'; }
+.prog .t2 { font-size: 12px; color: var(--mut); }
+.prog-title { display: flex; flex-direction: column; }
+.prog-title b { font: 600 15px/1.2 'Inter Tight'; }
+.prog-title span { font-size: 12px; color: var(--mut); }
+.sep { width: 1px; height: 30px; background: var(--border); }
+.badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; border: 1px solid transparent; font-weight: 600; font-size: 12.5px; transition: transform var(--t2) var(--spring), box-shadow var(--t2); }
+.badge:hover { transform: translateY(-1px); box-shadow: var(--sh-2); }
+.badge.e { background: var(--err-bg); color: var(--err); border-color: color-mix(in srgb, var(--err) 25%, transparent); }
+.badge.w { background: var(--warn-bg); color: var(--warn); border-color: color-mix(in srgb, var(--warn) 25%, transparent); }
+.badge.ok { background: var(--ok-bg); color: var(--ok); }
+.badge.bump { animation: bump 400ms var(--spring); }
+@keyframes bump { 40% { transform: scale(1.15); } }
+.grow { flex: 1; }
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 9px; border: 1px solid var(--border); background: var(--raised); font-weight: 500; box-shadow: var(--sh-1); transition: border-color var(--t1), box-shadow var(--t2), transform 80ms, background var(--t1); }
+.btn:hover { border-color: var(--border-strong); box-shadow: var(--sh-2); }
+.btn:active { transform: scale(.97); }
+.btn.primary { background: var(--fill); color: #fff; border-color: transparent; }
+.btn.primary:hover { background: #09396C; }
+.btn.ghost { background: transparent; box-shadow: none; }
+.dd { position: relative; }
+.dd .menu { left: auto; right: 0; width: 230px; }
+
+.legend { display: flex; gap: 14px; align-items: center; color: var(--mut); font-size: 12px; }
+.legend i { display: inline-block; width: 18px; height: 0; border-top: 2px solid var(--arrow); vertical-align: middle; margin-right: 5px; }
+.legend i.bad { border-top-color: var(--err); border-top-style: dashed; }
+
+/* ---------- Planner: board ---------- */
+.layout { display: grid; grid-template-columns: minmax(0,1fr) 360px; height: calc(100vh - 57px - 67px); min-height: 560px; }
+.board { position: relative; overflow: auto; background-color: var(--bg); background-image: radial-gradient(var(--dot) 1px, transparent 1px); background-size: 20px 20px; }
+.board-inner { padding: 18px 20px 30px; width: max-content; }
+.cols { position: relative; display: flex; gap: 52px; align-items: flex-start; }
+#arrows { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; z-index: 0; }
+.edge { fill: none; stroke: var(--arrow); stroke-width: 1.5; opacity: .55; transition: opacity var(--t2), stroke-width var(--t2), stroke var(--t2); }
+.edge.bad { stroke: var(--err); opacity: .9; stroke-dasharray: 5 4; stroke-width: 2; }
+.chain-mode .edge { opacity: .12; }
+.chain-mode .edge.hot { opacity: 1; stroke: var(--acc-bright); stroke-width: 2.5; stroke-dasharray: 6 4; animation: flow 1s linear infinite; }
+.chain-mode .edge.bad.hot { stroke: var(--err); }
+@keyframes flow { to { stroke-dashoffset: -20; } }
+
+.sem { position: relative; z-index: 1; width: 206px; padding: 10px; border-radius: 14px; background: color-mix(in srgb, var(--col) 88%, transparent); border: 1px solid var(--border); transition: background var(--t2), border-color var(--t2), box-shadow var(--t2); }
+.intro .sem { animation: rise 380ms var(--ease-out) both; animation-delay: calc(var(--i) * 45ms); }
+.sem.drop-ok { background: color-mix(in srgb, var(--acc) 9%, var(--col)); border-color: color-mix(in srgb, var(--acc) 45%, transparent); box-shadow: 0 0 0 3px var(--acc-tint); }
+.sem.drop-bad { border-color: var(--err); background: color-mix(in srgb, var(--err) 6%, var(--col)); cursor: not-allowed; }
+.sem-h { display: flex; align-items: baseline; justify-content: space-between; padding: 2px 4px 8px; }
+.sem-h b { font: 600 12px/1 Inter; text-transform: uppercase; letter-spacing: .05em; color: var(--mut); }
+.sem-h .yr { font-size: 11.5px; color: var(--mut); }
+.meter { display: flex; align-items: center; gap: 8px; padding: 0 4px 10px; font-size: 12px; color: var(--mut); }
+.meter .track { position: relative; flex: 1; height: 5px; border-radius: 9px; background: var(--border); overflow: hidden; }
+.meter .track i { position: absolute; inset: 0 auto 0 0; border-radius: 9px; background: linear-gradient(90deg, var(--acc), var(--acc-bright)); transition: width 600ms var(--ease-out), background var(--t2); }
+.meter.low .track i { background: var(--warn); }
+.meter.low { color: var(--warn); font-weight: 600; }
+.meter.high .track i { background: var(--err); }
+.meter .val { min-width: 42px; text-align: right; }
+
+.card { position: relative; margin-bottom: 8px; padding: 9px 10px 9px 12px; border-radius: 10px; background: var(--raised); border: 1px solid var(--border); box-shadow: var(--sh-1); cursor: grab; user-select: none; transition: transform 160ms var(--ease-out), box-shadow 160ms var(--ease-out), border-color 160ms, opacity var(--t2); }
+.intro .card { animation: rise 340ms var(--ease-out) both; animation-delay: min(calc(var(--i) * 45ms + var(--j) * 22ms + 80ms), 600ms); }
+.card:hover { transform: translateY(-2px); box-shadow: var(--sh-2); border-color: color-mix(in srgb, var(--acc) 40%, var(--border)); }
+.card:active { cursor: grabbing; }
+.card .row1 { display: flex; align-items: center; gap: 6px; }
+.card .code { font: 600 12.5px/1.2 'JetBrains Mono', monospace; letter-spacing: -.01em; }
+.card .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; background: var(--sub, var(--sub-other)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--sub, var(--sub-other)) 18%, transparent); }
+.card .cr { margin-left: auto; font-size: 11.5px; color: var(--mut); font-weight: 500; padding: 1px 6px; border-radius: 6px; background: var(--col); }
+.card .ttl { margin-top: 3px; font-size: 12.5px; line-height: 1.3; color: var(--mut); }
+.card .warn { display: none; margin-top: 6px; font-size: 11.5px; font-weight: 600; color: var(--err); align-items: center; gap: 5px; }
+.card.flagged { border-color: color-mix(in srgb, var(--err) 55%, transparent); background: linear-gradient(var(--err-bg), var(--err-bg)), var(--raised); }
+.card.flagged::before { content: ""; position: absolute; left: -1px; top: 8px; bottom: 8px; width: 3px; border-radius: 0 3px 3px 0; background: var(--err); }
+.card.flagged .warn { display: flex; }
+.card.pulse { animation: pulse 700ms var(--ease-out) 1; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--err) 55%, transparent); } 100% { box-shadow: 0 0 0 8px transparent; } }
+.card.landed { animation: landed 700ms cubic-bezier(.25,.1,.25,1); }
+@keyframes landed { 0% { background: color-mix(in srgb, var(--acc-bright) 22%, var(--raised)); transform: scale(1.03); } 100% { transform: none; } }
+.card.ghosted { opacity: .4; border-style: dashed; box-shadow: none; transform: none; }
+.chain-mode .card { opacity: .35; }
+.chain-mode .card.in-chain { opacity: 1; box-shadow: 0 0 0 2px var(--acc-bright), var(--sh-2); }
+.chain-mode .card.focus { transform: translateY(-2px); }
+.done-strip { width: 206px; }
+.card.completed { cursor: default; background: var(--ok-bg); border-color: color-mix(in srgb, var(--ok) 30%, transparent); }
+.card.completed .ttl { color: var(--ok); }
+
+/* ---------- Popover ---------- */
+.pop { position: fixed; z-index: 50; width: 300px; padding: 14px; border-radius: 14px; background: var(--raised); border: 1px solid var(--border); box-shadow: var(--sh-3); animation: menuIn 180ms var(--ease-out); }
+.pop h4 { margin: 0; font: 600 15px/1.3 'Inter Tight'; }
+.pop .sub { color: var(--mut); font-size: 12.5px; margin: 2px 0 10px; }
+.pop .sec { margin-top: 10px; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--mut); font-weight: 600; }
+.pop .list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.tag { font: 500 12px 'JetBrains Mono'; padding: 3px 7px; border-radius: 6px; background: var(--col); border: 1px solid var(--border); }
+.tag.bad { color: var(--err); border-color: color-mix(in srgb, var(--err) 35%, transparent); background: var(--err-bg); }
+.pop .msg { margin-top: 10px; padding: 9px 10px; border-radius: 10px; background: var(--err-bg); color: var(--err); font-size: 12.5px; }
+.pop .move { display: flex; gap: 8px; margin-top: 12px; }
+.pop .move .select { flex: 1; }
+.pop .move select { padding: 8px 30px 8px 10px; }
+.pop .close { position: absolute; top: 10px; right: 10px; width: 26px; height: 26px; border-radius: 8px; border: 0; background: none; color: var(--mut); }
+.pop .close:hover { background: var(--col); color: var(--text); }
+
+/* ---------- Flags list ---------- */
+.flags { position: absolute; z-index: 40; top: calc(100% + 8px); left: 0; width: 380px; padding: 8px; border-radius: 14px; background: var(--raised); border: 1px solid var(--border); box-shadow: var(--sh-3); animation: menuIn 180ms var(--ease-out); }
+.flag { display: flex; gap: 10px; width: 100%; text-align: left; padding: 10px; border: 0; background: none; border-radius: 10px; transition: background var(--t1); }
+.flag:hover { background: var(--col); }
+.flag .ic { flex: none; width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; }
+.flag.e .ic { background: var(--err-bg); color: var(--err); }
+.flag.w .ic { background: var(--warn-bg); color: var(--warn); }
+.flag b { display: block; font-size: 13px; }
+.flag span { font-size: 12.5px; color: var(--mut); }
+.flags .none { padding: 14px; color: var(--ok); font-weight: 500; }
+
+/* ---------- Chat ---------- */
+.chat { display: flex; flex-direction: column; min-height: 0; background: var(--surface); border-left: 1px solid var(--border); }
+.chat-h { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.avatar { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; color: #fff; background: linear-gradient(135deg, #21314D, #1D4289 55%, #0272DE); }
+.chat-h b { display: block; font: 600 14px/1.2 'Inter Tight'; }
+.chat-h span { font-size: 12px; color: var(--ok); display: flex; align-items: center; gap: 5px; }
+.chat-h span::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 3px var(--ok-bg); }
+.msgs { flex: 1; overflow: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; scroll-behavior: smooth; }
+.m { animation: msgIn 220ms var(--ease-out) both; font-size: 14px; line-height: 1.55; }
+@keyframes msgIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.m.u { align-self: flex-end; max-width: 85%; padding: 8px 12px; border-radius: 14px 14px 4px 14px; background: var(--fill); color: #fff; }
+.m.a { display: flex; gap: 10px; }
+.m.a .avatar { width: 24px; height: 24px; border-radius: 7px; flex: none; margin-top: 1px; }
+.m.a .body { min-width: 0; }
+.m.a code { font: 500 12.5px 'JetBrains Mono'; padding: 1px 5px; border-radius: 5px; background: var(--col); }
+.status { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--mut); }
+.typing { display: inline-flex; gap: 4px; }
+.typing i { width: 6px; height: 6px; border-radius: 50%; background: var(--mut); animation: blink 1.2s infinite both; }
+.typing i:nth-child(2) { animation-delay: 150ms; } .typing i:nth-child(3) { animation-delay: 300ms; }
+@keyframes blink { 0%, 80%, 100% { opacity: .3; transform: none; } 40% { opacity: 1; transform: translateY(-3px); } }
+.apply { margin-top: 10px; display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--acc) 30%, var(--border)); background: var(--acc-tint); }
+.apply .what { flex: 1; font-size: 12.5px; }
+.apply .what b { font-family: 'JetBrains Mono'; font-weight: 600; }
+.apply .btn { padding: 6px 10px; font-size: 13px; }
+.apply.done { background: var(--ok-bg); border-color: color-mix(in srgb, var(--ok) 30%, transparent); color: var(--ok); }
+.sugg { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 16px 10px; }
+.sugg button { padding: 6px 10px; border-radius: 999px; border: 1px solid var(--border); background: var(--raised); font-size: 12.5px; color: var(--text); transition: border-color var(--t1), background var(--t1), transform var(--t2) var(--spring); animation: rise 300ms var(--ease-out) both; animation-delay: calc(var(--i) * 60ms); }
+.sugg button:hover { border-color: var(--acc-bright); background: var(--acc-tint); transform: translateY(-1px); }
+.composer { margin: 0 12px 12px; display: flex; align-items: flex-end; gap: 8px; padding: 6px 6px 6px 12px; border-radius: 14px; border: 1px solid var(--border); background: var(--raised); box-shadow: var(--sh-1); transition: border-color var(--t1), box-shadow var(--t2); }
+.composer:focus-within { border-color: var(--acc-bright); box-shadow: 0 0 0 4px var(--acc-tint); }
+.composer input { flex: 1; border: 0; outline: 0; background: none; padding: 8px 0; }
+.send { width: 34px; height: 34px; flex: none; border-radius: 10px; border: 0; display: grid; place-items: center; background: var(--fill); color: #fff; transition: transform 80ms, background var(--t1), opacity var(--t1); }
+.send:hover { background: #09396C; }
+.send:active { transform: scale(.92); }
+.send:disabled { opacity: .45; cursor: default; }
+
+/* ---------- Toasts ---------- */
+.toasts { position: fixed; z-index: 60; left: 50%; bottom: 20px; transform: translateX(-50%); display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; }
+.toast { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; background: #0F1A2E; color: #E6EAF2; box-shadow: var(--sh-3); font-size: 13.5px; animation: toastIn 300ms var(--spring) both; }
+.toast.out { animation: toastOut 220ms var(--ease-out) forwards; }
+.toast .ok { color: #4ADE9A; } .toast .bad { color: #F87171; }
+@keyframes toastIn { from { opacity: 0; transform: translateY(16px) scale(.96); } }
+@keyframes toastOut { to { opacity: 0; transform: translateY(8px); } }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 980px) {
+  .setup-wrap { grid-template-columns: 1fr; }
+  .preview { position: static; }
+  .layout { grid-template-columns: 1fr; height: auto; }
+  .board { height: 70vh; }
+  .chat { border-left: 0; border-top: 1px solid var(--border); height: 560px; }
+  .legend { display: none; }
+}
+@media (max-width: 640px) {
+  .top { padding: 10px 16px; flex-wrap: wrap; }
+  .brand small, .mock-tag { display: none; }
+  .step .lb { display: none; }
+  .setup-wrap { padding: 22px 16px 40px; }
+  .hero h2 { font-size: 24px; }
+  .bar { padding: 10px 16px; }
+  .sep { display: none; }
+  .flags { width: calc(100vw - 32px); }
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; animation-delay: 0ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+  .card:hover, .chain-mode .card.focus { transform: none; }
+  .chain-mode .edge.hot { stroke-dasharray: none; }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1D4289"/><stop offset="1" stop-color="#0272DE"/></linearGradient>
+  </defs>
+</svg>
+
+<header class="top">
+  <div class="brand">
+    <div class="logo" aria-hidden="true">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20l6-14 4 8 3-5 5 11z"/></svg>
+    </div>
+    <div><h1>Degree Planner</h1><small>Colorado School of Mines</small></div>
+  </div>
+  <span class="mock-tag" title="Static mockup for team review. Nothing is sent anywhere.">Mockup</span>
+  <nav class="steps" id="steps" aria-label="Pages">
+    <button class="step on" data-go="setup"><span class="n">1</span><span class="lb">Setup</span></button>
+    <span class="line" aria-hidden="true"><i></i></span>
+    <button class="step" data-go="planner"><span class="n">2</span><span class="lb">Planner</span></button>
+  </nav>
+  <button class="icon-btn" id="theme" aria-label="Toggle dark mode" title="Toggle dark mode">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>
+  </button>
+</header>
+
+<!-- ======================= SETUP ======================= -->
+<main class="view on" id="setup">
+  <div class="setup-wrap">
+    <div>
+      <div class="hero">
+        <h2>Plan your path to <span class="grad">graduation</span>.</h2>
+        <p>Tell us your program and what you've finished. We'll lay out every semester and check every prerequisite.</p>
+      </div>
+      <div class="panel form">
+        <div class="field" style="--i:0">
+          <div class="lbl">Degree level</div>
+          <div class="seg" id="level" role="group" aria-label="Degree level">
+            <span class="pill" aria-hidden="true"></span>
+            <button type="button" aria-pressed="true" data-v="bachelor">Bachelor's</button>
+            <button type="button" aria-pressed="false" data-v="master">Master's</button>
+            <button type="button" aria-pressed="false" data-v="combined">Combined BS+MS</button>
+          </div>
+        </div>
+        <div class="field" style="--i:1">
+          <label class="lbl" for="major">Major</label>
+          <div class="select"><select id="major"></select></div>
+        </div>
+        <div class="field" style="--i:2">
+          <label class="lbl" for="minorIn">Minors and ASIs <span class="opt">optional, add as many as you like</span></label>
+          <div class="combo">
+            <div class="chips" id="chips"><input id="minorIn" placeholder="Search minors and ASIs..." autocomplete="off" role="combobox" aria-expanded="false" aria-controls="minorMenu"></div>
+            <div class="menu" id="minorMenu" role="listbox" hidden></div>
+          </div>
+        </div>
+        <div class="field" style="--i:3">
+          <div class="lbl">Transcript <span class="opt">optional; you can fix the parsed courses after</span></div>
+          <label class="drop" id="drop">
+            <input type="file" id="file" class="sr" accept=".pdf,.txt,.csv">
+            <span class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0l-4 4m4-4l4 4"/><path d="M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg></span>
+            <span><b id="dropT">Drop your transcript here</b><span id="dropS">or click to browse. PDF, TXT or CSV.</span></span>
+          </label>
+          <div class="parsed" id="parsed">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+            <span>Mock parse: found <b>MATH111</b> (4 cr, transfer). You'll be able to edit this list.</span>
+          </div>
+        </div>
+        <div class="field" style="--i:4">
+          <div class="lbl">Semesters left <span class="opt">starting Fall 2026</span></div>
+          <div class="stepper">
+            <div class="ctl"><button type="button" id="minus" aria-label="Fewer semesters">&minus;</button><output id="semN" class="num">8</output><button type="button" id="plus" aria-label="More semesters">+</button></div>
+            <div class="terms" id="terms" aria-hidden="true"></div>
+          </div>
+        </div>
+        <button class="cta" id="build"><span class="lbl-t">Build my plan</span><svg class="arr" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6l6 6-6 6"/></svg></button>
+      </div>
+    </div>
+
+    <aside class="panel preview" aria-live="polite">
+      <h3>Your plan at a glance</h3>
+      <div class="pv-row"><span class="k">Degree</span><span class="v" id="pvLevel">Bachelor's</span></div>
+      <div class="pv-row"><span class="k">Major</span><span class="v" id="pvMajor"></span></div>
+      <div class="pv-row"><span class="k">Add-ons</span><span class="v" id="pvMinor">None yet</span></div>
+      <div class="pv-row"><span class="k">Completed</span><span class="v" id="pvDone">Nothing uploaded</span></div>
+      <div class="grad-card"><small>Projected graduation</small><b id="pvGrad">Spring 2030</b><small id="pvSem">8 semesters &middot; catalog 2026-2027</small></div>
+      <div class="tip"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg><span>Department-approved electives are left open in the plan. Confirm those with your advisor.</span></div>
+    </aside>
+  </div>
+</main>
+
+<!-- ======================= PLANNER ======================= -->
+<main class="view" id="planner">
+  <div class="bar">
+    <div class="prog" title="Credits planned plus completed, out of the degree total">
+      <svg class="ring" viewBox="0 0 46 46" aria-hidden="true"><circle class="bg" cx="23" cy="23" r="19"/><circle class="fg" id="ringFg" cx="23" cy="23" r="19"/></svg>
+      <div><div class="t1 num" id="credT">0 / 130</div><div class="t2">credits</div></div>
+    </div>
+    <span class="sep"></span>
+    <div class="prog-title"><b>Computer Science BS</b><span>Catalog 2026-2027 &middot; sample student</span></div>
+    <span class="sep"></span>
+    <div class="dd" id="flagsDD">
+      <button class="badge e" id="errB"></button>
+      <button class="badge w" id="warnB"></button>
+    </div>
+    <span class="grow"></span>
+    <div class="legend"><span><i></i>prerequisite</span><span><i class="bad"></i>broken</span></div>
+    <div class="dd" id="dlDD">
+      <button class="btn primary" id="dlBtn" aria-haspopup="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16"/></svg>Download
+      </button>
+    </div>
+  </div>
+  <div class="layout">
+    <div class="board" id="board">
+      <div class="board-inner">
+        <div class="cols intro" id="cols"><svg id="arrows" aria-hidden="true"></svg></div>
+      </div>
+    </div>
+    <section class="chat" aria-label="Planning assistant">
+      <div class="chat-h">
+        <div class="avatar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16v10H8l-4 4z"/></svg></div>
+        <div><b>Planning assistant</b><span>Reads your plan and the catalog</span></div>
+      </div>
+      <div class="msgs" id="msgs" role="log" aria-live="polite">
+        <div class="m a"><div class="avatar"></div><div class="body">Hi! I can explain a requirement, swap a course, or fix a flag. Try one of these, or drag a course on the board.</div></div>
+      </div>
+      <div class="sugg" id="sugg"></div>
+      <form class="composer" id="composer">
+        <input id="ask" placeholder="Ask about your plan..." aria-label="Message">
+        <button class="send" id="sendB" aria-label="Send"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5m0 0l-6 6m6-6l6 6"/></svg></button>
+      </form>
+    </section>
+  </div>
+</main>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script type="application/json" id="plan-data">{
+  "plan_id": null,
+  "student": {
+    "degree_level": "bachelor",
+    "programs": [
+      "cs-bs-general-track"
+    ],
+    "catalog_year": "2026-2027",
+    "completed_courses": [
+      {
+        "code": "MATH111",
+        "credits": 4.0,
+        "term": "transfer",
+        "transfer_from": "Front Range Community College"
+      }
+    ]
+  },
+  "semesters": [
+    {
+      "semester_id": "sem-1",
+      "label": "Fall 2026",
+      "courses": [
+        {
+          "course_id": "sem-1-csci128",
+          "code": "CSCI128",
+          "title": "Computer Science for STEM",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-1-math112",
+          "code": "MATH112",
+          "title": "Calculus for Scientists and Engineers II",
+          "credits": 4.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-1-chgn121",
+          "code": "CHGN121",
+          "title": "Principles of Chemistry I",
+          "credits": 4.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-1-edns151",
+          "code": "EDNS151",
+          "title": "Cornerstone - Design I",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-1-csm101",
+          "code": "CSM101",
+          "title": "Freshman Success Seminar",
+          "credits": 1.0,
+          "status": "planned"
+        }
+      ],
+      "total_credits": 15.0
+    },
+    {
+      "semester_id": "sem-2",
+      "label": "Spring 2027",
+      "courses": [
+        {
+          "course_id": "sem-2-csci200",
+          "code": "CSCI200",
+          "title": "Foundational Programming Concepts + Design",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-2-math213",
+          "code": "MATH213",
+          "title": "Calculus for Scientists and Engineers III",
+          "credits": 4.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-2-phgn100",
+          "code": "PHGN100",
+          "title": "Physics I - Mechanics",
+          "credits": 4.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-2-hass100",
+          "code": "HASS100",
+          "title": "Nature and Human Values",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-2-pagn101",
+          "code": "PAGN101",
+          "title": "Physical Education",
+          "credits": 1.0,
+          "status": "planned"
+        }
+      ],
+      "total_credits": 15.0
+    },
+    {
+      "semester_id": "sem-3",
+      "label": "Fall 2027",
+      "courses": [
+        {
+          "course_id": "sem-3-csci210",
+          "code": "CSCI210",
+          "title": "Systems Programming",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-3-csci358",
+          "code": "CSCI358",
+          "title": "Discrete Mathematics",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-3-phgn200",
+          "code": "PHGN200",
+          "title": "Physics II-Electromagnetism and Optics",
+          "credits": 4.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-3-math201",
+          "code": "MATH201",
+          "title": "Introduction to Statistics",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-3-cben110",
+          "code": "CBEN110",
+          "title": "Fundamentals of Biology I",
+          "credits": 4.0,
+          "status": "planned"
+        }
+      ],
+      "total_credits": 17.0
+    },
+    {
+      "semester_id": "sem-4",
+      "label": "Spring 2028",
+      "courses": [
+        {
+          "course_id": "sem-4-csci220",
+          "code": "CSCI220",
+          "title": "Data Structures and Algorithms",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-4-csci341",
+          "code": "CSCI341",
+          "title": "Computer Organization",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-4-math332",
+          "code": "MATH332",
+          "title": "Linear Algebra",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-4-math334",
+          "code": "MATH334",
+          "title": "Introduction to Probability",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-4-ebgn201",
+          "code": "EBGN201",
+          "title": "Principles of Economics",
+          "credits": 3.0,
+          "status": "planned"
+        }
+      ],
+      "total_credits": 15.0
+    },
+    {
+      "semester_id": "sem-5",
+      "label": "Fall 2028",
+      "courses": [
+        {
+          "course_id": "sem-5-csci306",
+          "code": "CSCI306",
+          "title": "Software Engineering",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-5-csci400",
+          "code": "CSCI400",
+          "title": "Principles of Programming Languages",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-5-csci406",
+          "code": "CSCI406",
+          "title": "Algorithms",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-5-csci442",
+          "code": "CSCI442",
+          "title": "Operating Systems",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-5-csci403",
+          "code": "CSCI403",
+          "title": "Data Base Management",
+          "credits": 3.0,
+          "status": "planned"
+        }
+      ],
+      "total_credits": 15.0
+    },
+    {
+      "semester_id": "sem-6",
+      "label": "Spring 2029",
+      "courses": [
+        {
+          "course_id": "sem-6-csci370",
+          "code": "CSCI370",
+          "title": "Advanced Software Engineering",
+          "credits": 5.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-6-csci445",
+          "code": "CSCI445",
+          "title": "Web Programming",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-6-csci404",
+          "code": "CSCI404",
+          "title": "Artificial Intelligence",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-6-chgn122",
+          "code": "CHGN122",
+          "title": "Principles of Chemistry II (SC1)",
+          "credits": 4.0,
+          "status": "planned"
+        }
+      ],
+      "total_credits": 15.0
+    },
+    {
+      "semester_id": "sem-7",
+      "label": "Fall 2029",
+      "courses": [
+        {
+          "course_id": "sem-7-csci475",
+          "code": "CSCI475",
+          "title": "Information Security and Privacy",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-7-csci250",
+          "code": "CSCI250",
+          "title": "Python-Based Computing: Building a Sensor System",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-7-csci303",
+          "code": "CSCI303",
+          "title": "Introduction to Data Science",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-7-math225",
+          "code": "MATH225",
+          "title": "Differential Equations",
+          "credits": 3.0,
+          "status": "planned"
+        }
+      ],
+      "total_credits": 12.0
+    },
+    {
+      "semester_id": "sem-8",
+      "label": "Spring 2030",
+      "courses": [
+        {
+          "course_id": "sem-8-csci437",
+          "code": "CSCI437",
+          "title": "Introduction to Computer Vision",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-8-csci410",
+          "code": "CSCI410",
+          "title": "Elements of Computing Systems",
+          "credits": 3.0,
+          "status": "planned"
+        }
+      ],
+      "total_credits": 6.0
+    }
+  ],
+  "prerequisite_edges": [
+    {
+      "from": "sem-1-csci128",
+      "to": "sem-2-csci200"
+    },
+    {
+      "from": "sem-1-math112",
+      "to": "sem-2-math213"
+    },
+    {
+      "from": "sem-2-csci200",
+      "to": "sem-3-csci210"
+    },
+    {
+      "from": "sem-1-math112",
+      "to": "sem-3-csci358"
+    },
+    {
+      "from": "sem-2-phgn100",
+      "to": "sem-3-phgn200"
+    },
+    {
+      "from": "sem-2-csci200",
+      "to": "sem-4-csci220"
+    },
+    {
+      "from": "sem-3-csci358",
+      "to": "sem-4-csci220"
+    },
+    {
+      "from": "sem-3-csci210",
+      "to": "sem-4-csci341"
+    },
+    {
+      "from": "sem-1-csci128",
+      "to": "sem-4-math332"
+    },
+    {
+      "from": "sem-1-math112",
+      "to": "sem-4-math332"
+    },
+    {
+      "from": "sem-1-csci128",
+      "to": "sem-4-math334"
+    },
+    {
+      "from": "sem-3-csci210",
+      "to": "sem-5-csci306"
+    },
+    {
+      "from": "sem-4-csci220",
+      "to": "sem-5-csci306"
+    },
+    {
+      "from": "sem-5-csci306",
+      "to": "sem-5-csci400"
+    },
+    {
+      "from": "sem-3-csci358",
+      "to": "sem-5-csci400"
+    },
+    {
+      "from": "sem-4-csci220",
+      "to": "sem-5-csci406"
+    },
+    {
+      "from": "sem-2-math213",
+      "to": "sem-5-csci406"
+    },
+    {
+      "from": "sem-3-csci358",
+      "to": "sem-5-csci406"
+    },
+    {
+      "from": "sem-4-csci220",
+      "to": "sem-5-csci442"
+    },
+    {
+      "from": "sem-4-csci341",
+      "to": "sem-5-csci442"
+    },
+    {
+      "from": "sem-2-csci200",
+      "to": "sem-5-csci403"
+    },
+    {
+      "from": "sem-5-csci306",
+      "to": "sem-6-csci370"
+    },
+    {
+      "from": "sem-5-csci306",
+      "to": "sem-6-csci445"
+    },
+    {
+      "from": "sem-4-csci220",
+      "to": "sem-6-csci404"
+    },
+    {
+      "from": "sem-4-math334",
+      "to": "sem-6-csci404"
+    },
+    {
+      "from": "sem-1-chgn121",
+      "to": "sem-6-chgn122"
+    },
+    {
+      "from": "sem-4-csci220",
+      "to": "sem-7-csci475"
+    },
+    {
+      "from": "sem-4-csci341",
+      "to": "sem-7-csci475"
+    },
+    {
+      "from": "sem-3-csci210",
+      "to": "sem-7-csci475"
+    },
+    {
+      "from": "sem-1-csci128",
+      "to": "sem-7-csci250"
+    },
+    {
+      "from": "sem-1-csci128",
+      "to": "sem-7-csci303"
+    },
+    {
+      "from": "sem-1-math112",
+      "to": "sem-7-math225"
+    },
+    {
+      "from": "sem-4-math334",
+      "to": "sem-8-csci437"
+    },
+    {
+      "from": "sem-4-math332",
+      "to": "sem-8-csci437"
+    },
+    {
+      "from": "sem-2-csci200",
+      "to": "sem-8-csci437"
+    },
+    {
+      "from": "sem-4-csci341",
+      "to": "sem-8-csci410"
+    }
+  ],
+  "flags": [
+    {
+      "flag_id": "flag-1",
+      "type": "broken_prerequisite",
+      "severity": "error",
+      "course_id": "sem-5-csci400",
+      "message": "CSCI400 requires CSCI306 to be completed in an earlier semester. CSCI306 is scheduled in the same semester (Fall 2028).",
+      "overridable": false,
+      "overridden": false
+    },
+    {
+      "flag_id": "flag-2",
+      "type": "credit_shortfall",
+      "severity": "warning",
+      "course_id": null,
+      "message": "Spring 2030 has 6 credits, below the 12-credit full-time minimum.",
+      "overridable": false,
+      "overridden": false
+    },
+    {
+      "flag_id": "flag-3",
+      "type": "requirement_unmet",
+      "severity": "error",
+      "course_id": null,
+      "message": "The plan totals 114 of 130 required credits.",
+      "overridable": false,
+      "overridden": false
+    }
+  ],
+  "summary": {
+    "total_credits": 114.0,
+    "total_credits_required": 130,
+    "requirements_met": false
+  }
+}</script>
+<script type="application/json" id="programs-data">{"undergraduate": ["Applied Mathematics and Statistics", "Biochemistry", "Business Engineering and Management Science", "Ceramic Engineering", "Chemical Engineering", "Chemistry", "Civil Engineering", "Computer Science", "Construction Engineering", "Design Engineering", "Electrical Engineering", "Engineering Physics", "Environmental Engineering", "Geological Engineering", "Geophysical Engineering", "Mechanical Engineering", "Metallurgical and Materials Engineering", "Mining Engineering", "Petroleum Engineering", "Quantitative Biosciences and Engineering", "Quantum Systems Engineering"], "graduate": ["Additive Manufacturing", "Advanced Energy Systems", "Applied Mathematics and Statistics", "Carbon Capture, Utilization and Storage", "Chemical and Biological Engineering", "Chemistry", "Civil and Environmental Engineering", "Computer Science", "Data Science", "Economics and Business", "Electrical Engineering", "Engineering, Design and Society", "Finite Element Analysis (FEA)", "GIS and GeoInformatics", "Geochemistry", "Geology and Geological Engineering", "Geophysics", "Humanitarian Engineering and Science", "Humanities, Arts, and Social Sciences", "Hydrologic Science and Engineering", "Materials Science", "Mechanical Engineering", "Metallurgical and Materials Engineering", "Mining Engineering", "Nuclear Engineering", "Operations Research with Engineering", "Petroleum Engineering", "Physics", "Quantitative Biosciences and Engineering", "Quantum Engineering", "Robotics", "STEM Teaching", "Space Resources", "Underground Construction and Tunnel Engineering"], "addons": [{"name": "Minor in Aerospace Engineering", "kind": "minor"}, {"name": "Minor in Applied Mathematics and Statistics (AMS)", "kind": "minor"}, {"name": "Minor in Biology", "kind": "minor"}, {"name": "Minor in Biomechanical Engineering", "kind": "minor"}, {"name": "Minor in Biomedical Engineering (BME)", "kind": "minor"}, {"name": "Minor in Business", "kind": "minor"}, {"name": "Minor in Chemistry", "kind": "minor"}, {"name": "Minor in Computer Engineering", "kind": "minor"}, {"name": "Minor in Computer Science", "kind": "minor"}, {"name": "Minor in Culture, Creativity, and Communication", "kind": "minor"}, {"name": "Minor in Data Science (option 1)", "kind": "minor"}, {"name": "Minor in Data Science (option 2)", "kind": "minor"}, {"name": "Minor in Economics", "kind": "minor"}, {"name": "Minor in Electrical Engineering (Information Systems and Science (ISS) track)", "kind": "minor"}, {"name": "Minor in Electrical Engineering (Power and Energy Systems (PES) track)", "kind": "minor"}, {"name": "Minor in Electrical Engineering (Integrated Circuits and Electronics (ICE) track)", "kind": "minor"}, {"name": "Minor in Electrical Engineering (General Electrical Engineering track)", "kind": "minor"}, {"name": "Minor in Energy", "kind": "minor"}, {"name": "Minor in Engineering Physics", "kind": "minor"}, {"name": "Minor in Environment and Sustainability Studies", "kind": "minor"}, {"name": "Minor in Explosive Engineering", "kind": "minor"}, {"name": "Minor in Geological Engineering", "kind": "minor"}, {"name": "Minor in Geophysics/Geophysical Engineering", "kind": "minor"}, {"name": "Minor in Global Politics and Society", "kind": "minor"}, {"name": "Minor in Guy T. McBride, Jr. Honors Program in Public Affairs", "kind": "minor"}, {"name": "Minor in Humanitarian Engineering", "kind": "minor"}, {"name": "Individualized Minor in Humanities, Arts, and Social Sciences", "kind": "minor"}, {"name": "Minor in Mechanical Engineering (Robotics, Automation and Design track)", "kind": "minor"}, {"name": "Minor in Mechanical Engineering (Solid Materials track)", "kind": "minor"}, {"name": "Minor in Mechanical Engineering (Thermal-Fluids track)", "kind": "minor"}, {"name": "Minor in Metallurgical and Materials Engineering", "kind": "minor"}, {"name": "Minor in Mineral Processing & Extractive Metallurgy (MPEM)", "kind": "minor"}, {"name": "Minor in Mining Engineering", "kind": "minor"}, {"name": "Minor in Music, Audio Engineering, and the Recording Arts", "kind": "minor"}, {"name": "Minor in Operations Research", "kind": "minor"}, {"name": "Minor in Petroleum Data Analytics", "kind": "minor"}, {"name": "Minor in Petroleum Engineering", "kind": "minor"}, {"name": "Minor in Physics", "kind": "minor"}, {"name": "Minor in Quantum Engineering", "kind": "minor"}, {"name": "Minor in Robotics and Intelligent Systems", "kind": "minor"}, {"name": "Minor in Space Mining", "kind": "minor"}, {"name": "Minor in Structural Engineering", "kind": "minor"}, {"name": "Minor in Teaching", "kind": "minor"}, {"name": "Minor in Teaching with Licensure", "kind": "minor"}, {"name": "Minor in Underground Construction and Tunneling", "kind": "minor"}, {"name": "Minor in Water Sustainability", "kind": "minor"}, {"name": "Area of Special Interest in Civil Engineering", "kind": "ASI"}, {"name": "Area of Special Interest in Environmental Engineering", "kind": "ASI"}, {"name": "Area of Special Interest in Economics", "kind": "ASI"}, {"name": "Area of Special Interest in Entrepreneurship", "kind": "ASI"}, {"name": "Area of Special Interest in Humanitarian Engineering", "kind": "ASI"}, {"name": "Area of Special Interest in Electrical Engineering", "kind": "ASI"}, {"name": "Area of Special Interest in Aerospace Engineering", "kind": "ASI"}, {"name": "Area of Special Interest in Mechanical Engineering", "kind": "ASI"}, {"name": "Area of Special Interest in Additive Manufacturing", "kind": "ASI"}, {"name": "Area of Special Interest in Energy", "kind": "ASI"}, {"name": "Area of Special Interest in Space and Planetary Science and Engineering", "kind": "ASI"}, {"name": "Area of Special Interest in Underground Construction and Tunneling", "kind": "ASI"}, {"name": "Area of Special Interest in Geological Engineering", "kind": "ASI"}, {"name": "Area of Special Interest in Chemistry", "kind": "ASI"}, {"name": "Area of Special Interest in Polymer Chemistry", "kind": "ASI"}, {"name": "Area of Special Interest in Environmental Chemistry", "kind": "ASI"}, {"name": "Area of Special Interest in Biochemistry", "kind": "ASI"}, {"name": "Area of Special Interest in Music Technology", "kind": "ASI"}]}</script>
+<script>
+(() => {
+'use strict';
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const plan = JSON.parse($('#plan-data').textContent);
+const programs = JSON.parse($('#programs-data').textContent);
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const ICON = {
+  warn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 10v4m0 3h.01"/></svg>',
+  info: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5m0 3h.01"/></svg>',
+  check: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>',
+};
+
+/* ---------------- Theme ---------------- */
+$('#theme').onclick = () => {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  root.dataset.theme = dark ? 'light' : 'dark';
+  try { localStorage.setItem('dp-theme', root.dataset.theme); } catch (e) {}
+  requestAnimationFrame(drawArrows);
+};
+try { const t = localStorage.getItem('dp-theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+
+/* ---------------- Navigation ---------------- */
+function go(view) {
+  $$('.view').forEach(v => v.classList.toggle('on', v.id === view));
+  $$('.step').forEach(s => s.classList.toggle('on', s.dataset.go === view));
+  $('.step[data-go="setup"]').classList.toggle('done', view === 'planner');
+  $('#steps').classList.toggle('at2', view === 'planner');
+  if (view === 'planner') { render(true); animateRing(); }
+}
+$$('.step').forEach(s => s.onclick = () => go(s.dataset.go));
+
+/* ---------------- Setup page ---------------- */
+const seg = $('#level'), segPill = $('.pill', seg);
+const majorSel = $('#major');
+const state = { level: 'bachelor', addons: [], sems: 8, file: null };
+function fillMajors() {
+  const list = state.level === 'master' ? programs.graduate : programs.undergraduate;
+  majorSel.innerHTML = list.map(m => `<option${m === 'Computer Science' ? ' selected' : ''}>${esc(m)}</option>`).join('');
+}
+$$('button', seg).forEach((b, i) => b.onclick = () => {
+  $$('button', seg).forEach(x => x.setAttribute('aria-pressed', x === b));
+  segPill.style.transform = `translateX(${i * 100}%)`;
+  state.level = b.dataset.v; fillMajors(); updatePreview('pvLevel');
+});
+majorSel.onchange = () => updatePreview('pvMajor');
+
+// Minor / ASI combobox
+const minorIn = $('#minorIn'), menu = $('#minorMenu'), chips = $('#chips');
+let hl = 0;
+function short(n) { return n.replace(/^Minor in /, '').replace(/^Area of Special Interest in /, ''); }
+function openMenu() {
+  const q = minorIn.value.trim().toLowerCase();
+  const all = programs.addons.filter(p => !state.addons.includes(p.name));
+  const hits = (q ? all.filter(p => p.name.toLowerCase().includes(q)) : all).slice(0, 8);
+  hl = Math.min(hl, Math.max(0, hits.length - 1));
+  menu.innerHTML = hits.length ? hits.map((p, i) => {
+    let label = esc(short(p.name));
+    if (q) { const s = short(p.name), k = s.toLowerCase().indexOf(q); if (k >= 0) label = esc(s.slice(0, k)) + '<mark>' + esc(s.slice(k, k + q.length)) + '</mark>' + esc(s.slice(k + q.length)); }
+    return `<button type="button" role="option" class="${i === hl ? 'hl' : ''}" data-n="${esc(p.name)}">${label}<span class="kind">${p.kind}</span></button>`;
+  }).join('') : '<div class="empty">No matching minor or ASI</div>';
+  menu.hidden = false; minorIn.setAttribute('aria-expanded', 'true');
+  $$('button', menu).forEach(b => b.onmousedown = e => { e.preventDefault(); addAddon(b.dataset.n); });
+}
+function closeMenu() { menu.hidden = true; minorIn.setAttribute('aria-expanded', 'false'); }
+function addAddon(name) {
+  state.addons.push(name); minorIn.value = ''; hl = 0;
+  const c = document.createElement('span'); c.className = 'chip'; c.dataset.n = name;
+  c.innerHTML = `${esc(short(name))}<button type="button" aria-label="Remove ${esc(short(name))}">&times;</button>`;
+  $('button', c).onclick = () => { c.classList.add('out'); state.addons = state.addons.filter(x => x !== name); setTimeout(() => c.remove(), reduce ? 0 : 180); updatePreview('pvMinor'); };
+  chips.insertBefore(c, minorIn); updatePreview('pvMinor'); openMenu();
+}
+minorIn.addEventListener('focus', openMenu);
+minorIn.addEventListener('input', () => { hl = 0; openMenu(); });
+minorIn.addEventListener('blur', () => setTimeout(closeMenu, 100));
+minorIn.addEventListener('keydown', e => {
+  const items = $$('button', menu);
+  if (e.key === 'ArrowDown') { hl = Math.min(hl + 1, items.length - 1); openMenu(); e.preventDefault(); }
+  else if (e.key === 'ArrowUp') { hl = Math.max(hl - 1, 0); openMenu(); e.preventDefault(); }
+  else if (e.key === 'Enter') { e.preventDefault(); if (items[hl]) addAddon(items[hl].dataset.n); }
+  else if (e.key === 'Escape') closeMenu();
+  else if (e.key === 'Backspace' && !minorIn.value && state.addons.length) { const last = $$('.chip', chips).pop(); $('button', last).click(); }
+});
+
+// Transcript drop zone (mock parse)
+const drop = $('#drop'), file = $('#file');
+['dragenter', 'dragover'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave', 'drop'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.remove('over'); }));
+drop.addEventListener('drop', e => e.dataTransfer.files[0] && gotFile(e.dataTransfer.files[0]));
+file.onchange = () => file.files[0] && gotFile(file.files[0]);
+function gotFile(f) {
+  state.file = f.name;
+  $('#dropT').textContent = f.name; $('#dropS').textContent = 'Click to choose a different file';
+  $('#parsed').classList.remove('on'); void $('#parsed').offsetWidth; $('#parsed').classList.add('on');
+  updatePreview('pvDone');
+}
+
+// Semesters stepper
+const termName = i => (i % 2 === 0 ? 'Fall ' : 'Spring ') + (2026 + Math.ceil(i / 2));
+function drawTerms() {
+  $('#semN').textContent = state.sems;
+  $('#terms').innerHTML = Array.from({ length: state.sems }, (_, i) => `<i class="${i % 2 ? 'sp' : ''}" title="${termName(i)}" style="animation-delay:${i * 25}ms"></i>`).join('');
+  updatePreview('pvGrad');
+}
+$('#minus').onclick = () => { if (state.sems > 1) { state.sems--; drawTerms(); } };
+$('#plus').onclick = () => { if (state.sems < 12) { state.sems++; drawTerms(); } };
+
+function updatePreview(changed) {
+  $('#pvLevel').textContent = { bachelor: "Bachelor's", master: "Master's", combined: 'Combined BS+MS' }[state.level];
+  $('#pvMajor').textContent = majorSel.value;
+  $('#pvMinor').textContent = state.addons.length ? state.addons.map(short).join(', ') : 'None yet';
+  $('#pvDone').textContent = state.file ? '1 course parsed (4 cr)' : 'Nothing uploaded';
+  $('#pvGrad').textContent = termName(state.sems - 1);
+  $('#pvSem').textContent = `${state.sems} semester${state.sems > 1 ? 's' : ''} · catalog 2026-2027`;
+  const el = changed && $('#' + changed);
+  if (el) { el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }
+}
+fillMajors(); drawTerms(); updatePreview();
+
+$('#build').onclick = () => {
+  const b = $('#build');
+  b.classList.add('loading');
+  $('.lbl-t', b).textContent = 'Checking prerequisites...';
+  $('.arr', b).outerHTML = '<span class="spin"></span>';
+  setTimeout(() => {
+    go('planner');
+    b.classList.remove('loading'); $('.lbl-t', b).textContent = 'Rebuild my plan';
+    $('.spin', b).outerHTML = '<svg class="arr" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6l6 6-6 6"/></svg>';
+    toast(`${ICON.check} <span>Plan built: ${plan.semesters.length} semesters, sample CS plan</span>`, 'ok');
+  }, reduce ? 50 : 1100);
+};
+
+/* ---------------- Planner: model ---------------- */
+// Courses keep their course_id when moved; semester membership lives in `where`.
+const courses = {};               // id -> course
+const where = {};                 // id -> semester index
+plan.semesters.forEach((s, i) => s.courses.forEach(c => { courses[c.course_id] = c; where[c.course_id] = i; }));
+const edges = plan.prerequisite_edges;
+const pre = {}, post = {};
+edges.forEach(e => { (pre[e.to] ||= []).push(e.from); (post[e.from] ||= []).push(e.to); });
+const completed = plan.student.completed_courses;
+const doneCredits = completed.reduce((a, c) => a + c.credits, 0);
+const REQ = plan.summary.total_credits_required;
+const semCount = plan.semesters.length;
+const semCredits = i => Object.keys(where).filter(id => where[id] === i).reduce((a, id) => a + courses[id].credits, 0);
+const totalPlanned = () => Object.keys(courses).reduce((a, id) => a + courses[id].credits, 0);
+const fmt = n => (Math.round(n * 10) / 10).toString();
+
+// Flags are recomputed client-side for the mockup only; in the app they come from the backend validator.
+function computeFlags() {
+  const out = [];
+  edges.forEach(e => {
+    if (where[e.from] >= where[e.to]) {
+      const a = courses[e.from], b = courses[e.to];
+      out.push({ type: 'broken_prerequisite', severity: 'error', course_id: e.to,
+        title: `${b.code} is missing a prerequisite`,
+        message: `${b.code} needs ${a.code} in an earlier semester. ${a.code} is in ${plan.semesters[where[e.from]].label}${where[e.from] === where[e.to] ? ', the same semester' : ', which is later'}.` });
+    }
+  });
+  plan.semesters.forEach((s, i) => {
+    const c = semCredits(i);
+    if (c > 0 && c < 12) out.push({ type: 'credit_shortfall', severity: 'warning', course_id: null, sem: i, title: `${s.label} is under full time`, message: `${fmt(c)} credits, below the 12-credit full-time minimum.` });
+    if (c > 19) out.push({ type: 'credit_shortfall', severity: 'warning', course_id: null, sem: i, title: `${s.label} is overloaded`, message: `${fmt(c)} credits. Check the overload rules with your advisor.` });
+  });
+  const tot = totalPlanned() + doneCredits;
+  if (tot < REQ) out.push({ type: 'requirement_unmet', severity: 'error', course_id: null, title: 'Not enough credits yet', message: `The plan has ${fmt(tot)} of ${REQ} required credits. Add ${fmt(REQ - tot)} more.` });
+  return out;
+}
+let flags = [];
+
+/* ---------------- Planner: render ---------------- */
+const colsEl = $('#cols'), svg = $('#arrows');
+const SUB = { CSCI: 'var(--sub-csci)', MATH: 'var(--sub-math)', PHGN: 'var(--sub-phgn)', CHGN: 'var(--sub-chgn)' };
+function cardHTML(id, i, j) {
+  const c = courses[id];
+  const f = flags.find(f => f.course_id === id);
+  const sub = SUB[c.code.slice(0, 4)] || 'var(--sub-other)';
+  const aria = `${c.code} ${c.title}, ${fmt(c.credits)} credits${f ? '. Problem: ' + f.message : ''}`;
+  return `<div class="card${f ? ' flagged' : ''}" draggable="true" tabindex="0" data-id="${id}" style="--i:${i};--j:${j};--sub:${sub}" aria-label="${esc(aria)}">
+    <div class="row1"><span class="dot"></span><span class="code">${esc(c.code)}</span><span class="cr num">${fmt(c.credits)} cr</span></div>
+    <div class="ttl">${esc(c.title)}</div>
+    <div class="warn">${ICON.warn}<span>${f ? 'Prerequisite out of order' : ''}</span></div>
+  </div>`;
+}
+function render(intro = false) {
+  flags = computeFlags();
+  const html = plan.semesters.map((s, i) => {
+    const ids = Object.keys(where).filter(id => where[id] === i);
+    const cr = semCredits(i);
+    const pct = Math.min(100, cr / 18 * 100);
+    const [term, yr] = s.label.split(' ');
+    return `<section class="sem" data-sem="${i}" style="--i:${i}" aria-label="${esc(s.label)}">
+      <div class="sem-h"><b>${term}</b><span class="yr">${yr}</span></div>
+      <div class="meter${cr < 12 ? ' low' : ''}${cr > 19 ? ' high' : ''}"><span class="track"><i style="width:${pct}%"></i></span><span class="val num">${fmt(cr)} cr</span></div>
+      ${ids.map((id, j) => cardHTML(id, i, j)).join('')}
+    </section>`;
+  }).join('');
+  $$('.sem', colsEl).forEach(n => n.remove());
+  colsEl.insertAdjacentHTML('beforeend', html);
+  colsEl.classList.toggle('intro', intro && !reduce);
+  if (intro) setTimeout(() => colsEl.classList.remove('intro'), 1200);
+  bindCards(); updateBar();
+  requestAnimationFrame(drawArrows);
+}
+
+function drawArrows() {
+  if (!$('#planner').classList.contains('on')) return;
+  const r = colsEl.getBoundingClientRect();
+  svg.setAttribute('width', colsEl.scrollWidth); svg.setAttribute('height', colsEl.scrollHeight);
+  const rect = id => { const el = $(`.card[data-id="${id}"]`, colsEl); return el && el.getBoundingClientRect(); };
+  let out = `<defs>
+    <marker id="mk" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L8,4L0,8z" fill="var(--arrow)"/></marker>
+    <marker id="mkBad" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L8,4L0,8z" fill="var(--err)"/></marker>
+    <marker id="mkHot" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L8,4L0,8z" fill="var(--acc-bright)"/></marker></defs>`;
+  edges.forEach((e, k) => {
+    const A = rect(e.from), B = rect(e.to); if (!A || !B) return;
+    const sa = where[e.from], sb = where[e.to], bad = sa >= sb;
+    const ay = A.top - r.top + A.height / 2, by = B.top - r.top + B.height / 2;
+    let d;
+    if (sa === sb) { const x = A.right - r.left; const bend = 26 + Math.min(40, Math.abs(by - ay) / 6); d = `M${x},${ay} C${x + bend},${ay} ${x + bend},${by} ${x + 3},${by}`; }
+    else if (sa < sb) { const x1 = A.right - r.left, x2 = B.left - r.left - 2, dx = Math.max(24, (x2 - x1) * .5); d = `M${x1},${ay} C${x1 + dx},${ay} ${x2 - dx},${by} ${x2},${by}`; }
+    else { const x1 = A.left - r.left, x2 = B.right - r.left + 2, dx = Math.max(24, (x1 - x2) * .5); d = `M${x1},${ay} C${x1 - dx},${ay} ${x2 + dx},${by} ${x2},${by}`; }
+    out += `<path class="edge${bad ? ' bad' : ''}" data-k="${k}" d="${d}" marker-end="url(#${bad ? 'mkBad' : 'mk'})"/>`;
+  });
+  svg.innerHTML = out;
+}
+addEventListener('resize', () => requestAnimationFrame(drawArrows));
+if (document.fonts) document.fonts.ready.then(() => requestAnimationFrame(drawArrows));
+
+/* Highlight a course's whole prerequisite chain (ancestors and dependents) */
+function chain(id) {
+  const ids = new Set([id]), ks = new Set();
+  const walk = (start, map, dir) => {
+    const stack = [start];
+    while (stack.length) { const x = stack.pop(); (map[x] || []).forEach(y => {
+      edges.forEach((e, k) => { if ((dir === 'up' && e.from === y && e.to === x) || (dir === 'down' && e.from === x && e.to === y)) ks.add(k); });
+      if (!ids.has(y)) { ids.add(y); stack.push(y); } }); }
+  };
+  walk(id, pre, 'up'); walk(id, post, 'down');
+  return { ids, ks };
+}
+function hot(id) {
+  const { ids, ks } = chain(id);
+  colsEl.classList.add('chain-mode');
+  $$('.card', colsEl).forEach(c => { c.classList.toggle('in-chain', ids.has(c.dataset.id)); c.classList.toggle('focus', c.dataset.id === id); });
+  $$('.edge', svg).forEach(p => { const on = ks.has(+p.dataset.k); p.classList.toggle('hot', on); if (on && !p.classList.contains('bad')) p.setAttribute('marker-end', 'url(#mkHot)'); });
+}
+function cool() {
+  colsEl.classList.remove('chain-mode');
+  $$('.card', colsEl).forEach(c => c.classList.remove('in-chain', 'focus'));
+  $$('.edge', svg).forEach(p => { p.classList.remove('hot'); if (!p.classList.contains('bad')) p.setAttribute('marker-end', 'url(#mk)'); });
+}
+
+/* ---------------- Drag and drop (mock: moves happen locally) ---------------- */
+let dragId = null;
+function wouldBreak(id, to) {
+  return (pre[id] || []).some(p => where[p] >= to) || (post[id] || []).some(n => where[n] <= to);
+}
+function bindCards() {
+  $$('.card', colsEl).forEach(card => {
+    const id = card.dataset.id;
+    card.addEventListener('mouseenter', () => !dragId && hot(id));
+    card.addEventListener('mouseleave', () => !dragId && cool());
+    card.addEventListener('focus', () => hot(id));
+    card.addEventListener('blur', cool);
+    card.addEventListener('click', () => openPop(id, card));
+    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPop(id, card); } });
+    card.addEventListener('dragstart', e => {
+      dragId = id; cool(); closePop();
+      e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', id);
+      requestAnimationFrame(() => card.classList.add('ghosted'));
+    });
+    card.addEventListener('dragend', () => { card.classList.remove('ghosted'); dragId = null; $$('.sem', colsEl).forEach(s => s.classList.remove('drop-ok', 'drop-bad')); });
+  });
+  $$('.sem', colsEl).forEach(sem => {
+    const i = +sem.dataset.sem;
+    sem.addEventListener('dragover', e => {
+      if (!dragId) return; e.preventDefault();
+      const bad = wouldBreak(dragId, i) && where[dragId] !== i;
+      sem.classList.toggle('drop-ok', !bad); sem.classList.toggle('drop-bad', bad);
+    });
+    sem.addEventListener('dragleave', e => { if (!sem.contains(e.relatedTarget)) sem.classList.remove('drop-ok', 'drop-bad'); });
+    sem.addEventListener('drop', e => { e.preventDefault(); const id = dragId; dragId = null; if (id) move(id, i); });
+  });
+}
+function move(id, to) {
+  const from = where[id]; if (from === to) { render(); return; }
+  const before = computeFlags().filter(f => f.severity === 'error').length;
+  where[id] = to; render();
+  const card = $(`.card[data-id="${id}"]`, colsEl);
+  if (card) { card.classList.add(card.classList.contains('flagged') ? 'pulse' : 'landed'); card.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: reduce ? 'auto' : 'smooth' }); }
+  const after = flags.filter(f => f.severity === 'error').length;
+  const c = courses[id];
+  if (after > before) toast(`${ICON.warn} <span>Moved <b>${esc(c.code)}</b> to ${plan.semesters[to].label}. That breaks a prerequisite.</span>`, 'bad');
+  else if (after < before) toast(`${ICON.check} <span>Moved <b>${esc(c.code)}</b> to ${plan.semesters[to].label}. Prerequisite fixed.</span>`, 'ok');
+  else toast(`<span>Moved <b>${esc(c.code)}</b> to ${plan.semesters[to].label}.</span>`);
+  return after < before;
+}
+
+/* ---------------- Course popover ---------------- */
+let popEl = null;
+function closePop() { if (popEl) { popEl.remove(); popEl = null; } }
+function openPop(id, card) {
+  closePop();
+  const c = courses[id], f = flags.find(x => x.course_id === id);
+  const tag = (x, badIf) => `<span class="tag${badIf ? ' bad' : ''}" title="${esc(courses[x].title)}">${esc(courses[x].code)} &middot; ${esc(plan.semesters[where[x]].label)}</span>`;
+  const needs = (pre[id] || []).map(p => tag(p, where[p] >= where[id])).join('') || '<span class="tag">None in plan</span>';
+  const unlocks = (post[id] || []).map(n => tag(n, where[n] <= where[id])).join('') || '<span class="tag">Nothing in plan</span>';
+  popEl = document.createElement('div'); popEl.className = 'pop'; popEl.setAttribute('role', 'dialog'); popEl.setAttribute('aria-label', c.code);
+  popEl.innerHTML = `<button class="close" aria-label="Close">&times;</button>
+    <h4><span class="mono">${esc(c.code)}</span></h4><div class="sub">${esc(c.title)} &middot; ${fmt(c.credits)} credits</div>
+    ${f ? `<div class="msg">${esc(f.message)}</div>` : ''}
+    <div class="sec">Needs</div><div class="list">${needs}</div>
+    <div class="sec">Unlocks</div><div class="list">${unlocks}</div>
+    <div class="sec">Move to</div>
+    <div class="move"><div class="select"><select aria-label="Move to semester">${plan.semesters.map((s, i) => `<option value="${i}"${i === where[id] ? ' selected' : ''}>${esc(s.label)}${i !== where[id] && wouldBreak(id, i) ? '  (breaks a prerequisite)' : ''}</option>`).join('')}</select></div><button class="btn primary">Move</button></div>`;
+  document.body.appendChild(popEl);
+  const R = card.getBoundingClientRect(), W = 300, H = popEl.offsetHeight;
+  let x = R.right + 10; if (x + W > innerWidth - 10) x = R.left - W - 10; if (x < 10) x = 10;
+  let y = Math.min(Math.max(10, R.top - 8), innerHeight - H - 10);
+  popEl.style.left = x + 'px'; popEl.style.top = y + 'px';
+  $('.close', popEl).onclick = closePop;
+  $('.move .btn', popEl).onclick = () => { const to = +$('select', popEl).value; closePop(); move(id, to); };
+  $('select', popEl).focus();
+}
+document.addEventListener('mousedown', e => { if (popEl && !popEl.contains(e.target) && !e.target.closest('.card')) closePop(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closePop(); closeFlags(); closeDl(); } });
+$('#board').addEventListener('scroll', closePop);
+
+/* ---------------- Summary bar ---------------- */
+let lastErr = null, lastWarn = null;
+function updateBar() {
+  const tot = totalPlanned() + doneCredits;
+  $('#credT').textContent = `${fmt(tot)} / ${REQ}`;
+  const ne = flags.filter(f => f.severity === 'error').length, nw = flags.filter(f => f.severity === 'warning').length;
+  const eB = $('#errB'), wB = $('#warnB');
+  eB.className = 'badge ' + (ne ? 'e' : 'ok'); eB.innerHTML = ne ? `${ICON.warn} ${ne} error${ne > 1 ? 's' : ''}` : `${ICON.check} No errors`;
+  wB.style.display = nw ? '' : 'none'; wB.innerHTML = `${ICON.info} ${nw} warning${nw > 1 ? 's' : ''}`;
+  if (lastErr !== null && ne !== lastErr) { eB.classList.remove('bump'); void eB.offsetWidth; eB.classList.add('bump'); }
+  if (lastWarn !== null && nw !== lastWarn) { wB.classList.remove('bump'); void wB.offsetWidth; wB.classList.add('bump'); }
+  lastErr = ne; lastWarn = nw;
+  setRing(tot / REQ);
+}
+const C = 2 * Math.PI * 19, ring = $('#ringFg');
+ring.style.strokeDasharray = C; ring.style.strokeDashoffset = C;
+let ringTarget = 0;
+function setRing(p) { ringTarget = Math.min(1, p); ring.style.strokeDashoffset = C * (1 - ringTarget); }
+function animateRing() {
+  ring.style.transition = 'none'; ring.style.strokeDashoffset = C; void ring.getBoundingClientRect();
+  ring.style.transition = ''; requestAnimationFrame(() => setRing(ringTarget));
+  const el = $('#credT'), end = totalPlanned() + doneCredits, t0 = performance.now(), dur = reduce ? 1 : 900;
+  const step = t => { const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3); el.textContent = `${Math.round(end * e)} / ${REQ}`; if (k < 1) requestAnimationFrame(step); else el.textContent = `${fmt(end)} / ${REQ}`; };
+  requestAnimationFrame(step);
+}
+
+// Flags dropdown
+let flagsEl = null;
+function closeFlags() { if (flagsEl) { flagsEl.remove(); flagsEl = null; } }
+function openFlags() {
+  if (flagsEl) { closeFlags(); return; }
+  flagsEl = document.createElement('div'); flagsEl.className = 'flags'; flagsEl.setAttribute('role', 'menu');
+  flagsEl.innerHTML = flags.length ? flags.map((f, i) => `<button class="flag ${f.severity === 'error' ? 'e' : 'w'}" data-i="${i}"><span class="ic">${f.severity === 'error' ? ICON.warn : ICON.info}</span><span><b>${esc(f.title)}</b><span>${esc(f.message)}</span></span></button>`).join('') : `<div class="none">${ICON.check} Everything checks out.</div>`;
+  $('#flagsDD').appendChild(flagsEl);
+  $$('.flag', flagsEl).forEach(b => b.onclick = () => {
+    const f = flags[+b.dataset.i]; closeFlags();
+    let el = f.course_id ? $(`.card[data-id="${f.course_id}"]`, colsEl) : (f.sem !== undefined ? $(`.sem[data-sem="${f.sem}"]`, colsEl) : null);
+    if (!el) return;
+    el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center', inline: 'center' });
+    if (el.classList.contains('card')) { el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse'); setTimeout(() => el.focus({ preventScroll: true }), 350); }
+  });
+}
+$('#errB').onclick = openFlags; $('#warnB').onclick = openFlags;
+document.addEventListener('mousedown', e => { if (flagsEl && !$('#flagsDD').contains(e.target)) closeFlags(); if (dlEl && !$('#dlDD').contains(e.target)) closeDl(); });
+
+// Download menu (JSON works; PDF is a placeholder)
+let dlEl = null;
+function closeDl() { if (dlEl) { dlEl.remove(); dlEl = null; } }
+$('#dlBtn').onclick = () => {
+  if (dlEl) { closeDl(); return; }
+  dlEl = document.createElement('div'); dlEl.className = 'menu'; dlEl.setAttribute('role', 'menu');
+  dlEl.innerHTML = `<button data-k="json">Plan as JSON<span class="kind">.json</span></button><button data-k="pdf">Printable PDF<span class="kind">soon</span></button>`;
+  $('#dlDD').appendChild(dlEl);
+  $('[data-k="json"]', dlEl).onclick = () => {
+    const out = JSON.parse(JSON.stringify(plan));
+    out.semesters.forEach((s, i) => { s.courses = Object.keys(where).filter(id => where[id] === i).map(id => courses[id]); s.total_credits = semCredits(i); });
+    const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'degree-plan.json'; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    closeDl(); toast(`${ICON.check} <span>Downloaded degree-plan.json</span>`, 'ok');
+  };
+  $('[data-k="pdf"]', dlEl).onclick = () => { closeDl(); toast('<span>PDF export is planned (Plan download task).</span>'); };
+};
+
+/* ---------------- Toasts ---------------- */
+function toast(html, kind = '') {
+  const t = document.createElement('div'); t.className = 'toast';
+  t.innerHTML = html.replace('<svg', `<svg class="${kind}"`);
+  $('#toasts').appendChild(t);
+  setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 240); }, 2800);
+}
+
+/* ---------------- Chat (scripted for the mockup) ---------------- */
+const msgs = $('#msgs');
+const firstBroken = () => flags.find(f => f.type === 'broken_prerequisite');
+const SUGG = [
+  { q: 'Why is a course flagged?', key: 'flag' },
+  { q: 'Can I graduate in 7 semesters?', key: 'seven' },
+  { q: 'What does the CS minor need?', key: 'minor' },
+];
+function drawSugg() {
+  $('#sugg').innerHTML = SUGG.map((s, i) => `<button type="button" style="--i:${i}" data-k="${s.key}">${esc(s.q)}</button>`).join('');
+  $$('#sugg button').forEach(b => b.onclick = () => ask(b.textContent, b.dataset.k));
+}
+drawSugg();
+function addMsg(html, who) {
+  const m = document.createElement('div'); m.className = 'm ' + who;
+  m.innerHTML = who === 'a' ? `<div class="avatar"></div><div class="body">${html}</div>` : html;
+  msgs.appendChild(m); msgs.scrollTop = msgs.scrollHeight; return m;
+}
+let busy = false;
+function ask(text, key) {
+  if (busy || !text.trim()) return;
+  busy = true; $('#sendB').disabled = true; $('#sugg').innerHTML = '';
+  addMsg(esc(text), 'u');
+  const k = key || (/flag|why|error|broken/i.test(text) ? 'flag' : /7|seven|early|faster/i.test(text) ? 'seven' : /minor/i.test(text) ? 'minor' : 'other');
+  const steps = { flag: ['Reading your plan...', 'Checking prerequisites...'], seven: ['Counting remaining credits...', 'Checking semester loads...'], minor: ['Looking up the CS minor...'], other: ['Thinking...'] }[k];
+  const st = addMsg(`<div class="status"><span class="typing"><i></i><i></i><i></i></span><span class="lab">${steps[0]}</span></div>`, 'a');
+  steps.slice(1).forEach((s, i) => setTimeout(() => { const l = $('.lab', st); if (l) l.textContent = s; }, 700 * (i + 1)));
+  setTimeout(() => { st.remove(); answer(k); busy = false; $('#sendB').disabled = false; drawSugg(); }, reduce ? 200 : 700 * steps.length + 500);
+}
+function answer(k) {
+  if (k === 'flag') {
+    const f = firstBroken();
+    if (!f) { addMsg('Nothing is flagged for prerequisites right now. Nice work.', 'a'); return; }
+    const id = f.course_id, c = courses[id];
+    const target = Math.max(...(pre[id] || []).map(p => where[p])) + 1;
+    const ok = target < semCount && !wouldBreak(id, target);
+    const m = addMsg(`${esc(f.message)}${ok ? ` Moving <code>${esc(c.code)}</code> to <b>${esc(plan.semesters[target].label)}</b> fixes it without breaking anything else.` : ''}
+      ${ok ? `<div class="apply"><span class="what">Move <b>${esc(c.code)}</b> &rarr; ${esc(plan.semesters[target].label)}</span><button class="btn primary">Apply</button></div>` : ''}`, 'a');
+    const btn = $('.apply .btn', m);
+    if (btn) btn.onclick = () => { move(id, target); const ap = $('.apply', m); ap.classList.add('done'); ap.innerHTML = `${ICON.check}<span class="what">Applied. ${esc(c.code)} is now in ${esc(plan.semesters[target].label)}.</span>`; };
+  } else if (k === 'seven') {
+    const left = REQ - doneCredits;
+    addMsg(`You need about <b>${fmt(left)}</b> more credits. Over 7 semesters that's roughly <b>${fmt(Math.ceil(left / 7 * 10) / 10)}</b> credits each, which is a heavy load. I'd also need to check that every prerequisite chain still fits. <i>(Mockup answer. The real one comes from the agent.)</i>`, 'a');
+  } else if (k === 'minor') {
+    addMsg('The CS minor needs 18 credits: <code>CSCI200</code>, <code>CSCI210</code> and <code>CSCI220</code>, then one of <code>CSCI358</code> or <code>MATH334</code>, then 6 more credits from the approved CSCI electives. As a CS major you can’t also take it, though. <i>(Mockup answer.)</i>', 'a');
+  } else {
+    addMsg('In the real app the planning assistant answers this using the catalog and your plan. <i>(Mockup.)</i>', 'a');
+  }
+}
+$('#composer').onsubmit = e => { e.preventDefault(); const v = $('#ask').value; $('#ask').value = ''; ask(v); };
+if (location.hash === '#planner') go('planner');
+addEventListener('hashchange', () => go(location.hash === '#planner' ? 'planner' : 'setup'));
+})();
+</script>
+</body>
+</html>

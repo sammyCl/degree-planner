@@ -1,0 +1,501 @@
+{
+  "plan_id": null,
+  "student": {
+    "degree_level": "bachelor",
+    "programs": [
+      "cs-bs-general-track"
+    ],
+    "catalog_year": "2026-2027",
+    "completed_courses": [
+      {
+        "code": "MATH111",
+        "credits": 4.0,
+        "term": "transfer",
+        "transfer_from": "Front Range Community College"
+      }
+    ]
+  },
+  "semesters": [
+    {
+      "semester_id": "sem-1",
+      "label": "Fall 2026",
+      "courses": [
+        {
+          "course_id": "sem-1-csci128",
+          "code": "CSCI128",
+          "title": "Computer Science for STEM",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-1-math112",
+          "code": "MATH112",
+          "title": "Calculus for Scientists and Engineers II",
+          "credits": 4.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-1-chgn121",
+          "code": "CHGN121",
+          "title": "Principles of Chemistry I",
+          "credits": 4.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-1-edns151",
+          "code": "EDNS151",
+          "title": "Cornerstone - Design I",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-1-csm101",
+          "code": "CSM101",
+          "title": "Freshman Success Seminar",
+          "credits": 1.0,
+          "status": "planned"
+        }
+      ],
+      "total_credits": 15.0
+    },
+    {
+      "semester_id": "sem-2",
+      "label": "Spring 2027",
+      "courses": [
+        {
+          "course_id": "sem-2-csci200",
+          "code": "CSCI200",
+          "title": "Foundational Programming Concepts + Design",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-2-math213",
+          "code": "MATH213",
+          "title": "Calculus for Scientists and Engineers III",
+          "credits": 4.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-2-phgn100",
+          "code": "PHGN100",
+          "title": "Physics I - Mechanics",
+          "credits": 4.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-2-hass100",
+          "code": "HASS100",
+          "title": "Nature and Human Values",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-2-pagn101",
+          "code": "PAGN101",
+          "title": "Physical Education",
+          "credits": 1.0,
+          "status": "planned"
+        }
+      ],
+      "total_credits": 15.0
+    },
+    {
+      "semester_id": "sem-3",
+      "label": "Fall 2027",
+      "courses": [
+        {
+          "course_id": "sem-3-csci210",
+          "code": "CSCI210",
+          "title": "Systems Programming",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-3-csci358",
+          "code": "CSCI358",
+          "title": "Discrete Mathematics",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-3-phgn200",
+          "code": "PHGN200",
+          "title": "Physics II-Electromagnetism and Optics",
+          "credits": 4.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-3-math201",
+          "code": "MATH201",
+          "title": "Introduction to Statistics",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-3-cben110",
+          "code": "CBEN110",
+          "title": "Fundamentals of Biology I",
+          "credits": 4.0,
+          "status": "planned"
+        }
+      ],
+      "total_credits": 17.0
+    },
+    {
+      "semester_id": "sem-4",
+      "label": "Spring 2028",
+      "courses": [
+        {
+          "course_id": "sem-4-csci220",
+          "code": "CSCI220",
+          "title": "Data Structures and Algorithms",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-4-csci341",
+          "code": "CSCI341",
+          "title": "Computer Organization",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-4-math332",
+          "code": "MATH332",
+          "title": "Linear Algebra",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-4-math334",
+          "code": "MATH334",
+          "title": "Introduction to Probability",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-4-ebgn201",
+          "code": "EBGN201",
+          "title": "Principles of Economics",
+          "credits": 3.0,
+          "status": "planned"
+        }
+      ],
+      "total_credits": 15.0
+    },
+    {
+      "semester_id": "sem-5",
+      "label": "Fall 2028",
+      "courses": [
+        {
+          "course_id": "sem-5-csci306",
+          "code": "CSCI306",
+          "title": "Software Engineering",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-5-csci400",
+          "code": "CSCI400",
+          "title": "Principles of Programming Languages",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-5-csci406",
+          "code": "CSCI406",
+          "title": "Algorithms",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-5-csci442",
+          "code": "CSCI442",
+          "title": "Operating Systems",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-5-csci403",
+          "code": "CSCI403",
+          "title": "Data Base Management",
+          "credits": 3.0,
+          "status": "planned"
+        }
+      ],
+      "total_credits": 15.0
+    },
+    {
+      "semester_id": "sem-6",
+      "label": "Spring 2029",
+      "courses": [
+        {
+          "course_id": "sem-6-csci370",
+          "code": "CSCI370",
+          "title": "Advanced Software Engineering",
+          "credits": 5.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-6-csci445",
+          "code": "CSCI445",
+          "title": "Web Programming",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-6-csci404",
+          "code": "CSCI404",
+          "title": "Artificial Intelligence",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-6-chgn122",
+          "code": "CHGN122",
+          "title": "Principles of Chemistry II (SC1)",
+          "credits": 4.0,
+          "status": "planned"
+        }
+      ],
+      "total_credits": 15.0
+    },
+    {
+      "semester_id": "sem-7",
+      "label": "Fall 2029",
+      "courses": [
+        {
+          "course_id": "sem-7-csci475",
+          "code": "CSCI475",
+          "title": "Information Security and Privacy",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-7-csci250",
+          "code": "CSCI250",
+          "title": "Python-Based Computing: Building a Sensor System",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-7-csci303",
+          "code": "CSCI303",
+          "title": "Introduction to Data Science",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-7-math225",
+          "code": "MATH225",
+          "title": "Differential Equations",
+          "credits": 3.0,
+          "status": "planned"
+        }
+      ],
+      "total_credits": 12.0
+    },
+    {
+      "semester_id": "sem-8",
+      "label": "Spring 2030",
+      "courses": [
+        {
+          "course_id": "sem-8-csci437",
+          "code": "CSCI437",
+          "title": "Introduction to Computer Vision",
+          "credits": 3.0,
+          "status": "planned"
+        },
+        {
+          "course_id": "sem-8-csci410",
+          "code": "CSCI410",
+          "title": "Elements of Computing Systems",
+          "credits": 3.0,
+          "status": "planned"
+        }
+      ],
+      "total_credits": 6.0
+    }
+  ],
+  "prerequisite_edges": [
+    {
+      "from": "sem-1-csci128",
+      "to": "sem-2-csci200"
+    },
+    {
+      "from": "sem-1-math112",
+      "to": "sem-2-math213"
+    },
+    {
+      "from": "sem-2-csci200",
+      "to": "sem-3-csci210"
+    },
+    {
+      "from": "sem-1-math112",
+      "to": "sem-3-csci358"
+    },
+    {
+      "from": "sem-2-phgn100",
+      "to": "sem-3-phgn200"
+    },
+    {
+      "from": "sem-2-csci200",
+      "to": "sem-4-csci220"
+    },
+    {
+      "from": "sem-3-csci358",
+      "to": "sem-4-csci220"
+    },
+    {
+      "from": "sem-3-csci210",
+      "to": "sem-4-csci341"
+    },
+    {
+      "from": "sem-1-csci128",
+      "to": "sem-4-math332"
+    },
+    {
+      "from": "sem-1-math112",
+      "to": "sem-4-math332"
+    },
+    {
+      "from": "sem-1-csci128",
+      "to": "sem-4-math334"
+    },
+    {
+      "from": "sem-3-csci210",
+      "to": "sem-5-csci306"
+    },
+    {
+      "from": "sem-4-csci220",
+      "to": "sem-5-csci306"
+    },
+    {
+      "from": "sem-5-csci306",
+      "to": "sem-5-csci400"
+    },
+    {
+      "from": "sem-3-csci358",
+      "to": "sem-5-csci400"
+    },
+    {
+      "from": "sem-4-csci220",
+      "to": "sem-5-csci406"
+    },
+    {
+      "from": "sem-2-math213",
+      "to": "sem-5-csci406"
+    },
+    {
+      "from": "sem-3-csci358",
+      "to": "sem-5-csci406"
+    },
+    {
+      "from": "sem-4-csci220",
+      "to": "sem-5-csci442"
+    },
+    {
+      "from": "sem-4-csci341",
+      "to": "sem-5-csci442"
+    },
+    {
+      "from": "sem-2-csci200",
+      "to": "sem-5-csci403"
+    },
+    {
+      "from": "sem-5-csci306",
+      "to": "sem-6-csci370"
+    },
+    {
+      "from": "sem-5-csci306",
+      "to": "sem-6-csci445"
+    },
+    {
+      "from": "sem-4-csci220",
+      "to": "sem-6-csci404"
+    },
+    {
+      "from": "sem-4-math334",
+      "to": "sem-6-csci404"
+    },
+    {
+      "from": "sem-1-chgn121",
+      "to": "sem-6-chgn122"
+    },
+    {
+      "from": "sem-4-csci220",
+      "to": "sem-7-csci475"
+    },
+    {
+      "from": "sem-4-csci341",
+      "to": "sem-7-csci475"
+    },
+    {
+      "from": "sem-3-csci210",
+      "to": "sem-7-csci475"
+    },
+    {
+      "from": "sem-1-csci128",
+      "to": "sem-7-csci250"
+    },
+    {
+      "from": "sem-1-csci128",
+      "to": "sem-7-csci303"
+    },
+    {
+      "from": "sem-1-math112",
+      "to": "sem-7-math225"
+    },
+    {
+      "from": "sem-4-math334",
+      "to": "sem-8-csci437"
+    },
+    {
+      "from": "sem-4-math332",
+      "to": "sem-8-csci437"
+    },
+    {
+      "from": "sem-2-csci200",
+      "to": "sem-8-csci437"
+    },
+    {
+      "from": "sem-4-csci341",
+      "to": "sem-8-csci410"
+    }
+  ],
+  "flags": [
+    {
+      "flag_id": "flag-1",
+      "type": "broken_prerequisite",
+      "severity": "error",
+      "course_id": "sem-5-csci400",
+      "message": "CSCI400 requires CSCI306 to be completed in an earlier semester. CSCI306 is scheduled in the same semester (Fall 2028).",
+      "overridable": false,
+      "overridden": false
+    },
+    {
+      "flag_id": "flag-2",
+      "type": "credit_shortfall",
+      "severity": "warning",
+      "course_id": null,
+      "message": "Spring 2030 has 6 credits, below the 12-credit full-time minimum.",
+      "overridable": false,
+      "overridden": false
+    },
+    {
+      "flag_id": "flag-3",
+      "type": "requirement_unmet",
+      "severity": "error",
+      "course_id": null,
+      "message": "The plan totals 114 of 130 required credits.",
+      "overridable": false,
+      "overridden": false
+    }
+  ],
+  "summary": {
+    "total_credits": 114.0,
+    "total_credits_required": 130,
+    "requirements_met": false
+  }
+}
