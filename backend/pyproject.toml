@@ -8,7 +8,6 @@ dependencies = [
     "uvicorn[standard]>=0.32",
     "pydantic>=2.9",
     "pypdf>=7.1.0",
-    "anthropic>=2.12.0",
     "mcp>=2.3.0",
 ]
 
