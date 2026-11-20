@@ -24,7 +24,8 @@ from typing import Any, Callable
 
 from degree_planner_backend import validator
 from degree_planner_backend.agent import tools
-from degree_planner_backend.agent.mcp_server import SERVER_NAME, TOOL_DEFINITIONS, context_for
+from degree_planner_backend.agent.agent_file import load_agent
+from degree_planner_backend.agent.mcp_server import SERVER_NAME, context_for
 from degree_planner_backend.agent.request_models import (
     EXPLANATION_MAX,
     PROBLEM_MAX,
@@ -39,62 +40,24 @@ from degree_planner_backend.plan_models import Plan
 logger = logging.getLogger(__name__)
 
 CLAUDE_COMMAND = "claude"
-MODEL = "claude-sonnet-5-5"
-# Recommended starting point for multistep tool use on Sonnet 5.5; tune with the eval like STEP_LIMIT.
-EFFORT = "medium"
 # Longest one request may run before it is stopped, in seconds.
 TIMEOUT_SECONDS = 600
 
+# The agent's settings and system prompt live in planner.md; edit the agent there, not here.
+AGENT_FILE = Path(__file__).with_name("planner.md")
+AGENT = load_agent(AGENT_FILE)
+MODEL = AGENT.model
+EFFORT = AGENT.effort
 # Most model turns one request may take (Claude Code's --max-turns, reported as Usage.steps)
-# before the loop returns "cannot_work". Placeholder set generously so it does not decide the
-# outcome yet; to be tuned from the usage.steps of real runs (Example 1 first, then the eval
-# runner) and recorded in DECISIONS.md.
-STEP_LIMIT = 25
-
+# before the loop returns "cannot_work": maxTurns in planner.md.
+STEP_LIMIT = AGENT.max_turns
 # Replaces Claude Code's own system prompt, and is the same for every request; the student's
 # details and the semester labels go in the first message instead. The loop, not the model,
 # decides "ok" or "cannot_work" from the last check_plan result; the model's final message
 # becomes the explanation.
-SYSTEM_PROMPT = """\
-You are the degree planner for Colorado School of Mines students. You build a semester-by-semester \
-course plan that meets every requirement of the student's programs (bachelor's, master's, combined \
-BS+MS, minors, ASIs) in the semesters they asked for.
-
-Only use what the tools return
-- Plan only with courses that search_catalog, get_prerequisites or get_program_requirements returned. \
-Never invent a course code, title, credit count, prerequisite or requirement, and never fill a gap \
-from what you remember about Mines or any other school.
-- If the data is missing something you need (a course, a program, a prerequisite), say so plainly \
-instead of guessing.
-
-How to work
-1. Call get_program_requirements for each of the student's programs.
-2. Look up prerequisites for the courses you plan to use; ask for several courses in one turn \
-where you can.
-3. Place courses only into the semester labels you were given, in that order, with no others. \
-Leave out courses the student has already completed.
-4. Call check_plan with the whole plan. Fix every error it reports and call check_plan again. \
-Repeat until requirements_met is true.
-5. If a requirement cannot be met in the semesters given, stop and say which requirement and why, \
-rather than handing back a plan that only looks finished.
-
-The student stays in charge
-- The student cannot answer you during this run; they will see your plan and your message on the \
-planner page and can change the plan there.
-- Never decide an exception for the student. If a course needs an exception (open_exceptions in \
-check_plan), keep the course only when the plan needs it, and name it in your message so the \
-student can decide.
-- When you make a choice the requirements leave open, such as which elective fills a group, \
-say which choice you made so the student can change it.
-
-Your final message
-When you are done, reply without calling a tool. Write to the student in plain sentences: what the \
-plan does, the choices you made, any exceptions they need to decide, and, if the plan does not \
-work, what is blocking it. Keep it under 4,000 characters.
-"""
-
+SYSTEM_PROMPT = AGENT.system_prompt
 # Claude Code names an MCP tool mcp__<server>__<tool>; only these may run, without asking.
-ALLOWED_TOOLS = [f"mcp__{SERVER_NAME}__{tool['name']}" for tool in TOOL_DEFINITIONS]
+ALLOWED_TOOLS = [f"mcp__{SERVER_NAME}__{name}" for name in AGENT.tools]
 
 NO_PLAN_PROBLEM = "The agent never sent a plan that check_plan could read."
 NOT_MET_PROBLEM = "The plan does not meet every requirement of the student's programs yet."
