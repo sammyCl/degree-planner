@@ -1,0 +1,140 @@
+"""MCP server that gives Claude Code the planner's tools (the five in tools.py).
+
+The agent loop (loop.py) runs `claude -p`, and Claude Code starts this server as a child process
+for one request. Run as:
+
+    python -m degree_planner_backend.agent.mcp_server --db DB --request REQUEST.json --plan PLAN.json
+
+--db       the SQLite catalog, opened read-only
+--request  the AgentRequest, written by the loop: the student's record, overrides and semester
+           labels come from here, never from the model
+--plan     where the server saves the last check_plan input it accepted, for the loop to rebuild
+           and validate once Claude Code is done
+
+Only stderr is used for logging: stdout carries the MCP messages.
+"""
+
+from __future__ import annotations
+
+import argparse
+import asyncio
+import json
+import logging
+import os
+import sqlite3
+import sys
+from pathlib import Path
+from typing import Any, Callable
+
+import mcp.types as types
+from mcp.server.lowlevel import Server
+from mcp.server.stdio import stdio_server
+
+from degree_planner_backend.agent import tools
+from degree_planner_backend.agent.request_models import AgentRequest
+
+logger = logging.getLogger(__name__)
+
+SERVER_NAME = "planner"
+
+# Fixed order, so the tool list Claude Code sees is the same on every request.
+TOOL_DEFINITIONS = [
+    tools.SEARCH_CATALOG_TOOL,
+    tools.GET_PREREQUISITES_TOOL,
+    tools.GET_PROGRAM_REQUIREMENTS_TOOL,
+    tools.GET_FORMS_TOOL,
+    tools.CHECK_PLAN_TOOL,
+]
+_LOOKUP_HANDLERS: dict[str, Callable[[sqlite3.Connection, dict[str, Any]], tools.ToolResult]] = {
+    "search_catalog": tools.search_catalog,
+    "get_prerequisites": tools.get_prerequisites,
+    "get_program_requirements": tools.get_program_requirements,
+    "get_forms": tools.get_forms,
+}
+
+
+def context_for(request: AgentRequest) -> tools.StudentContext:
+    return tools.StudentContext(
+        student=request.student,
+        overrides=frozenset((o.type, o.code) for o in request.overrides),
+    )
+
+
+class PlannerTools:
+    """Runs one tool call for one request. Plain Python, so it can be tested without MCP."""
+
+    def __init__(self, connection: sqlite3.Connection, request: AgentRequest, plan_path: Path) -> None:
+        self.connection = connection
+        self.context = context_for(request)
+        self.labels = request.semester_labels()
+        self.plan_path = plan_path
+
+    def call(self, name: str, tool_input: Any) -> tools.ToolResult:
+        if name == "check_plan":
+            return self._check_plan(tool_input)
+        handler = _LOOKUP_HANDLERS.get(name)
+        if handler is None:
+            names = ", ".join(tool["name"] for tool in TOOL_DEFINITIONS)
+            return {"error": f"there is no tool named {name!r}; the tools are {names}."}
+        return handler(self.connection, tool_input)
+
+    def _check_plan(self, tool_input: Any) -> tools.ToolResult:
+        # Checked before the tool runs, so the model fixes its labels now instead of the plan
+        # failing at the end for not answering the request.
+        sent = tool_input.get("semesters") if isinstance(tool_input, dict) else None
+        if isinstance(sent, list):
+            sent_labels = [item.get("label") if isinstance(item, dict) else None for item in sent]
+            if sent_labels != self.labels:
+                return {"error": f"semesters must use exactly these labels, in this order: {json.dumps(self.labels)}."}
+        result = tools.check_plan(self.connection, tool_input, self.context)
+        if "error" not in result:
+            self._save_plan(tool_input)
+        return result
+
+    def _save_plan(self, tool_input: dict[str, Any]) -> None:
+        # Written to a temporary file and renamed, so the loop never reads half a plan.
+        partial = self.plan_path.with_name(self.plan_path.name + ".partial")
+        partial.write_text(json.dumps(tool_input))
+        os.replace(partial, self.plan_path)
+
+
+def build_server(planner: PlannerTools) -> Server:
+    async def list_tools(_context: Any, _params: Any) -> types.ListToolsResult:
+        return types.ListToolsResult(
+            tools=[
+                types.Tool(name=tool["name"], description=tool["description"], inputSchema=tool["input_schema"])
+                for tool in TOOL_DEFINITIONS
+            ]
+        )
+
+    async def call_tool(_context: Any, params: types.CallToolRequestParams) -> types.CallToolResult:
+        result = planner.call(params.name, params.arguments if params.arguments is not None else {})
+        return types.CallToolResult(
+            content=[types.TextContent(text=json.dumps(result))],
+            isError="error" in result,
+        )
+
+    return Server(SERVER_NAME, on_list_tools=list_tools, on_call_tool=call_tool)
+
+
+async def _serve(server: Server) -> None:
+    async with stdio_server() as (read_stream, write_stream):
+        await server.run(read_stream, write_stream, server.create_initialization_options())
+
+
+def main(argv: list[str] | None = None) -> None:
+    parser = argparse.ArgumentParser(description="MCP server with the degree planner's tools")
+    parser.add_argument("--db", required=True, type=Path)
+    parser.add_argument("--request", required=True, type=Path)
+    parser.add_argument("--plan", required=True, type=Path)
+    args = parser.parse_args(argv)
+
+    logging.basicConfig(level=logging.INFO, stream=sys.stderr)
+    request = AgentRequest.model_validate_json(args.request.read_text())
+    # Read-only: no tool writes to the catalog, and a bug must not be able to change it.
+    connection = sqlite3.connect(f"{args.db.resolve().as_uri()}?mode=ro", uri=True)
+    asyncio.run(_serve(build_server(PlannerTools(connection, request, args.plan))))
+
+
+if __name__ == "__main__":
+    main()
