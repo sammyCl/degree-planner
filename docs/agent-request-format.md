@@ -46,16 +46,23 @@ Free-text notes from the student ("no Friday classes"). They come with Chat logi
 |---|---|---|---|
 | `status` | string | yes | `ok` or `cannot_work` |
 | `plan` | Plan \| null | yes | from the plan format, with the validator's edges, flags and summary |
-| `explanation` | string | yes | shown to the student: what the plan does and any choices the agent made; never empty |
-| `problems` | array of string | yes | why it cannot work; `[]` when `status` is `ok`; no entry may be empty |
+| `explanation` | string | yes | shown to the student: what the plan does and any choices the agent made; at most 4,000 characters, and it must have visible text (spaces, zero-width and other invisible characters alone do not count) |
+| `problems` | array of string | yes | why it cannot work; `[]` when `status` is `ok`; at most 30 entries of at most 600 characters each (the same limits as the flags `check_plan` shows), each with visible text |
 | `usage` | Usage | yes | token counts for the eval and the cost numbers |
 
-- `ok`: `plan` is present, its `summary.requirements_met` is true, it has no open error flag (an error counts as handled only when it is both `overridable` and `overridden`; see BUG-032), and `problems` is empty.
+- `ok`: `plan` is present, its `summary.requirements_met` is true, its `summary.total_credits` is at least `total_credits_required`, it has no open error flag, and `problems` is empty. An error counts as handled only when it is `overridden` and its type is one the student may override (today `exception_claimed`); the flag's own `overridable` field is not trusted (see BUG-032). An open `exception_claimed` warning is allowed: the planner page shows it and the student overrides it there.
 - `cannot_work`: `problems` has at least one entry. `plan` is the agent's last attempt with its flags, so the planner page can still draw it and the student can fix it by hand; it is `null` only when the agent never proposed a plan (for example, a program that is not loaded).
 
 The backend always rebuilds and validates the plan (`build_plan`, then the validator), so the plan in a response is never the model's output taken as is.
+A response on its own cannot tell whether its plan answers the request (same student, the labels from `semester_labels()` in order); the Agent loop checks that before it returns.
+
+## Read-only once checked
+
+`AgentRequest`, `Override`, `AgentResponse` and `Usage` are frozen: a field cannot be changed after the model is built, and `overrides` and `problems` are tuples, so nothing can be appended. Build a new model instead of changing one. `model_copy(update=...)` skips validation in Pydantic, so do not use it on these models.
 
 ### Usage
+
+All three are strict integers: `true`, `"500"` and `5.0` are rejected.
 
 | Field | Type | Notes |
 |---|---|---|

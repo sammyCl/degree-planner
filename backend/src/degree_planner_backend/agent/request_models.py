@@ -6,12 +6,15 @@ The student and the plan reuse the plan format (plan_models.py), so there is one
 from __future__ import annotations
 
 import re
+import unicodedata
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, field_validator, model_validator
 
 from degree_planner_backend.agent.tools import (
     _COURSE_CODE,
+    FLAG_MESSAGE_MAX,
+    FLAGS_SHOWN_MAX,
     OVERRIDABLE_FLAG_TYPES,
     SEMESTERS_MAX,
     _clean_stored_code,
@@ -25,6 +28,18 @@ START_YEAR_MAX = 2500
 
 OVERRIDES_MAX = 50
 OVERRIDE_CODE_MAX = 20
+
+# Response text the student sees. Problems match how many flags and how long a flag message the
+# check_plan tool shows (tools.py), so a problem copied from a flag always fits.
+EXPLANATION_MAX = 4000
+PROBLEMS_MAX = FLAGS_SHOWN_MAX  # 30
+PROBLEM_MAX = FLAG_MESSAGE_MAX  # 600
+
+
+def _has_visible_text(value: str) -> bool:
+    """False for text made only of spaces, control or format characters (zero-width spaces,
+    direction marks), which .strip() does not remove."""
+    return any(unicodedata.category(ch)[0] not in ("C", "Z") for ch in value)
 
 # Most semesters a student can ask for, by degree level. Combined BS+MS, minors and ASIs go with a
 # bachelor's, so they share its limit; master's and PhD are graduate.
@@ -44,7 +59,7 @@ class Override(BaseModel):
     Only overridable flag types are accepted (OVERRIDABLE_FLAG_TYPES in tools.py). Those are all
     about one course, so code is required; it is cleaned up like the tools do ('mngn 501' -> 'MNGN501')."""
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", frozen=True)
 
     type: FlagType
     code: str = Field(max_length=OVERRIDE_CODE_MAX)
@@ -67,16 +82,17 @@ class Override(BaseModel):
 
 
 class AgentRequest(BaseModel):
-    """What the backend sends the agent loop."""
+    """What the backend sends the agent loop. Read-only once checked, so the loop cannot change a
+    field (or append an override) after validation."""
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", frozen=True)
 
     student: Student
     # Strict: true, 8.0 or "8" is a frontend bug, so it is rejected instead of converted.
     semesters: StrictInt = Field(ge=1)
     start_term: str
     include_summers: StrictBool = False
-    overrides: list[Override] = Field(default_factory=list, max_length=OVERRIDES_MAX)
+    overrides: tuple[Override, ...] = Field(default=(), max_length=OVERRIDES_MAX)
 
     @field_validator("start_term")
     @classmethod
@@ -90,7 +106,7 @@ class AgentRequest(BaseModel):
 
     @field_validator("overrides")
     @classmethod
-    def _drop_duplicate_overrides(cls, value: list[Override]) -> list[Override]:
+    def _drop_duplicate_overrides(cls, value: tuple[Override, ...]) -> tuple[Override, ...]:
         # Checked after each code is cleaned, so 'mngn 501' and 'MNGN501' count as the same.
         seen: set[tuple[str, str]] = set()
         unique = []
@@ -99,7 +115,7 @@ class AgentRequest(BaseModel):
             if key not in seen:
                 seen.add(key)
                 unique.append(override)
-        return unique
+        return tuple(unique)
 
     @model_validator(mode="after")
     def _check_semester_count(self) -> AgentRequest:
@@ -135,11 +151,11 @@ def semester_labels(start_term: str, count: int, include_summers: bool = False) 
 class Usage(BaseModel):
     """Token counts for one request, summed over every model call in the loop (for the eval and cost)."""
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", frozen=True)
 
-    input_tokens: int = Field(ge=0)
-    output_tokens: int = Field(ge=0)
-    steps: int = Field(ge=0)
+    input_tokens: StrictInt = Field(ge=0)
+    output_tokens: StrictInt = Field(ge=0)
+    steps: StrictInt = Field(ge=0)
 
     @model_validator(mode="after")
     def _check_steps(self) -> Usage:
@@ -157,26 +173,29 @@ class AgentResponse(BaseModel):
     The plan is always rebuilt and checked by the backend, never taken from the model as is.
     """
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", frozen=True)
 
     status: Literal["ok", "cannot_work"]
     plan: Plan | None
-    explanation: str
-    problems: list[str] = Field(default_factory=list)
+    explanation: str = Field(max_length=EXPLANATION_MAX)
+    problems: tuple[str, ...] = Field(default=(), max_length=PROBLEMS_MAX)
     usage: Usage
 
     @field_validator("explanation")
     @classmethod
     def _check_explanation(cls, value: str) -> str:
-        if not value.strip():
+        if not _has_visible_text(value):
             raise ValueError("explanation must not be empty")
         return value
 
     @field_validator("problems")
     @classmethod
-    def _check_problems(cls, value: list[str]) -> list[str]:
-        if any(not problem.strip() for problem in value):
-            raise ValueError("each problem must say something")
+    def _check_problems(cls, value: tuple[str, ...]) -> tuple[str, ...]:
+        for problem in value:
+            if not _has_visible_text(problem):
+                raise ValueError("each problem must say something")
+            if len(problem) > PROBLEM_MAX:
+                raise ValueError(f"each problem must be at most {PROBLEM_MAX} characters")
         return value
 
     @model_validator(mode="after")
@@ -186,15 +205,24 @@ class AgentResponse(BaseModel):
                 raise ValueError('status "ok" needs a plan')
             if not self.plan.summary.requirements_met:
                 raise ValueError('status "ok" needs a plan whose summary has requirements_met true')
+            summary = self.plan.summary
+            if summary.total_credits < summary.total_credits_required:
+                raise ValueError(
+                    f'status "ok" needs at least the required credits; the plan has '
+                    f"{summary.total_credits:g} of {summary.total_credits_required:g}"
+                )
             # The summary could disagree with the flags in a hand-built or edited plan. An override
-            # only counts on a flag the student may override (BUG-032: the validator trusts any).
+            # only counts when the flag's type may be overridden; the flag's own overridable field
+            # is not trusted (BUG-032: the validator trusts any override).
             open_errors = [
                 f.flag_id
                 for f in self.plan.flags
-                if f.severity == "error" and not (f.overridden and f.overridable)
+                if f.severity == "error" and not (f.overridden and f.type in OVERRIDABLE_FLAG_TYPES)
             ]
             if open_errors:
                 raise ValueError(f'status "ok" needs a plan with no open error flags; found {", ".join(open_errors)}')
+            # An open exception_claimed warning is allowed in an "ok" plan (team decision, 2026-11-19):
+            # the planner page shows it and the student overrides it there.
             if self.problems:
                 raise ValueError('status "ok" must not list problems')
         elif not self.problems:

@@ -5,6 +5,9 @@ import pytest
 from pydantic import ValidationError
 
 from degree_planner_backend.agent.request_models import (
+    EXPLANATION_MAX,
+    PROBLEM_MAX,
+    PROBLEMS_MAX,
     OVERRIDES_MAX,
     SEMESTERS_MAX_BACHELOR,
     SEMESTERS_MAX_GRADUATE,
@@ -12,6 +15,7 @@ from degree_planner_backend.agent.request_models import (
     AgentResponse,
     semester_labels,
 )
+from degree_planner_backend.agent.tools import FLAG_MESSAGE_MAX, FLAGS_SHOWN_MAX
 from degree_planner_backend.plan_models import Plan
 
 DOCS = Path(__file__).resolve().parents[2] / "docs"
@@ -33,6 +37,7 @@ def _plan(requirements_met: bool) -> Plan:
     sample["summary"]["requirements_met"] = requirements_met
     if requirements_met:
         sample["flags"] = []
+        sample["summary"]["total_credits"] = sample["summary"]["total_credits_required"]
     return Plan.model_validate(sample)
 
 
@@ -47,7 +52,7 @@ def test_sample_files_match_the_models():
 
 def test_request_minimal():
     request = AgentRequest.model_validate({"student": _student(), "semesters": 8, "start_term": "Fall 2026"})
-    assert request.overrides == []
+    assert request.overrides == ()
     assert request.semester_labels()[:3] == ["Fall 2026", "Spring 2027", "Fall 2027"]
     assert len(request.semester_labels()) == 8
 
@@ -228,7 +233,7 @@ def test_request_strict_types_still_parse_from_json():
 
 def test_response_ok():
     response = AgentResponse(status="ok", plan=_plan(True), explanation="Eight semesters.", usage=_usage())
-    assert response.problems == []
+    assert response.problems == ()
 
 
 def test_response_ok_needs_a_passing_plan():
@@ -263,16 +268,28 @@ def test_response_cannot_work_needs_a_problem():
 def test_response_ok_rejects_open_error_flags():
     # requirements_met says true, but the sample's broken prerequisite flag is still open.
     plan = _plan(False)
-    plan = plan.model_copy(update={"summary": plan.summary.model_copy(update={"requirements_met": True})})
+    summary = plan.summary.model_copy(update={"requirements_met": True, "total_credits": plan.summary.total_credits_required})
+    plan = plan.model_copy(update={"summary": summary})
     with pytest.raises(ValidationError):
         AgentResponse(status="ok", plan=plan, explanation="x", usage=_usage())
     # The sample's broken prerequisite cannot be overridden, so marking it overridden does not help.
     forged = plan.model_copy(update={"flags": [f.model_copy(update={"overridden": True}) for f in plan.flags]})
     with pytest.raises(ValidationError):
         AgentResponse(status="ok", plan=forged, explanation="x", usage=_usage())
-    # An overridable error that the student overrode does count as handled.
-    allowed = plan.model_copy(
+    # Marking it overridable by hand does not help either: the type decides, not the flag's field.
+    relabeled = plan.model_copy(
         update={"flags": [f.model_copy(update={"overridden": True, "overridable": True}) for f in plan.flags]}
+    )
+    with pytest.raises(ValidationError):
+        AgentResponse(status="ok", plan=relabeled, explanation="x", usage=_usage())
+    # An error of a type the student may override, and did override, counts as handled.
+    allowed = plan.model_copy(
+        update={
+            "flags": [
+                f.model_copy(update={"type": "exception_claimed", "overridden": True, "overridable": True})
+                for f in plan.flags
+            ]
+        }
     )
     assert AgentResponse(status="ok", plan=allowed, explanation="x", usage=_usage()).status == "ok"
 
@@ -324,3 +341,89 @@ def test_usage_rejects_negative_counts():
             problems=["y"],
             usage={"input_tokens": -1, "output_tokens": 0, "steps": 0},
         )
+
+
+def test_ok_rejects_a_summary_short_on_credits():
+    plan = _plan(True)
+    short = plan.model_copy(update={"summary": plan.summary.model_copy(update={"total_credits": 14})})
+    with pytest.raises(ValidationError):
+        AgentResponse(status="ok", plan=short, explanation="x", usage=_usage())
+
+
+def test_ok_allows_an_open_exception_warning():
+    # Team decision 2026-11-19: the planner page shows the warning and the student overrides it there.
+    plan = _plan(True)
+    warning = {
+        "flag_id": "f1",
+        "type": "exception_claimed",
+        "severity": "warning",
+        "course_id": None,
+        "message": "needs instructor approval",
+        "overridable": True,
+        "overridden": False,
+    }
+    with_warning = Plan.model_validate({**plan.model_dump(by_alias=True), "flags": [warning]})
+    assert AgentResponse(status="ok", plan=with_warning, explanation="x", usage=_usage()).status == "ok"
+
+
+def test_request_is_read_only_after_validation():
+    request = AgentRequest.model_validate(
+        {**_with_overrides([{"type": "exception_claimed", "code": "MNGN501"}])}
+    )
+    with pytest.raises(ValidationError):
+        request.semesters = 500
+    with pytest.raises(ValidationError):
+        request.start_term = "Fall 2027"
+    with pytest.raises(AttributeError):
+        request.overrides.append("anything")
+    with pytest.raises(ValidationError):
+        request.overrides[0].type = "broken_prerequisite"
+
+
+def test_response_is_read_only_after_validation():
+    response = AgentResponse(status="cannot_work", plan=None, explanation="x", problems=["y"], usage=_usage())
+    with pytest.raises(ValidationError):
+        response.status = "ok"
+    with pytest.raises(AttributeError):
+        response.problems.append("z")
+    with pytest.raises(ValidationError):
+        response.usage.steps = 0
+
+
+@pytest.mark.parametrize("text", ["\u200b\u200b", "\u200f", " \u00a0\t", "\u2028", "\ufeff"])
+def test_invisible_text_does_not_count(text):
+    with pytest.raises(ValidationError):
+        AgentResponse(status="cannot_work", plan=None, explanation=text, problems=["y"], usage=_usage())
+    with pytest.raises(ValidationError):
+        AgentResponse(status="cannot_work", plan=None, explanation="x", problems=[text], usage=_usage())
+
+
+def test_text_with_some_visible_characters_counts():
+    response = AgentResponse(
+        status="cannot_work", plan=None, explanation="\u200bCSCI400 needs CSCI262", problems=["\u00e9"], usage=_usage()
+    )
+    assert response.status == "cannot_work"
+
+
+@pytest.mark.parametrize("field", ["input_tokens", "output_tokens", "steps"])
+@pytest.mark.parametrize("value", [True, "500", 5.0])
+def test_usage_counts_are_strict(field, value):
+    usage = {"input_tokens": 1, "output_tokens": 1, "steps": 1, field: value}
+    with pytest.raises(ValidationError):
+        AgentResponse(status="cannot_work", plan=None, explanation="x", problems=["y"], usage=usage)
+
+
+def test_response_text_limits():
+    def response(explanation="x", problems=("y",)):
+        return AgentResponse(
+            status="cannot_work", plan=None, explanation=explanation, problems=list(problems), usage=_usage()
+        )
+
+    assert (PROBLEMS_MAX, PROBLEM_MAX) == (FLAGS_SHOWN_MAX, FLAG_MESSAGE_MAX) == (30, 600)
+    response(explanation="x" * EXPLANATION_MAX, problems=["p" * PROBLEM_MAX] * PROBLEMS_MAX)
+    with pytest.raises(ValidationError):
+        response(explanation="x" * (EXPLANATION_MAX + 1))
+    with pytest.raises(ValidationError):
+        response(problems=["p"] * (PROBLEMS_MAX + 1))
+    with pytest.raises(ValidationError):
+        response(problems=["p" * (PROBLEM_MAX + 1)])
