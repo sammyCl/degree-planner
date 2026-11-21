@@ -495,7 +495,7 @@ BUG-024  The validator applies overrides to flags that are not overridable
              in backend/tests/test_validator.py. Same fix as BUG-032.
 
 BUG-025  One course can count toward several requirement groups
-  Status:    Open
+  Status:    Fixed
   Owner:     Midhat Sajad (validator)
   Where:     backend/src/degree_planner_backend/validator.py (requirement
              groups loop)
@@ -514,6 +514,18 @@ BUG-025  One course can count toward several requirement groups
              then choose_credits with lists, then free electives from what is
              left); double counting across programs stays governed by
              double_counts_with.
+  Fixed in:  PR #25 (backend/fix-bug-025-double-counting), exactly the fix
+             idea above: "all" groups claim their courses first, then
+             choose_credits groups with a list (in declared order, each
+             claiming only as many courses as it needs), then choose_credits
+             groups with no list. Covered by
+             test_check_plan_does_not_let_free_electives_recount_a_fixed_group_s_courses
+             and
+             test_check_plan_lets_a_shared_candidate_satisfy_only_one_choose_credits_group
+             in test_validator.py. Also updated
+             test_check_plan_matches_the_sample_plan: the sample plan's Free
+             Electives group now correctly falls short instead of being
+             double-counted from Core.
 
 BUG-026  Validator gaps: no credit cap per semester, no corequisite check,
          empty "all" groups always met, OR-with-exception still flagged

@@ -1113,20 +1113,14 @@ def test_program_real_cs_minor(real_data_connection: sqlite3.Connection) -> None
 
 
 def test_program_every_real_program_is_clean(real_data_connection: sqlite3.Connection) -> None:
-    # mining-bs-ms-combined and cs-bs-ms-combined correctly warn that their mining-bs/
-    # cs-bs-general-track components aren't loaded: Samantha's Bachelor's data isn't in yet.
-    # Expected to clear once that data lands; not a defect in the combined programs themselves.
-    expected_combines_warnings = {
-        "mining-bs-ms-combined": ["combines: component mining-bs is not in the loaded program data"],
-        "cs-bs-ms-combined": ["combines: component cs-bs-general-track is not in the loaded program data"],
-    }
-
+    # The combined programs' components (mining-bs, cs-bs-general-track) are in bachelors.json now,
+    # so every program, combined ones included, must load with no data warnings.
     ids = [row[0] for row in real_data_connection.execute("SELECT DISTINCT program_id FROM programs")]
-    assert len(ids) == 120
+    assert len(ids) == 125
     for program_id in ids:
         result = get_program_requirements(real_data_connection, {"program_id": program_id})
         assert "error" not in result, program_id
-        assert result["data_warnings"] == expected_combines_warnings.get(program_id, []), program_id
+        assert result["data_warnings"] == [], program_id
         assert len(json.dumps(result, allow_nan=False)) < 10_000
 
 
@@ -1315,7 +1309,7 @@ def test_program_every_no_list_group_shows_label(real_data_connection: sqlite3.C
         for group in get_program_requirements(real_data_connection, {"program_id": program_id})["requirement_groups"]
         if group["courses"] is None
     ]
-    assert len(no_list) == 80
+    assert len(no_list) == 85
     for group in no_list:
         assert group["label"] in group["summary"]
 
