@@ -50,6 +50,27 @@ Chemistry minor and ASIs, Geological Engineering minor and ASI, the Geophysics m
 - **For the UI:** show a notice on any group whose label says "approved" or whose `courses` is missing: "Confirm this choice with the department."
 - **Proposal for Midhat:** an optional boolean on a requirement group, for example `needs_approval: true` plus `approver: "Geophysics department"`, so the UI does not have to read the label text. Not added to the schema; it is her decision.
 
+## Course catalog (`json/courses.json`)
+
+Built from the two course CSVs by `tools/build_courses_json.py`. Counts and every flagged item are regenerated, in full, into `json/courses.REVIEW.md`; everything the format could not hold (dropped grade minimums and notes) is also in `json/courses.dropped-info.csv`.
+
+- **Same code in both CSVs:** about 950 codes (the 400-level cross-listed courses) appear in both files, some more than once in the graduate file. One entry per code. The undergraduate row wins (it carries the catalog URL); an empty field is filled from the other rows; a shorter description that is a prefix of a longer one is replaced by the longer. Real disagreements (title, credits, prerequisites) keep the undergraduate value and are listed in the review file.
+- **Credit ranges** ("1-6", "0.5-6"; 471 courses, mostly independent study, thesis, special topics): the format has one number, so the upper bound is used, as for minors. Open question for Midhat: does the format need a minimum and maximum?
+- **Prerequisite text becomes AND/OR logic** (`tools/prereq_parser.py`, tested in `tools/test_prereq_parser.py`):
+  - A comma or "and" means AND; "or" binds tighter, so "MATH225 or MATH235 and MATH332 or MATH342" is (225 or 235) AND (332 or 342); a list that is only commas ending in ", or" is one OR.
+  - A bare number after a code inherits its subject ("MATH 201 or 530").
+  - "Instructor consent", "permission of instructor" and "or equivalent" become `exception` requirements (the validator warns and the student can override).
+  - **Grade minimums** ("with a C- or better") are dropped because the format has no grade field. Open question for Midhat. **Every course affected (67) is listed with the exact wording in `json/courses.REVIEW.md` and in `json/courses.dropped-info.csv`**, so a grade field can be added later and filled from that list. Grade wording inside free-text prerequisites is not dropped: it stays in the exception's label.
+  - Notes about credit or repetition ("Variable credit...", "Repeatable for credit...", "Independent Study form must be completed...") are dropped from prerequisites; each one is listed in the same two files (kind `credit/repeat note`).
+  - **Free text** that is not course logic ("Graduate standing", "Enrollment in Chemistry M.S. program") is kept whole as one `exception` with the original text as its label, so nothing is lost and nothing is silently passed. If a `;`-separated clause has course codes, those clauses are kept as real requirements and only the free-text clauses become exceptions ("mixed").
+- **Corequisites** are a plain list in the format, so an OR ("PHGN300 or PHGN310") or free text cannot be expressed and is left empty and reported. Open question for Midhat.
+- **Codes the catalog does not have:** prerequisite codes that match no course (typos like `CSC128`, retired courses) are kept as written and listed in the review file, not corrected.
+- **Placeholder and special codes** (`CHGN1XX`, `HASS2XX`, `CEEN599AB`, lab sections such as `MTGN348L`) are real catalog entries and are kept.
+- **Titles** are in capitals in the catalog and are converted to title case (small words lower, Roman numerals and common acronyms kept); a few unusual acronyms may be off. Titles that already have lower-case letters are untouched.
+- **Source:** undergraduate rows carry their catalog URL. The graduate CSV has a PDF page number and no URL, so the six courses only it has carry no `source`.
+- **Catalog year:** 2026-2027 for all courses, matching the minors.
+- **Programs that reference codes missing from the catalog:** `CSCI481`, `EENG432`, `SPRS401` (Quantum Engineering, Space Mining minors) and `CEEN360`, `EDNS480`, `AMFG401`, `AMFG421`, `AMFG498` (ASIs). The program PDFs list them, so the programs keep them; Samantha is checking the CSV.
+
 ## Catalog years
 
 - Minors and forms/policies: 2026-2027. ASIs: 2025-2026 (see above).
