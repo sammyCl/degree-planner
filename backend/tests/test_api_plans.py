@@ -7,6 +7,9 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
+from degree_planner_backend import main
+from degree_planner_backend.agent.loop import ClaudeCodeError
+from degree_planner_backend.agent.request_models import AgentResponse, Usage
 from degree_planner_backend.data_loader import refresh_database
 from degree_planner_backend.db import get_db, init_schema
 from degree_planner_backend.main import app
@@ -125,3 +128,65 @@ def test_create_and_update_plan_never_trust_the_client_s_flags(client_with_catal
 
     fetched = client_with_catalog.get(f"/plans/{plan_id}")
     assert fetched.json()["summary"]["requirements_met"] is False
+
+
+SETUP_REQUEST = {
+    "student": {
+        "degree_level": "bachelor",
+        "programs": ["cs-bs-general-track"],
+        "catalog_year": "2026-2027",
+        "completed_courses": [],
+    },
+    "semesters": 8,
+    "start_term": "Fall 2026",
+}
+
+
+def test_submit_setup_endpoint_returns_the_agent_s_response(
+    client_with_catalog: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # The agent loop itself (run_agent) has its own test suite (test_agent_loop.py); this only
+    # checks the endpoint's wiring: it accepts an AgentRequest body and returns run_agent's
+    # AgentResponse as JSON.
+    canned = AgentResponse(
+        status="cannot_work",
+        plan=None,
+        explanation="Could not fit every requirement in 8 semesters.",
+        problems=("Math and Science needs 6.0 credits, only 0.0 completed or planned.",),
+        usage=Usage(input_tokens=100, output_tokens=50, steps=3),
+    )
+    captured = {}
+
+    def fake_run_agent(connection, request):
+        captured["connection"] = connection
+        captured["request"] = request
+        return canned
+
+    monkeypatch.setattr(main, "run_agent", fake_run_agent)
+
+    response = client_with_catalog.post("/plans/submit-setup", json=SETUP_REQUEST)
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["status"] == "cannot_work"
+    assert body["plan"] is None
+    assert body["problems"] == list(canned.problems)
+    assert captured["request"].student.programs == ["cs-bs-general-track"]
+
+
+def test_submit_setup_endpoint_returns_503_when_claude_code_is_unavailable(
+    client_with_catalog: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def fake_run_agent(connection, request):
+        raise ClaudeCodeError("'claude' is not installed or not on PATH")
+
+    monkeypatch.setattr(main, "run_agent", fake_run_agent)
+
+    response = client_with_catalog.post("/plans/submit-setup", json=SETUP_REQUEST)
+
+    assert response.status_code == 503
+
+
+def test_submit_setup_endpoint_rejects_a_malformed_request(client_with_catalog: TestClient) -> None:
+    response = client_with_catalog.post("/plans/submit-setup", json={**SETUP_REQUEST, "semesters": 0})
+    assert response.status_code == 422
