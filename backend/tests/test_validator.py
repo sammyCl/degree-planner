@@ -38,7 +38,12 @@ def test_check_plan_matches_the_sample_plan(connection: sqlite3.Connection) -> N
     assert "CSCI306 and (MATH201 or MATH223)" in broken[0].message
 
     shortfalls = [flag for flag in result.flags if flag.type == "credit_shortfall"]
-    assert len(shortfalls) == 2  # the unmet Math and Science group, and the overall total
+    # BUG-025: Core (CSCI200, CSCI306, CSCI400) claims those courses first, so Free Electives
+    # (no course list) can no longer double-count them; it now falls short too.
+    assert len(shortfalls) == 3  # Math and Science, Free Electives, and the overall total
+    assert {"Math and Science", "Free Electives"} <= {
+        flag.message.split(": ", 1)[1].split(" needs", 1)[0] for flag in shortfalls if ": " in flag.message
+    }
 
     assert result.summary.total_credits == 14.0
     assert result.summary.total_credits_required == 130.0
@@ -180,6 +185,135 @@ def test_check_plan_flags_double_count_over_the_cap(tmp_path: Path) -> None:
     assert len(double_counts) == 1
     assert "3.0 credits" in double_counts[0].message
     assert "2" in double_counts[0].message
+
+
+def test_check_plan_does_not_let_free_electives_recount_a_fixed_group_s_courses(tmp_path: Path) -> None:
+    # BUG-025: a course already used to satisfy an "all" group must not also count toward a
+    # choose_credits group (e.g. free electives) in the same program.
+    (tmp_path / "program.json").write_text(
+        json.dumps(
+            {
+                "courses": [
+                    {"code": "X100", "subject": "X", "number": "100", "title": "X100", "credits": 3.0,
+                     "description": "", "prerequisites": None, "catalog_year": "2099-2000"},
+                    {"code": "X200", "subject": "X", "number": "200", "title": "X200", "credits": 3.0,
+                     "description": "", "prerequisites": None, "catalog_year": "2099-2000"},
+                ],
+                "programs": [
+                    {
+                        "program_id": "prog-core-free",
+                        "name": "Core and Free Electives Program",
+                        "degree_level": "bachelor",
+                        "catalog_year": "2099-2000",
+                        "total_credits_required": 0,
+                        "requirement_groups": [
+                            {"group_id": "core", "label": "Core", "kind": "all", "courses": ["X100", "X200"]},
+                            {"group_id": "free", "label": "Free Electives", "kind": "choose_credits", "credits_required": 6},
+                        ],
+                    }
+                ],
+            }
+        )
+    )
+    connection = sqlite3.connect(":memory:")
+    refresh_database(tmp_path, connection)
+
+    plan = Plan.model_validate(
+        {
+            "student": {
+                "degree_level": "bachelor",
+                "programs": ["prog-core-free"],
+                "catalog_year": "2099-2000",
+                "completed_courses": [],
+            },
+            "semesters": [
+                {
+                    "semester_id": "sem-1",
+                    "label": "Term 1",
+                    "courses": [
+                        {"course_id": "sem-1-x100", "code": "X100", "title": "X100", "credits": 3.0, "status": "planned"},
+                        {"course_id": "sem-1-x200", "code": "X200", "title": "X200", "credits": 3.0, "status": "planned"},
+                    ],
+                    "total_credits": 0.0,
+                }
+            ],
+            "flags": [],
+            "summary": {"total_credits": 0.0, "total_credits_required": 0.0, "requirements_met": False},
+        }
+    )
+
+    result = check_plan(connection, plan)
+
+    assert not [flag for flag in result.flags if flag.type == "requirement_unmet"]  # Core is satisfied
+    shortfalls = [flag for flag in result.flags if flag.type == "credit_shortfall"]
+    assert len(shortfalls) == 1
+    assert "Free Electives" in shortfalls[0].message
+    assert "only 0.0" in shortfalls[0].message
+
+
+def test_check_plan_lets_a_shared_candidate_satisfy_only_one_choose_credits_group(tmp_path: Path) -> None:
+    # BUG-025's second case: two choose_credits groups that both list the same course must not
+    # both be satisfied by that one course; the first group (declared first) claims it.
+    (tmp_path / "program.json").write_text(
+        json.dumps(
+            {
+                "courses": [
+                    {"code": "MATH201", "subject": "MATH", "number": "201", "title": "Stats", "credits": 3.0,
+                     "description": "", "prerequisites": None, "catalog_year": "2099-2000"},
+                    {"code": "CSCI100", "subject": "CSCI", "number": "100", "title": "CS100", "credits": 3.0,
+                     "description": "", "prerequisites": None, "catalog_year": "2099-2000"},
+                    {"code": "CSCI200", "subject": "CSCI", "number": "200", "title": "CS200", "credits": 3.0,
+                     "description": "", "prerequisites": None, "catalog_year": "2099-2000"},
+                ],
+                "programs": [
+                    {
+                        "program_id": "prog-ab",
+                        "name": "A/B Program",
+                        "degree_level": "bachelor",
+                        "catalog_year": "2099-2000",
+                        "total_credits_required": 0,
+                        "requirement_groups": [
+                            {"group_id": "a", "label": "Group A", "kind": "choose_credits",
+                             "courses": ["MATH201", "CSCI100"], "credits_required": 3},
+                            {"group_id": "b", "label": "Group B", "kind": "choose_credits",
+                             "courses": ["MATH201", "CSCI200"], "credits_required": 3},
+                        ],
+                    }
+                ],
+            }
+        )
+    )
+    connection = sqlite3.connect(":memory:")
+    refresh_database(tmp_path, connection)
+
+    plan = Plan.model_validate(
+        {
+            "student": {
+                "degree_level": "bachelor",
+                "programs": ["prog-ab"],
+                "catalog_year": "2099-2000",
+                "completed_courses": [],
+            },
+            "semesters": [
+                {
+                    "semester_id": "sem-1",
+                    "label": "Term 1",
+                    "courses": [
+                        {"course_id": "sem-1-math201", "code": "MATH201", "title": "Stats", "credits": 3.0, "status": "planned"},
+                    ],
+                    "total_credits": 0.0,
+                }
+            ],
+            "flags": [],
+            "summary": {"total_credits": 0.0, "total_credits_required": 0.0, "requirements_met": False},
+        }
+    )
+
+    result = check_plan(connection, plan)
+
+    shortfalls = [flag for flag in result.flags if flag.type == "credit_shortfall"]
+    assert len(shortfalls) == 1
+    assert "Group B" in shortfalls[0].message  # Group A (declared first) claims MATH201
 
 
 def test_check_plan_preserves_overridden_flags_across_revalidation(connection: sqlite3.Connection) -> None:

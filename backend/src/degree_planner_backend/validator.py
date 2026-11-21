@@ -168,30 +168,51 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                         False,
                     )
 
-            for group in req_program.requirement_groups:
-                if group.kind == "all":
-                    missing = [code for code in (group.courses or []) if code not in plan_codes]
-                    if missing:
-                        add_flag(
-                            "requirement_unmet",
-                            "error",
-                            None,
-                            f"{req_program.name}: {group.label} is missing {', '.join(missing)}.",
-                            False,
-                        )
-                else:
-                    candidates = group.courses if group.courses else list(plan_codes)
-                    earned = sum(code_credits.get(code, 0.0) for code in candidates if code in plan_codes)
-                    credits_required = group.credits_required or 0.0
-                    if earned < credits_required:
-                        add_flag(
-                            "credit_shortfall",
-                            "error",
-                            None,
-                            f"{req_program.name}: {group.label} needs {credits_required} credits, "
-                            f"only {earned} completed or planned.",
-                            False,
-                        )
+            # A course counts toward at most one group of this program (BUG-025): "all" groups
+            # claim their fixed courses first, then choose_credits groups with an explicit list,
+            # in the order they're declared, then choose_credits groups with no list (free
+            # electives) take whatever is left. Cross-program double counting is unaffected;
+            # that's double_counts_with's job, above.
+            available = set(plan_codes)
+            all_groups = [g for g in req_program.requirement_groups if g.kind == "all"]
+            choose_with_list = [g for g in req_program.requirement_groups if g.kind != "all" and g.courses]
+            choose_without_list = [g for g in req_program.requirement_groups if g.kind != "all" and not g.courses]
+
+            for group in all_groups:
+                listed = group.courses or []
+                missing = [code for code in listed if code not in plan_codes]
+                if missing:
+                    add_flag(
+                        "requirement_unmet",
+                        "error",
+                        None,
+                        f"{req_program.name}: {group.label} is missing {', '.join(missing)}.",
+                        False,
+                    )
+                available -= set(listed)
+
+            for group in choose_with_list + choose_without_list:
+                candidates = group.courses if group.courses else sorted(available)
+                credits_required = group.credits_required or 0.0
+                earned = 0.0
+                claimed: set[str] = set()
+                for code in candidates:
+                    if code not in available:
+                        continue
+                    if earned >= credits_required:
+                        break
+                    earned += code_credits.get(code, 0.0)
+                    claimed.add(code)
+                if earned < credits_required:
+                    add_flag(
+                        "credit_shortfall",
+                        "error",
+                        None,
+                        f"{req_program.name}: {group.label} needs {credits_required} credits, "
+                        f"only {earned} completed or planned.",
+                        False,
+                    )
+                available -= claimed
 
     total_credits = sum(semester.total_credits for semester in semesters) + sum(
         completed.credits for completed in student.completed_courses
