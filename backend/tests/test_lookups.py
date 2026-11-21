@@ -76,7 +76,7 @@ def test_ambiguous_catalog_year_requires_disambiguation(tmp_path: Path) -> None:
 
 
 def test_search_catalog_matches_code_and_title(connection: sqlite3.Connection) -> None:
-    results = search_catalog(connection, "algorithms")
+    results = search_catalog(connection, "software engineering")
     assert [course.code for course in results] == ["CSCI306"]
 
     results = search_catalog(connection, "MATH")

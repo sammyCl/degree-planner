@@ -30,14 +30,14 @@
         {
           "course_id": "sem-2-csci306",
           "code": "CSCI306",
-          "title": "Algorithms",
+          "title": "Software Engineering",
           "credits": 3.0,
           "status": "planned"
         },
         {
           "course_id": "sem-2-csci400",
           "code": "CSCI400",
-          "title": "Database Management",
+          "title": "Principles of Programming Languages",
           "credits": 3.0,
           "status": "planned"
         }

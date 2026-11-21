@@ -28,9 +28,9 @@
       "code": "CSCI306",
       "subject": "CSCI",
       "number": "306",
-      "title": "Algorithms",
+      "title": "Software Engineering",
       "credits": 3.0,
-      "description": "Design and analysis of algorithms.",
+      "description": "Software engineering processes and object-oriented design.",
       "prerequisites": { "type": "course", "code": "CSCI200", "min_grade": "C-" },
       "corequisites": null,
       "catalog_year": "2026-2027",
@@ -40,9 +40,9 @@
       "code": "CSCI400",
       "subject": "CSCI",
       "number": "400",
-      "title": "Database Management",
+      "title": "Principles of Programming Languages",
       "credits": 3.0,
-      "description": "Relational database design and implementation.",
+      "description": "Fundamental abstractions and principles of programming language design.",
       "prerequisites": {
         "type": "AND",
         "of": [
