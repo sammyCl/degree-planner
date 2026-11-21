@@ -1,0 +1,124 @@
+{
+  "programs": [
+    {
+      "program_id": "ee-ms",
+      "name": "Electrical Engineering, M.S. (Non-Thesis)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "seminar",
+          "label": "Graduate Seminar (EENG500, required every fall and spring semester, 0 credits)",
+          "kind": "all",
+          "courses": ["EENG500"]
+        },
+        {
+          "group_id": "ee_core",
+          "label": "EE Core (12 credits from the Antennas and Wireless Communications, Information and Systems Sciences, or Power and Energy Systems track course lists)",
+          "kind": "choose_credits",
+          "courses": [
+            "EENG525", "EENG527", "EENG530", "EENG526", "EENG528", "EENG532", "EENG533", "EENG536", "EENG540",
+            "EENG515", "EENG509", "EENG510", "EENG511", "EENG514", "EENG517", "EENG519", "EENG589",
+            "EENG570", "EENG573", "EENG577", "EENG581", "EENG584", "EENG585", "EENG587", "EENG588"
+          ],
+          "credits_required": 12
+        },
+        {
+          "group_id": "technical_electives",
+          "label": "Technical Electives (at least 9 credits of EENG courses; at most 6 credits of Independent Study)",
+          "kind": "choose_credits",
+          "credits_required": 18
+        }
+      ]
+    },
+    {
+      "program_id": "mining-ms",
+      "name": "Mining Engineering, M.S.",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Requirements (two of MNGN508, MNGN512, MNGN516)",
+          "kind": "choose_credits",
+          "courses": ["MNGN508", "MNGN512", "MNGN516"],
+          "credits_required": 6
+        },
+        {
+          "group_id": "seminar",
+          "label": "Graduate Mining Seminar (MNGN625)",
+          "kind": "all",
+          "courses": ["MNGN625"]
+        },
+        {
+          "group_id": "coursework",
+          "label": "Mining Engineering coursework (at least 21 credits of coursework from within the Mining Engineering Department, non-thesis option)",
+          "kind": "choose_credits",
+          "credits_required": 23
+        }
+      ],
+      "double_counts_with": [
+        {
+          "program_id": "mining-bs",
+          "shared_courses": ["MNGN508", "MNGN512", "MNGN516"],
+          "shared_credit_limit": 6
+        }
+      ]
+    },
+    {
+      "program_id": "mining-bs-ms-combined",
+      "name": "Mining Engineering, Combined B.S./M.S.",
+      "degree_level": "combined",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 152,
+      "requirement_groups": [],
+      "combines": ["mining-bs", "mining-ms"]
+    },
+    {
+      "program_id": "cs-ms-non-thesis-project-track",
+      "name": "Computer Science, M.S. (Non-Thesis, Project Track)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Courses",
+          "kind": "all",
+          "courses": ["CSCI561", "CSCI564"]
+        },
+        {
+          "group_id": "project",
+          "label": "MS Project (CSCI700, two consecutive semesters recommended; at most 6 credits count toward the degree)",
+          "kind": "choose_credits",
+          "courses": ["CSCI700"],
+          "credits_required": 6
+        },
+        {
+          "group_id": "electives",
+          "label": "Electives (any CSCI graduate course; up to 6 credits may be outside CSCI; at most 6 credits of Independent Study across the degree)",
+          "kind": "choose_credits",
+          "credits_required": 18
+        }
+      ],
+      "double_counts_with": [
+        {
+          "program_id": "cs-bs-general-track",
+          "shared_courses": ["CSCI561", "CSCI564"],
+          "shared_credit_limit": 6
+        }
+      ]
+    },
+    {
+      "program_id": "cs-bs-ms-combined",
+      "name": "Computer Science, Combined B.S./M.S. (Non-Thesis, Project Track)",
+      "degree_level": "combined",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 154,
+      "requirement_groups": [],
+      "combines": ["cs-bs-general-track", "cs-ms-non-thesis-project-track"]
+    }
+  ]
+}
