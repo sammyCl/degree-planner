@@ -71,7 +71,23 @@ Built from the two course CSVs by `tools/build_courses_json.py`. Counts and ever
 - **Catalog year:** 2026-2027 for all courses, matching the minors.
 - **Programs that reference codes missing from the catalog:** `CSCI481`, `EENG432`, `SPRS401` (Quantum Engineering, Space Mining minors) and `CEEN360`, `EDNS480`, `AMFG401`, `AMFG421`, `AMFG498` (ASIs). The program PDFs list them, so the programs keep them; Samantha is checking the CSV.
 
+## Bachelor's programs (`json/bachelors.json`)
+
+Slice: bachelor's (Samantha). Built by `tools/build_bachelors_json.py`; the generated list of what it found is `json/bachelors.REVIEW.md`. Programs so far: the ones the five examples need (CS General Track, Mining, Applied Mathematics and Statistics).
+
+| # | Where | Conflict | Resolution | Rule | Status |
+|---|---|---|---|---|---|
+| 14 | CAS electives (all bachelor's) | The degree tables name "CAS Mid-Level Restricted Elective" and "CAS 400-Level Restricted Elective" slots but no course list. | Mid-level = HASS200-399, 400-level = HASS400-499 (HASS100 and HASS215 are core, not electives), going by the slot names. | 6 | Decided by Samantha, 2026-11-20 |
+| 15 | CAS electives, non-HASS courses | The registrar's core-curriculum page (https://registrar.mines.edu/core-curriculum/) also lists LIFL (mid-level), HNRS (advisor approval) and approved EBGN, EDNS, MNGN and PEGN courses as CAS-eligible, but does not say which fill the mid-level slot and which fill the 400-level slot. | Not added; data unchanged. | 7 | Open, to look into later |
+| 16 | Success and Wellness (S&W) | The degree tables show "S&W SUCCESS AND WELLNESS 1.0" with no course code; no collected PDF or the course CSV lists the courses. | 1 credit from the registrar's "Success & Wellness Electives" table (core-curriculum page, read 2026-11-20): CSM250, CSM275, CSM350, or any 1.0-credit PAGN 2xx course. CSM202 is on that table but every program already requires it, so it is not on the elective list. Variable-credit PAGN298/PAGN299 left out. The registrar says more courses may be approved later. | 1 | Decided by Samantha, 2026-11-20 |
+| 17 | CS BS "General Track" | The PDF has no "General Track"; it lists seven focus areas, the first called "Computer Science". | General Track = the "Computer Science" focus area (5 CS electives + 3 free electives) plus the main table's CS elective and free electives: 18 CS elective credits and 18 free elective credits. | 8 | Decided by Samantha, 2026-11-20 |
+| 18 | Mining BS, `MNGN2XX` | Sophomore spring lists "MNGN2XX New Special Topics" (3 credits), not a single course. | 3 credits from the MNGN 200-level courses that are not already required: MNGN205, MNGN298, MNGN299. | 7 | Decided by Samantha, 2026-11-20 |
+| 19 | Mining BS, CAS elective | Junior fall lists "CAS ELECTIVE" with no level (the table also has one mid-level and one 400-level CAS elective). | Read as mid-level: 6 mid-level and 3 400-level CAS credits. | — | Decided by Samantha, 2026-11-20 |
+| 20 | Mining BS, `MNGN205` | Marked "(optional)" in the summer; the PDF says 2.0 credits, the CSV 1.0. | Left out of the requirements. | 1 | Decided by Samantha, 2026-11-20 |
+| 21 | Applied Mathematics and Statistics BS | The PDF has three emphases (CAM, STATS, DS) with separate tables; Example 4 says only "AMS bachelor's". | One program each: `ams-bs-cam`, `ams-bs-stats`, `ams-bs-ds`. Example 4 uses `ams-bs-stats`. | 8 | Decided by Samantha, 2026-11-20 |
+| 22 | AMS BS, linear algebra | The PDF writes "MATH332 LINEAR ALGEBRA or 342". | MATH332 or MATH342 (the honors version). | — | Decided by Samantha, 2026-11-20 |
+
 ## Catalog years
 
-- Minors and forms/policies: 2026-2027. ASIs: 2025-2026 (see above).
+- Minors and forms/policies: 2026-2027. ASIs: 2025-2026 (see above). Bachelor's programs: 2026-2027.
 - The catalog changes every year and mid-year; the student registration portal (Trailhead) is the most current source but is private to students. Student-only data cannot be collected into this public repo (it is private, and the repo is public).
