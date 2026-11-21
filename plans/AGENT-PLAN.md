@@ -29,7 +29,7 @@ Until Lookups and Plan validator exist, build the agent against stub tools that 
 
 | Name | Task | Priority | Due | Needs | Status |
 |---|---|---|---|---|---|
-| Agent request format | Define what the backend sends the agent (student inputs, completed courses, semesters wanted) and what the agent returns (plan in Plan format format + explanation); share with Midhat | P0 | Nov 13 | | [ ] |
+| Agent request format | Define what the backend sends the agent (student inputs, completed courses, semesters wanted) and what the agent returns (plan in Plan format format + explanation); share with Midhat | P0 | Nov 13 | | [x] |
 | Five examples | Write up the five examples in the repo: exact inputs, "right output" per the proposal, and where they live. Examples are in EVAL.md; add machine-readable input files | P0 | Nov 13 | | [ ] |
 | Bachelor's list | Data: list the bachelor's degrees and courses needed for Examples 1, 4, 5 (CS General Track, AMS, CS BS with transfer credits and Thorson's honors) and the Mining BS for Example 3 | P0 | Nov 13 | Five examples | [ ] |
 | Catalog sources | Lead the catalog-source decision (Mines catalog pages, scrape vs. export vs. give the agent pages) | P0 | Nov 13 | | [ ] |
@@ -39,8 +39,8 @@ Until Lookups and Plan validator exist, build the agent against stub tools that 
 | Name | Task | Priority | Due | Needs | Status |
 |---|---|---|---|---|---|
 | Bachelor's data | Data: collect the bachelor's degrees and course catalog entries for the examples into the Data format format | P0 | Nov 18 | Data format, Bachelor's list | [ ] |
-| Agent tools | Agent tools: `search_catalog`, `get_prerequisites`, `get_program_requirements`, `get_forms`, each with clear descriptions and error returns, wrapping the backend lookups. Start with stubs | P0 | Nov 17 | Plan format, Lookups (stubs first) | [ ] |
-| Check-plan tool | `check_plan` tool calling the backend validator, returning flags the agent can act on | P0 | Nov 18 | Plan validator (stub first) | [ ] |
+| Agent tools | Agent tools: `search_catalog`, `get_prerequisites`, `get_program_requirements`, `get_forms`, each with clear descriptions and error returns, wrapping the backend lookups. Start with stubs | P0 | Nov 17 | Plan format, Lookups (stubs first) | [x] |
+| Check-plan tool | `check_plan` tool calling the backend validator, returning flags the agent can act on | P0 | Nov 18 | Plan validator (stub first) | [x] |
 | Agent loop | Agent loop: plan, check, revise, with a step limit and a clear "cannot work" answer; system prompt covers: student stays in the loop, never invent courses not in the data. First target: Example 1 gives a valid plan | P0 | Nov 19 | Agent tools, Check-plan tool | [ ] |
 | Chat logic | Chat endpoint logic: the student asks for electives or applies a granted exception; the agent returns a reply and an updated plan. API key from environment only, never in git | P2 | Nov 19 | Agent loop, API endpoints | [ ] |
 | Exception handling | Exception handling: placement/instructor-approval exceptions the student says they were granted; show a warning and let the student override (DECISIONS) | P2 | Nov 20 | Chat logic | [ ] |
@@ -83,3 +83,6 @@ Never cut Agent tools, Check-plan tool, Agent loop, Eval runner and Eval runs: t
 ## Status log
 
 - 2026-11-12: Plan created. Nothing started.
+- 2026-11-19: Agent tools done (Samantha): all four tools in backend/src/degree_planner_backend/agent/tools.py, built against the real lookups (no stubs), 294 tests in backend/tests/test_agent_tools.py after nine adversarial reviews; data and lookup problems found on the way are in bugs.txt (BUG-001 to BUG-023). On branch agent/tools, not yet merged.
+- 2026-11-19: Check-plan tool done (Samantha): check_plan and build_plan in backend/src/degree_planner_backend/agent/tools.py, using the real validator (no stub); the student's record comes from the loop through StudentContext. 349 tests in test_agent_tools.py after two adversarial reviews. Validator gaps found are BUG-024 to BUG-027 in bugs.txt (BUG-024 matters for the frontend's /plans/check). On branch agent/tools, not yet merged.
+- 2026-11-19: Agent request format done (Samantha): docs/agent-request-format.md with request and response samples, and AgentRequest/AgentResponse in backend/src/degree_planner_backend/agent/request_models.py, reusing Student and Plan from the plan format. Decisions (Samantha): the backend makes the semester labels from start_term; summers optional (include_summers, off by default); 1 to 18 semesters for bachelor's, combined, minor and ASI, 1 to 15 for master's and PhD (check_plan now also allows 18); start year 2000 to 2500; only overridable flag types can be overridden; a failed plan returns cannot_work with the last attempt; an open exception warning is allowed in an ok plan; free-text notes wait for Chat logic. 91 tests in backend/tests/test_agent_request_models.py after two adversarial passes; problems found in the plan format, validator and transcript parser are BUG-028 to BUG-033 in bugs.txt (BUG-032 matters for /plans/check). Checking a response against its request is left for the Agent loop. Not yet shared with Midhat: on branch agent/tools, not yet merged.

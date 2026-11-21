@@ -1,0 +1,646 @@
+BUGS - Group 9 degree planner
+==============================
+
+One list of every bug we find, in any part of the project. Each entry says
+whose part it is in, how to make it happen, and what should happen instead,
+so the owner can fix it without asking.
+
+How to use this file
+--------------------
+- Found a bug? Add an entry at the bottom with the next number. Copy the
+  template below and fill in every field.
+- Steps must be exact: the command, the input, and the real output you saw.
+  If you only suspect a bug and have not reproduced it, say so in "Found by".
+- Owner comes from "Who owns what" in CLAUDE.md:
+    Frontend ................................... Abdallah Salhi
+    Backend, data format, validator ............ Midhat Sajad
+    Agent, tools, chatbot logic, evaluation .... Samantha Clapp
+    Data: bachelor's ........................... Samantha Clapp
+    Data: graduate and combined ................ Midhat Sajad
+    Data: minors, ASIs, forms .................. Abdallah Salhi
+- Only the owner (or someone they ask) changes the status. When you fix a
+  bug, set Status to "Fixed", add the branch or PR, and name the test that
+  now covers it. Do not delete entries; fixed ones show what was tested.
+- Never paste private data here (keys, real student transcripts). This file
+  is public on GitHub.
+
+Statuses: Open, In progress, Fixed, Won't fix (say why).
+
+Template
+--------
+BUG-NNN  <one-line title>
+  Status:    Open
+  Owner:     <name> (<part>)
+  Where:     <file or screen>
+  Found:     <YYYY-MM-DD> by <who or what>
+  Steps:     <exact steps, input, command>
+  Actual:    <what happened, real output>
+  Expected:  <what should happen>
+  Fix idea:  <optional, one or two lines>
+  Fixed in:  <branch / PR, and the test that covers it>
+
+
+==============================================================================
+Entries
+==============================================================================
+
+BUG-001  search_catalog crashed when the tool input was not a dict
+  Status:    Fixed
+  Owner:     Samantha Clapp (agent tools)
+  Where:     backend/src/degree_planner_backend/agent/tools.py
+  Found:     2026-11-18 by adversarial test agent, reproduced by Samantha
+  Steps:     search_catalog(connection, None)   (also "MATH", ["MATH"], 42)
+  Actual:    AttributeError: 'NoneType' object has no attribute 'get'
+  Expected:  {"error": ...} so the agent loop never crashes
+  Fixed in:  branch agent/tools; test_non_dict_input_returns_error
+
+BUG-002  search_catalog crashed on database errors and bad stored rows
+  Status:    Fixed
+  Owner:     Samantha Clapp (agent tools)
+  Where:     backend/src/degree_planner_backend/agent/tools.py
+  Found:     2026-11-18 by adversarial test agent, reproduced by Samantha
+  Steps:     search_catalog on (a) a database with no tables, (b) a closed
+             connection, (c) a courses row whose data column is '{}'
+  Actual:    (a) OperationalError: no such table: courses
+             (b) ProgrammingError: Cannot operate on a closed database.
+             (c) pydantic ValidationError: 7 validation errors for Course
+  Expected:  {"error": ...} telling the model it is a server problem
+  Fixed in:  branch agent/tools; test_database_without_tables_returns_error,
+             test_closed_connection_returns_error,
+             test_malformed_course_row_returns_error
+
+BUG-003  The real course catalog is not loaded: search finds 0 courses
+  Status:    Open
+  Owner:     Samantha Clapp (bachelor's data: mines-courses.csv) and
+             Midhat Sajad (graduate data: mines-graduate-courses.csv; data format)
+  Where:     data/Academic Catalog/*.csv, backend data_loader.py
+  Found:     2026-11-18 by adversarial test agent, reproduced by Samantha
+  Steps:     from backend/:  uv run python -c "
+               import sqlite3, pathlib
+               from degree_planner_backend.data_loader import refresh_database
+               from degree_planner_backend.agent.tools import search_catalog
+               c = sqlite3.connect(':memory:'); refresh_database(pathlib.Path('../data'), c)
+               print(c.execute('select count(*) from courses').fetchone()[0])
+               print(search_catalog(c, {'query': 'CSCI'}))"
+  Actual:    0 courses; {'courses': [], 'count': 0}. The loader reads only
+             *.json files, and the ~3,100 courses exist only as CSV.
+  Expected:  the catalog courses load, and a CSCI search finds CSCI courses
+  Fix idea:  convert each CSV into data-format JSON (docs/data-format.md).
+             Until then the agent tool cannot tell "empty catalog" from
+             "no match" and tells the model to keep trying other queries.
+
+BUG-004  The two catalog CSVs overlap and would silently overwrite each other
+  Status:    Open
+  Owner:     Midhat Sajad (graduate data, data format), with Samantha Clapp
+             (bachelor's data)
+  Where:     data/Academic Catalog/mines-courses.csv,
+             data/Academic Catalog/mines-graduate-courses.csv,
+             data_loader.py (INSERT OR REPLACE on code + catalog_year)
+  Found:     2026-11-18 by adversarial test agent; counts re-measured by Samantha
+  Steps:     read both CSVs and compare the course_number column
+  Actual:    mines-courses.csv: 2,131 rows, 2,131 codes.
+             mines-graduate-courses.csv: 1,037 rows but 953 distinct codes
+             (84 repeated rows). 947 codes are in both files, and 463 of
+             those differ in description or credits. Loaded into the same
+             catalog year, the second file replaces the first with no warning.
+  Expected:  one row per course per catalog year, chosen on purpose
+  Fix idea:  decide which file wins for shared codes (or merge them) before
+             converting; have the loader report duplicates instead of
+             replacing quietly.
+
+BUG-005  search_catalog crashed on a lone surrogate character in the input
+  Status:    Fixed
+  Owner:     Samantha Clapp (agent tools)
+  Where:     backend/src/degree_planner_backend/agent/tools.py
+  Found:     2026-11-18 by second adversarial test agent, reproduced by Samantha
+  Steps:     search_catalog(conn, json.loads('{"query":"MATH","catalog_year":"\ud800"}'))
+  Actual:    UnicodeEncodeError (json.loads accepts the escape; SQLite cannot
+             encode it)
+  Expected:  {"error": ...} as bad input
+  Fixed in:  branch agent/tools; test_lone_surrogate_returns_error
+
+BUG-006  search_catalog error messages showed database internals to the model
+  Status:    Fixed
+  Owner:     Samantha Clapp (agent tools)
+  Where:     backend/src/degree_planner_backend/agent/tools.py
+  Found:     2026-11-18 by second adversarial test agent
+  Steps:     search_catalog on a database with no tables, or with a connection
+             used from another thread
+  Actual:    the error text included "no such table: courses" and
+             "...thread id 8521671040..."
+  Expected:  one fixed message for the model; details only in the server log
+  Fixed in:  branch agent/tools; test_database_without_tables_returns_error,
+             test_other_thread_hides_thread_ids
+
+BUG-007  A course with infinite or NaN credits loads fine, then breaks every search
+  Status:    Open
+  Owner:     Midhat Sajad (data format, data loader)
+  Where:     backend/src/degree_planner_backend/models.py (Course.credits),
+             data_loader.py
+  Found:     2026-11-18 by second adversarial test agent, reproduced by Samantha
+  Steps:     put two courses in a data JSON file: MATH201 with credits 3 and
+             ZZZZ999 with credits 1e400 (JSON for infinity). Load the folder
+             with refresh_database, then search_catalog(conn, {"query": "MATH"}).
+  Actual:    LoadReport(... courses_loaded=2, errors={}). The row is stored
+             with "credits": null. Every search afterwards returns "The course
+             catalog could not be read", even for courses that are fine.
+  Expected:  the loader rejects ZZZZ999 and lists it in LoadReport.errors
+  Fix idea:  Field(allow_inf_nan=False) on credits, or
+             model_config = ConfigDict(allow_inf_nan=False) on the models
+
+BUG-008  One malformed course row blocks every catalog search
+  Status:    Open
+  Owner:     Midhat Sajad (lookups)
+  Where:     backend/src/degree_planner_backend/lookups.py (search_catalog)
+  Found:     2026-11-18 by second adversarial test agent
+  Steps:     insert a courses row with data '{}' (code BAD100), then search
+             for "MATH", which does not match BAD100
+  Actual:    lookups.search_catalog validates every row before filtering, so
+             the one bad row raises ValidationError and the search fails.
+             The agent tool now turns this into "catalog unavailable".
+  Expected:  the bad row is skipped (and logged); the MATH search still works
+  Fix idea:  validate per row in lookups.search_catalog and skip failures.
+             When fixed, tell Samantha: test_malformed_course_row_returns_error
+             in backend/tests/test_agent_tools.py expects the old behavior and
+             must change with it.
+
+BUG-009  Deeply nested prerequisites load fine but can never be read back
+  Status:    Open
+  Owner:     Midhat Sajad (data format, data loader)
+  Where:     backend/src/degree_planner_backend/data_loader.py, models.py
+  Found:     2026-11-18 by get_prerequisites adversarial test agent, reproduced
+             by Samantha
+  Steps:     load one course whose prerequisites nest 100 levels deep
+             (alternating AND/OR around one course) plus a normal MATH100, with
+             refresh_database; then search_catalog(conn, {"query": "MATH"}).
+             Repeat with 150 levels.
+  Actual:    100 levels: LoadReport(courses_loaded=2, errors={}), then every
+             search fails ("recursion limit exceeded" from model_validate_json;
+             the agent tool shows "catalog could not be read", see BUG-008).
+             150 levels: refresh_database itself raises
+             PydanticSerializationError and the whole load stops.
+  Expected:  the loader rejects that course and lists it in LoadReport.errors
+  Fix idea:  at load, round-trip each course through
+             Course.model_validate_json(course.model_dump_json()) inside the
+             per-row error handling, or cap nesting depth in the format.
+
+BUG-010  Empty AND/OR groups are allowed in the data format
+  Status:    Open
+  Owner:     Midhat Sajad (data format)
+  Where:     backend/src/degree_planner_backend/models.py (AndRequirement.of,
+             OrRequirement.of), docs/data-format.md
+  Found:     2026-11-18 by get_prerequisites adversarial test agent, reproduced
+             by Samantha
+  Steps:     load a course with prerequisites
+             {"type": "AND", "of": [{"type": "course", "code": "MATH111"},
+                                    {"type": "OR", "of": []}]}
+  Actual:    loads with errors={}. An OR of nothing can never be satisfied and
+             an AND of nothing means nothing; the validator and agent have to
+             guess which the data author meant. (The agent tool now shows it
+             as "MATH111 AND (empty OR group)" instead of hiding it.)
+  Expected:  the loader rejects empty groups
+  Fix idea:  of: list[Requirement] = Field(min_length=1) on both models, and
+             say so in docs/data-format.md.
+
+BUG-011  Course codes are not checked or normalized when data is loaded
+  Status:    Open
+  Owner:     Midhat Sajad (data format, data loader)
+  Where:     backend/src/degree_planner_backend/models.py (Course.code),
+             data_loader.py
+  Found:     2026-11-18 by get_prerequisites adversarial test agent, reproduced
+             by Samantha
+  Steps:     load a course with "code": "math101" (or "CSCI 200"), then
+             get_prerequisites(conn, {"code": "math101"})
+  Actual:    loads with errors={}, but the course can never be found:
+             {"error": "no course MATH101 in the catalog. ..."}. The agent tool
+             uppercases and removes spaces from the code it is asked for, so a
+             stored code in any other form is unreachable.
+  Expected:  codes are stored in one form (CSCI400), and anything else is
+             normalized or rejected at load
+  Fix idea:  validate Course.code against ^[A-Z]{3,4}\d{3}[A-Z]{0,2}$ (the shape
+             of every real code in the CSVs), uppercase and strip spaces first.
+
+BUG-012  The catalog CSVs hold placeholder codes and free-text corequisites
+  Status:    Open
+  Owner:     Samantha Clapp (bachelor's data: mines-courses.csv) and
+             Midhat Sajad (graduate data: mines-graduate-courses.csv)
+  Where:     data/Academic Catalog/mines-courses.csv,
+             data/Academic Catalog/mines-graduate-courses.csv
+  Found:     2026-11-18 by get_prerequisites adversarial test agent; counts
+             measured by Samantha
+  Steps:     read the course_number and corequisites columns of both CSVs
+  Actual:    mines-courses.csv has 14 placeholder codes that are not real
+             courses: BIOLADD, CHGN1XX, CSCI1XX, EBGN1XX, HASS1XX, HASS2XX,
+             HASS4XX, LIFL1XX, LIFL2XX, LIFL3XX, MATH1XX, PAGN1XX, PAGN2XX,
+             PHGN1XX. Of 234 corequisite cells, 68 are not one course code
+             ("AMFG 501, AMFG 521, AMFG 531", "Senior or graduate standing in
+             QBE, BIOL301"). In the graduate CSV all 5 corequisite cells are
+             text ("GEGN462 or GEGN561.").
+             Converted as-is, placeholders would show up in search_catalog as
+             real courses, and corequisites would reach the model as text.
+             (get_prerequisites already refuses placeholder codes.)
+  Expected:  only real courses in the catalog; corequisites as a list of codes,
+             with "or" and standing rules expressed some other way
+  Fix idea:  during CSV-to-JSON conversion (BUG-003), drop or flag the
+             placeholder rows and parse corequisites into codes; decide with
+             Midhat how the format should carry "X or Y" corequisites.
+
+BUG-013  A catalog year that is not loaded looks like "no match" in search_catalog
+  Status:    Open
+  Owner:     Midhat Sajad (lookups), then Samantha Clapp (agent tools)
+  Where:     backend/src/degree_planner_backend/lookups.py,
+             backend/src/degree_planner_backend/agent/tools.py
+  Found:     2026-11-18 by second get_prerequisites adversarial test agent,
+             reproduced by Samantha
+  Steps:     load docs/data-format.sample.json (only 2026-2027), then
+             search_catalog(conn, {"query": "CSCI", "catalog_year": "0000-0000"})
+             (also "2027-2026", "2019-2020")
+  Actual:    {"courses": [], "count": 0}. The year has the right shape, so
+             the tool accepts it, and the tool description tells the model
+             that an empty list means "try a different query", so it rewrites
+             a query that was fine.
+  Expected:  {"error": "no courses loaded for catalog year 0000-0000; loaded
+             years: 2026-2027"}
+  Fix idea:  Midhat: add lookups.catalog_years(connection) -> list[str]
+             (SELECT DISTINCT catalog_year FROM courses). Samantha: call it in
+             search_catalog when catalog_year is given and not in the list.
+
+BUG-014  Exception labels are not checked when data is loaded
+  Status:    Open
+  Owner:     Midhat Sajad (data format, data loader)
+  Where:     backend/src/degree_planner_backend/models.py
+             (ExceptionRequirement.label), data_loader.py
+  Found:     2026-11-18 by second get_prerequisites adversarial test agent,
+             reproduced by Samantha
+  Steps:     load a course with prerequisites {"type": "exception", "label": L}
+             where L is "", or 100,000 characters, or contains U+202E (a
+             right-to-left override) or a newline
+  Actual:    all load with errors={}. Labels are scraped text that reaches
+             the model. (The agent tool now cleans them: drops invisible
+             characters, joins lines, cuts at 200 characters, shows "" as
+             "(no label)". The validator and frontend still see the raw text.)
+  Expected:  the loader rejects or cleans empty, very long, and control-
+             character labels, so every consumer gets the same clean text
+  Fix idea:  label: str = Field(min_length=1, max_length=200) plus a validator
+             that strips Unicode categories Cc/Cf; say so in docs/data-format.md.
+
+BUG-015  Design note: tool errors carry no machine-readable kind
+  Status:    Open (decide when building the agent loop)
+  Owner:     Samantha Clapp (agent tools, agent loop)
+  Where:     backend/src/degree_planner_backend/agent/tools.py
+  Found:     2026-11-18 by second get_prerequisites adversarial test agent
+             (reasoned, not a crash)
+  Steps:     compare the error from get_prerequisites for {"code": 400} (bad
+             input), {"code": "NOPE999"} (not found), and a closed database
+             (server problem)
+  Actual:    all three are {"error": "<sentence>"}; the model and the agent
+             loop can tell them apart only by the wording
+  Expected:  the loop can decide retry / ask the student / stop without
+             parsing English
+  Fix idea:  add "kind": "bad_input" | "not_found" | "unavailable" to every
+             error in both tools, at the same time as the loop that uses it.
+
+BUG-016  No bachelor's or graduate programs are loaded, only minors and ASIs
+  Status:    Open
+  Owner:     Samantha Clapp (bachelor's data) and Midhat Sajad (graduate and
+             combined data)
+  Where:     data/json/ (has minors.json, asis.json, forms-policies.json only)
+  Found:     2026-11-18 by get_forms adversarial test agent, reproduced by
+             Samantha
+  Steps:     from backend/:  load ../data/json with refresh_database and list
+             program_id from the programs table
+  Actual:    64 programs: 35 minors, 18 ASIs, 7 tracks, and 4 others; none
+             ending in -bs, -ms, or a combined BS+MS. Every example in EVAL.md
+             needs a bachelor's or master's program, so get_program_requirements
+             and the validator have nothing to work with for them yet.
+             (get_forms no longer fails on these ids: it lists the "any" forms
+             and says program_found: false.)
+  Expected:  the programs for the five examples are in data/json
+  Fix idea:  part of the Bachelor's data and Graduate data tasks; see also
+             BUG-003 (course catalog not loaded).
+
+BUG-017  Form fields are not checked when data is loaded
+  Status:    Open
+  Owner:     Midhat Sajad (data format, data loader); tell Abdallah Salhi
+             (forms data) what the rules become
+  Where:     backend/src/degree_planner_backend/models.py (Form),
+             data_loader.py, docs/data-format.md
+  Found:     2026-11-18 by get_forms adversarial test agent, reproduced by
+             Samantha
+  Steps:     load forms with: max_credits NaN; max_credits -5; applies_to
+             ["Any"]; applies_to []; then get_forms(conn, {}) and
+             get_forms(conn, {"program_id": "anything"})
+  Actual:    all load with errors={}. NaN is stored as null, so a broken cap
+             reads as "no cap"; -5 comes back as -5.0. "Any" (capital A) is not
+             treated as "any", so that form is missing from every program's
+             list, and the [] form shows only in the full list. form_id and
+             applies_to can hold any text (the agent tool now cleans them, but
+             the validator and frontend still see the raw text), and url can
+             be any scheme (the tool now passes only https).
+  Expected:  the loader rejects or normalizes these, so every consumer sees
+             the same valid forms
+  Fix idea:  form_id and applies_to entries as lowercase slugs (lowercase and
+             strip first), applies_to min_length=1, max_credits finite and > 0
+             (allow_inf_nan=False, gt=0), url must start with https://.
+
+BUG-018  Duplicate form_ids replace each other silently, and one bad form row
+         blocks every form
+  Status:    Open
+  Owner:     Midhat Sajad (data loader, lookups)
+  Where:     backend/src/degree_planner_backend/data_loader.py
+             (INSERT OR REPLACE into forms), lookups.py (get_forms)
+  Found:     2026-11-18 by get_forms adversarial test agent, reproduced by
+             Samantha
+  Steps:     (a) put form_id "dup" in a.json (notes "first file") and in b.json
+             (notes "second file"), load the folder; (b) insert a forms row
+             with data '{}' and call get_forms(conn, {})
+  Actual:    (a) LoadReport(forms_loaded=2, errors={}), but only one form
+             remains, with notes "second file". (b) every get_forms call
+             returns "The catalog data ... could not be read" (same pattern as
+             BUG-008 for courses).
+  Expected:  (a) the loader reports the duplicate; (b) the bad row is skipped
+             and logged, and the other forms are still listed
+  Fix idea:  track seen form_ids in refresh_database and add an error entry;
+             validate per row in lookups.get_forms and skip failures.
+
+BUG-019  Forms have no catalog year; the file's catalog_year is dropped
+  Status:    Open
+  Owner:     Midhat Sajad (data format); Abdallah Salhi (forms data)
+  Where:     backend/src/degree_planner_backend/models.py (Form, DataFile),
+             data/json/forms-policies.json, docs/data-format.md
+  Found:     2026-11-18 by get_forms adversarial test agent (reasoned);
+             confirmed by Samantha from the models
+  Steps:     data/json/forms-policies.json has a top-level
+             "catalog_year": "2026-2027"; DataFile has no catalog_year field,
+             so pydantic ignores it, and Form has none either
+  Actual:    get_forms cannot say which catalog year a policy comes from, while
+             minors are 2026-2027 and ASIs are 2025-2026. A rule that changed
+             between years cannot be told apart.
+  Expected:  each form or policy carries the catalog year it was taken from
+  Fix idea:  add catalog_year to Form (and to the forms table key), filled from
+             the file or per entry; then the agent tool can return it.
+
+BUG-020  No way to list program ids, so a mistyped id cannot be corrected
+  Status:    Open
+  Owner:     Midhat Sajad (lookups), then Samantha Clapp (agent tools)
+  Where:     backend/src/degree_planner_backend/lookups.py,
+             backend/src/degree_planner_backend/agent/tools.py (get_forms)
+  Found:     2026-11-18 by second get_forms adversarial test agent,
+             reproduced by Samantha
+  Steps:     load data/json, then get_forms(conn, {"program_id":
+             "computer-science-minr"}) (a typo for computer-science-minor)
+  Actual:    program_found: false, the forms for every program, and a note
+             saying the id is mistyped or not loaded. The model cannot tell
+             which, because no lookup lists the loaded program ids.
+  Expected:  a short "did_you_mean": ["computer-science-minor"] when a loaded
+             id is close
+  Fix idea:  Midhat: add lookups.program_ids(connection) -> list[str]
+             (SELECT DISTINCT program_id FROM programs). Samantha: in get_forms,
+             add up to 3 difflib.get_close_matches when program_found is false
+             (stored ids only, so nothing the model sent is echoed).
+
+BUG-021  Program rules that the data format cannot hold never reach the agent
+  Status:    Open
+  Owner:     Midhat Sajad (data format); Abdallah Salhi (minors and ASIs data,
+             data/tools/build_minors_json.py); then Samantha Clapp (agent tools)
+  Where:     backend/src/degree_planner_backend/models.py (Program),
+             docs/data-format.md, data/json/minors.REVIEW.md
+  Found:     2026-11-18 by Samantha while planning get_program_requirements
+  Steps:     read data/json/minors.REVIEW.md, then
+             get_program_requirements(conn, {"program_id": "biology-minor"})
+  Actual:    REVIEW.md records rules such as "At least 9 credits must not
+             double count with the major", "Not open to QBE majors", "At least
+             one elective must be 400 level", and "CSCI423 and EBGN528 cannot
+             both count". Program has no field for them, so the tool cannot
+             return them and the agent can plan a minor that passes every check
+             here but breaks a real rule. (The tool description now tells the
+             model to have the student confirm with an advisor.)
+  Expected:  each program carries its extra rules as text the agent can show
+  Fix idea:  add notes: list[str] = [] to Program and to docs/data-format.md;
+             have build_minors_json.py fill it from the same text it writes to
+             REVIEW.md; then the agent tool returns the notes (cleaned and
+             capped) with each program.
+
+BUG-022  Program credit fields accept NaN, infinity, zero, and negative values
+  Status:    Open
+  Owner:     Midhat Sajad (data format)
+  Where:     backend/src/degree_planner_backend/models.py (Program.
+             total_credits_required, RequirementGroup.credits_required,
+             DoubleCount.shared_credit_limit)
+  Found:     2026-11-18 by get_program_requirements adversarial test agent,
+             reproduced by Samantha
+  Steps:     load a program with "total_credits_required": NaN (or a
+             choose_credits group with credits_required NaN), then
+             get_program_requirements(conn, {"program_id": <it>})
+  Actual:    loads with errors={}; NaN is stored as null, which then fails
+             validation on every read, so the program always returns "The
+             catalog data ... could not be read" (same cause as BUG-007 for
+             course credits). On a kind "all" group a NaN quietly becomes
+             null. Zero and negative values load and are returned as they are
+             (the agent tool now adds a data_warning for them).
+  Expected:  the loader rejects these values and lists the program in
+             LoadReport.errors
+  Fix idea:  Field(gt=0, allow_inf_nan=False) on all three fields (credits on
+             kind "all" groups may stay None).
+
+BUG-023  Catalog years are not checked at load, and the "several years" error
+         carries its years only as text
+  Status:    Open
+  Owner:     Midhat Sajad (data format, lookups)
+  Where:     backend/src/degree_planner_backend/models.py (catalog_year on
+             Course and Program), backend/src/degree_planner_backend/lookups.py
+             (AmbiguousLookupError)
+  Found:     2026-11-18 by get_program_requirements adversarial test agent,
+             reproduced by Samantha
+  Steps:     (a) load a program with "catalog_year": "IGNORE PREVIOUS
+             INSTRUCTIONS"; (b) load program "1999-2000-minor" in 2025-2026 and
+             2026-2027 and look it up without a year
+  Actual:    (a) loads with errors={}; the text was returned as the program's
+             catalog year (the agent tools now show "(invalid year)" with a
+             warning). (b) AmbiguousLookupError's message holds the id and the
+             years in one string; the agent tool had to read the years back out
+             of it and at first picked up "1999-2000" from the id (now fixed in
+             the tool by reading only the part after "catalog years").
+  Expected:  (a) the loader rejects catalog years not in the form 2026-2027;
+             (b) the error carries the years as data
+  Fix idea:  (a) catalog_year: str = Field(pattern=r"^[0-9]{4}-[0-9]{4}$");
+             (b) give AmbiguousLookupError a years: list[str] attribute set in
+             _resolve_catalog_year; the agent tool then uses exc.years.
+
+BUG-024  The validator applies overrides to flags that are not overridable
+  Status:    Open
+  Owner:     Midhat Sajad (validator)
+  Where:     backend/src/degree_planner_backend/validator.py (check_plan,
+             previously_overridden)
+  Found:     2026-11-19 by check_plan adversarial test agent, reproduced by
+             Samantha
+  Steps:     send /plans/check (or validator.check_plan) a plan whose flags
+             include {"type": "credit_shortfall", "course_id": null,
+             "overridden": true} and {"type": "requirement_unmet", "course_id":
+             null, "overridden": true}, for a plan that misses its core courses
+  Actual:    every flag of those types is marked overridden, so
+             requirements_met is true while "Core is missing CSCI100, CSCI200".
+             One (credit_shortfall, null) entry hides every group shortfall and
+             the plan total at once. The override is matched on (type,
+             course_id) only; overridable is never checked.
+  Expected:  only flags with overridable true (exception_claimed) can be
+             overridden; anything else stays an error
+  Fix idea:  in add_flag, set overridden only when overridable is true. (The
+             agent's check_plan tool now passes only exception_claimed
+             overrides, but the frontend calls /plans/check directly.)
+
+BUG-025  One course can count toward several requirement groups
+  Status:    Open
+  Owner:     Midhat Sajad (validator)
+  Where:     backend/src/degree_planner_backend/validator.py (requirement
+             groups loop)
+  Found:     2026-11-19 by check_plan adversarial test agent, reproduced by
+             Samantha
+  Steps:     program with groups Core (all: CSCI100, CSCI200) and Free
+             (choose_credits 6, courses omitted), total 6; plan CSCI100 then
+             CSCI200. Also: groups A [MATH201, CSCI100] and B [MATH201, CSCI200],
+             3 credits each, plan MATH201 only.
+  Actual:    both pass. The free-elective group counts CSCI100 and CSCI200,
+             already used for Core; A and B are both satisfied by MATH201.
+  Expected:  a course counts toward one group of a program (unless a rule
+             says otherwise), and free electives count only courses not used
+             elsewhere
+  Fix idea:  assign courses to groups once per program (fixed lists first,
+             then choose_credits with lists, then free electives from what is
+             left); double counting across programs stays governed by
+             double_counts_with.
+
+BUG-026  Validator gaps: no credit cap per semester, no corequisite check,
+         empty "all" groups always met, OR-with-exception still flagged
+  Status:    Open
+  Owner:     Midhat Sajad (validator, data format)
+  Where:     backend/src/degree_planner_backend/validator.py, docs/plan-format.md
+  Found:     2026-11-19 by check_plan adversarial test agent, reproduced by
+             Samantha (credit cap)
+  Steps:     (a) plan 36 credits in one semester; (b) plan a course without its
+             corequisite; (c) program with an "all" group whose courses list is
+             []; (d) course with prerequisites OR(CSCI100, exception) and
+             CSCI100 in an earlier semester
+  Actual:    (a), (b), (c) pass with no flag; (d) still raises
+             exception_claimed although CSCI100 satisfies the OR
+  Expected:  (a) a flag above the Mines per-term credit limit (look up the
+             number in the catalog); (b) a flag for a missing corequisite
+             (needs BUG-012's corequisite cleanup first); (c) a data error, not
+             "met"; (d) no exception flag when another branch is satisfied
+  Fix idea:  one new flag type each for (a) and (b); treat (c) as malformed
+             data; only collect exception labels from branches that are
+             actually needed.
+
+BUG-027  Courses that may be repeated for credit cannot be marked
+  Status:    Open
+  Owner:     Midhat Sajad (data format)
+  Where:     docs/data-format.md, backend/src/degree_planner_backend/models.py
+             (Course)
+  Found:     2026-11-19 by check_plan adversarial test agent (reasoned)
+  Steps:     plan a seminar or research course that the catalog allows to be
+             repeated in two semesters
+  Actual:    the format has no way to say a course is repeatable, so the agent
+             tool keeps only the first and warns "planned more than once"
+  Expected:  repeatable courses (and their credit limit) can be planned more
+             than once
+  Fix idea:  add repeatable: bool = false and max_repeat_credits to Course;
+             the tool then allows repeats up to that limit.
+
+BUG-028  Student accepts an empty programs list
+  Status:    Open
+  Owner:     Midhat Sajad (data format)
+  Where:     backend/src/degree_planner_backend/plan_models.py (Student)
+  Found:     2026-11-19 by Samantha, probing the agent request format
+  Steps:     AgentRequest.model_validate({"student": {"degree_level":
+             "bachelor", "programs": [], "catalog_year": "2026-2027",
+             "completed_courses": []}, "semesters": 8, "start_term":
+             "Fall 2026"})
+  Actual:    accepted; the empty list is only caught later, when build_plan
+             reports no programs
+  Expected:  rejected when the request comes in: a student always has at
+             least one program
+  Fix idea:  programs: list[str] = Field(min_length=1)
+
+BUG-029  Completed courses accept negative (or zero) credits
+  Status:    Open
+  Owner:     Midhat Sajad (data format, transcript parser)
+  Where:     backend/src/degree_planner_backend/plan_models.py (CompletedCourse)
+  Found:     2026-11-19 by Samantha, probing the agent request format
+  Steps:     a request whose student has completed_courses [{"code":
+             "MATH111", "credits": -4, "term": "transfer"}]
+  Actual:    accepted, so -4 credits can reach the validator's credit totals
+  Expected:  rejected; credits are positive (check whether the catalog has
+             0-credit courses that a transcript could list before choosing
+             gt=0 or ge=0)
+  Fix idea:  credits: float = Field(gt=0)
+
+BUG-030  Unknown fields inside student are silently dropped
+  Status:    Open
+  Owner:     Midhat Sajad (data format)
+  Where:     backend/src/degree_planner_backend/plan_models.py (Student and
+             the other plan-format models)
+  Found:     2026-11-19 by Samantha, probing the agent request format
+  Steps:     a request whose student has an extra field, e.g. "notes":
+             "no Fridays"
+  Actual:    accepted and the field is thrown away with no error, while the
+             same field at the top level of the request is rejected
+  Expected:  rejected, so a frontend that sends a misspelled or unsupported
+             field finds out. Not a security problem: the dropped text never
+             reaches the model
+  Fix idea:  model_config = ConfigDict(extra="forbid") on the plan-format
+             models (check that saved plans in the plan store still load)
+
+BUG-031  Prerequisite edges are written as "from_" unless dumped by alias
+  Status:    Open
+  Owner:     Midhat Sajad (data format)
+  Where:     backend/src/degree_planner_backend/plan_models.py (Edge)
+  Found:     2026-11-19 by Samantha, probing the agent request format
+  Steps:     AgentResponse.model_validate_json(
+             open("docs/agent-response.sample.json").read()).model_dump_json()
+  Actual:    edges come out as {"from_": ..., "to": ...}
+  Expected:  {"from": ..., "to": ...} as in docs/plan-format.md. FastAPI
+             responses are fine (it dumps by alias); files saved by our own
+             code, such as the eval runner's, are not
+  Fix idea:  model_config = ConfigDict(populate_by_name=True,
+             serialize_by_alias=True) on Edge (Pydantic 2.11 or newer), or
+             always dump with by_alias=True and say so in plan-format.md
+
+BUG-032  Validator keeps "overridden" on flags that cannot be overridden
+  Status:    Open
+  Owner:     Midhat Sajad (validator)
+  Where:     backend/src/degree_planner_backend/validator.py (check_plan,
+             previously_overridden), reached through POST /plans/check
+  Found:     2026-11-19 by Samantha, reviewing override handling
+  Steps:     load docs/data-format.sample.json; run check_plan on
+             docs/plan-format.sample.json; set overridden: true on every
+             flag it returns; run check_plan again
+  Actual:    before: broken_prerequisite, credit_shortfall, credit_shortfall
+             (all errors, overridable false), requirements_met false.
+             after: the same three flags with overridden true, and
+             requirements_met true. A plan with a broken prerequisite passes
+  Expected:  overridden is only carried forward for flags that are
+             overridable (today only exception_claimed); requirements_met
+             stays false. The agent path is not affected (StudentContext
+             drops overrides of other types) but drag and drop is
+  Fix idea:  overridden=overridable and (flag_type, course_id) in
+             previously_overridden; a test that forges overridden on a
+             broken_prerequisite. AgentResponse in agent/request_models.py
+             already ignores such overrides
+
+BUG-033  Transcript term headings accept non-ASCII digits and any year
+  Status:    Open
+  Owner:     Midhat Sajad (transcript parser)
+  Where:     backend/src/degree_planner_backend/transcript_parser.py
+             (_TERM_HEADING)
+  Found:     2026-11-19 by Samantha, comparing it with the agent request
+             format's start_term rule
+  Steps:     _TERM_HEADING.match(x) for "Fall ２０２４" (full-width
+             digits), "fall 1850", "SUMMER 0001"
+  Actual:    all three match, so they become semester headings and the
+             courses under them get that term
+  Expected:  only ASCII digits (\d also matches other scripts' digits);
+             possibly a sensible year range (the request format uses 2000
+             or later). Low impact: a real Mines transcript will not have
+             these, but a crafted PDF could
+  Fix idea:  [0-9]{4} instead of \d{4}; normalize the term label to
+             "Fall 2024" form so it matches the request format
