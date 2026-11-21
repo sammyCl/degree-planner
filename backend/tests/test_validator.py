@@ -230,6 +230,28 @@ def test_check_plan_preserves_overridden_flags_across_revalidation(connection: s
     assert exception_flag_again.overridden is True
 
 
+def test_check_plan_rejects_a_forged_override_on_a_non_overridable_flag(connection: sqlite3.Connection) -> None:
+    # BUG-024 / BUG-032: only overridable flags (exception_claimed) may carry overridden
+    # forward; a forged override on an error flag like broken_prerequisite or
+    # credit_shortfall must not make the plan pass.
+    plan = Plan.model_validate(json.loads((REPO_ROOT / "docs" / "plan-format.sample.json").read_text()))
+
+    first = check_plan(connection, plan)
+    assert first.summary.requirements_met is False
+
+    forged = first.model_copy(deep=True)
+    for flag in forged.flags:
+        flag.overridden = True
+    assert any(flag.type in ("broken_prerequisite", "credit_shortfall") for flag in forged.flags)
+
+    second = check_plan(connection, forged)
+
+    for flag in second.flags:
+        if flag.type in ("broken_prerequisite", "credit_shortfall"):
+            assert flag.overridden is False
+    assert second.summary.requirements_met is False
+
+
 def test_check_plan_ignores_unknown_courses_instead_of_crashing(connection: sqlite3.Connection) -> None:
     plan = Plan.model_validate(
         {
