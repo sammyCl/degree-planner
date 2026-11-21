@@ -8,10 +8,12 @@ dependencies = [
     "uvicorn[standard]>=0.32",
     "pydantic>=2.9",
     "pypdf>=7.1.0",
+    "mcp>=2.3.0",
 ]
 
 [project.scripts]
 load-data = "degree_planner_backend.data_loader:main"
+try-agent = "degree_planner_backend.agent.try_agent:main"
 
 [dependency-groups]
 dev = [
