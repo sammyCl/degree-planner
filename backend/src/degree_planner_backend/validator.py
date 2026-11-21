@@ -89,7 +89,7 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                 course_id=course_id,
                 message=message,
                 overridable=overridable,
-                overridden=(flag_type, course_id) in previously_overridden,
+                overridden=overridable and (flag_type, course_id) in previously_overridden,
             )
         )
 
