@@ -5,7 +5,7 @@ Regenerated every run; do not edit by hand. Rules: `data/CONFLICT-LOG.md`, secti
 ## Counts
 
 - codes in both CSVs (merged): 947
-- corequisites not expressible (OR/free text; left empty): 34
+- corequisites kept as one exception (free text): 19
 - courses with no description: 101
 - courses written: 2137
 - credit ranges (upper bound used): 471
@@ -15,7 +15,7 @@ Regenerated every run; do not edit by hand. Rules: `data/CONFLICT-LOG.md`, secti
 - prerequisites kept as one exception (free text): 226
 - prerequisites partly free text (mixed): 8
 - prerequisites with a grade minimum (grade dropped): 67
-- references to codes not in the catalog: 74
+- references to codes not in the catalog: 76
 
 ## Prerequisites that are free text, whole or in part (free text becomes an exception the student can override) (234)
 
@@ -254,44 +254,29 @@ Regenerated every run; do not edit by hand. Rules: `data/CONFLICT-LOG.md`, secti
 - SPRS508: SPRS501
 - SYGN550: 
 
-## Corequisites not expressible as a plain list (OR or free text), left empty (34)
+## Corequisites that are free text, kept whole as one exception (same as free-text prerequisites) (19)
 
 - BIOL491: Senior or graduate standing in QBE, BIOL301
 - CBEN461: CBEN460, 3 hours laboratory, 1 semester hour
-- CEEN315: CEEN310 or CEEN311
 - CEEN585L: GEGN/CEEN 585 Fluid Mechanics for Hydrology
-- CSCI290: CSCI220 or CSCI262
 - CSED464: Completed/concurrent 3 credits of SCED 262; complete/concurrent with CSED 430 or CSED 435
 - CSED465: Completed/concurrent with SCED 333, SCED 363, CSED 430, and CSED 435
 - CSED564: Completed/concurrent 3 credits of SCED 562; complete/concurrent with CSED 530 or CSED 535
 - CSED565: Completed/concurrent with SCED 533, SCED 563, CSED 530, and CSED 535
-- EBGN280: DSCI403 OR CSCI303
 - EDNS479: HASS215 or graduate student standing
 - EDNS491: For BSME students, MEGN481; for BSCE students, any one of CEEN443, CEEN445, CEEN442, or CEEN415; for BSEE students, EENG
-- EENG284: EENG282 or EENG281 or PHGN215
 - GEGN317: GEOL314; requirement, must be a geological engineering major with junior status or higher
 - GEGN585L: GEGN/CEEN 585 Fluid Mechanics for Hydrology
-- HASS482: HASS200 or HASS215
 - MAED464: Completed/concurrent 3 credits of SCED 262; completed/concurrent with MAED 405 or MAED 425
 - MAED465: Completed/concurrent with SCED 333, SCED 363, MAED 405, and MAED 425
 - MAED564: Completed/concurrent 3 credits of SCED 562; completed/concurrent with MAED 505 or MAED 525
 - MAED565: Completed/concurrent with SCED 333, SCED 363, MAED 505, and MAED 425
-- MATH213: CSCI128 or CSCI102
-- MATH225: CSC128 or CSCI102
-- MATH307: MATH225 or MATH235
-- MNGN504: GEGN462 or GEGN561
-- MTGN251: CHGN122 or CHGN125
-- PHGN100: MATH112 or MATH122
-- PHGN200: MATH213 or MATH223
-- PHGN401: PHGN300 or PHGN310
-- PHGN471: PHGN481 or PHGN491
-- PHGN472: PHGN482 or PHGN492
 - SCED464: Completed/concurrent 3 credits of SCED 262; completed/concurrent with SCED 415 or SCED 445
 - SCED465: Completed/concurrent with SCED 333, SCED 363, SCED 415, and SCED 445
 - SCED564: Completed/concurrent 3 credits of SCED 562; completed/concurrent with SCED 515 or SCED 545
 - SCED565: Completed/concurrent with SCED 333, SCED 363, SCED 515, and SCED 545
 
-## Prerequisite/corequisite codes that are not courses in the catalog CSVs (typos or retired courses) (74)
+## Prerequisite/corequisite codes that are not courses in the catalog CSVs (typos or retired courses) (76)
 
 - CBEN305 -> CBEN404
 - CSCI406 -> MATH358
@@ -322,6 +307,7 @@ Regenerated every run; do not edit by hand. Rules: `data/CONFLICT-LOG.md`, secti
 - HASS330 -> SYGN200
 - HNRS305 -> HNRS198A
 - HNRS315 -> HNRS198A
+- MATH225 -> CSC128
 - MATH235 -> MATH113
 - MATH572 -> MATH331
 - MLGN502 -> PH320
@@ -345,6 +331,7 @@ Regenerated every run; do not edit by hand. Rules: `data/CONFLICT-LOG.md`, secti
 - MNGN436 -> MNGN381
 - MNGN436 -> MNGN384
 - MNGN504 -> MTGN321
+- MNGN504 -> GEGN462
 - MNGN505 -> MN321
 - MNGN527 -> ESGN500
 - MNGN527 -> ESGN504

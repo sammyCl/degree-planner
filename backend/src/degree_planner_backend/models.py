@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field, model_validator
 class CourseRequirement(BaseModel):
     type: Literal["course"]
     code: str
+    min_grade: str | None = None
 
 
 class ExceptionRequirement(BaseModel):
@@ -47,9 +48,11 @@ class Course(BaseModel):
     number: str
     title: str
     credits: float
+    credits_min: float | None = None
+    credits_max: float | None = None
     description: str
     prerequisites: Requirement | None = None
-    corequisites: list[str] = Field(default_factory=list)
+    corequisites: Requirement | None = None
     catalog_year: str
     source: Source | None = None
 

@@ -228,17 +228,9 @@ def parse_prerequisites(text: str) -> ParseResult:
     )
 
 
-def parse_corequisites(text: str) -> tuple[list[str], bool]:
-    """Return (codes, expressible). OR/free text cannot be a plain list, so it is reported, not guessed."""
-    t = " ".join((text or "").split()).rstrip(". ")
-    if not t or NONE.match(t):
-        return [], True
-    res = parse_prerequisites(t)
-    req = res.requirement
-    if req is None or res.fallback:
-        return [], False
-    if req["type"] == "course":
-        return [req["code"]], True
-    if req["type"] == "AND" and all(x["type"] == "course" for x in req["of"]):
-        return [x["code"] for x in req["of"]], True
-    return [], False
+def parse_corequisites(text: str) -> ParseResult:
+    """Corequisite text uses the same grammar as prerequisites (AND/OR/exception), so corequisites
+    are a Requirement tree too (docs/data-format.md). `fallback=True` still means free text kept
+    whole as one exception, same meaning as for parse_prerequisites.
+    """
+    return parse_prerequisites(text)

@@ -106,7 +106,8 @@ def test_credit_notes_are_dropped_not_parsed():
 
 
 def test_corequisites():
-    assert parse_corequisites("MTGN464") == (["MTGN464"], True)
-    assert parse_corequisites("CBEN404, CBEN210") == (["CBEN404", "CBEN210"], True)
-    assert parse_corequisites("None") == ([], True)
-    assert parse_corequisites("PHGN300 or PHGN310") == ([], False)
+    assert parse_corequisites("MTGN464").requirement == c("MTGN464")
+    assert parse_corequisites("CBEN404, CBEN210").requirement == AND(c("CBEN404"), c("CBEN210"))
+    assert parse_corequisites("None").requirement is None
+    # Same grammar as prerequisites, so OR corequisites are now a tree too, not dropped.
+    assert parse_corequisites("PHGN300 or PHGN310").requirement == OR(c("PHGN300"), c("PHGN310"))
