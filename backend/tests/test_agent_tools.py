@@ -1101,7 +1101,7 @@ def test_program_real_cs_minor(real_data_connection: sqlite3.Connection) -> None
 
 def test_program_every_real_program_is_clean(real_data_connection: sqlite3.Connection) -> None:
     ids = [row[0] for row in real_data_connection.execute("SELECT DISTINCT program_id FROM programs")]
-    assert len(ids) == 64
+    assert len(ids) == 69  # 64 minors/ASIs + 5 bachelor's programs (bachelors.json)
     for program_id in ids:
         result = get_program_requirements(real_data_connection, {"program_id": program_id})
         assert "error" not in result, program_id
@@ -1294,7 +1294,7 @@ def test_program_every_no_list_group_shows_label(real_data_connection: sqlite3.C
         for group in get_program_requirements(real_data_connection, {"program_id": program_id})["requirement_groups"]
         if group["courses"] is None
     ]
-    assert len(no_list) == 9
+    assert len(no_list) == 14  # 9 minors/ASIs + 5 free-elective groups in bachelors.json
     for group in no_list:
         assert group["label"] in group["summary"]
 
