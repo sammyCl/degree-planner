@@ -109,7 +109,7 @@ def test_refresh_database_loads_the_real_sample_file(tmp_path: Path) -> None:
     report = refresh_database(tmp_path, connection)
 
     assert report.ok
-    assert report.courses_loaded == 6
+    assert report.courses_loaded == 7
     assert report.programs_loaded == 4
     assert report.forms_loaded == 1
 
@@ -117,3 +117,9 @@ def test_refresh_database_loads_the_real_sample_file(tmp_path: Path) -> None:
     stored = json.loads(row[0])
     assert stored["prerequisites"]["type"] == "AND"
     assert stored["prerequisites"]["of"][1]["type"] == "OR"
+    assert stored["corequisites"]["type"] == "OR"
+
+    ranged = connection.execute("SELECT data FROM courses WHERE code = 'MNGN598'").fetchone()
+    stored_ranged = json.loads(ranged[0])
+    assert stored_ranged["credits_min"] == 1.0
+    assert stored_ranged["credits_max"] == 6.0

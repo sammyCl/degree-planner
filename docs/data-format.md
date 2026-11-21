@@ -14,10 +14,12 @@ Field names use `snake_case`. Credits are numbers (not strings), since `0.5`/`1.
 | `subject` | string | yes | e.g. `"CSCI"` |
 | `number` | string | yes | e.g. `"400"` |
 | `title` | string | yes | |
-| `credits` | number | yes | |
+| `credits` | number | yes | for a variable- or range-credit course (e.g. independent study), the upper bound |
+| `credits_min` | number \| null | no | set together with `credits_max` when the catalog gives a range (e.g. "1-6 credits"); omit for a fixed-credit course |
+| `credits_max` | number \| null | no | equal to `credits` when set; see `credits_min` |
 | `description` | string | yes | catalog text, may be empty string |
 | `prerequisites` | Requirement \| null | no | see **Requirement expressions** below; `null` means no prerequisites |
-| `corequisites` | array of course codes | no | default `[]` |
+| `corequisites` | Requirement \| null | no | same shape as `prerequisites` (a flat `AND` of courses covers the common case); `null` means no corequisites |
 | `catalog_year` | string | yes | e.g. `"2026-2027"`; requirements change by year, so the same code can have one row per year |
 | `source` | object | no | `{"url": string, "page": number}`, for the spot-check task |
 
@@ -25,7 +27,7 @@ Field names use `snake_case`. Credits are numbers (not strings), since `0.5`/`1.
 
 Prerequisites need real AND/OR logic, not a flat string (the raw CSVs collected so far store prerequisites as plain text like `"MATH301, MATH332."`, which this format replaces). A requirement is one of:
 
-- A single course: `{"type": "course", "code": "MATH301"}`
+- A single course: `{"type": "course", "code": "MATH301"}`, optionally with a minimum grade: `{"type": "course", "code": "MATH301", "min_grade": "C-"}`. Omit `min_grade` when the catalog states no minimum beyond a passing grade. The validator does not yet check it (BUG-026); the field exists so the requirement isn't silently lost.
 - All of a list: `{"type": "AND", "of": [Requirement, ...]}`
 - Any of a list: `{"type": "OR", "of": [Requirement, ...]}`
 - An exception the student says they were granted (placement, instructor approval): `{"type": "exception", "label": "instructor approval"}`. The validator does not silently pass this; per DECISIONS.md it shows a warning and lets the student override.

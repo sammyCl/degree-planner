@@ -8,7 +8,7 @@
       "credits": 3.0,
       "description": "Probability and statistics for engineers.",
       "prerequisites": { "type": "course", "code": "MATH112" },
-      "corequisites": [],
+      "corequisites": null,
       "catalog_year": "2026-2027",
       "source": { "url": "https://catalog.mines.edu/coursesaz/math/", "page": 4 }
     },
@@ -20,7 +20,7 @@
       "credits": 3.0,
       "description": "Vector spaces, matrices, eigenvalues.",
       "prerequisites": { "type": "course", "code": "MATH112" },
-      "corequisites": [],
+      "corequisites": null,
       "catalog_year": "2026-2027",
       "source": { "url": "https://catalog.mines.edu/coursesaz/math/", "page": 5 }
     },
@@ -31,8 +31,8 @@
       "title": "Algorithms",
       "credits": 3.0,
       "description": "Design and analysis of algorithms.",
-      "prerequisites": { "type": "course", "code": "CSCI200" },
-      "corequisites": [],
+      "prerequisites": { "type": "course", "code": "CSCI200", "min_grade": "C-" },
+      "corequisites": null,
       "catalog_year": "2026-2027",
       "source": { "url": "https://catalog.mines.edu/coursesaz/computerscience/", "page": 2 }
     },
@@ -56,7 +56,13 @@
           }
         ]
       },
-      "corequisites": [],
+      "corequisites": {
+        "type": "OR",
+        "of": [
+          { "type": "course", "code": "MATH201" },
+          { "type": "course", "code": "MATH223" }
+        ]
+      },
       "catalog_year": "2026-2027",
       "source": { "url": "https://catalog.mines.edu/coursesaz/computerscience/", "page": 3 }
     },
@@ -68,7 +74,7 @@
       "credits": 3.0,
       "description": "Graduate-level mine planning and design.",
       "prerequisites": { "type": "exception", "label": "instructor approval" },
-      "corequisites": [],
+      "corequisites": null,
       "catalog_year": "2026-2027",
       "source": { "url": "https://catalog.mines.edu/coursesaz/mining/", "page": 11 }
     },
@@ -80,9 +86,23 @@
       "credits": 3.0,
       "description": "Applied rock mechanics for underground and surface mines.",
       "prerequisites": null,
-      "corequisites": [],
+      "corequisites": null,
       "catalog_year": "2026-2027",
       "source": { "url": "https://catalog.mines.edu/coursesaz/mining/", "page": 12 }
+    },
+    {
+      "code": "MNGN598",
+      "subject": "MNGN",
+      "number": "598",
+      "title": "Independent Study",
+      "credits": 6.0,
+      "credits_min": 1.0,
+      "credits_max": 6.0,
+      "description": "Independent study under faculty supervision; credits by arrangement.",
+      "prerequisites": { "type": "exception", "label": "instructor approval" },
+      "corequisites": null,
+      "catalog_year": "2026-2027",
+      "source": { "url": "https://catalog.mines.edu/coursesaz/mining/", "page": 13 }
     }
   ],
 
