@@ -40,6 +40,7 @@ class ParseResult:
     requirement: dict | None
     fallback: bool = False  # whole text kept as one exception
     grade_dropped: bool = False
+    grade_texts: list[str] = field(default_factory=list)  # the grade-minimum wording that was dropped
     notes_dropped: list[str] = field(default_factory=list)
 
 
@@ -195,13 +196,14 @@ def parse_prerequisites(text: str) -> ParseResult:
         # several sentences that are not plain code lists: keep them all as free text
         body = ". ".join(kept)
 
+    grade_texts = [m.group().strip(" ()") for m in GRADE.finditer(body)]
     stripped, n_grade = GRADE.subn("", body)
     stripped = re.sub(r"\(\s*or\s+(equivalents?)\s*\)", r"or \1", stripped, flags=re.I)
     stripped = re.sub(r"\s+", " ", stripped).strip(" .,;")
     toks = _tokens(stripped)
     if toks is not None and any(k in ("code", "num", "exc") for k, _ in toks):
         try:
-            return ParseResult(_parse_all(toks), grade_dropped=bool(n_grade), notes_dropped=dropped)
+            return ParseResult(_parse_all(toks), grade_dropped=bool(n_grade), grade_texts=grade_texts, notes_dropped=dropped)
         except _Fail:
             pass
     # Mixed text: parse each ";" clause on its own; a clause that cannot be parsed becomes an exception.
@@ -218,7 +220,7 @@ def parse_prerequisites(text: str) -> ParseResult:
             except _Fail:
                 atoms.append({"type": "exception", "label": clause[:300]})
         if any_course:
-            return ParseResult(_wrap("AND", atoms), fallback=True, grade_dropped=bool(n_grade), notes_dropped=dropped)
+            return ParseResult(_wrap("AND", atoms), fallback=True, grade_dropped=bool(n_grade), grade_texts=grade_texts, notes_dropped=dropped)
     return ParseResult(
         {"type": "exception", "label": body.rstrip(".")[:300]},
         fallback=True,

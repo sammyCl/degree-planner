@@ -19,240 +19,240 @@ Regenerated every run; do not edit by hand. Rules: `data/CONFLICT-LOG.md`, secti
 
 ## Prerequisites that are free text, whole or in part (free text becomes an exception the student can override) (234)
 
-- AMFG581: Junior standing in an engineering major, or instructor consent
-- CBEN198: none; 1 to 6 semester hours
-- CBEN199: submission of “Independent Study” form to CSM Registrar
-- CBEN250: Concurrent enrollment in CBEN210
-- CBEN298: none; 1 to 6 semester hours
-- CBEN299: submission of “Independent Study” form to CSM Registrar
-- CBEN304: General Biology I
-- CBEN324 (mixed): CBEN110; Student must be at least 21 years of age at beginning of semester
-- CBEN350: Junior standing
-- CBEN351: junior standing
-- CBEN398: none; 1 to 6 semester hours
-- CBEN399: submission of “Independent Study” form to CSM Registrar
-- CBEN421: CBEN321, CHGN428 or graduate status
-- CBEN435: Senior standing in PHGN, CBEN, MTGN, or EGGN
-- CBEN450: senior standing
+- AMFG581: AMFG 501, AMFG 521, AMFG 531
+- CBEN198: CBEN 120 or equivalent
+- CBEN199: none; 1 to 6 semester hours
+- CBEN250: CHGN121, CHGN122, MATH111
+- CBEN298: Concurrent enrollment in CBEN210
+- CBEN299: none; 1 to 6 semester hours
+- CBEN304: submission of “Independent Study” form to CSM Registrar
+- CBEN324 (mixed): CBEN110, CHGN122, PHGN200
+- CBEN350: none
+- CBEN351: Junior standing
+- CBEN398: grade of C- or better in CBEN357
+- CBEN399: none; 1 to 6 semester hours
+- CBEN421: MATH225, CHGN209 or CBEN210, CBEN307, CBEN357
+- CBEN435: CBEN307
+- CBEN450: CBEN307, CBEN314, CBEN357, CBEN375, CHGN351 and CHGN353, CHGN221 and CHGN222, MATH225
 - CBEN451: senior standing
-- CBEN454: General Biology [BIOL110]
-- CBEN472: CBEN357 Chemical Engineering Thermodynamics (or equivalent)
-- CBEN498: none; 1 to 6 semester hours
-- CBEN499: none, submission of “Independent Study” form to CSM Registrar
-- CBEN507: Undergraduate differential equations course; undergraduate chemical engineering courses covering reaction kinetics, and heat, mass and momen
-- CBEN513: none. 1 to 3 semester hours lecture/discussion; 1 to 3 semester hours.
-- CBEN521: Senior level QBE, CBE, or Biochemistry
-- CBEN528: CBEN418 or equivalent (instructor may make special exemptions)
-- CBEN531: Biology BIOL110 or equivalent or graduate standing
-- CBEN568: graduate student in Chemical and Biological Engineering in good standing
-- CBEN605: Graduate status
-- CBEN609: none. 1 to 3 semester hours.
-- CBEN620: the equivalent of one semester of graduate level applied mathematics
-- CBEN624: Undergraduate-level classical thermodynamics
-- CBEN690: Good academic standing, CBEN 507, CBEN 509, CBEN 516, CBEN 518
-- CCUS525: None Co-requisite: None Prerequisite: Undergraduate introductory biology course (BIOL300 and BIOL301, or equivalent),Undergraduate general c
-- CCUS530: None Co-requisite: None Prerequisite: Undergraduate introductory chemistry (CHGN121 and CHGN122, or equivalent),Differential equations (MATH
-- CEEN241: PHGN100 and credit or concurrent enrollment in MATH112
-- CEEN267: EDNS151 or EDNS155 or HNRS115 or Grandey First-Year Honors Experience (HNRS198A and HNRS198B)
-- CEEN340: Second semester sophomore status or above and a cumulative grade-point average of at least 2.00
-- CEEN401: Junior standing
-- CEEN493: Senior or graduate standing
-- CEEN510: A first course in soil mechanics
-- CEEN527: CEEN320 Introduction to Construction Engineering
-- CEEN582: CEEN580 and knowledge of basic statistics and computer programming
-- CEEN583: CEEN480 or CEEN580 recommended
-- CEEN585L: Fluid Mechanics
-- CEEN590: EGGN491 and EGGN492, equivalent senior design project experience or industrial design experience, graduate standing; EGGN491 and EGGN492, eq
-- CEEN593: Senior or graduate standing
-- CEEN594: CEEN592 and one semester of statistics
-- CHGC503: Introductory chemistry, mineralogy and petrology
-- CHGC504: Graduate standing in geochemistry or environmental science and engineering
-- CHGC506: Introductory chemistry, graduate standing
-- CHGC511: Undergraduate mineralogy and petrology
-- CHGC514: Introductory chemistry, introductory thermodynamics, mineralogy and petrology
-- CHGN223: CHGN221 or concurrent enrollment
-- CHGN340: Second semester sophomore status and a cumulative grade-point average, of at least 2.00
-- CHGN395: Completion of the chemistry curriculum through the Spring semester of the sophomore year
-- CHGN435: CHGN428, CHGN209 or (equivalent CBEN 210 or BIOL 301)
-- CHGN495: Selection of a research topic and advisor, preparation and approval of a research proposal, completion of chemistry curriculum through the j
-- CHGN497: Completion of chemistry curriculum through the junior year
-- CHGN535: CHGN 428 + CHGN 209 or equivalent (CBEN 210 or BIOL 301)
-- CHGN538: Organic Chemistry 1 & 2 are encouraged
-- CHGN560: Enrollment in Chemistry M.S. or Ph.D. degree program
-- CHGN583: B.S. in Metallurgy, Chemistry, Chemical Engineering, Physics, or consent of instructor
-- CHGN625: CBEN 509 or equivalent, and recommend CBEN 610 or equivalent
-- CSCI195: Current CS@Mines Bridge Student
-- CSCI340: Second semester sophomore status and a cumulative grade point average of at least 2.00
-- CSCI478: CSCI101 or CSCI102 CSCI128
-- CSCI507: Undergraduate level knowledge of linear algebra, statistics, and a programming language
-- CSCI532: Graduate student standing
-- CSCI533: Graduate standing; Recommended: CSCI 406 (Algorithms); CSCI 358 (Discrete Mathematics)
-- CSCI536: Data Structures, Probability and Statistics or equivalent
-- CSCI537: No official prerequisites, but requires knowledge of - Linear algebra, calculus, probability, and statistics - Linux, Algorithms, C++, and P
-- CSCI555: CSCI406 Algorithms
-- CSCI563: Programming experience in C
-- CSCI578: Prior experience with introductory programming concepts
-- CSCI584: None; please note, this is not a programming-focused course; as such, this course is appropriate for both CS and non-CS graduate students
-- CSCI691: none. 1 hour seminar; 1 semester hour. Repeatable for credit to a maximum of 12 hours.
-- CSED464: Completed/concurrent 3 credits of SCED 262; complete/concurrent with CSED 430 or CSED 435
-- CSED465: Completed CSED 464; completed/concurrent with SCED 333, SCED 363, CSED 430, and CSED 435
-- CSED564: Completed/concurrent 3 credits of SCED 562; complete/concurrent with CSED 530 or CSED 535
-- CSED565: Completed CSED 564; completed/concurrent with SCED 533, SCED 563, CSED 530, and CSED 535
-- DSCI503: CSCI200 with a grade of C- or higher or CSCI262 with a grade of C- or higher, MATH201 or MATH334 OR Graduate level standing and at least CSC
-- EBGN477: junior standing (60CH)
-- EBGN509: Principles of Microeconomics, and MATH111
-- EBGN510: Principles of Microeconomics
-- EBGN512: Principles of Microeconomics, MATH111
-- EBGN527: Admission to the ETM program or permission of the instructor
-- EBGN529: None Co-requisite: None.
-- EBGN530: Math111, Principles of Microeconomics recommended
-- EBGN536: Principles of Microeconomics, MATH111, EBGN509, EBGN510, EBGN511
-- EBGN541: Principles of Microeconomics, MATH111, EBGN509, EBGN511
-- EBGN542: Principles of Microeconomics, MATH111, EBGN509, EBGN511, EBGN512
-- EBGN546: Principles of Microeconomics, MATH111, MATH530
-- EBGN547 (mixed): Principles of Microeconomics, MATH111, MATH530, EBGN505; EBGN545 or EBGN546
-- EBGN570: Principles of Microeconomics, MATH111, EBGN509, EBGN510
-- EBGN610: Principles of Microeconomics, MATH111, MATH5301, EBGN509, EBGN510, EBGN511
-- EBGN611: Principles of Microeconomics, MATH111, MATH5301, EBGN509, EBGN511
-- EBGN645: MATH111, MATH530, Principles of Microeconomics, EBGN509, EBGN511
-- EBGN690: Principles of Microeconomics, MATH111, MATH530, EBGN509, EBGN590
-- EDNS440: Junior Standing
-- EDNS445: Junior standing
-- EDNS479: HNRS105, HNRS115 or HASS100 or graduate student standing
-- EDNS491: For BSME students, completion of MEGN301; for BSCE students, completion of Engineering Field Session, Civil, CEEN 331; for BSENV completion 
-- EENG340: Second semester sophomore status and a cumulative grade-point average of at least 2.00
-- EENG383: EENG281 or EENG282 or PHGN215 (C-or better) and EENG284 or PHGN317 (C-or better)
-- EENG437: MATH201 or EENG311, MATH332, CSCI261 or CSCI200, Senior level standing
-- EENG495: senior-level standing based on credit hours
-- EENG683 (mixed): EENG580 and EENG582 or equivalent; a strong knowledge of digital simulation techniques
-- GEGN340: Second semester sophomore status and a cumulative grade-point average of at least 2.00
-- GEGN403: GEGN401, GEGN475 (or concurrent enrollment)
-- GEGN432: Junior standing in Geological Engineering
-- GEGN438 (mixed): GEOL308 or GEOL309 and GEOL314 or GEOL315; and GEGN316 or GPGN486 or PEGN316
-- GEGN483: Familiarity with computers, mathematics through differential and integral calculus, and GEGN466
-- GEGN502: GEGN501, GEGN475 (or concurrent enrollment)
-- GEGN520: Senior or graduate status in earth resources field
-- GEGN561: Graduate standing in Underground Construction and Tunnel Engineering, Civil engineering, Mining engineering, or Geological Engineering
-- GEGN566: Calc III (MATH213 or MATH223) and DiffEQ (MATH225 or MATH235) and GEGN351 or MEGN351
-- GEGN583: A knowledge of FORTRAN programming, mathematics through differential and integral calculus, and GEGN467
-- GEGN584: Groundwater Engineering (GEGN466, Integrated Surface Water Hydrology (GEGN582) or equivalent classes
-- GEGN585L: Fluid Mechanics
-- GEGN669: none. 1 to 2 semester hours; may be repeated for credit.
-- GEGN681 (mixed): GEGN467 or equivalent; Math through Differential Equations
-- GEOC407: Completion of CSM freshman technical core, or equivalent
-- GEOL102: GEGN101 or concurrent enrollment
-- GEOL440: Basic geology knowledge; Consent from instructor
-- GEOL526: Basic geology knowledge; Consent from instructor
-- GEOL527: GEOL 321 Mineralogy and mineral characterization, GEGN401 Mineral Deposits
-- GEOL550: none. A course background in structural geology, sedimentology/stratigraphy or organic geochemistry will be helpful.
-- GEOL555: (need previous field experience such as a field course, and a course in structural geology and one in earth materials)
-- GEOL556: Structural geology knowledge; Consent from instructor
-- GEOL642: Undergraduate degree in geology and GEGN316 or equivalent
-- GEOL643: Restricted to Ph.D. or advanced M.S. candidates
-- GOGN501: Introductory courses in geology, rock mechanics, and soil mechanics
-- GOGN502: Introductory Rock Mechanics
-- GOGN503: Introductory courses in geology, rock mechanics, and soil mechanics
-- GOGN625: Enrollment in Geo-Engineering Program
-- GPGN545: Python programming, signal processing
-- GPGN573: CSCI 128 or similar; MATH 225 or similar
-- HASS111: HASS110 or AP English score of 5
-- HASS550: HASS 545 and IPE Minor
-- HASS601: Must have completed one full year (or equivalent) of graduate school course work
-- HNRS425: HNRS305: Explorations in Modern America and HNRS315: Explorations in The Modern World
-- HNRS430: HNRS305: Explorations in Modern America and HNRS315: Explorations in the Modern World
+- CBEN454: senior standing
+- CBEN472: CBEN307 or MEGN351
+- CBEN498: 
+- CBEN499: none; 1 to 6 semester hours
+- CBEN507: 
+- CBEN513: CBEN110, CBEN120, CHGN221, CHGN222, PHGN100, and PHGN200
+- CBEN521: 
+- CBEN528: none.
+- CBEN531: MATH225 or equivalent
+- CBEN568: none.
+- CBEN605: none
+- CBEN609: CBEN508
+- CBEN620: CBEN516
+- CBEN624: the equivalent of one semester of graduate level applied mathematics
+- CBEN690: 
+- CCUS525: 
+- CCUS530: None Co-requisite: None Prerequisite: Undergraduate introductory biology course (BIOL300 and BIOL301, or equivalent),Undergraduate general chemistry course (CHGN121 and CHGN122, or equivalent).
+- CEEN241: 
+- CEEN267: PHGN100 and credit or concurrent enrollment in MATH112
+- CEEN340: EDNS251, CEEN267
+- CEEN401: Independent Study form must be completed and submitted to the Registrar
+- CEEN493: CEEN301 or CEEN302
+- CEEN510: Consent of the instructor
+- CEEN527: 
+- CEEN582: 
+- CEEN583: CEEN580 and knowledge of basic statistics and computer programming
+- CEEN585L: 
+- CEEN590: 
+- CEEN593: 
+- CEEN594: Senior or graduate standing
+- CHGC503: 
+- CHGC504: Introductory chemistry, mineralogy and petrology
+- CHGC506: 
+- CHGC511: CHGN209 or CBEN210
+- CHGC514: Undergraduate mineralogy and petrology
+- CHGN223: Grade of C- or better in CHGN221
+- CHGN340: CHGN221 (C- or better), CHGN 223
+- CHGN395: CHGN351
+- CHGN435: 
+- CHGN495: CHGN323, CHGN341, and CHGN351
+- CHGN497: 
+- CHGN535: CHGN 428
+- CHGN538: CHGN 430, CBEN 415, MLGN 530
+- CHGN560: none.
+- CHGN583: none.
+- CHGN625: “Independent Study” form must be completed and submitted to the Registrar
+- CSCI195: None
+- CSCI340: CSCI210 with grade of C- or higher, CSCI220 with grade of C- or higher or CSCI262 with grade of C- or higher
+- CSCI478: CSCI220 or CSCI262
+- CSCI507: 
+- CSCI532: CSCI520
+- CSCI533: Graduate student standing
+- CSCI536: 
+- CSCI537: Data Structures, Probability and Statistics or equivalent
+- CSCI555: 
+- CSCI563: CSCI406
+- CSCI578: CSCI 306
+- CSCI584: 
+- CSCI691: “Independent Study” form must be completed and submitted to the Registrar
+- CSED464: None
+- CSED465: Completed/concurrent 3 credits of SCED 262; complete/concurrent with CSED 430 or CSED 435
+- CSED564: 
+- CSED565: Completed/concurrent 3 credits of SCED 562; complete/concurrent with CSED 530 or CSED 535
+- DSCI503: CSCI101 or CSCI 102 or CSCI261 or CSCI200; MATH201, MATH332
+- EBGN477: None
+- EBGN509: 
+- EBGN510: Principles of Microeconomics, and MATH111
+- EBGN512: MATH111, EBGN509
+- EBGN527: 
+- EBGN529: 
+- EBGN530: None Co-requisite: None.
+- EBGN536: EBGN201, MATH111, EBGN509, and EBGN510
+- EBGN541: 
+- EBGN542: Principles of Microeconomics, MATH111, EBGN509, EBGN511
+- EBGN546: Principles of Microeconomics, MATH111, EBGN509, EBGN511, EBGN512
+- EBGN547 (mixed): Principles of Microeconomics, MATH111, MATH530
+- EBGN570: EBGN504
+- EBGN610: “Independent Study” form must be completed and submitted to the Registrar
+- EBGN611: Principles of Microeconomics, MATH111, MATH5301, EBGN509, EBGN510, EBGN511
+- EBGN645: EBGN590
+- EBGN690: EBGN555
+- EDNS440: HASS100
+- EDNS445: 
+- EDNS479: HASS100
+- EDNS491: HNRS105, HNRS115 or HASS100 or graduate student standing
+- EENG340: EENG310 and EENG391
+- EENG383: EENG307, EENG383
+- EENG437: EENG385 and EENG430 or EENG530
+- EENG495: EENG284 and EENG383
+- EENG683 (mixed): 
+- GEGN340: CHGN121, CHGN122 or CHGN125, MATH111, MATH112
+- GEGN403: GEGN307, GEGN316
+- GEGN432: GEOL321, GEGN401
+- GEGN438 (mixed): Junior standing in Geological Engineering
+- GEGN483: GEGN466
+- GEGN502: GEGN307, GEGN316
+- GEGN520: DCGN209 or equivalent
+- GEGN561: 
+- GEGN566: GEGN468, MNGN321 or CEEN312
+- GEGN583: 
+- GEGN584: A knowledge of FORTRAN programming, mathematics through differential and integral calculus, and GEGN467
+- GEGN585L: 
+- GEGN669: “Independent Study” form must be completed and submitted to the Registrar
+- GEGN681 (mixed): 
+- GEOC407: none.
+- GEOL102: 
+- GEOL440: 
+- GEOL526: GEOL321 and GEGN307
+- GEOL527: Basic geology knowledge; Consent from instructor
+- GEOL550: none.
+- GEOL555: GEOL501 or GEOL314
+- GEOL556: (need previous field experience such as a field course, and a course in structural geology and one in earth materials)
+- GEOL642: GEOL321, GEGN206
+- GEOL643: Undergraduate degree in geology and GEGN316 or equivalent
+- GOGN501: 
+- GOGN502: Introductory courses in geology, rock mechanics, and soil mechanics
+- GOGN503: Introductory Rock Mechanics
+- GOGN625: GOGN501, GOGN502, GOGN503
+- GPGN545: 
+- GPGN573: PHGN200 and MATH225
+- HASS111: 
+- HASS550: 
+- HASS601: “Independent Study” form must be completed and submitted to the Registrar
+- HNRS425: 
+- HNRS430: HNRS305: Explorations in Modern America and HNRS315: Explorations in The Modern World
 - HNRS435: HNRS305: Explorations in Modern America and HNRS315: Explorations in the Modern World
 - HNRS440: HNRS305: Explorations in Modern America and HNRS315: Explorations in the Modern World
 - HNRS445: HNRS305: Explorations in Modern America and HNRS315: Explorations in the Modern World
 - HNRS450: HNRS305: Explorations in Modern America and HNRS315: Explorations in the Modern World
-- MAED464: Completed/concurrent 3 credits of SCED 262; completed/concurrent with MAED 405 or MAED 425
-- MAED465: Completed MAED 464; completed/concurrent with SCED 333, SCED 363, MAED 405, and MAED 425
-- MAED564: Completed/concurrent 3 credits of SCED 562; completed/concurrent with MAED 505 or MAED 525
-- MAED565: Completed MAED 564; completed/concurrent with SCED 333, SCED 363, MAED 505, and MAED 425
-- MATH111: precalculus
-- MATH470: MATH431, MATH455 or equivalent courses and familiarity with MATLAB
-- MATH552: Graduate level mathematical maturity and confidence to build on elements from (computational) linear algebra, functional analysis, and Gauss
-- MATH559: Calculus and ordinary differential equations
-- MATH691: none. 1 hour seminar; 1 semester hour. Repeatable for credit to a maximum of 12 hours.
+- MAED464: 
+- MAED465: Completed/concurrent 3 credits of SCED 262; completed/concurrent with MAED 405 or MAED 425
+- MAED564: 
+- MAED565: Completed/concurrent 3 credits of SCED 562; completed/concurrent with MAED 505 or MAED 525
+- MATH111: 
+- MATH470: MATH213 and MATH225
+- MATH552: MATH332, MATH 307
+- MATH559: MATH332 or MATH342 and MATH455
+- MATH691: “Independent Study” form must be completed and submitted to the Registrar
 - MATH692: none. 1 hour seminar; 1 semester hour. Repeatable for credit to a maximum of 12 hours.
-- MATH693: none. 1 hour seminar; 1 semester hour.
-- MEGN340: Second semester sophomore status and a cumulative grade-point average of at least 2.00
-- MEGN435: MEGN315 with a grade C- or better, MEGN330 with grade of C- or better
-- MEGN455: Best taken just before Senior Design or as a co-req with Senior Design I
-- MEGN501: EENG281 or equivalent, and MATH201 or equivalent, Graduate student status
-- MEGN503: Graduate standing
-- MEGN532: Graduate Student Standing
-- MEGN572: Basic understanding of (i) Thermodynamics and (ii) Transport Phenomena, (ie), mass, momentum, and heat transfer; familiarity with one of the
-- MEGN651: MEGN502 and MEGN551 are recommended
-- MLGN536: CHGN430, ChEN415, MLGN530
-- MLGN561: ChEN307 or ChEN308 or MTGN461
-- MLGN569: EGGN371 or ChEN357 or MTGN351 Thermodynamics I, MATH225 Differential Equations
-- MLGN583: B.S. in metallurgy, chemistry, chemical engineering, physics
-- MLGN591: 300 level thermodynamics, multivariable calculus and differential equations, introductory college chemistry, and introductory materials scie
-- MLGN592: 300 level thermodynamics, multivariable calculus and differential equations, introductory college chemistry, and introductory materials scie
-- MLGN593: 300 level thermodynamics, multivariable calculus and differential equations, introductory college chemistry, and introductory materials scie
-- MNGN309: MNGN210 and MSHA part 48, 40-hour training and 5000.23 certificate
-- MNGN340: Second semester sophomore status and a cumulative grade-point average of at least 2.00
-- MNGN407: CEEN241, concurrent enrollment
-- MNGN421: MNGN321, concurrent enrollment
-- MNGN433: MNGN312, MNGN314, and Senior or graduate status
-- MNGN440: MNGN427, senior or graduate status
-- MNGN490: EBGN330 and one of either ENGY310, ENGY320, or ENGY340
-- MNGN501: Senior or graduate status
-- MNGN511: none. Lecture, consultation, lab, and assigned reading; 2 to 4 semester hours.
-- MNGN517: Underground Mine Design (e.g., MNGN314)
-- MNGN521: Graduate student or senior in good standing
-- MNGN523: none. 2 to 4 semester hours. Repeatable for credit under different titles.
-- MNGN526: Graduate standing
-- MNGN530: Any course in computer programming
-- MNGN532: Graduate or Senior in good- standing
-- MNGN537: Graduate or Senior in good-standing
-- MNGN538: MATH323 or equivalent course in statistics; graduate or senior status
-- MNGN550: Graduate standing
-- MNGN552: Senior or graduate status
-- MNGN572A: None Co-requisite: None.
-- MNGN581: BSc in Mining Engineering, Geosciences, or related fields
-- MNGN582: BSc in Mining Engineering, Civil Engineering, Geosciences or related engineering fields
-- MNGN590: Senior or graduate status
-- MTGN199: Selection of topic; Independent Study Form must be completed and submitted to Registrar
-- MTGN299: Selection of topic; Independent Study Form must be completed and submitted to Registrar
-- MTGN399: Selection of topic; Independent Study Form must be completed and submitted to Registrar
-- MTGN464: MTGN281 and, CEEN311 or MEGN212, MTGN348
-- MTGN499: Selection of topic; Independent Study Form must be completed and submitted to Registrar
-- MTGN511: Selection of topic
+- MATH693: none. 1 hour seminar; 1 semester hour. Repeatable for credit to a maximum of 12 hours.
+- MEGN340: CEEN241
+- MEGN435: MEGN212 OR CEEN311; MEGN315; MEGN330 (C- or better)
+- MEGN455: MEGN315 or PHGN350
+- MEGN501: 
+- MEGN503: 
+- MEGN532: MEGN391
+- MEGN572: 
+- MEGN651: 
+- MLGN536: none.
+- MLGN561: 
+- MLGN569: MTGN445 or MLGN505
+- MLGN583: 
+- MLGN591: B.S. in metallurgy, chemistry, chemical engineering, physics
+- MLGN592: 300 level thermodynamics, multivariable calculus and differential equations, introductory college chemistry, and introductory materials science courses or consent of instructor
+- MLGN593: 300 level thermodynamics, multivariable calculus and differential equations, introductory college chemistry, and introductory materials science courses or consent of instructor
+- MNGN309: MNGN210
+- MNGN340: 
+- MNGN407: MNGN321
+- MNGN421: MNGN321
+- MNGN433: MNGN322, MNGN323
+- MNGN440: MNGN312, MNGN314
+- MNGN490: MNGN312, MNGN 314
+- MNGN501: "Independent Study" form must be completed and submitted to the Registrar
+- MNGN511: MATH111, MATH112
+- MNGN517: MNGN210
+- MNGN521: MNGN321
+- MNGN523: 
+- MNGN526: 
+- MNGN530: 
+- MNGN532: MTGN351
+- MNGN537: MNGN433
+- MNGN538: Graduate or Senior in good-standing
+- MNGN550: EGGN351, EGGN320, GEOC408
+- MNGN552: 
+- MNGN572A: 
+- MNGN581: None.
+- MNGN582: BSc in Mining Engineering, Geosciences, or related fields
+- MNGN590: MNGN427 or EBGN504 or equivalent
+- MTGN199: none
+- MTGN299: none
+- MTGN399: none
+- MTGN464: CEEN301, CEEN302, and CHGN403
+- MTGN499: 
+- MTGN511: MTGN315, MTGN310
 - MTGN512: Selection of topic
-- MTGN526: Graduate Status
-- MTGN528: Graduate or Senior in good-standing
-- MTGN532: Graduate or Senior in good- standing
-- MTGN553: MTGN543 or concurrent enrollment
-- MTGN564: MTGN445/MLGN505, 2 hours lecture; 3 hours lab, 3 semester hours
-- MTGN593: Graduate or Senior in good-standing
-- MTGN598: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles. MTGN598LA. SPECIAL TOPICS LAB. 1-3 Semester Hr.
-- NUGN586: NUGN585 (taken in the same academic year)
-- PEGN315: PEGN308 (grade C or better)
-- PEGN340: Second semester sophomore status and a cumulative grade-point average of at least 2.00
-- PEGN513: PEGN424 or equivalent, strong reservoir engineering background, and basic computer programming knowledge
-- PEGN608: PEGN 424, 3 hours lecture; 3 semester hours
-- PEGN614: PEGN513 or equivalent, strong reservoir engineering background, and basic computer programming knowledge
+- MTGN526: 
+- MTGN528: ESGN500 and ESGN504
+- MTGN532: MTGN351
+- MTGN553: MTGN451
+- MTGN564: none.
+- MTGN593: none.
+- MTGN598: Graduate or Senior in good-standing
+- NUGN586: NUGN510, NUGN520
+- PEGN315: PEGN308 (C or better), CHGN209 (C or better)
+- PEGN340: PEGN315, PEGN419, GEOL308, and GEOL315
+- PEGN513: PEGN423
+- PEGN608: PEGN426
+- PEGN614: PEGN 424, 3 hours lecture; 3 semester hours
 - PEGN620: PEGN513 or equivalent, strong reservoir engineering background, and basic computer programming knowledge
 - PEGN624: PEGN513 or equivalent, strong reservoir engineering background, and basic computer programming knowledge
-- PHGN300 (mixed): PHGN200; Concurrent enrollment in MATH225
+- PHGN300 (mixed): Independent Study form must be completed and submitted to the Registrar
 - PHGN310 (mixed): PHGN200; Concurrent enrollment in MATH225
-- PHGN340: Second semester sophomore status and a cumulative grade-point average of at least 2.00
-- PHGN450: Introductory-level knowledge of C, Fortran, or Basic; and PHGN311
-- PHGN519: MATH332 (linear algebra) or an equivalent linear algebra course
-- PHGN522: Equivalent of an undergraduate Modern Physics course covering basic quantum mechanics
-- ROBO509 (mixed): SPRS501; Desired, some background in either aerospace engineering, mechanical engineering, electrical engineering, computer science, or plan
-- ROBO517: Undergraduate level knowledge of linear algebra, statistics, and a programming language
-- ROBO533: Graduate standing; Recommended: CSCI 406 (Algorithms); CSCI 358 (Discrete Mathematics)
-- ROBO537: Familiarity with: - Linear algebra, calculus, probability, and statistics - Linux, Algorithms, C++, and Python - Computer vision
-- ROBO576: Data Structures, Probability and Statistics or equivalent
-- SCED464: Completed/concurrent 3 credits of SCED 262; completed/concurrent with SCED 415 or SCED 445
-- SCED465: Completed SCED 464; completed/concurrent with SCED 333, SCED 363, SCED 415, and SCED 445
-- SCED564: Completed/concurrent 3 credits of SCED 562; completed/concurrent with SCED 515 or SCED 545
-- SCED565: Completed SCED 564; completed/concurrent with SCED 333, SCED 363, SCED 515, and SCED 545
-- SPRS501: Working knowledge of physical sciences, engineering fields, or economics at an advanced undergraduate level, with basic numerical analysis s
-- SPRS508: Space Resources Fundamentals (SPRS 501); SPRS 507 is recommended but not required; students planning to take both this course and SPRS 507 s
-- SYGN550: Graduate standing
+- PHGN340: PHGN315
+- PHGN450: PHGN440 or MLGN502
+- PHGN519: 
+- PHGN522: PHGN520
+- ROBO509 (mixed): 
+- ROBO517: 
+- ROBO533: 
+- ROBO537: 
+- ROBO576: 
+- SCED464: 
+- SCED465: Completed/concurrent 3 credits of SCED 262; completed/concurrent with SCED 415 or SCED 445
+- SCED564: 
+- SCED565: Completed/concurrent 3 credits of SCED 562; completed/concurrent with SCED 515 or SCED 545
+- SPRS501: 
+- SPRS508: SPRS501
+- SYGN550: 
 
 ## Corequisites not expressible as a plain list (OR or free text), left empty (34)
 
@@ -508,4 +508,685 @@ Regenerated every run; do not edit by hand. Rules: `data/CONFLICT-LOG.md`, secti
 - CBEN298: 1-6 -> 6
 - CBEN299: 1-6 -> 6
 - CBEN340: 1-3 -> 3
-- ... and 456 more (same pattern)
+- CBEN350: 1-3 -> 3
+- CBEN351: 1-3 -> 3
+- CBEN398: 0-6 -> 6
+- CBEN399: 1-6 -> 6
+- CBEN418: 0-3 -> 3
+- CBEN435: 0-3 -> 3
+- CBEN450: 1-3 -> 3
+- CBEN451: 1-3 -> 3
+- CBEN497: 0-15 -> 15
+- CBEN498: 1-6 -> 6
+- CBEN499: 1-6 -> 6
+- CBEN513: 1-3 -> 3
+- CBEN535: 0-3 -> 3
+- CBEN598: 0-6 -> 6
+- CBEN599: 0.5-6 -> 6
+- CBEN608: 1-3 -> 3
+- CBEN609: 1-3 -> 3
+- CBEN699: 0.5-6 -> 6
+- CBEN707: 1-15 -> 15
+- CEEN198: 1-6 -> 6
+- CEEN199: 1-6 -> 6
+- CEEN298: 0-6 -> 6
+- CEEN299: 1-6 -> 6
+- CEEN398: 0-6 -> 6
+- CEEN399: 1-6 -> 6
+- CEEN498: 1-6 -> 6
+- CEEN499: 1-6 -> 6
+- CEEN550: 0-3 -> 3
+- CEEN598: 0-6 -> 6
+- CEEN599: 0.5-6 -> 6
+- CEEN599AA: 0.5-6 -> 6
+- CEEN599AB: 0.5-6 -> 6
+- CEEN599AC: 0.5-6 -> 6
+- CEEN599AD: 0.5-6 -> 6
+- CEEN599AE: 0.5-6 -> 6
+- CEEN599AF: 0.5-6 -> 6
+- CEEN599AG: 0.5-6 -> 6
+- CEEN599AH: 0.5-6 -> 6
+- CEEN599AI: 0.5-6 -> 6
+- CEEN599AJ: 0.5-6 -> 6
+- CEEN599AK: 0.5-6 -> 6
+- CEEN599AL: 0.5-6 -> 6
+- CEEN599AM: 0.5-6 -> 6
+- CEEN599AN: 0.5-6 -> 6
+- CEEN599AO: 0.5-6 -> 6
+- CEEN599AP: 0.5-6 -> 6
+- CEEN698: 0-6 -> 6
+- CEEN699: 0.5-6 -> 6
+- CEEN707: 1-15 -> 15
+- CHGC598: 1-6 -> 6
+- CHGC599: 0.5-6 -> 6
+- CHGC698: 1-6 -> 6
+- CHGC699: 0.5-6 -> 6
+- CHGC707: 0.5-15 -> 15
+- CHGN198: 1-6 -> 6
+- CHGN198LA: 0-6 -> 6
+- CHGN198LB: 0-6 -> 6
+- CHGN199: 1-6 -> 6
+- CHGN1XX: 0-6 -> 6
+- CHGN298: 1-6 -> 6
+- CHGN299: 1-6 -> 6
+- CHGN353: 0-4 -> 4
+- CHGN396: 1-5 -> 5
+- CHGN398: 1-6 -> 6
+- CHGN398LA: 1-6 -> 6
+- CHGN399: 1-6 -> 6
+- CHGN495: 1-5 -> 5
+- CHGN496A: 0-16 -> 16
+- CHGN497: 1-6 -> 6
+- CHGN498: 1-6 -> 6
+- CHGN499: 0.5-6 -> 6
+- CHGN597: 0-15 -> 15
+- CHGN598: 0-6 -> 6
+- CHGN599: 0.5-6 -> 6
+- CHGN698: 0-6 -> 6
+- CHGN699: 0.5-6 -> 6
+- CHGN707: 1-15 -> 15
+- CSCI198: 1-6 -> 6
+- CSCI199: 1-6 -> 6
+- CSCI1XX: 1-6 -> 6
+- CSCI298: 1-6 -> 6
+- CSCI299: 1-6 -> 6
+- CSCI340: 0-3 -> 3
+- CSCI398: 1-6 -> 6
+- CSCI399: 1-6 -> 6
+- CSCI436: 0-3 -> 3
+- CSCI498: 1-6 -> 6
+- CSCI499: 1-6 -> 6
+- CSCI597: 0-6 -> 6
+- CSCI598: 0-6 -> 6
+- CSCI599: 0.5-6 -> 6
+- CSCI698: 0-6 -> 6
+- CSCI699: 0.5-6 -> 6
+- CSCI700: 1-6 -> 6
+- CSCI707: 1-15 -> 15
+- CSED199: 1-6 -> 6
+- CSED299: 1-6 -> 6
+- CSED399: 1-6 -> 6
+- CSED465: 6-12 -> 12
+- CSED498: 0-6 -> 6
+- CSED499: 1-6 -> 6
+- CSED565: 6-12 -> 12
+- CSED598: 0-6 -> 6
+- CSED599: 1-6 -> 6
+- CSM198: 0-6 -> 6
+- CSM199: 0.5-6 -> 6
+- CSM298: 0-6 -> 6
+- CSM398: 0-6 -> 6
+- CSM497: 0-6 -> 6
+- CSM598: 0-6 -> 6
+- CSM888: 3-12 -> 12
+- CSM999: 0-16 -> 16
+- DSCI598: 0-6 -> 6
+- DSCI599: 0.5-6 -> 6
+- EBGN198: 1-6 -> 6
+- EBGN199: 0.5-6 -> 6
+- EBGN1XX: 1-6 -> 6
+- EBGN298: 1-6 -> 6
+- EBGN299: 1-6 -> 6
+- EBGN397: 1-6 -> 6
+- EBGN398: 1-6 -> 6
+- EBGN399: 1-6 -> 6
+- EBGN403: 1-4 -> 4
+- EBGN497: 0-6 -> 6
+- EBGN498: 0.5-6 -> 6
+- EBGN499: 1-6 -> 6
+- EBGN598: 0-6 -> 6
+- EBGN599: 0.5-6 -> 6
+- EBGN698: 0-6 -> 6
+- EBGN699: 0.5-6 -> 6
+- EBGN707: 1-15 -> 15
+- EDNS198: 1-6 -> 6
+- EDNS199: 1-6 -> 6
+- EDNS298: 1-6 -> 6
+- EDNS299: 1-6 -> 6
+- EDNS398: 1-6 -> 6
+- EDNS399: 1-6 -> 6
+- EDNS492: 0-3 -> 3
+- EDNS497: 0-6 -> 6
+- EDNS498: 0-6 -> 6
+- EDNS499: 1-6 -> 6
+- EDNS597: 0-6 -> 6
+- EDNS598: 0-6 -> 6
+- EDNS599: 0.5-6 -> 6
+- EDNS707: 1-15 -> 15
+- EENG198: 1-6 -> 6
+- EENG199: 1-6 -> 6
+- EENG298: 1-6 -> 6
+- EENG299: 0.5-6 -> 6
+- EENG395: 1-3 -> 3
+- EENG398: 0-6 -> 6
+- EENG399: 1-6 -> 6
+- EENG495: 1-3 -> 3
+- EENG497: 0-15 -> 15
+- EENG498: 1-6 -> 6
+- EENG499: 1-6 -> 6
+- EENG597: 0-6 -> 6
+- EENG598: 0-6 -> 6
+- EENG599: 0.5-6 -> 6
+- EENG698: 0-6 -> 6
+- EENG699: 0.5-6 -> 6
+- EENG707: 1-15 -> 15
+- ENGY198: 1-6 -> 6
+- ENGY298: 1-6 -> 6
+- ENGY398: 0-6 -> 6
+- ENGY399: 0.5-6 -> 6
+- ENGY497: 0-6 -> 6
+- ENGY498: 0-6 -> 6
+- ENGY499: 0.5-6 -> 6
+- ENGY598: 0-6 -> 6
+- ENGY599: 0.5-6 -> 6
+- ENGY707: 1-15 -> 15
+- FEGN599: 0.5-6 -> 6
+- GEGN198: 1-6 -> 6
+- GEGN199: 1-6 -> 6
+- GEGN298: 1-6 -> 6
+- GEGN299: 1-6 -> 6
+- GEGN340: 1-3 -> 3
+- GEGN398: 1-6 -> 6
+- GEGN399: 1-6 -> 6
+- GEGN438: 0-4 -> 4
+- GEGN475: 0-3 -> 3
+- GEGN497: 0-15 -> 15
+- GEGN498: 1-6 -> 6
+- GEGN499: 1-6 -> 6
+- GEGN575: 0-3 -> 3
+- GEGN578: 1-3 -> 3
+- GEGN580: 0-3 -> 3
+- GEGN590: 1-6 -> 6
+- GEGN592: 1-6 -> 6
+- GEGN598: 0-6 -> 6
+- GEGN599: 0.5-6 -> 6
+- GEGN669: 1-2 -> 2
+- GEGN698: 0-6 -> 6
+- GEGN699: 0.5-6 -> 6
+- GEGN707: 1-15 -> 15
+- GEOL198: 1-6 -> 6
+- GEOL199: 1-6 -> 6
+- GEOL298: 1-6 -> 6
+- GEOL299: 1-6 -> 6
+- GEOL314: 0-4 -> 4
+- GEOL398: 1-6 -> 6
+- GEOL399: 1-6 -> 6
+- GEOL443: 1-3 -> 3
+- GEOL497: 0-15 -> 15
+- GEOL498: 1-6 -> 6
+- GEOL499: 1-6 -> 6
+- GEOL501: 0-4 -> 4
+- GEOL597: 0-15 -> 15
+- GEOL598: 0-3 -> 3
+- GEOL598LA: 0-6 -> 6
+- GEOL598LB: 0-6 -> 6
+- GEOL599: 0.5-6 -> 6
+- GEOL642: 1-3 -> 3
+- GEOL643: 1-3 -> 3
+- GEOL698: 0-6 -> 6
+- GEOL699: 0.5-6 -> 6
+- GEOL707: 1-15 -> 15
+- GPGN198: 1-6 -> 6
+- GPGN199: 1-6 -> 6
+- GPGN298: 1-6 -> 6
+- GPGN299: 1-6 -> 6
+- GPGN398: 1-6 -> 6
+- GPGN399: 1-6 -> 6
+- GPGN498: 1-6 -> 6
+- GPGN499: 1-6 -> 6
+- GPGN558: 0-3 -> 3
+- GPGN574: 0-3 -> 3
+- GPGN581: 0-1 -> 1
+- GPGN597: 0-12 -> 12
+- GPGN598: 0-6 -> 6
+- GPGN599: 0.5-6 -> 6
+- GPGN698: 0-6 -> 6
+- GPGN699: 0.5-6 -> 6
+- GPGN707: 1-15 -> 15
+- HASS198: 1-6 -> 6
+- HASS199: 1-6 -> 6
+- HASS1XX: 0-6 -> 6
+- HASS298: 1-6 -> 6
+- HASS299: 1-6 -> 6
+- HASS2XX: 0-6 -> 6
+- HASS398: 1-6 -> 6
+- HASS399: 1-6 -> 6
+- HASS498: 1-6 -> 6
+- HASS499: 1-6 -> 6
+- HASS598: 0-6 -> 6
+- HASS599: 0.5-6 -> 6
+- HASS601: 2-3 -> 3
+- HASS698: 0-6 -> 6
+- HASS699: 0.5-6 -> 6
+- HASS707: 1-15 -> 15
+- HNRS155: 1-3 -> 3
+- HNRS198: 0-6 -> 6
+- HNRS199: 1-6 -> 6
+- HNRS255: 1-3 -> 3
+- HNRS298: 1-6 -> 6
+- HNRS299: 1-6 -> 6
+- HNRS355: 1-3 -> 3
+- HNRS398: 1-6 -> 6
+- HNRS399: 1-6 -> 6
+- HNRS405: 1-3 -> 3
+- HNRS455: 1-3 -> 3
+- HNRS497: 0-6 -> 6
+- HNRS498: 1-6 -> 6
+- HNRS499: 1-6 -> 6
+- LICM198: 0.5-6 -> 6
+- LICM298: 0.5-6 -> 6
+- LIFL198: 1-6 -> 6
+- LIFL199: 1-6 -> 6
+- LIFL1XX: 0-12 -> 12
+- LIFL298: 1-6 -> 6
+- LIFL299: 0-6 -> 6
+- LIFL2XX: 0-12 -> 12
+- LIFL398: 1-6 -> 6
+- LIFL399: 1-6 -> 6
+- LIFL3XX: 0-12 -> 12
+- LIFL498: 1-6 -> 6
+- LIFL499: 1-6 -> 6
+- LIMU198: 0-6 -> 6
+- LIMU199: 1-6 -> 6
+- LIMU298: 1-6 -> 6
+- LIMU299: 1-6 -> 6
+- LIMU398: 1-6 -> 6
+- LIMU399: 1-6 -> 6
+- LIMU498: 1-6 -> 6
+- LIMU499: 1-6 -> 6
+- MAED465: 6-12 -> 12
+- MAED498: 0-6 -> 6
+- MAED562: 1-3 -> 3
+- MAED565: 6-12 -> 12
+- MAED598: 0-6 -> 6
+- MAED599: 0.5-6 -> 6
+- MATH198: 0-6 -> 6
+- MATH199: 1-6 -> 6
+- MATH1XX: 1-6 -> 6
+- MATH298: 1-6 -> 6
+- MATH299: 1-6 -> 6
+- MATH398: 0-6 -> 6
+- MATH399: 0.5-6 -> 6
+- MATH491: 1-3 -> 3
+- MATH498: 1-6 -> 6
+- MATH499: 0.5-6 -> 6
+- MATH598: 0-6 -> 6
+- MATH599: 0.5-6 -> 6
+- MATH698: 0-6 -> 6
+- MATH699: 0.5-6 -> 6
+- MATH707: 1-15 -> 15
+- MEGN298: 1-6 -> 6
+- MEGN299: 1-6 -> 6
+- MEGN398: 0-6 -> 6
+- MEGN399: 1-6 -> 6
+- MEGN497: 0-15 -> 15
+- MEGN498: 1-6 -> 6
+- MEGN499: 1-6 -> 6
+- MEGN598: 0-6 -> 6
+- MEGN599: 0.5-6 -> 6
+- MEGN698: 0-6 -> 6
+- MEGN699: 0.5-6 -> 6
+- MEGN707: 1-15 -> 15
+- MLGN535: 0-3 -> 3
+- MLGN597: 0.5-6 -> 6
+- MLGN598: 0-6 -> 6
+- MLGN599: 0.5-6 -> 6
+- MLGN698: 0-6 -> 6
+- MLGN699: 0.5-6 -> 6
+- MLGN707: 1-15 -> 15
+- MNGN198: 1-6 -> 6
+- MNGN199: 1-6 -> 6
+- MNGN298: 0-6 -> 6
+- MNGN299: 1-6 -> 6
+- MNGN340: 0-3 -> 3
+- MNGN398: 1-6 -> 6
+- MNGN399: 1-6 -> 6
+- MNGN444: 0-3 -> 3
+- MNGN498: 1-6 -> 6
+- MNGN499: 1-6 -> 6
+- MNGN511: 2-4 -> 4
+- MNGN523: 2-4 -> 4
+- MNGN598: 0-6 -> 6
+- MNGN599: 0.5-6 -> 6
+- MNGN698: 0-6 -> 6
+- MNGN699: 0.5-6 -> 6
+- MNGN700: 1-6 -> 6
+- MNGN707: 1-15 -> 15
+- MSGN198: 1-6 -> 6
+- MSGN199: 1-6 -> 6
+- MSGN298: 1-6 -> 6
+- MSGN299: 1-6 -> 6
+- MSGN398: 1-6 -> 6
+- MSGN399: 1-6 -> 6
+- MSGN498: 1-6 -> 6
+- MSGN499: 1-6 -> 6
+- MSGN599: 0.5-6 -> 6
+- MTGN198: 1-3 -> 3
+- MTGN199: 1-3 -> 3
+- MTGN219: 0-2 -> 2
+- MTGN298: 0-3 -> 3
+- MTGN299: 1-3 -> 3
+- MTGN340: 1-3 -> 3
+- MTGN398: 0-3 -> 3
+- MTGN399: 1-3 -> 3
+- MTGN435: 0-3 -> 3
+- MTGN498: 0-3 -> 3
+- MTGN498LA: 1-3 -> 3
+- MTGN498LB: 1-3 -> 3
+- MTGN498LC: 1-3 -> 3
+- MTGN499: 1-6 -> 6
+- MTGN511: 1-3 -> 3
+- MTGN512: 1-3 -> 3
+- MTGN535: 0-3 -> 3
+- MTGN598: 0-6 -> 6
+- MTGN598LA: 1-3 -> 3
+- MTGN599: 0.5-6 -> 6
+- MTGN698: 0-6 -> 6
+- MTGN699: 0.5-6 -> 6
+- MTGN700: 1-6 -> 6
+- MTGN707: 1-15 -> 15
+- NUGN598: 0-6 -> 6
+- NUGN599: 0.5-6 -> 6
+- NUGN698: 0-6 -> 6
+- NUGN699: 0.5-6 -> 6
+- NUGN707: 1-15 -> 15
+- ORWE498: 0-6 -> 6
+- ORWE598: 0-6 -> 6
+- ORWE599: 0.5-6 -> 6
+- PAGN198: 0.5-6 -> 6
+- PAGN1XX: 0-4 -> 4
+- PAGN298: 0.5-6 -> 6
+- PAGN299: 0.5-6 -> 6
+- PAGN398: 0.5-6 -> 6
+- PAGN498: 0.5-6 -> 6
+- PEGN198: 1-6 -> 6
+- PEGN199: 1-6 -> 6
+- PEGN298: 1-6 -> 6
+- PEGN299: 1-6 -> 6
+- PEGN308: 0-3 -> 3
+- PEGN340: 0-3 -> 3
+- PEGN398: 0-6 -> 6
+- PEGN398LA: 0-6 -> 6
+- PEGN399: 1-6 -> 6
+- PEGN438: 0-3 -> 3
+- PEGN497: 0-15 -> 15
+- PEGN498: 1-6 -> 6
+- PEGN499: 1-6 -> 6
+- PEGN598: 0-6 -> 6
+- PEGN598LA: 0-6 -> 6
+- PEGN599: 0.5-6 -> 6
+- PEGN698: 0-6 -> 6
+- PEGN699: 0.5-6 -> 6
+- PEGN707: 1-15 -> 15
+- PHGN198: 1-6 -> 6
+- PHGN199: 1-6 -> 6
+- PHGN1XX: 0-6 -> 6
+- PHGN215: 0-4 -> 4
+- PHGN298: 1-6 -> 6
+- PHGN299: 1-6 -> 6
+- PHGN340: 1-3 -> 3
+- PHGN398: 1-6 -> 6
+- PHGN399: 1-6 -> 6
+- PHGN435: 0-3 -> 3
+- PHGN497: 0-6 -> 6
+- PHGN498: 1-6 -> 6
+- PHGN499: 0.5-6 -> 6
+- PHGN535: 0-3 -> 3
+- PHGN597: 0-6 -> 6
+- PHGN598: 0-6 -> 6
+- PHGN599: 0.5-6 -> 6
+- PHGN698: 0-6 -> 6
+- PHGN699: 0.5-6 -> 6
+- PHGN707: 1-15 -> 15
+- ROBO298: 0-6 -> 6
+- ROBO598: 0-3 -> 3
+- ROBO599: 0.5-6 -> 6
+- ROBO707: 1-15 -> 15
+- SCED199: 1-6 -> 6
+- SCED262: 1-3 -> 3
+- SCED299: 1-6 -> 6
+- SCED398: 0-6 -> 6
+- SCED465: 6-12 -> 12
+- SCED498: 0-6 -> 6
+- SCED499: 0.5-6 -> 6
+- SCED562: 1-3 -> 3
+- SCED565: 6-12 -> 12
+- SCED598: 0-6 -> 6
+- SCED599: 0.5-6 -> 6
+- SPRS498: 0-6 -> 6
+- SPRS598: 0-6 -> 6
+- SPRS599: 0.5-6 -> 6
+- SPRS707: 1-15 -> 15
+- SYGN398: 1-6 -> 6
+- SYGN498: 1-6 -> 6
+- SYGN588: 1-6 -> 6
+- SYGN589: 1-6 -> 6
+- SYGN590: 1-6 -> 6
+- SYGN598: 0-6 -> 6
+- SYGN599: 0-6 -> 6
+
+## Grade minimums dropped from prerequisites (the data format has no grade field) (67)
+
+- CBEN307: `grade of C- or better in` (full text: MATH225, grade of C- or better in CBEN201)
+- CBEN314: `with a grade of C- or better` (full text: MATH225, CBEN307 with a grade of C- or better)
+- CBEN357: `grade of C- or better in` (full text: CBEN210 (or equivalent), MATH225, grade of C- or better in CBEN201)
+- CBEN375: `grade of C- or better in` (full text: grade of C- or better in CBEN357)
+- CHGN122: `Grade of C- or better in` (full text: Grade of C- or better in CHGN121)
+- CHGN125: `Grade of C- or better in` (full text: Grade of C- or better in CHGN121)
+- CHGN221: `Grade of C- or better in` (full text: Grade of C- or better in CHGN122 or CHGN125)
+- CHGN222: `Grade of C- or better in` (full text: Grade of C- or better in CHGN221)
+- CHGN323: `Grade of C- or better in` (full text: Grade of C- or better in CHGN222, CHGN224)
+- CHGN335: `with a grade of C- or better; with a grade of C- or better` (full text: CHGN122 with a grade of C- or better or CHGN125 with a grade of C- or better)
+- CHGN336: `with a grade of C- or better; with a grade of C- or better` (full text: CHGN221, CHGN122 with a grade of C- or better or CHGN125 with a grade of C- or better)
+- CHGN337: `C- or better` (full text: CHGN221 (C- or better), CHGN 223)
+- CHGN351: `with a grade of C- or better` (full text: MATH225, PHGN200, CHGN209 with a grade of C- or better or CBEN210)
+- CSCI220: `with a C- or better` (full text: CSCI200 with a C- or better, CSCI358 or MATH334)
+- CSCI262: `with a grade of C- or higher; with a grade of C- or higher` (full text: CSCI261 with a grade of C- or higher or CSCI200 with a grade of C- or higher)
+- CSCI306: `with grade of C- or higher; with grade of C- or higher; with grade of C- or higher` (full text: CSCI210 with grade of C- or higher, CSCI220 with grade of C- or higher or CSCI262 with grade of C- or higher)
+- CSCI403: `with a grade of C- or higher` (full text: CSCI200 with a grade of C- or higher)
+- CSCI404: `with a grade of C- or higher; with a grade of C- or higher` (full text: (CSCI220 with a grade of C- or higher or CSCI262 with a grade of C- or higher) and (MATH201 or MATH334))
+- CSCI406: `with a grade of C- or higher; with a grade of C- or higher` (full text: CSCI220 with a grade of C- or higher or CSCI262 with a grade of C- or higher, MATH213 or MATH223, MATH300 or MATH358 or CSCI358)
+- CSCI413: `with a grade of C- or higher` (full text: CSCI 200 with a grade of C- or higher and (MATH 201 OR MATH 334))
+- CSCI440: `with a grade of C- or higher; with a grade of C- or higher` (full text: CSCI220 with a grade of C- or higher or CSCI262 with a grade of C- or higher, CSCI341)
+- CSCI441: `with a grade of C- or higher; with a grade of C- or higher` (full text: CSCI220 with a grade of C- or higher or CSCI262 with a grade of C- or higher, MATH332)
+- CSCI442: `with a grade of C- or higher; with a grade of C- or higher` (full text: (CSCI 220 with a grade of C- or higher OR CSCI 262 with a grade of C- or higher) AND CSCI341)
+- CSCI448: `with a grade of C- or higher` (full text: CSCI306 with a grade of C- or higher)
+- DSCI403: `with a grade of C- or higher` (full text: CSCI128 with a grade of C- or higher, GPGN268 or MATH201 or MATH334)
+- EENG284: `C- or better; C- or better` (full text: CSCI261 (C- or better) or CSCI200 (C- or better))
+- EENG307: `C- or better` (full text: EENG281 or EENG282 or PHGN215 (C- or better) and MATH225 or MATH235)
+- EENG310: `C- or better` (full text: EENG281 or EENG282 (C- or better), MATH225 or MATH235)
+- EENG386: `C- or better; C- or better` (full text: EENG281 (C- or better) or EENG282 (C- or better), and MATH225 or MATH235)
+- EENG389: `C- or better; C- or better` (full text: EENG281 (C- or better) or EENG282 (C- or better))
+- EENG391: `C- or better` (full text: EENG281 or EENG282 (C- or better), MATH225 or MATH235)
+- EENG423: `C- or better; C- or better; C- or better` (full text: EENG281 (C- or better) or EENG282 (C- or better), and EENG284 (C- or better))
+- HNRS115: `with a grade of C- or higher` (full text: HNRS105 with a grade of C- or higher)
+- HNRS120: `with a grade of C- or better` (full text: HNRS110 with a grade of C- or better)
+- MATH112: `Grade of C- or better in` (full text: Grade of C- or better in MATH111)
+- MATH122: `Grade of B- or better in` (full text: Grade of B- or better in MATH111)
+- MATH213: `Grade of C- or better in` (full text: Grade of C- or better in MATH112 or MATH122)
+- MATH223: `with a grade of B- or higher; with a grade of B- or higher` (full text: MATH112 with a grade of B- or higher or MATH122 with a grade of B- or higher)
+- MATH225: `Grade of C- or better in` (full text: Grade of C- or better in MATH112 or MATH122)
+- MATH235: `Grade of B- or better in` (full text: Grade of B- or better in MATH112 or MATH 113 or MATH122)
+- MEGN212: `C- or better` (full text: CEEN241 (C- or better))
+- MEGN261: `C- or better` (full text: MATH213 (C- or better))
+- MEGN300: `C- or better` (full text: MEGN200 (C- or better))
+- MEGN301: `C- or better; C- or better; C- or better` (full text: MEGN200 (C- or better), MEGN201 (C- or better), MEGN300 (C- or better))
+- MEGN315: `C- or better` (full text: CEEN241 (C- or better))
+- MEGN324: `C- or better; C- or better` (full text: MEGN212 (C- or better) or CEEN311 (C- or better))
+- MEGN351: `with a grade of C- or better; with a grade of C- or better` (full text: CEEN241 with a grade of C- or better or MNGN317 with a grade of C- or better)
+- MEGN381: `C- or better; C- or better` (full text: MEGN201 (C- or better) AND MEGN212 (C- or better) AND MTGN202)
+- MEGN412: `C- or better; C- or better` (full text: MEGN212 (C- or better) or CEEN311 (C- or better))
+- MEGN414: `C- or better` (full text: MEGN212 (C- or better))
+- MEGN416: `C- or better` (full text: MEGN315 (C- or better))
+- MEGN423: `C- or better` (full text: MEGN351 (C- or better))
+- MEGN430: `C- or better` (full text: MEGN212 OR CEEN311; MEGN315; MEGN330 (C- or better))
+- MEGN451: `C- or better` (full text: MEGN351(C- or better))
+- MEGN461: `C- or better; C- or better` (full text: MEGN351 (C- or better), MEGN261 (C- or better))
+- MEGN466: `with a grade of C- or better; with a grade of C- or better` (full text: MEGN351 with a grade of C- or better, MEGN261 with a grade of C- or better)
+- MEGN467: `with a grade of C- or better; with a grade of C- or better` (full text: MEGN351 with a grade of C- or better, MEGN261 with a grade of C- or better)
+- MEGN469: `with a grade of C- or better; with a grade of C- or better` (full text: MEGN261 with a grade of C- or better or CBEN357 with a grade of C- or better)
+- MEGN471: `C- or better; C- or better` (full text: MEGN351 (C- or better), MEGN261 (C- or better), and MATH307)
+- MEGN481: `C- or better; C- or better; C- or better` (full text: MEGN315 (C- or better) or PHGN350 (C- or better), and MEGN324 (C- or better))
+- MEGN533: `C or better` (full text: MEGN212 or CEEN311; MEGN315; MEGN330 (C or better))
+- ORWE598: `with a grade of C- or higher; with a grade of C- or higher` (full text: CSCI220 with a grade of C- or higher or CSCI262 with a grade of C- or higher, MATH213 or MATH223 or MATH224, MATH300 or MATH358 or CSCI358.)
+- PEGN311: `with a grade of C or higher` (full text: PEGN251 with a grade of C or higher, PEGN315, CEEN241)
+- PEGN312: `C or better; C or better` (full text: PEGN308 (C or better), CHGN209 (C or better))
+- PEGN411: `grade of C or better` (full text: PEGN251, PEGN308 (grade of C or better), PEGN311, and PEGN312)
+- PEGN419: `grade of C or better` (full text: GEOL315, PHGN200 (grade of C or better))
+- PHGN200: `Grade of C- or higher in` (full text: Grade of C- or higher in PHGN100)
+
+## Credit/repeat notes dropped from prerequisites (not course requirements) (153)
+
+- AMFG598: `Variable credit; 1 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit; 1 to 6 credit hours. Repeatable for credit under different titles.)
+- BIOL399: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- BIOL599: `"Independent Study" form must be completed and submitted to the Registrar` (full text: "Independent Study" form must be completed and submitted to the Registrar)
+- CBEN598: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- CBEN599: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- CBEN699: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- CEEN199: `Independent Study form must be completed and submitted to the Registrar` (full text: Independent Study form must be completed and submitted to the Registrar)
+- CEEN299: `Independent Study form must be completed and submitted to the Registrar` (full text: Independent Study form must be completed and submitted to the Registrar)
+- CEEN399: `Independent Study form must be completed and submitted to the Registrar` (full text: Independent Study form must be completed and submitted to the Registrar)
+- CEEN499: `Independent Study form must be completed and submitted to the Registrar` (full text: Independent Study form must be completed and submitted to the Registrar)
+- CEEN598: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- CEEN599: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- CEEN699: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- CHGC598: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- CHGC599: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- CHGC698: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- CHGC699: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- CHGN199: `"Independent Study" form must be completed and submitted to the Registrar` (full text: "Independent Study" form must be completed and submitted to the Registrar)
+- CHGN299: `"Independent Study" form must be completed and submitted to the Registrar` (full text: "Independent Study" form must be completed and submitted to the Registrar)
+- CHGN399: `"Independent Study" form must be completed and submitted to the Registrar` (full text: "Independent Study" form must be completed and submitted to the Registrar)
+- CHGN499: `"Independent Study" form must be completed and submitted to the Registrar` (full text: "Independent Study" form must be completed and submitted to the Registrar)
+- CHGN598: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- CHGN599: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- CHGN698: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- CHGN699: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- CSCI199: `"Independent Study" form must be completed and submitted to the Registrar` (full text: "Independent Study" form must be completed and submitted to the Registrar)
+- CSCI299: `"Independent Study" form must be completed and submitted to the Registrar` (full text: "Independent Study" form must be completed and submitted to the Registrar)
+- CSCI399: `"Independent Study" form must be completed and submitted to the Registrar` (full text: "Independent Study" form must be completed and submitted to the Registrar)
+- CSCI499: `"Independent Study" form must be completed and submitted to the Registrar` (full text: "Independent Study" form must be completed and submitted to the Registrar)
+- CSCI598: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- CSCI599: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- CSCI691: `Repeatable for credit to a maximum of 12 hours` (full text: none. 1 hour seminar; 1 semester hour. Repeatable for credit to a maximum of 12 hours.)
+- CSCI698: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- CSCI699: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- EBGN199: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- EBGN299: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- EBGN399: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- EBGN499: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- EBGN598: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- EBGN599: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- EBGN698: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- EBGN699: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- EDNS199: `Independent Study form must be completed and submitted to the Registrar` (full text: Independent Study form must be completed and submitted to the Registrar)
+- EDNS299: `Independent Study form must be completed and submitted to the Registrar` (full text: Independent Study form must be completed and submitted to the Registrar)
+- EDNS399: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- EDNS499: `Independent Study form must be completed and submitted to the Registrar` (full text: Independent Study form must be completed and submitted to the Registrar)
+- EDNS598: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- EENG199: `"Independent Study" form must be completed and submitted to the Registrar` (full text: "Independent Study" form must be completed and submitted to the Registrar)
+- EENG299: `Independent Study form must be completed and submitted to the Registrar` (full text: Independent Study form must be completed and submitted to the Registrar)
+- EENG399: `"Independent Study" form must be completed and submitted to the Registrar` (full text: "Independent Study" form must be completed and submitted to the Registrar)
+- EENG499: `"Independent Study" form must be completed and submitted to the Registrar` (full text: "Independent Study" form must be completed and submitted to the Registrar)
+- EENG598: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- EENG599: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- EENG698: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- EENG699: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- ENGY599: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- GEGN199: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- GEGN299: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- GEGN399: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- GEGN499: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- GEGN578: `Variable credit, 1-3 semester hours, depending on project | Offered on demand` (full text: none. Variable credit, 1-3 semester hours, depending on project. Offered on demand.)
+- GEGN598: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- GEGN599: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- GEGN698: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- GEGN699: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- GEOL199: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- GEOL399: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- GEOL499: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- GEOL598: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- GEOL599: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- GEOL698: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- GEOL699: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- GPGN199: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- GPGN299: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- GPGN399: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- GPGN499: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- GPGN598: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- GPGN599: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- GPGN698: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- GPGN699: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- HASS199: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- HASS299: `"Independent Study" form must be completed and submitted to the Registrar; HASS100` (full text: “Independent Study” form must be completed and submitted to the Registrar; HASS100)
+- HASS399: `"Independent Study" form must be completed and submitted to the Registrar; HASS100` (full text: “Independent Study” form must be completed and submitted to the Registrar; HASS100)
+- HASS499: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- HASS598: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- HASS599: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- HASS698: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- HASS699: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- LIFL199: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- LIFL299: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- LIFL399: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- LIFL499: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- LIMU199: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- LIMU299: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- LIMU399: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- LIMU499: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- MATH199: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- MATH299: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- MATH399: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- MATH499: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- MATH598: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- MATH599: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- MATH691: `Repeatable for credit to a maximum of 12 hours` (full text: none. 1 hour seminar; 1 semester hour. Repeatable for credit to a maximum of 12 hours.)
+- MATH692: `Repeatable for credit to a maximum of 12 hours` (full text: none. 1 hour seminar; 1 semester hour. Repeatable for credit to a maximum of 12 hours.)
+- MATH698: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- MATH699: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- MEGN299: `"Independent Study" form must be completed and submitted to the Registrar` (full text: "Independent Study" form must be completed and submitted to the Registrar)
+- MEGN399: `"Independent Study" form must be completed and submitted to the Registrar` (full text: "Independent Study" form must be completed and submitted to the Registrar)
+- MEGN499: `Independent Study form must be completed and submitted to the Registrar` (full text: Independent Study form must be completed and submitted to the Registrar)
+- MEGN698: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- MEGN699: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- MLGN598: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- MLGN599: `Independent Study form must be completed and submitted to the Registrar` (full text: Independent Study form must be completed and submitted to the Registrar)
+- MLGN698: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- MLGN699: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- MNGN199: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- MNGN299: `"Independent Study" form must be completed and submitted to the Registrar` (full text: "Independent Study" form must be completed and submitted to the Registrar)
+- MNGN399: `"Independent Study" form must be completed and submitted to the Registrar` (full text: "Independent Study" form must be completed and submitted to the Registrar)
+- MNGN499: `"Independent Study" form must be completed and submitted to the Registrar` (full text: "Independent Study" form must be completed and submitted to the Registrar)
+- MNGN523: `Repeatable for credit under different titles` (full text: none. 2 to 4 semester hours. Repeatable for credit under different titles.)
+- MNGN599: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- MNGN698: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- MNGN699: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- MSGN199: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- MSGN299: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- MSGN399: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- MSGN499: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- MSGN599: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- MTGN598: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles. MTGN598LA. SPECIAL TOPICS LAB. 1-3 Semester Hr.)
+- MTGN599: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- MTGN698: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- MTGN699: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- NUGN598: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- NUGN599: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- NUGN698: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- NUGN699: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- PAGN299: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- PEGN199: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- PEGN299: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- PEGN399: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- PEGN499: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- PEGN598: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- PEGN599: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- PEGN698: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- PEGN699: `"Independent Study" form must be completed and submitted to the Registrar` (full text: “Independent Study” form must be completed and submitted to the Registrar)
+- PHGN199: `Independent Study form must be completed and submitted to the Registrar` (full text: Independent Study form must be completed and submitted to the Registrar)
+- PHGN299: `Independent Study form must be completed and submitted to the Registrar` (full text: Independent Study form must be completed and submitted to the Registrar)
+- PHGN399: `Independent Study form must be completed and submitted to the Registrar` (full text: Independent Study form must be completed and submitted to the Registrar)
+- PHGN499: `Independent Study form must be completed and submitted to the Registrar` (full text: Independent Study form must be completed and submitted to the Registrar)
+- PHGN598: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- PHGN599: `Independent Study form must be completed and submitted to the Registrar` (full text: Independent Study form must be completed and submitted to the Registrar)
+- PHGN698: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
+- PHGN699: `Independent Study form must be completed and submitted to the Registrar` (full text: Independent Study form must be completed and submitted to the Registrar)

@@ -17,5 +17,5 @@ Everything the team collected for the planner. Nothing here is private.
 
 `json/minors.REVIEW.md` lists conflicts between the catalog PDFs and the course CSV, and rules the format cannot express.
 Rebuild minors/ASIs/forms: `python -I data/tools/build_minors_json.py` (needs `pypdf`).
-Rebuild courses: `python3 data/tools/build_courses_json.py` (standard library only); `json/courses.REVIEW.md` lists what it could not convert cleanly. Tests for the prerequisite parser: from `backend/`, `uv run pytest ../data/tools`.
+Rebuild courses: `python3 data/tools/build_courses_json.py` (standard library only); `json/courses.REVIEW.md` lists everything it could not convert cleanly, and `json/courses.dropped-info.csv` lists each grade minimum and note the format could not hold. Tests for the prerequisite parser: from `backend/`, `uv run pytest ../data/tools`.
 Load everything into the database (each person builds their own; the `.db` file is not in git): from `backend/`, `uv run load-data ../data`.

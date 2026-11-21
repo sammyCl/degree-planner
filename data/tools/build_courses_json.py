@@ -23,6 +23,7 @@ from prereq_parser import parse_corequisites, parse_prerequisites  # noqa: E402
 ROOT = Path(__file__).resolve().parents[2]
 CSV_DIR = ROOT / "data" / "Academic Catalog"
 OUT = ROOT / "data" / "json" / "courses.json"
+DROPPED = ROOT / "data" / "json" / "courses.dropped-info.csv"  # CSV, not JSON: the loader reads every .json under data/
 REVIEW = ROOT / "data" / "json" / "courses.REVIEW.md"
 CATALOG_YEAR = "2026-2027"
 
@@ -110,6 +111,8 @@ def merge(rows: list[dict], notes: dict[str, list[str]]) -> list[dict]:
 def build() -> tuple[list[dict], dict[str, list[str]], Counter]:
     notes: dict[str, list[str]] = defaultdict(list)
     stats: Counter = Counter()
+    dropped: list[dict] = []
+    notes["_dropped"] = dropped  # type: ignore[assignment]
     rows = load_rows()
     stats["csv rows"] = len(rows)
     merged = merge(rows, notes)
@@ -126,11 +129,14 @@ def build() -> tuple[list[dict], dict[str, list[str]], Counter]:
         if pre.fallback:
             whole = pre.requirement["type"] == "exception"
             stats["prerequisites kept as one exception (free text)" if whole else "prerequisites partly free text (mixed)"] += 1
-            notes["free-text prerequisites"].append(f"{code}{'' if whole else ' (mixed)'}: {' '.join(r['prerequisites'].split())[:140]}")
+            notes["free-text prerequisites"].append(f"{code}{'' if whole else ' (mixed)'}: {original}")
+        original = " ".join(r["prerequisites"].split())
         if pre.grade_dropped:
             stats["prerequisites with a grade minimum (grade dropped)"] += 1
+            dropped.append({"code": code, "kind": "grade minimum", "detail": "; ".join(pre.grade_texts), "original_prerequisites": original})
         if pre.notes_dropped:
             stats["credit/repeat notes dropped from prerequisites"] += 1
+            dropped.append({"code": code, "kind": "credit/repeat note", "detail": " | ".join(pre.notes_dropped), "original_prerequisites": original})
         if pre.requirement is None and r["prerequisites"].strip().lower() not in ("", "none", "none.", "n/a"):
             if not pre.notes_dropped:
                 notes["empty prerequisites"].append(f"{code}: {r['prerequisites'][:100]}")
@@ -191,10 +197,15 @@ def write_review(notes: dict[str, list[str]], stats: Counter) -> None:
     for key, title in caps.items():
         items = notes.get(key, [])
         out.append(f"\n## {title} ({len(items)})\n")
-        shown = items if key != "credit ranges" else items[:15]
-        out += [f"- {x}" for x in shown]
-        if len(shown) < len(items):
-            out.append(f"- ... and {len(items) - len(shown)} more (same pattern)")
+        out += [f"- {x}" for x in items]
+    dropped = notes.get("_dropped", [])
+    for kind, title in [
+        ("grade minimum", "Grade minimums dropped from prerequisites (the data format has no grade field)"),
+        ("credit/repeat note", "Credit/repeat notes dropped from prerequisites (not course requirements)"),
+    ]:
+        items = [d for d in dropped if d["kind"] == kind]
+        out.append(f"\n## {title} ({len(items)})\n")
+        out += [f"- {d['code']}: `{d['detail']}` (full text: {d['original_prerequisites']})" for d in items]
     REVIEW.write_text("\n".join(out) + "\n", encoding="utf-8")
 
 
@@ -202,9 +213,13 @@ def main() -> int:
     courses, notes, stats = build()
     OUT.write_text(json.dumps({"courses": courses}, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     write_review(notes, stats)
+    with open(DROPPED, "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=["code", "kind", "detail", "original_prerequisites"])
+        w.writeheader()
+        w.writerows(notes["_dropped"])  # type: ignore[arg-type]
     for k, v in sorted(stats.items()):
         print(f"{k}: {v}")
-    print(f"wrote {OUT.relative_to(ROOT)} and {REVIEW.relative_to(ROOT)}")
+    print(f"wrote {OUT.relative_to(ROOT)}, {REVIEW.relative_to(ROOT)} and {DROPPED.relative_to(ROOT)}")
     return 0
 
 
