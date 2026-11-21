@@ -1,6 +1,646 @@
 {
   "programs": [
     {
+      "program_id": "additive-manufacturing-ms",
+      "name": "Additive Manufacturing, M.S. (Non-Thesis)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Courses",
+          "kind": "all",
+          "courses": [
+            "AMFG501",
+            "AMFG521",
+            "AMFG531",
+            "AMFG541"
+          ]
+        },
+        {
+          "group_id": "required_electives",
+          "label": "Required Electives (choose two)",
+          "kind": "choose_credits",
+          "courses": [
+            "AMFG511",
+            "AMFG522",
+            "AMFG523",
+            "MEGN579"
+          ],
+          "credits_required": 6
+        },
+        {
+          "group_id": "additional_electives",
+          "label": "Additional Electives (Additive Manufacturing focus-area list; up to 6 credits may be project-based Independent Study)",
+          "kind": "choose_credits",
+          "courses": [
+            "MEGN511",
+            "MEGN515",
+            "MTGN531",
+            "MTGN536",
+            "MTGN557",
+            "MTGN560",
+            "MTGN564",
+            "MTGN565",
+            "FEGN525",
+            "FEGN526",
+            "FEGN527",
+            "FEGN528",
+            "CSCI507",
+            "CSCI534",
+            "CSCI562",
+            "CSCI575",
+            "CSCI587",
+            "EENG509",
+            "EENG515",
+            "EENG517",
+            "MATH551",
+            "MEGN540",
+            "MEGN544",
+            "MEGN545",
+            "MEGN587",
+            "MEGN588",
+            "EBGN559",
+            "EBGN563",
+            "EBGN576",
+            "MEGN592"
+          ],
+          "credits_required": 12
+        }
+      ]
+    },
+    {
+      "program_id": "advanced-energy-systems-ms",
+      "name": "Advanced Energy Systems, M.S. (Non-Thesis)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Courses",
+          "kind": "all",
+          "courses": [
+            "ENGY501",
+            "ENGY502",
+            "ENGY503"
+          ]
+        },
+        {
+          "group_id": "economics",
+          "label": "Economics (one graduate-level Economics course from the approved program list)",
+          "kind": "choose_credits",
+          "credits_required": 3
+        },
+        {
+          "group_id": "technical_and_policy_electives",
+          "label": "Technical Electives (12-18 credits, STEM courses approved by advisor) plus Economics or Policy electives (0-6 credits); modeled as one 18-credit pool since the two trade off against each other",
+          "kind": "choose_credits",
+          "credits_required": 18
+        }
+      ]
+    },
+    {
+      "program_id": "advanced-energy-systems-phd",
+      "name": "Advanced Energy Systems, Ph.D.",
+      "degree_level": "phd",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 72,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Courses (shared with the MS)",
+          "kind": "all",
+          "courses": [
+            "ENGY501",
+            "ENGY502",
+            "ENGY503"
+          ]
+        },
+        {
+          "group_id": "phd_core",
+          "label": "PhD Core Courses",
+          "kind": "all",
+          "courses": [
+            "ENGY691",
+            "ENGY692"
+          ]
+        },
+        {
+          "group_id": "economics",
+          "label": "Economics (one graduate-level Economics course from the approved program list)",
+          "kind": "choose_credits",
+          "credits_required": 3
+        },
+        {
+          "group_id": "electives_and_research",
+          "label": "Technical Electives (15-18 credits), Economics/Policy elective (0-3), and AES Graduate Student Seminar ENGY693 (0-3); modeled as one 18-credit pool",
+          "kind": "choose_credits",
+          "credits_required": 18
+        },
+        {
+          "group_id": "thesis",
+          "label": "Graduate Thesis (ENGY707)",
+          "kind": "choose_credits",
+          "courses": [
+            "ENGY707"
+          ],
+          "credits_required": 36
+        }
+      ]
+    },
+    {
+      "program_id": "applied-mathematics-statistics-ms",
+      "name": "Applied Mathematics and Statistics, M.S. (Non-Thesis)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "specialty_core",
+          "label": "Specialty Core (15 credits from either the Computational & Applied Mathematics specialty list or the Statistics specialty list; the department expects one coherent specialty, simplified here to a single pool, same simplification as EE's tracks)",
+          "kind": "choose_credits",
+          "courses": [
+            "MATH500",
+            "MATH501",
+            "MATH514",
+            "MATH550",
+            "MATH551",
+            "MATH531",
+            "MATH534",
+            "MATH535",
+            "MATH560"
+          ],
+          "credits_required": 15
+        },
+        {
+          "group_id": "math_electives",
+          "label": "Two additional 500-level MATH courses",
+          "kind": "choose_credits",
+          "credits_required": 6
+        },
+        {
+          "group_id": "general_electives",
+          "label": "General Electives (any other AMS graduate course; up to 6 credits may be outside the department)",
+          "kind": "choose_credits",
+          "credits_required": 9
+        }
+      ]
+    },
+    {
+      "program_id": "applied-mathematics-statistics-phd",
+      "name": "Applied Mathematics and Statistics, Ph.D.",
+      "degree_level": "phd",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 72,
+      "requirement_groups": [
+        {
+          "group_id": "specialty_core",
+          "label": "Specialty Core (16 credits: 15 from either the Computational & Applied Mathematics or the Statistics specialty list, plus MATH588; simplified to one pool, same simplification as EE's tracks)",
+          "kind": "choose_credits",
+          "courses": [
+            "MATH500",
+            "MATH501",
+            "MATH514",
+            "MATH550",
+            "MATH551",
+            "MATH531",
+            "MATH534",
+            "MATH535",
+            "MATH560",
+            "MATH588"
+          ],
+          "credits_required": 16
+        },
+        {
+          "group_id": "math_electives",
+          "label": "Two additional 500-level MATH courses",
+          "kind": "choose_credits",
+          "credits_required": 6
+        },
+        {
+          "group_id": "research",
+          "label": "Research/thesis hours (at least 24 of the degree's 72 credits must be thesis hours) and any remaining coursework",
+          "kind": "choose_credits",
+          "credits_required": 50
+        }
+      ]
+    },
+    {
+      "program_id": "ccus-ms",
+      "name": "Carbon Capture, Utilization and Storage, M.S. (Non-Thesis)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Courses (including the CCUS585 capstone)",
+          "kind": "all",
+          "courses": [
+            "CCUS520",
+            "EBGN502",
+            "CCUS585"
+          ]
+        },
+        {
+          "group_id": "electives",
+          "label": "Electives (choose 21 credits)",
+          "kind": "choose_credits",
+          "courses": [
+            "CCUS521",
+            "CCUS522",
+            "CCUS525",
+            "CCUS530",
+            "GEOL557",
+            "GPGN519",
+            "GPGN558",
+            "PEGN506"
+          ],
+          "credits_required": 21
+        }
+      ]
+    },
+    {
+      "program_id": "chemical-engineering-ms",
+      "name": "Chemical Engineering, M.S. (Non-Thesis)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Chemical Engineering core graduate courses (12 credits: one of CBEN507/CBEN505, CBEN509, one of CBEN516/CBEN530, one of CBEN518/CBEN519)",
+          "kind": "choose_credits",
+          "courses": [
+            "CBEN507",
+            "CBEN505",
+            "CBEN509",
+            "CBEN516",
+            "CBEN530",
+            "CBEN518",
+            "CBEN519"
+          ],
+          "credits_required": 12
+        },
+        {
+          "group_id": "electives",
+          "label": "Approved Electives",
+          "kind": "choose_credits",
+          "credits_required": 18
+        }
+      ]
+    },
+    {
+      "program_id": "chemical-engineering-phd",
+      "name": "Chemical Engineering, Ph.D.",
+      "degree_level": "phd",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 73,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Courses",
+          "kind": "all",
+          "courses": [
+            "CBEN507",
+            "CBEN509",
+            "CBEN516",
+            "CBEN518",
+            "CBEN568"
+          ]
+        },
+        {
+          "group_id": "proposal",
+          "label": "Proposal Preparation (CBEN630)",
+          "kind": "all",
+          "courses": [
+            "CBEN630"
+          ]
+        },
+        {
+          "group_id": "level_600_electives",
+          "label": "CBEN 600-Level Coursework Electives",
+          "kind": "choose_credits",
+          "credits_required": 3
+        },
+        {
+          "group_id": "approved_electives",
+          "label": "Approved Coursework Electives",
+          "kind": "choose_credits",
+          "credits_required": 12
+        },
+        {
+          "group_id": "research",
+          "label": "Graduate Research Credit (CBEN707, up to 12 hours per semester)",
+          "kind": "choose_credits",
+          "courses": [
+            "CBEN707"
+          ],
+          "credits_required": 42
+        }
+      ]
+    },
+    {
+      "program_id": "chemistry-ms",
+      "name": "Chemistry, M.S. (Non-Thesis)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "seminar",
+          "label": "Graduate Seminar (CHGN560)",
+          "kind": "all",
+          "courses": [
+            "CHGN560"
+          ]
+        },
+        {
+          "group_id": "core_three_of_four",
+          "label": "Three of the four core courses (CHGN502, CHGN503, CHGN505, CHGN507)",
+          "kind": "choose_credits",
+          "courses": [
+            "CHGN502",
+            "CHGN503",
+            "CHGN505",
+            "CHGN507"
+          ],
+          "credits_required": 9
+        },
+        {
+          "group_id": "coursework",
+          "label": "Additional coursework (to reach 24 credits of coursework)",
+          "kind": "choose_credits",
+          "credits_required": 14
+        },
+        {
+          "group_id": "independent_study",
+          "label": "Independent Study (CHGN699)",
+          "kind": "choose_credits",
+          "courses": [
+            "CHGN699"
+          ],
+          "credits_required": 6
+        }
+      ]
+    },
+    {
+      "program_id": "chemistry-phd",
+      "name": "Applied Chemistry, Ph.D.",
+      "degree_level": "phd",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 72,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Courses",
+          "kind": "all",
+          "courses": [
+            "CHGN502",
+            "CHGN503",
+            "CHGN505",
+            "CHGN507"
+          ]
+        },
+        {
+          "group_id": "seminar",
+          "label": "Graduate Seminar (CHGN560, 2 credits toward the PhD)",
+          "kind": "choose_credits",
+          "courses": [
+            "CHGN560"
+          ],
+          "credits_required": 2
+        },
+        {
+          "group_id": "additional_coursework",
+          "label": "Additional coursework (at least 18 credits of coursework total are required)",
+          "kind": "choose_credits",
+          "credits_required": 4
+        },
+        {
+          "group_id": "research",
+          "label": "Graduate Thesis/Dissertation Research Credit (CHGN707)",
+          "kind": "choose_credits",
+          "courses": [
+            "CHGN707"
+          ],
+          "credits_required": 54
+        }
+      ]
+    },
+    {
+      "program_id": "civil-engineering-ms",
+      "name": "Civil Engineering, M.S. (Non-Thesis)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core (three courses from one emphasis area: Geotechnical Engineering or Structural Engineering)",
+          "kind": "choose_credits",
+          "courses": [
+            "CEEN506",
+            "CEEN510",
+            "CEEN511",
+            "CEEN512",
+            "CEEN515",
+            "CEEN519",
+            "CEEN523",
+            "CEEN582",
+            "CEEN530",
+            "CEEN531",
+            "CEEN533",
+            "CEEN539",
+            "CEEN541",
+            "CEEN542",
+            "CEEN543",
+            "CEEN545",
+            "CEEN548",
+            "CEEN549"
+          ],
+          "credits_required": 9
+        },
+        {
+          "group_id": "seminar",
+          "label": "Civil Engineering Seminar (CEEN590, two semesters required)",
+          "kind": "all",
+          "courses": [
+            "CEEN590"
+          ]
+        },
+        {
+          "group_id": "electives",
+          "label": "Electives, advisor-approved (at least 15 credits total within the CEEN prefix, including core)",
+          "kind": "choose_credits",
+          "credits_required": 21
+        }
+      ]
+    },
+    {
+      "program_id": "civil-environmental-engineering-phd",
+      "name": "Civil and Environmental Engineering, Ph.D.",
+      "degree_level": "phd",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 72,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core (three courses from one emphasis area: Geotechnical, Structural, or Environmental and Water Engineering)",
+          "kind": "choose_credits",
+          "courses": [
+            "CEEN506",
+            "CEEN510",
+            "CEEN511",
+            "CEEN512",
+            "CEEN515",
+            "CEEN519",
+            "CEEN523",
+            "CEEN582",
+            "CEEN530",
+            "CEEN531",
+            "CEEN533",
+            "CEEN539",
+            "CEEN541",
+            "CEEN542",
+            "CEEN543",
+            "CEEN545",
+            "CEEN548",
+            "CEEN549",
+            "CEEN550",
+            "CEEN580",
+            "CEEN566",
+            "CEEN560",
+            "CEEN562",
+            "CEEN570",
+            "CEEN578"
+          ],
+          "credits_required": 9
+        },
+        {
+          "group_id": "additional_coursework",
+          "label": "Additional coursework (at least 24 credit hours of coursework total, including core)",
+          "kind": "choose_credits",
+          "credits_required": 15
+        },
+        {
+          "group_id": "research",
+          "label": "Dissertation research credit (at least 24 credit hours)",
+          "kind": "choose_credits",
+          "credits_required": 24
+        },
+        {
+          "group_id": "flexible_remainder",
+          "label": "Additional coursework or research credit to reach the 72-credit total, advisor's choice",
+          "kind": "choose_credits",
+          "credits_required": 24
+        }
+      ]
+    },
+    {
+      "program_id": "cs-bs-ms-combined",
+      "name": "Computer Science, Combined B.S./M.S. (Non-Thesis, Project Track)",
+      "degree_level": "combined",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 154,
+      "requirement_groups": [],
+      "combines": [
+        "cs-bs-general-track",
+        "cs-ms-non-thesis-project-track"
+      ]
+    },
+    {
+      "program_id": "cs-ms-non-thesis-project-track",
+      "name": "Computer Science, M.S. (Non-Thesis, Project Track)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Courses",
+          "kind": "all",
+          "courses": [
+            "CSCI561",
+            "CSCI564"
+          ]
+        },
+        {
+          "group_id": "project",
+          "label": "MS Project (CSCI700, two consecutive semesters recommended; at most 6 credits count toward the degree)",
+          "kind": "choose_credits",
+          "courses": [
+            "CSCI700"
+          ],
+          "credits_required": 6
+        },
+        {
+          "group_id": "electives",
+          "label": "Electives (any CSCI graduate course; up to 6 credits may be outside CSCI; at most 6 credits of Independent Study across the degree)",
+          "kind": "choose_credits",
+          "credits_required": 18
+        }
+      ],
+      "double_counts_with": [
+        {
+          "program_id": "cs-bs-general-track",
+          "shared_courses": [
+            "CSCI561",
+            "CSCI564"
+          ],
+          "shared_credit_limit": 6
+        }
+      ]
+    },
+    {
+      "program_id": "data-science-ms",
+      "name": "Data Science, M.S. (Non-Thesis)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Courses (Data Modeling and Statistical Learning; Machine Learning, Data Processing and Algorithms, and Parallel Computation)",
+          "kind": "all",
+          "courses": [
+            "MATH530",
+            "MATH560",
+            "MATH561",
+            "DSCI503",
+            "DSCI570",
+            "DSCI575"
+          ]
+        },
+        {
+          "group_id": "professional_development",
+          "label": "Professional Development",
+          "kind": "choose_credits",
+          "courses": [
+            "SYGN502",
+            "SYGN683",
+            "SYGN684",
+            "LICM501",
+            "EBGN562",
+            "EBGN563",
+            "EBGN566",
+            "EBGN577",
+            "PHGN503",
+            "SYGN598"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "electives",
+          "label": "Electives, designed by the student in a chosen application domain",
+          "kind": "choose_credits",
+          "credits_required": 9
+        }
+      ]
+    },
+    {
       "program_id": "ee-ms",
       "name": "Electrical Engineering, M.S. (Non-Thesis)",
       "degree_level": "master",
@@ -11,16 +651,40 @@
           "group_id": "seminar",
           "label": "Graduate Seminar (EENG500, required every fall and spring semester, 0 credits)",
           "kind": "all",
-          "courses": ["EENG500"]
+          "courses": [
+            "EENG500"
+          ]
         },
         {
           "group_id": "ee_core",
           "label": "EE Core (12 credits from the Antennas and Wireless Communications, Information and Systems Sciences, or Power and Energy Systems track course lists)",
           "kind": "choose_credits",
           "courses": [
-            "EENG525", "EENG527", "EENG530", "EENG526", "EENG528", "EENG532", "EENG533", "EENG536", "EENG540",
-            "EENG515", "EENG509", "EENG510", "EENG511", "EENG514", "EENG517", "EENG519", "EENG589",
-            "EENG570", "EENG573", "EENG577", "EENG581", "EENG584", "EENG585", "EENG587", "EENG588"
+            "EENG525",
+            "EENG527",
+            "EENG530",
+            "EENG526",
+            "EENG528",
+            "EENG532",
+            "EENG533",
+            "EENG536",
+            "EENG540",
+            "EENG515",
+            "EENG509",
+            "EENG510",
+            "EENG511",
+            "EENG514",
+            "EENG517",
+            "EENG519",
+            "EENG589",
+            "EENG570",
+            "EENG573",
+            "EENG577",
+            "EENG581",
+            "EENG584",
+            "EENG585",
+            "EENG587",
+            "EENG588"
           ],
           "credits_required": 12
         },
@@ -30,6 +694,861 @@
           "kind": "choose_credits",
           "credits_required": 18
         }
+      ]
+    },
+    {
+      "program_id": "engineering-technology-management-ms",
+      "name": "Engineering and Technology Management, M.S. (Non-Thesis)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Courses",
+          "kind": "all",
+          "courses": [
+            "EBGN525",
+            "EBGN540",
+            "EBGN553",
+            "EBGN563",
+            "EBGN585"
+          ]
+        },
+        {
+          "group_id": "electives",
+          "label": "Elective Courses (Engineering Management and Optimization, or Technology Management and Innovation)",
+          "kind": "choose_credits",
+          "credits_required": 15
+        }
+      ]
+    },
+    {
+      "program_id": "enrep-ms",
+      "name": "Environment, Resources & Energy Policy, M.S. (Non-Thesis)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "foundations",
+          "label": "Core: Foundations Courses",
+          "kind": "all",
+          "courses": [
+            "HASS578",
+            "HASS584",
+            "MNGN571"
+          ]
+        },
+        {
+          "group_id": "skills",
+          "label": "Core: Skills Courses (choose any two)",
+          "kind": "choose_credits",
+          "courses": [
+            "EBGN590",
+            "GEGN532",
+            "GEGN575",
+            "GEGN580",
+            "MATH530",
+            "EDNS479",
+            "HASS526",
+            "HASS527",
+            "HASS550",
+            "HASS568",
+            "CEEN501",
+            "CEEN595",
+            "HASS525",
+            "PEGN530",
+            "EDNS515",
+            "HASS521"
+          ],
+          "credits_required": 6
+        },
+        {
+          "group_id": "electives",
+          "label": "Electives (pre-approved, organized by theme in the catalog: Energy Transition, Environmental Futures, International Development, Minerals & Mining, Economics & Policy, Professional Development; any department, by advisor approval)",
+          "kind": "choose_credits",
+          "credits_required": 15
+        }
+      ]
+    },
+    {
+      "program_id": "environmental-engineering-ms",
+      "name": "Environmental Engineering and Science, M.S. (Non-Thesis)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "core_required",
+          "label": "Core Required (Chemistry; Physical Transport)",
+          "kind": "all",
+          "courses": [
+            "CEEN550",
+            "CEEN580"
+          ]
+        },
+        {
+          "group_id": "core_choice",
+          "label": "Core Choice (one Bio Processes course, one Systems Design course)",
+          "kind": "choose_credits",
+          "courses": [
+            "CEEN566",
+            "CEEN560",
+            "CEEN562",
+            "CEEN570",
+            "CEEN578"
+          ],
+          "credits_required": 6
+        },
+        {
+          "group_id": "seminar",
+          "label": "Environmental Science and Engineering Seminar (CEEN596, two semesters required)",
+          "kind": "all",
+          "courses": [
+            "CEEN596"
+          ]
+        },
+        {
+          "group_id": "electives",
+          "label": "Electives, advisor-approved",
+          "kind": "choose_credits",
+          "credits_required": 18
+        }
+      ]
+    },
+    {
+      "program_id": "geochemistry-ms",
+      "name": "Geochemistry, M.S. (Geochemistry Track)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Courses",
+          "kind": "all",
+          "courses": [
+            "CHGC503",
+            "CHGC504"
+          ]
+        },
+        {
+          "group_id": "breadth",
+          "label": "Breadth coursework (at least 12 credits from the Geochemistry course list, e.g. CHGC509, CHGC514, CEEN550, GEGN586, GEGN587, GEGX571, GEOL513, GEOL523, GEOL540)",
+          "kind": "choose_credits",
+          "courses": [
+            "CHGC509",
+            "CHGC514",
+            "CEEN550",
+            "GEGN586",
+            "GEGN587",
+            "GEGX571",
+            "GEOL513",
+            "GEOL523",
+            "GEOL540"
+          ],
+          "credits_required": 12
+        },
+        {
+          "group_id": "research",
+          "label": "Research credits",
+          "kind": "choose_credits",
+          "credits_required": 6
+        },
+        {
+          "group_id": "choice",
+          "label": "Additional research or coursework, student's choice",
+          "kind": "choose_credits",
+          "credits_required": 6
+        }
+      ]
+    },
+    {
+      "program_id": "geochemistry-phd",
+      "name": "Geochemistry, Ph.D. (Geochemistry Track)",
+      "degree_level": "phd",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 72,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Courses",
+          "kind": "all",
+          "courses": [
+            "CHGC503",
+            "CHGC504"
+          ]
+        },
+        {
+          "group_id": "breadth",
+          "label": "Breadth coursework (at least 12 credits from Table 1, the Geochemistry course list)",
+          "kind": "choose_credits",
+          "courses": [
+            "CHGC509",
+            "CHGC514",
+            "CEEN550",
+            "GEGN586",
+            "GEGN587",
+            "GEGX571",
+            "GEOL513",
+            "GEOL523",
+            "GEOL540"
+          ],
+          "credits_required": 12
+        },
+        {
+          "group_id": "research",
+          "label": "Research credits (at least 12 required; at least 9 of the 18 course credits must be completed at Mines)",
+          "kind": "choose_credits",
+          "credits_required": 12
+        },
+        {
+          "group_id": "additional",
+          "label": "Additional dissertation research or coursework to reach 72 credits beyond the bachelor's degree",
+          "kind": "choose_credits",
+          "credits_required": 42
+        }
+      ]
+    },
+    {
+      "program_id": "geological-engineering-ms",
+      "name": "Geological Engineering, M.S. (Engineering Geology/Geotechnics Specialization)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 36,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Requirement",
+          "kind": "all",
+          "courses": [
+            "GEGN532"
+          ]
+        },
+        {
+          "group_id": "specialization_electives",
+          "label": "At least three of the following (some with a stated alternate course)",
+          "kind": "choose_credits",
+          "courses": [
+            "GEGN563",
+            "GEGN570",
+            "GEGN673",
+            "GEGN573",
+            "GEGN575",
+            "GEGN580",
+            "GEGN568",
+            "GEGN671"
+          ],
+          "credits_required": 9
+        },
+        {
+          "group_id": "additional_coursework",
+          "label": "Additional coursework, typically from topical areas chosen with the advisor",
+          "kind": "choose_credits",
+          "credits_required": 12
+        },
+        {
+          "group_id": "research",
+          "label": "Research credits (thesis required)",
+          "kind": "choose_credits",
+          "credits_required": 12
+        }
+      ]
+    },
+    {
+      "program_id": "geological-engineering-phd",
+      "name": "Geological Engineering, Ph.D. (Engineering Geology/Geotechnics Specialization)",
+      "degree_level": "phd",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 72,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Requirement",
+          "kind": "all",
+          "courses": [
+            "GEGN532"
+          ]
+        },
+        {
+          "group_id": "specialization_electives",
+          "label": "At least three of the following (some with a stated alternate course)",
+          "kind": "choose_credits",
+          "courses": [
+            "GEGN563",
+            "GEGN570",
+            "GEGN673",
+            "GEGN573",
+            "GEGN575",
+            "GEGN580",
+            "GEGN568",
+            "GEGN671"
+          ],
+          "credits_required": 9
+        },
+        {
+          "group_id": "additional_coursework",
+          "label": "Additional coursework to reach at least 24 total course credits",
+          "kind": "choose_credits",
+          "credits_required": 12
+        },
+        {
+          "group_id": "research",
+          "label": "Research credits (at least 24 required)",
+          "kind": "choose_credits",
+          "credits_required": 24
+        },
+        {
+          "group_id": "flexible",
+          "label": "Remaining credits, research or coursework at the committee's discretion",
+          "kind": "choose_credits",
+          "credits_required": 24
+        }
+      ]
+    },
+    {
+      "program_id": "geology-ms",
+      "name": "Geology, M.S.",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 36,
+      "requirement_groups": [
+        {
+          "group_id": "research",
+          "label": "Research credits (thesis required)",
+          "kind": "choose_credits",
+          "credits_required": 12
+        },
+        {
+          "group_id": "coursework",
+          "label": "Coursework (no fixed course list in the catalog; chosen with the thesis advisory committee)",
+          "kind": "choose_credits",
+          "credits_required": 24
+        }
+      ]
+    },
+    {
+      "program_id": "geology-phd",
+      "name": "Geology, Ph.D.",
+      "degree_level": "phd",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 72,
+      "requirement_groups": [
+        {
+          "group_id": "research",
+          "label": "Research credits (at least 24 required)",
+          "kind": "choose_credits",
+          "credits_required": 24
+        },
+        {
+          "group_id": "coursework",
+          "label": "Coursework (at least 36 required; no fixed course list in the catalog, chosen with the doctoral committee)",
+          "kind": "choose_credits",
+          "credits_required": 36
+        },
+        {
+          "group_id": "flexible",
+          "label": "Remaining credits, research or coursework at the committee's discretion",
+          "kind": "choose_credits",
+          "credits_required": 12
+        }
+      ]
+    },
+    {
+      "program_id": "geophysics-ms",
+      "name": "Geophysics or Geophysical Engineering, M.S. (Non-Thesis)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "oral_communication",
+          "label": "Oral Communication (LICM501 or SYGN683)",
+          "kind": "choose_credits",
+          "courses": [
+            "LICM501",
+            "SYGN683"
+          ],
+          "credits_required": 1
+        },
+        {
+          "group_id": "seminar",
+          "label": "Graduate Seminar (GPGN581)",
+          "kind": "all",
+          "courses": [
+            "GPGN581"
+          ]
+        },
+        {
+          "group_id": "categorized_coursework",
+          "label": "Professional Development (1), Theory (3), Application (3), Computational (3), and Earth & Space (3) coursework, each from its own pre-approved elective list in the catalog (not individually listed here); at least 15 of the degree's 30 credits total must be GPGN-listed courses, and at most 6 credits of independent study may count",
+          "kind": "choose_credits",
+          "credits_required": 13
+        },
+        {
+          "group_id": "additional_coursework",
+          "label": "Additional coursework chosen with the student's advisor",
+          "kind": "choose_credits",
+          "credits_required": 15
+        }
+      ]
+    },
+    {
+      "program_id": "gis-geoinformatics-ms",
+      "name": "GIS & GeoInformatics, M.S. (Non-Thesis)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Requirements",
+          "kind": "all",
+          "courses": [
+            "GEGN575",
+            "GEGN590",
+            "GEGN592"
+          ]
+        },
+        {
+          "group_id": "electives",
+          "label": "Electives (seven of the following courses)",
+          "kind": "choose_credits",
+          "courses": [
+            "GEGN542",
+            "GEGN579",
+            "GEGN580",
+            "GEGN588",
+            "GEOL557",
+            "GEOL558",
+            "MNGN502",
+            "MNGN557",
+            "MNGN561",
+            "MNGN562",
+            "DSCI503",
+            "DSCI570",
+            "MATH530",
+            "CEEN501"
+          ],
+          "credits_required": 21
+        }
+      ]
+    },
+    {
+      "program_id": "humanitarian-engineering-ms",
+      "name": "Humanitarian Engineering and Science, M.S. (Non-Thesis)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "HES Core Courses",
+          "kind": "all",
+          "courses": [
+            "EDNS515",
+            "EDNS577",
+            "EDNS579",
+            "EDNS580"
+          ]
+        },
+        {
+          "group_id": "hes_elective",
+          "label": "One approved HES elective",
+          "kind": "choose_credits",
+          "courses": [
+            "EDNS590",
+            "CEEN501",
+            "CEEN575",
+            "CEEN593",
+            "CEEN556",
+            "CEEN570",
+            "CEEN573",
+            "CEEN580",
+            "CEEN581",
+            "CEEN595",
+            "EBGN553",
+            "HASS525",
+            "HASS526",
+            "HASS527",
+            "HASS565",
+            "HASS568",
+            "HASS590",
+            "MNGN503",
+            "MNGN510",
+            "MNGN565",
+            "MNGN567",
+            "MNGN571",
+            "PEGN530"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "track_electives",
+          "label": "15 credits of courses approved by the affiliated department, from one of six disciplinary tracks (Geophysics shown in the catalog; the other five tracks' course lists are not broken out here)",
+          "kind": "choose_credits",
+          "credits_required": 15
+        }
+      ]
+    },
+    {
+      "program_id": "hydrologic-science-and-engineering-ms",
+      "name": "Hydrologic Science and Engineering, M.S. (Non-Thesis)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Curriculum (Groundwater, Surface Water, Chemistry, Contaminant Fate and Transport)",
+          "kind": "all",
+          "courses": [
+            "GEGN566",
+            "GEGN582",
+            "CEEN550",
+            "CEEN580"
+          ]
+        },
+        {
+          "group_id": "design_or_independent_study",
+          "label": "Design Course or Independent Study",
+          "kind": "choose_credits",
+          "courses": [
+            "CEEN515",
+            "CEEN581",
+            "CEEN575",
+            "CEEN584",
+            "GEGN532",
+            "GEGN575",
+            "GEGN583",
+            "GEGN584",
+            "GEGN586"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "electives",
+          "label": "Electives (approved list, or as approved by advisor/thesis committee)",
+          "kind": "choose_credits",
+          "courses": [
+            "CEEN511",
+            "CEEN512",
+            "CEEN515",
+            "CEEN555",
+            "CEEN560",
+            "CEEN562",
+            "CEEN570",
+            "CEEN571",
+            "CEEN575",
+            "CEEN586",
+            "CEEN581",
+            "CEEN582",
+            "GEGN532",
+            "GEGN573",
+            "GEGN575",
+            "GEGN581",
+            "GEGN584",
+            "GEGN586",
+            "GEOL540",
+            "MATH530",
+            "MATH531",
+            "MATH532",
+            "EBGN510",
+            "HASS588",
+            "GEGN585"
+          ],
+          "credits_required": 15
+        }
+      ]
+    },
+    {
+      "program_id": "materials-science-ms",
+      "name": "Materials Science, M.S. (Non-Thesis, with Case Study/Design)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Courses",
+          "kind": "all",
+          "courses": [
+            "MLGN591",
+            "MLGN592",
+            "MLGN593"
+          ]
+        },
+        {
+          "group_id": "case_study_or_design",
+          "label": "MLGN Case Study or Designated Design Course",
+          "kind": "choose_credits",
+          "courses": [
+            "MLGN500",
+            "MLGN505",
+            "MLGN510",
+            "MLGN516",
+            "MLGN535",
+            "MLGN544",
+            "MLGN561",
+            "MLGN569",
+            "MLGN583"
+          ],
+          "credits_required": 6
+        },
+        {
+          "group_id": "electives",
+          "label": "Electives (Materials Science or related courses in AMFG, CBEN, CEEN, CHGN, DSCI, MEGN, or MTGN)",
+          "kind": "choose_credits",
+          "credits_required": 15
+        }
+      ]
+    },
+    {
+      "program_id": "materials-science-phd",
+      "name": "Materials Science, Ph.D.",
+      "degree_level": "phd",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 72,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Courses",
+          "kind": "all",
+          "courses": [
+            "MLGN591",
+            "MLGN592",
+            "MLGN593"
+          ]
+        },
+        {
+          "group_id": "research",
+          "label": "Graduate Thesis/Dissertation Research Credit (minimum)",
+          "kind": "choose_credits",
+          "courses": [
+            "MLGN707"
+          ],
+          "credits_required": 24
+        },
+        {
+          "group_id": "electives",
+          "label": "Electives (Materials Science or related courses in AMFG, CBEN, CEEN, CHGN, DSCI, MEGN, or MTGN; minimum)",
+          "kind": "choose_credits",
+          "credits_required": 15
+        },
+        {
+          "group_id": "additional_research_or_coursework",
+          "label": "Additional thesis research or Materials Science coursework",
+          "kind": "choose_credits",
+          "credits_required": 24
+        }
+      ]
+    },
+    {
+      "program_id": "mechanical-engineering-ms",
+      "name": "Mechanical Engineering, M.S. (Non-Thesis)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "intro",
+          "label": "Required Course",
+          "kind": "all",
+          "courses": [
+            "MEGN502"
+          ]
+        },
+        {
+          "group_id": "me_core",
+          "label": "ME Core (two courses from the Mechanical Engineering Core list)",
+          "kind": "choose_credits",
+          "courses": [
+            "MEGN505",
+            "MEGN514",
+            "MEGN551",
+            "MEGN571"
+          ],
+          "credits_required": 6
+        },
+        {
+          "group_id": "me_electives",
+          "label": "ME Electives (any 500-level or above MEGN, AMFG, or FEGN course)",
+          "kind": "choose_credits",
+          "credits_required": 12
+        },
+        {
+          "group_id": "technical_electives",
+          "label": "Technical Electives (any 500-level or above course)",
+          "kind": "choose_credits",
+          "credits_required": 9
+        }
+      ]
+    },
+    {
+      "program_id": "mechanical-engineering-phd",
+      "name": "Mechanical Engineering, Ph.D.",
+      "degree_level": "phd",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 72,
+      "requirement_groups": [
+        {
+          "group_id": "intro",
+          "label": "Required Courses (MEGN502, and MEGN503 Graduate Seminar every fall/spring, 0 credits)",
+          "kind": "all",
+          "courses": [
+            "MEGN502",
+            "MEGN503"
+          ]
+        },
+        {
+          "group_id": "me_core",
+          "label": "ME Core (courses from the Mechanical Engineering Core list)",
+          "kind": "choose_credits",
+          "courses": [
+            "MEGN505",
+            "MEGN514",
+            "MEGN551",
+            "MEGN571"
+          ],
+          "credits_required": 6
+        },
+        {
+          "group_id": "technical_electives",
+          "label": "Technical Electives (any 500-level or above course, approved by advisor/thesis committee)",
+          "kind": "choose_credits",
+          "credits_required": 21
+        },
+        {
+          "group_id": "research",
+          "label": "Graduate Thesis/Dissertation Research Credit",
+          "kind": "choose_credits",
+          "courses": [
+            "MEGN707"
+          ],
+          "credits_required": 30
+        },
+        {
+          "group_id": "additional_research_or_electives",
+          "label": "Additional research and/or technical electives (remaining credits)",
+          "kind": "choose_credits",
+          "credits_required": 12
+        }
+      ]
+    },
+    {
+      "program_id": "metallurgical-and-materials-engineering-ms",
+      "name": "Metallurgical and Materials Engineering, Master of Engineering",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "seminar",
+          "label": "MME Graduate Seminar (MTGN501, enroll every semester; at most 1 credit applies)",
+          "kind": "all",
+          "courses": [
+            "MTGN501"
+          ]
+        },
+        {
+          "group_id": "design_or_project",
+          "label": "MTGN700 Graduate Research Credit (Master of Engineering) or a designated design course",
+          "kind": "choose_credits",
+          "courses": [
+            "MTGN700",
+            "MTGN549",
+            "MTGN564",
+            "MTGN560"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "coursework",
+          "label": "Approved coursework (catalog gives an 18-26 credit range; the midpoint/max used here to reach 30 total with the fixed pieces above; at least 9 credits must be MTGN, at least 21 MTGN or MLGN)",
+          "kind": "choose_credits",
+          "credits_required": 26
+        }
+      ]
+    },
+    {
+      "program_id": "mineral-energy-economics-ms",
+      "name": "Mineral and Energy Economics, M.S. (Non-Thesis)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 36,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Courses",
+          "kind": "all",
+          "courses": [
+            "EBGN509",
+            "EBGN510",
+            "EBGN521",
+            "EBGN590",
+            "EBGN594"
+          ]
+        },
+        {
+          "group_id": "electives",
+          "label": "Approved Electives (all EBGN graduate courses; up to 6 credits may apply toward a 9-credit minor in another department)",
+          "kind": "choose_credits",
+          "credits_required": 21
+        }
+      ]
+    },
+    {
+      "program_id": "mineral-energy-economics-phd",
+      "name": "Mineral and Energy Economics, Ph.D.",
+      "degree_level": "phd",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 72,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "First-Year Core Courses",
+          "kind": "all",
+          "courses": [
+            "EBGN509",
+            "EBGN510",
+            "EBGN521",
+            "EBGN590",
+            "EBGN594"
+          ]
+        },
+        {
+          "group_id": "extended_core",
+          "label": "Extended Core",
+          "kind": "all",
+          "courses": [
+            "EBGN611"
+          ]
+        },
+        {
+          "group_id": "electives",
+          "label": "Approved Electives (at least two must be advanced economics courses)",
+          "kind": "choose_credits",
+          "credits_required": 18
+        },
+        {
+          "group_id": "research",
+          "label": "Research credits (dissertation)",
+          "kind": "choose_credits",
+          "credits_required": 36
+        }
+      ]
+    },
+    {
+      "program_id": "mining-bs-ms-combined",
+      "name": "Mining Engineering, Combined B.S./M.S.",
+      "degree_level": "combined",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 152,
+      "requirement_groups": [],
+      "combines": [
+        "mining-bs",
+        "mining-ms"
       ]
     },
     {
@@ -43,14 +1562,20 @@
           "group_id": "core",
           "label": "Core Requirements (two of MNGN508, MNGN512, MNGN516)",
           "kind": "choose_credits",
-          "courses": ["MNGN508", "MNGN512", "MNGN516"],
+          "courses": [
+            "MNGN508",
+            "MNGN512",
+            "MNGN516"
+          ],
           "credits_required": 6
         },
         {
           "group_id": "seminar",
           "label": "Graduate Mining Seminar (MNGN625)",
           "kind": "all",
-          "courses": ["MNGN625"]
+          "courses": [
+            "MNGN625"
+          ]
         },
         {
           "group_id": "coursework",
@@ -62,23 +1587,18 @@
       "double_counts_with": [
         {
           "program_id": "mining-bs",
-          "shared_courses": ["MNGN508", "MNGN512", "MNGN516"],
+          "shared_courses": [
+            "MNGN508",
+            "MNGN512",
+            "MNGN516"
+          ],
           "shared_credit_limit": 6
         }
       ]
     },
     {
-      "program_id": "mining-bs-ms-combined",
-      "name": "Mining Engineering, Combined B.S./M.S.",
-      "degree_level": "combined",
-      "catalog_year": "2026-2027",
-      "total_credits_required": 152,
-      "requirement_groups": [],
-      "combines": ["mining-bs", "mining-ms"]
-    },
-    {
-      "program_id": "cs-ms-non-thesis-project-track",
-      "name": "Computer Science, M.S. (Non-Thesis, Project Track)",
+      "program_id": "nuclear-engineering-me",
+      "name": "Nuclear Engineering, M.E. (Master of Engineering, Non-Thesis)",
       "degree_level": "master",
       "catalog_year": "2026-2027",
       "total_credits_required": 30,
@@ -87,38 +1607,879 @@
           "group_id": "core",
           "label": "Core Courses",
           "kind": "all",
-          "courses": ["CSCI561", "CSCI564"]
+          "courses": [
+            "NUGN510",
+            "NUGN520",
+            "NUGN580",
+            "NUGN585",
+            "NUGN586"
+          ]
         },
         {
-          "group_id": "project",
-          "label": "MS Project (CSCI700, two consecutive semesters recommended; at most 6 credits count toward the degree)",
+          "group_id": "elective_core",
+          "label": "Elective Core (choose four of the following)",
           "kind": "choose_credits",
-          "courses": ["CSCI700"],
-          "credits_required": 6
+          "courses": [
+            "MTGN593",
+            "PHGN504",
+            "CHGN511",
+            "CHGN513",
+            "MEGN592",
+            "NUGN506",
+            "NUGN590"
+          ],
+          "credits_required": 12
         },
         {
-          "group_id": "electives",
-          "label": "Electives (any CSCI graduate course; up to 6 credits may be outside CSCI; at most 6 credits of Independent Study across the degree)",
+          "group_id": "additional_elective",
+          "label": "Additional Elective Courses",
           "kind": "choose_credits",
-          "credits_required": 18
-        }
-      ],
-      "double_counts_with": [
+          "credits_required": 3
+        },
         {
-          "program_id": "cs-bs-general-track",
-          "shared_courses": ["CSCI561", "CSCI564"],
-          "shared_credit_limit": 6
+          "group_id": "seminar",
+          "label": "Nuclear Science and Engineering Seminar (NUGN505, repeated)",
+          "kind": "choose_credits",
+          "courses": [
+            "NUGN505"
+          ],
+          "credits_required": 2
         }
       ]
     },
     {
-      "program_id": "cs-bs-ms-combined",
-      "name": "Computer Science, Combined B.S./M.S. (Non-Thesis, Project Track)",
-      "degree_level": "combined",
+      "program_id": "nuclear-engineering-phd",
+      "name": "Nuclear Engineering, Ph.D.",
+      "degree_level": "phd",
       "catalog_year": "2026-2027",
-      "total_credits_required": 154,
-      "requirement_groups": [],
-      "combines": ["cs-bs-general-track", "cs-ms-non-thesis-project-track"]
+      "total_credits_required": 72,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Courses",
+          "kind": "all",
+          "courses": [
+            "NUGN510",
+            "NUGN520",
+            "NUGN580",
+            "NUGN585",
+            "NUGN586"
+          ]
+        },
+        {
+          "group_id": "elective_core",
+          "label": "Elective Core (choose four of the following)",
+          "kind": "choose_credits",
+          "courses": [
+            "MTGN593",
+            "PHGN504",
+            "CHGN511",
+            "CHGN513",
+            "MEGN592",
+            "NUGN506",
+            "NUGN590"
+          ],
+          "credits_required": 12
+        },
+        {
+          "group_id": "additional_elective",
+          "label": "Additional Elective Courses",
+          "kind": "choose_credits",
+          "credits_required": 3
+        },
+        {
+          "group_id": "seminar",
+          "label": "Nuclear Science and Engineering Seminar (NUGN505, repeated)",
+          "kind": "choose_credits",
+          "courses": [
+            "NUGN505"
+          ],
+          "credits_required": 4
+        },
+        {
+          "group_id": "research",
+          "label": "Graduate research (minimum 24 credits, e.g. NUGN707) or elective coursework",
+          "kind": "choose_credits",
+          "credits_required": 40
+        }
+      ]
+    },
+    {
+      "program_id": "operations-research-engineering-ms",
+      "name": "Operations Research with Engineering, M.S. (Non-Thesis)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Courses",
+          "kind": "all",
+          "courses": [
+            "MEGN502",
+            "EBGN526",
+            "EBGN528",
+            "MATH530",
+            "ORWE586",
+            "ORWE587"
+          ]
+        },
+        {
+          "group_id": "electives",
+          "label": "Remaining ORWE-labeled coursework, or an approved specialty track (many specialty tracks across departments collapsed into this one elective group; see Notes and decisions)",
+          "kind": "choose_credits",
+          "credits_required": 12
+        }
+      ]
+    },
+    {
+      "program_id": "operations-research-engineering-phd",
+      "name": "Operations Research with Engineering, Ph.D.",
+      "degree_level": "phd",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 72,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Courses (customized across the 8 participating departments; no fixed list in the catalog)",
+          "kind": "choose_credits",
+          "credits_required": 24
+        },
+        {
+          "group_id": "specialization",
+          "label": "Area of Specialization Courses",
+          "kind": "choose_credits",
+          "credits_required": 12
+        },
+        {
+          "group_id": "specialization_or_research",
+          "label": "Any combination of specialization courses or research",
+          "kind": "choose_credits",
+          "credits_required": 12
+        },
+        {
+          "group_id": "research",
+          "label": "Research Credits",
+          "kind": "choose_credits",
+          "credits_required": 24
+        }
+      ]
+    },
+    {
+      "program_id": "petroleum-engineering-me",
+      "name": "Petroleum Engineering, M.E. (Master of Engineering, Non-Thesis)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "coursework",
+          "label": "Graduate coursework, no fixed course list in the catalog (advisor- and department-head-approved; at least 15 credits must be in PEGN courses; at most 6 credits by independent study)",
+          "kind": "choose_credits",
+          "credits_required": 30
+        }
+      ]
+    },
+    {
+      "program_id": "petroleum-engineering-phd",
+      "name": "Petroleum Engineering, Ph.D.",
+      "degree_level": "phd",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 78,
+      "requirement_groups": [
+        {
+          "group_id": "coursework",
+          "label": "Graduate coursework, no fixed course list in the catalog (at least half in PEGN courses, at least 6 credits outside PEGN; advisor-, committee-, and department-head-approved)",
+          "kind": "choose_credits",
+          "credits_required": 48
+        },
+        {
+          "group_id": "research",
+          "label": "Research credit",
+          "kind": "choose_credits",
+          "credits_required": 30
+        }
+      ]
+    },
+    {
+      "program_id": "physics-ms",
+      "name": "Applied Physics, M.S. (Non-Thesis)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Courses",
+          "kind": "all",
+          "courses": [
+            "PHGN511",
+            "PHGN515"
+          ]
+        },
+        {
+          "group_id": "electives",
+          "label": "Electives (physics or relevant classes in other departments; at least one with significant laboratory or design emphasis; up to 7 credits of independent study)",
+          "kind": "choose_credits",
+          "credits_required": 22
+        },
+        {
+          "group_id": "seminar",
+          "label": "Graduate Seminar (PHGN501, PHGN502)",
+          "kind": "all",
+          "courses": [
+            "PHGN501",
+            "PHGN502"
+          ]
+        }
+      ]
+    },
+    {
+      "program_id": "physics-phd",
+      "name": "Physics, Ph.D.",
+      "degree_level": "phd",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 72,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Courses",
+          "kind": "all",
+          "courses": [
+            "PHGN507",
+            "PHGN511",
+            "PHGN515",
+            "PHGN520",
+            "PHGN521",
+            "PHGN530"
+          ]
+        },
+        {
+          "group_id": "seminar",
+          "label": "Advanced Graduate Seminar (PHGN601, PHGN602)",
+          "kind": "all",
+          "courses": [
+            "PHGN601",
+            "PHGN602"
+          ]
+        },
+        {
+          "group_id": "specialty_electives",
+          "label": "Special topic area electives, defined with the thesis advisor",
+          "kind": "choose_credits",
+          "credits_required": 12
+        },
+        {
+          "group_id": "research",
+          "label": "Graduate Thesis/Dissertation Research Credit (PHGN707)",
+          "kind": "choose_credits",
+          "courses": [
+            "PHGN707"
+          ],
+          "credits_required": 40
+        }
+      ]
+    },
+    {
+      "program_id": "quantitative-biosciences-engineering-ms",
+      "name": "Quantitative Biosciences and Engineering, M.S. (Non-Thesis)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "QBE Core Courses",
+          "kind": "all",
+          "courses": [
+            "BIOL500",
+            "BIOL510",
+            "BIOL520",
+            "CHGN535"
+          ]
+        },
+        {
+          "group_id": "electives",
+          "label": "QBE Electives (the catalog's list is open-ended; additional courses may be approved ad hoc by the advisor, so this is a representative subset)",
+          "kind": "choose_credits",
+          "courses": [
+            "BIOL599",
+            "CBEN505",
+            "CBEN511",
+            "CBEN531",
+            "CBEN532",
+            "CBEN570",
+            "CBEN624",
+            "CBEN625",
+            "CEEN501",
+            "CEEN550",
+            "CEEN551",
+            "CEEN560",
+            "CEEN562",
+            "CEEN566",
+            "CEEN570",
+            "CHGN507",
+            "CHGN509",
+            "CSCI562",
+            "DSCI503",
+            "EBGN525",
+            "EBGN553"
+          ],
+          "credits_required": 15
+        },
+        {
+          "group_id": "seminar",
+          "label": "QBE Graduate Seminar (BIOL590, repeated)",
+          "kind": "choose_credits",
+          "courses": [
+            "BIOL590"
+          ],
+          "credits_required": 2
+        }
+      ]
+    },
+    {
+      "program_id": "quantitative-biosciences-engineering-phd",
+      "name": "Quantitative Biosciences and Engineering, Ph.D.",
+      "degree_level": "phd",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 72,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "QBE Core Courses",
+          "kind": "all",
+          "courses": [
+            "BIOL500",
+            "BIOL510",
+            "BIOL520",
+            "CHGN535"
+          ]
+        },
+        {
+          "group_id": "electives",
+          "label": "QBE Electives (the catalog's list is open-ended; additional courses may be approved ad hoc by the advisor, so this is a representative subset)",
+          "kind": "choose_credits",
+          "courses": [
+            "BIOL599",
+            "CBEN505",
+            "CBEN511",
+            "CBEN531",
+            "CBEN532",
+            "CBEN570",
+            "CBEN624",
+            "CBEN625",
+            "CEEN501",
+            "CEEN550",
+            "CEEN551",
+            "CEEN560",
+            "CEEN562",
+            "CEEN566",
+            "CEEN570",
+            "CHGN507",
+            "CHGN509",
+            "CSCI562",
+            "DSCI503",
+            "EBGN525",
+            "EBGN553"
+          ],
+          "credits_required": 11
+        },
+        {
+          "group_id": "seminar",
+          "label": "QBE Graduate Seminar (BIOL590, repeated)",
+          "kind": "choose_credits",
+          "courses": [
+            "BIOL590"
+          ],
+          "credits_required": 4
+        },
+        {
+          "group_id": "research",
+          "label": "Graduate Thesis/Dissertation Research Credit (BIOL707)",
+          "kind": "choose_credits",
+          "courses": [
+            "BIOL707"
+          ],
+          "credits_required": 24
+        },
+        {
+          "group_id": "electives_or_research",
+          "label": "QBE Electives or BIOL707 Research, combined",
+          "kind": "choose_credits",
+          "credits_required": 20
+        }
+      ]
+    },
+    {
+      "program_id": "quantum-engineering-ms",
+      "name": "Quantum Engineering, M.S. (Non-Thesis)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "seminar",
+          "label": "Quantum Engineering Seminar (PHGN526 fall, PHGN527 spring)",
+          "kind": "all",
+          "courses": [
+            "PHGN526",
+            "PHGN527"
+          ]
+        },
+        {
+          "group_id": "track_core",
+          "label": "Track core (9 credits; Software track: PHGN519, CSCI581, PHGN545; Hardware track: PHGN519, EENG532, PHGN535)",
+          "kind": "choose_credits",
+          "courses": [
+            "PHGN519",
+            "CSCI581",
+            "PHGN545",
+            "EENG532",
+            "PHGN535"
+          ],
+          "credits_required": 9
+        },
+        {
+          "group_id": "electives",
+          "label": "Electives (19 credits from the approved Physics/CS/EE/Materials/AMS/HASS lists; at least 9 credits total should come from outside the student's major)",
+          "kind": "choose_credits",
+          "courses": [
+            "PHGN511",
+            "PHGN520",
+            "PHGN521",
+            "PHGN530",
+            "PHGN550",
+            "PHGN566",
+            "PHGN581",
+            "PHGN585",
+            "CSCI542",
+            "CSCI561",
+            "CSCI563",
+            "CSCI564",
+            "CSCI571",
+            "CSCI575",
+            "CSCI574",
+            "CSCI580",
+            "EENG509",
+            "EENG517",
+            "EENG526",
+            "EENG528",
+            "EENG530",
+            "EENG533",
+            "EENG617",
+            "EENG618",
+            "MTGN605",
+            "MTGN605L",
+            "MTGN656",
+            "MTGN656L",
+            "MLGN502",
+            "MTGN573",
+            "MLGN515",
+            "MLGN583",
+            "MLGN593",
+            "MATH506",
+            "MATH510",
+            "MATH536",
+            "MATH538",
+            "MATH550",
+            "MATH551",
+            "HASS523"
+          ],
+          "credits_required": 19
+        }
+      ]
+    },
+    {
+      "program_id": "robotics-ms",
+      "name": "Robotics, M.S. (Non-Thesis)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "core_breadth",
+          "label": "Robotics Core (Breadth): four courses, one from each of the four focus areas' core course lists, collapsed into one 12-credit choice instead of four per-area programs",
+          "kind": "choose_credits",
+          "courses": [
+            "ROBO513",
+            "ROBO517",
+            "ROBO529",
+            "ROBO537",
+            "ROBO533",
+            "ROBO534",
+            "ROBO535",
+            "ROBO554",
+            "ROBO550",
+            "ROBO565",
+            "ROBO567",
+            "ROBO572",
+            "ROBO576"
+          ],
+          "credits_required": 12
+        },
+        {
+          "group_id": "electives_depth",
+          "label": "Robotics Electives (Depth): two courses from the robotics course list",
+          "kind": "choose_credits",
+          "courses": [
+            "CSCI508",
+            "ROBO566"
+          ],
+          "credits_required": 6
+        },
+        {
+          "group_id": "technical_electives",
+          "label": "Technical Electives: four courses in any participating robotics department (CSCI, EDNS, EENG, MATH, MEGN); no fixed course list",
+          "kind": "choose_credits",
+          "credits_required": 12
+        }
+      ]
+    },
+    {
+      "program_id": "robotics-phd",
+      "name": "Robotics, Ph.D.",
+      "degree_level": "phd",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 72,
+      "requirement_groups": [
+        {
+          "group_id": "core_breadth",
+          "label": "Robotics Core (Breadth): four courses, one from each of the four focus areas' core course lists, collapsed into one 12-credit choice instead of four per-area programs",
+          "kind": "choose_credits",
+          "courses": [
+            "ROBO513",
+            "ROBO517",
+            "ROBO529",
+            "ROBO537",
+            "ROBO533",
+            "ROBO534",
+            "ROBO535",
+            "ROBO554",
+            "ROBO550",
+            "ROBO565",
+            "ROBO567",
+            "ROBO572",
+            "ROBO576"
+          ],
+          "credits_required": 12
+        },
+        {
+          "group_id": "electives_depth",
+          "label": "Robotics Electives (Depth): four courses from the robotics course list",
+          "kind": "choose_credits",
+          "courses": [
+            "CSCI508",
+            "ROBO566"
+          ],
+          "credits_required": 12
+        },
+        {
+          "group_id": "technical_electives",
+          "label": "Technical Electives: four courses in any participating robotics department (CSCI, EDNS, EENG, MATH, MEGN); no fixed course list",
+          "kind": "choose_credits",
+          "credits_required": 12
+        },
+        {
+          "group_id": "research",
+          "label": "Graduate thesis/dissertation research credit",
+          "kind": "choose_credits",
+          "courses": [
+            "ROBO707"
+          ],
+          "credits_required": 36
+        }
+      ]
+    },
+    {
+      "program_id": "space-resources-ms",
+      "name": "Space Resources, M.S. (Non-Thesis, Online)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 31,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Requirements",
+          "kind": "all",
+          "courses": [
+            "SPRS501",
+            "SPRS502",
+            "SPRS503",
+            "SPRS591",
+            "SPRS592"
+          ]
+        },
+        {
+          "group_id": "electives",
+          "label": "Electives (Table 3; other Mines courses allowed with program director approval)",
+          "kind": "choose_credits",
+          "courses": [
+            "AMFG501",
+            "AMFG521",
+            "AMFG522",
+            "CEEN501",
+            "GEOL557",
+            "GEOL558",
+            "MEGN551",
+            "MEGN566",
+            "MEGN571",
+            "SPRS504",
+            "SPRS505",
+            "SPRS506",
+            "SPRS507",
+            "SPRS508",
+            "SPRS509",
+            "SPRS598"
+          ],
+          "credits_required": 18
+        }
+      ]
+    },
+    {
+      "program_id": "space-resources-phd",
+      "name": "Space Resources, Ph.D.",
+      "degree_level": "phd",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 72,
+      "requirement_groups": [
+        {
+          "group_id": "core",
+          "label": "Core Requirements",
+          "kind": "all",
+          "courses": [
+            "SPRS501",
+            "SPRS502",
+            "SPRS503",
+            "SPRS591",
+            "SPRS592"
+          ]
+        },
+        {
+          "group_id": "coursework_electives",
+          "label": "Coursework electives (Table 3; at least 36 credits of coursework total, including the core above)",
+          "kind": "choose_credits",
+          "courses": [
+            "AMFG501",
+            "AMFG521",
+            "AMFG522",
+            "CEEN501",
+            "GEOL557",
+            "GEOL558",
+            "MEGN551",
+            "MEGN566",
+            "MEGN571",
+            "SPRS504",
+            "SPRS505",
+            "SPRS506",
+            "SPRS507",
+            "SPRS508",
+            "SPRS509",
+            "SPRS598"
+          ],
+          "credits_required": 23
+        },
+        {
+          "group_id": "research",
+          "label": "Graduate thesis/dissertation research credit (at least 24 credits)",
+          "kind": "choose_credits",
+          "courses": [
+            "SPRS707"
+          ],
+          "credits_required": 24
+        },
+        {
+          "group_id": "flexible",
+          "label": "Flexible coursework or research credit, approved by advisor and Dissertation Committee",
+          "kind": "choose_credits",
+          "credits_required": 12
+        }
+      ]
+    },
+    {
+      "program_id": "stem-teaching-ms",
+      "name": "STEM Teaching, M.S. in STEM Education (Non-Thesis)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "common_required",
+          "label": "Required of all three specialties (Science, Mathematics, Computer Science Teaching)",
+          "kind": "all",
+          "courses": [
+            "SCED562",
+            "SCED533",
+            "SCED563"
+          ]
+        },
+        {
+          "group_id": "capstone",
+          "label": "Specialty capstone sequence (9 credits; Science: SCED564/565, Mathematics: MAED564/565, Computer Science: CSED564/565 — one specialty's pair, collapsed into one choice instead of three per-specialty programs)",
+          "kind": "choose_credits",
+          "courses": [
+            "SCED564",
+            "SCED565",
+            "MAED564",
+            "MAED565",
+            "CSED564",
+            "CSED565"
+          ],
+          "credits_required": 9
+        },
+        {
+          "group_id": "pedagogy",
+          "label": "Discipline-specific pedagogy courses (6 credits; one specialty's pair)",
+          "kind": "choose_credits",
+          "courses": [
+            "SCED515",
+            "SCED545",
+            "MAED505",
+            "MAED525",
+            "CSED530",
+            "CSED535"
+          ],
+          "credits_required": 6
+        },
+        {
+          "group_id": "electives",
+          "label": "General electives, may be taken in other departments",
+          "kind": "choose_credits",
+          "credits_required": 6
+        }
+      ]
+    },
+    {
+      "program_id": "ucte-ms-non-thesis",
+      "name": "Underground Construction and Tunnel Engineering, M.S. (Non-Thesis)",
+      "degree_level": "master",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 30,
+      "requirement_groups": [
+        {
+          "group_id": "required_core",
+          "label": "Required Coursework",
+          "kind": "all",
+          "courses": [
+            "GEGN561",
+            "GEGN572",
+            "MNGN504",
+            "CEEN523"
+          ]
+        },
+        {
+          "group_id": "required_choice",
+          "label": "CEEN532 or MNGN509",
+          "kind": "choose_credits",
+          "courses": [
+            "CEEN532",
+            "MNGN509"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "independent_study",
+          "label": "Practically-focused independent study in the advisor's home department",
+          "kind": "choose_credits",
+          "courses": [
+            "CEEN599",
+            "GEGN599",
+            "MNGN599"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "coursework_electives",
+          "label": "Elective coursework",
+          "kind": "choose_credits",
+          "courses": [
+            "CEEN506",
+            "CEEN510",
+            "CEEN512",
+            "CEEN541",
+            "GEGN563",
+            "GEGN566",
+            "GEGN573",
+            "GEGN581",
+            "GEGN672",
+            "GEGN673",
+            "MNGN506",
+            "MNGN507",
+            "MNGN524",
+            "MNGN590"
+          ],
+          "credits_required": 12
+        }
+      ]
+    },
+    {
+      "program_id": "ucte-phd",
+      "name": "Underground Construction and Tunnel Engineering, Ph.D.",
+      "degree_level": "phd",
+      "catalog_year": "2026-2027",
+      "total_credits_required": 69,
+      "requirement_groups": [
+        {
+          "group_id": "required_core",
+          "label": "Required Coursework",
+          "kind": "all",
+          "courses": [
+            "GEGN561",
+            "GEGN572",
+            "MNGN504",
+            "CEEN523"
+          ]
+        },
+        {
+          "group_id": "required_choice",
+          "label": "CEEN532 or MNGN509",
+          "kind": "choose_credits",
+          "courses": [
+            "CEEN532",
+            "MNGN509"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "independent_study",
+          "label": "Practically-focused independent study in the advisor's home department",
+          "kind": "choose_credits",
+          "courses": [
+            "CEEN599",
+            "GEGN599",
+            "MNGN599"
+          ],
+          "credits_required": 3
+        },
+        {
+          "group_id": "coursework_electives",
+          "label": "Elective coursework (42 credits of coursework beyond the BS total, including the above)",
+          "kind": "choose_credits",
+          "courses": [
+            "CEEN506",
+            "CEEN510",
+            "CEEN512",
+            "CEEN541",
+            "GEGN563",
+            "GEGN566",
+            "GEGN573",
+            "GEGN581",
+            "GEGN672",
+            "GEGN673",
+            "MNGN506",
+            "MNGN507",
+            "MNGN524",
+            "MNGN590"
+          ],
+          "credits_required": 27
+        },
+        {
+          "group_id": "research",
+          "label": "Dissertation research credit (minimum 24 credits), home department",
+          "kind": "choose_credits",
+          "credits_required": 24
+        }
+      ]
     }
   ]
 }

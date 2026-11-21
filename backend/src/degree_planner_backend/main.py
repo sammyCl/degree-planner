@@ -31,12 +31,14 @@ def check(plan: Plan, connection: sqlite3.Connection = Depends(get_db)) -> Plan:
 
 @app.post("/plans", response_model=Plan)
 def create_plan(plan: Plan, connection: sqlite3.Connection = Depends(get_db)) -> Plan:
-    return save_plan(connection, plan)
+    """Re-validate before saving: flags and summary.requirements_met are never trusted from the client."""
+    return save_plan(connection, check_plan(connection, plan))
 
 
 @app.put("/plans/{plan_id}", response_model=Plan)
 def update_plan(plan_id: str, plan: Plan, connection: sqlite3.Connection = Depends(get_db)) -> Plan:
-    return save_plan(connection, plan.model_copy(update={"plan_id": plan_id}))
+    checked = check_plan(connection, plan.model_copy(update={"plan_id": plan_id}))
+    return save_plan(connection, checked)
 
 
 @app.get("/plans/{plan_id}", response_model=Plan)

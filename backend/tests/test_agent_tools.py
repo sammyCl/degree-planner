@@ -1116,7 +1116,7 @@ def test_program_every_real_program_is_clean(real_data_connection: sqlite3.Conne
     # The combined programs' components (mining-bs, cs-bs-general-track) are in bachelors.json now,
     # so every program, combined ones included, must load with no data warnings.
     ids = [row[0] for row in real_data_connection.execute("SELECT DISTINCT program_id FROM programs")]
-    assert len(ids) == 74  # 64 minors/ASIs + 5 graduate/combined (graduate-programs.json) + 5 bachelor's (bachelors.json)
+    assert len(ids) == 125
     for program_id in ids:
         result = get_program_requirements(real_data_connection, {"program_id": program_id})
         assert "error" not in result, program_id
@@ -1309,7 +1309,7 @@ def test_program_every_no_list_group_shows_label(real_data_connection: sqlite3.C
         for group in get_program_requirements(real_data_connection, {"program_id": program_id})["requirement_groups"]
         if group["courses"] is None
     ]
-    assert len(no_list) == 17  # 9 minors/ASIs + 3 graduate + 5 free-elective groups in bachelors.json
+    assert len(no_list) == 85
     for group in no_list:
         assert group["label"] in group["summary"]
 

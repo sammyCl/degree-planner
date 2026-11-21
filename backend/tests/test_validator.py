@@ -279,3 +279,77 @@ def test_check_plan_ignores_unknown_courses_instead_of_crashing(connection: sqli
     result = check_plan(connection, plan)
 
     assert not [flag for flag in result.flags if flag.type == "broken_prerequisite"]
+
+
+def test_check_plan_ignores_an_unknown_program_instead_of_crashing(connection: sqlite3.Connection) -> None:
+    plan = Plan.model_validate(
+        {
+            "student": {
+                "degree_level": "bachelor",
+                "programs": ["no-such-program"],
+                "catalog_year": "2026-2027",
+                "completed_courses": [],
+            },
+            "semesters": [],
+            "flags": [],
+            "summary": {"total_credits": 0.0, "total_credits_required": 0.0, "requirements_met": False},
+        }
+    )
+
+    result = check_plan(connection, plan)
+
+    assert result.summary.total_credits_required == 0.0
+    assert not [flag for flag in result.flags if flag.type == "requirement_unmet"]
+
+
+def test_check_plan_ignores_a_combined_program_s_unloaded_component(tmp_path: Path) -> None:
+    (tmp_path / "combined.json").write_text(
+        json.dumps(
+            {
+                "programs": [
+                    {
+                        "program_id": "combo",
+                        "name": "Combo",
+                        "degree_level": "combined",
+                        "catalog_year": "2099-2000",
+                        "total_credits_required": 10,
+                        "requirement_groups": [],
+                        # "component-bs" is never loaded: the component data hasn't landed yet.
+                        "combines": ["component-bs", "component-ms"],
+                    },
+                    {
+                        "program_id": "component-ms",
+                        "name": "Component MS",
+                        "degree_level": "master",
+                        "catalog_year": "2099-2000",
+                        "total_credits_required": 10,
+                        "requirement_groups": [
+                            {"group_id": "core", "label": "Core", "kind": "all", "courses": []}
+                        ],
+                    },
+                ]
+            }
+        )
+    )
+    connection = sqlite3.connect(":memory:")
+    refresh_database(tmp_path, connection)
+
+    plan = Plan.model_validate(
+        {
+            "student": {
+                "degree_level": "combined",
+                "programs": ["combo"],
+                "catalog_year": "2099-2000",
+                "completed_courses": [],
+            },
+            "semesters": [],
+            "flags": [],
+            "summary": {"total_credits": 0.0, "total_credits_required": 0.0, "requirements_met": False},
+        }
+    )
+
+    result = check_plan(connection, plan)
+
+    # The loaded component (component-ms) is still checked; the missing one is skipped, not a crash.
+    assert result.summary.total_credits_required == 10.0
+    assert not [flag for flag in result.flags if flag.type == "requirement_unmet"]

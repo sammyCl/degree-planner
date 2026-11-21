@@ -136,14 +136,22 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
 
     total_credits_required = 0.0
     for program_id in student.programs:
-        program = get_program(connection, program_id, catalog_year)
+        try:
+            program = get_program(connection, program_id, catalog_year)
+        except NotFoundError:
+            continue
         total_credits_required += program.total_credits_required
 
-        requirement_programs: list[Program] = (
-            [get_program(connection, component_id, catalog_year) for component_id in program.combines]
-            if program.combines
-            else [program]
-        )
+        requirement_programs: list[Program]
+        if program.combines:
+            requirement_programs = []
+            for component_id in program.combines:
+                try:
+                    requirement_programs.append(get_program(connection, component_id, catalog_year))
+                except NotFoundError:
+                    continue
+        else:
+            requirement_programs = [program]
 
         for req_program in requirement_programs:
             for double_count in req_program.double_counts_with:
