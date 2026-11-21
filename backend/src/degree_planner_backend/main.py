@@ -4,6 +4,8 @@ from pathlib import Path
 
 from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
 
+from degree_planner_backend.agent.loop import ClaudeCodeError, run_agent
+from degree_planner_backend.agent.request_models import AgentRequest, AgentResponse
 from degree_planner_backend.db import get_db
 from degree_planner_backend.plan_models import CompletedCourse, Plan
 from degree_planner_backend.plan_store import PlanNotFoundError, load_plan, save_plan
@@ -47,6 +49,17 @@ def get_plan(plan_id: str, connection: sqlite3.Connection = Depends(get_db)) -> 
         return load_plan(connection, plan_id)
     except PlanNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@app.post("/plans/submit-setup", response_model=AgentResponse)
+def submit_setup(request: AgentRequest, connection: sqlite3.Connection = Depends(get_db)) -> AgentResponse:
+    """Setup form submitted: call the agent loop and return the plan it builds (or why it couldn't)."""
+    try:
+        return run_agent(connection, request)
+    except ClaudeCodeError as exc:
+        # The agent itself could not run (not installed, not signed in) - a server problem, not
+        # something wrong with the student's setup, so 503 rather than 400.
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @app.post("/transcripts/parse", response_model=list[CompletedCourse])
