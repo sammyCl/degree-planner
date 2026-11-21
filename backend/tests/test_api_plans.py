@@ -100,3 +100,28 @@ def test_plan_store_round_trip(client_with_empty_db: TestClient) -> None:
 def test_get_missing_plan_returns_404(client_with_empty_db: TestClient) -> None:
     response = client_with_empty_db.get("/plans/no-such-plan")
     assert response.status_code == 404
+
+
+def test_create_and_update_plan_never_trust_the_client_s_flags(client_with_catalog: TestClient) -> None:
+    # POST /plans and PUT /plans/{plan_id} must re-run the validator before saving, the same as
+    # POST /plans/check, or a client can forge a passing plan straight into the plan store.
+    payload = json.loads((REPO_ROOT / "docs" / "plan-format.sample.json").read_text())
+    payload["summary"]["requirements_met"] = True
+    payload["flags"] = []
+
+    created = client_with_catalog.post("/plans", json=payload)
+    assert created.status_code == 200
+    body = created.json()
+    assert body["summary"]["requirements_met"] is False
+    assert any(flag["type"] == "broken_prerequisite" for flag in body["flags"])
+
+    plan_id = body["plan_id"]
+    forged_update = {**payload, "summary": {**payload["summary"], "requirements_met": True}, "flags": []}
+    updated = client_with_catalog.put(f"/plans/{plan_id}", json=forged_update)
+    assert updated.status_code == 200
+    updated_body = updated.json()
+    assert updated_body["summary"]["requirements_met"] is False
+    assert any(flag["type"] == "broken_prerequisite" for flag in updated_body["flags"])
+
+    fetched = client_with_catalog.get(f"/plans/{plan_id}")
+    assert fetched.json()["summary"]["requirements_met"] is False

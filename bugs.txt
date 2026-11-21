@@ -468,7 +468,7 @@ BUG-023  Catalog years are not checked at load, and the "several years" error
              _resolve_catalog_year; the agent tool then uses exc.years.
 
 BUG-024  The validator applies overrides to flags that are not overridable
-  Status:    Open
+  Status:    Fixed
   Owner:     Midhat Sajad (validator)
   Where:     backend/src/degree_planner_backend/validator.py (check_plan,
              previously_overridden)
@@ -488,6 +488,11 @@ BUG-024  The validator applies overrides to flags that are not overridable
   Fix idea:  in add_flag, set overridden only when overridable is true. (The
              agent's check_plan tool now passes only exception_claimed
              overrides, but the frontend calls /plans/check directly.)
+  Fixed in:  PR #19 (backend/fix-validator-override-bypass): add_flag now sets
+             overridden=overridable and (flag_type, course_id) in
+             previously_overridden. Covered by
+             test_check_plan_rejects_a_forged_override_on_a_non_overridable_flag
+             in backend/tests/test_validator.py. Same fix as BUG-032.
 
 BUG-025  One course can count toward several requirement groups
   Status:    Open
@@ -606,7 +611,7 @@ BUG-031  Prerequisite edges are written as "from_" unless dumped by alias
              always dump with by_alias=True and say so in plan-format.md
 
 BUG-032  Validator keeps "overridden" on flags that cannot be overridden
-  Status:    Open
+  Status:    Fixed
   Owner:     Midhat Sajad (validator)
   Where:     backend/src/degree_planner_backend/validator.py (check_plan,
              previously_overridden), reached through POST /plans/check
@@ -626,6 +631,9 @@ BUG-032  Validator keeps "overridden" on flags that cannot be overridden
              previously_overridden; a test that forges overridden on a
              broken_prerequisite. AgentResponse in agent/request_models.py
              already ignores such overrides
+  Fixed in:  PR #19 (backend/fix-validator-override-bypass), exactly the fix
+             idea above. Same root cause as BUG-024; see that entry for the
+             test. Found independently of it, reproduced the same way.
 
 BUG-033  Transcript term headings accept non-ASCII digits and any year
   Status:    Open
@@ -644,3 +652,34 @@ BUG-033  Transcript term headings accept non-ASCII digits and any year
              these, but a crafted PDF could
   Fix idea:  [0-9]{4} instead of \d{4}; normalize the term label to
              "Fall 2024" form so it matches the request format
+
+BUG-034  create_plan and update_plan never run the validator before saving
+  Status:    Fixed
+  Owner:     Midhat Sajad (API endpoints, plan store)
+  Where:     backend/src/degree_planner_backend/main.py (create_plan,
+             update_plan)
+  Found:     2026-11-21 reviewing the BUG-024/032 override fix: it only
+             closed the forging path through POST /plans/check
+  Steps:     POST /plans (or PUT /plans/{plan_id}) a plan whose flags are []
+             and summary.requirements_met is true, for a plan that is
+             actually missing a prerequisite or a requirement
+  Actual:    save_plan stores the plan exactly as sent; GET /plans/{id}
+             returns the forged "passing" plan untouched. The same forging
+             attack BUG-024/032 fixed for /plans/check, just through a
+             different endpoint; docs/plan-format.md says flags are
+             "validator output", not client input
+  Expected:  the backend is the trust boundary: flags and summary are always
+             backend-computed before a plan is saved
+  Fix idea:  create_plan/update_plan call check_plan on the incoming plan
+             before save_plan, the same as POST /plans/check
+  Fixed in:  PR #22 (backend/fix-plan-store-validation-gap):
+             create_plan/update_plan now call check_plan before save_plan.
+             check_plan itself needed to tolerate an unknown program_id and
+             an unknown combines component (previously an uncaught
+             NotFoundError, since real plans can reference the student's
+             program before all program data has loaded). Covered by
+             test_create_and_update_plan_never_trust_the_client_s_flags in
+             test_api_plans.py, and
+             test_check_plan_ignores_an_unknown_program_instead_of_crashing /
+             test_check_plan_ignores_a_combined_program_s_unloaded_component
+             in test_validator.py.
