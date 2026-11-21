@@ -140,9 +140,10 @@ def build() -> tuple[list[dict], dict[str, list[str]], Counter]:
         if pre.requirement is None and r["prerequisites"].strip().lower() not in ("", "none", "none.", "n/a"):
             if not pre.notes_dropped:
                 notes["empty prerequisites"].append(f"{code}: {r['prerequisites'][:100]}")
-        coreq, ok = parse_corequisites(r["corequisites"])
-        if not ok:
-            stats["corequisites not expressible (OR/free text; left empty)"] += 1
+        coreq_res = parse_corequisites(r["corequisites"])
+        coreq = coreq_res.requirement
+        if coreq_res.fallback:
+            stats["corequisites kept as one exception (free text)"] += 1
             notes["corequisites"].append(f"{code}: {r['corequisites'][:120]}")
         course = {
             "code": code,
@@ -172,7 +173,7 @@ def build() -> tuple[list[dict], dict[str, list[str]], Counter]:
                 for x in req["of"]:
                     yield from refs(x)
 
-        for ref in list(refs(course["prerequisites"])) + coreq:
+        for ref in list(refs(course["prerequisites"])) + list(refs(course["corequisites"])):
             if ref not in known:
                 stats["references to codes not in the catalog"] += 1
                 notes["unknown references"].append(f"{code} -> {ref}")
@@ -188,7 +189,7 @@ def write_review(notes: dict[str, list[str]], stats: Counter) -> None:
     out += [f"- {k}: {v}" for k, v in sorted(stats.items())]
     caps = {
         "free-text prerequisites": "Prerequisites that are free text, whole or in part (free text becomes an exception the student can override)",
-        "corequisites": "Corequisites not expressible as a plain list (OR or free text), left empty",
+        "corequisites": "Corequisites that are free text, kept whole as one exception (same as free-text prerequisites)",
         "unknown references": "Prerequisite/corequisite codes that are not courses in the catalog CSVs (typos or retired courses)",
         "conflicts": "Duplicate codes whose CSV rows disagree (undergraduate row kept)",
         "empty prerequisites": "Prerequisite text that produced no requirement",

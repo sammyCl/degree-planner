@@ -194,17 +194,18 @@ GET_PREREQUISITES_TOOL: dict[str, Any] = {
     "description": (
         "Get what a student must complete before taking one Colorado School of Mines course, "
         "and the corequisites they must take in the same semester (or earlier). "
-        "Returns code, catalog_year, prerequisites, summary, and corequisites. "
-        "prerequisites is a tree: {'type': 'course', 'code': ...} is one course; "
-        "{'type': 'exception', 'label': ...} is an approval such as 'instructor approval', not a course; "
-        "{'type': 'AND', 'of': [...]} needs all of its parts; {'type': 'OR', 'of': [...]} needs any one. "
-        "prerequisites is null and summary is 'none' when the course has no prerequisites. "
-        "summary is the same tree as one line, such as 'CSCI306 AND (MATH201 OR MATH223)'; "
+        "Returns code, catalog_year, prerequisites, summary, corequisites, and corequisites_summary. "
+        "prerequisites and corequisites are each the same kind of tree: {'type': 'course', 'code': ...} is "
+        "one course, with an optional min_grade such as 'C-'; {'type': 'exception', 'label': ...} is an "
+        "approval such as 'instructor approval', not a course; {'type': 'AND', 'of': [...]} needs all of "
+        "its parts; {'type': 'OR', 'of': [...]} needs any one. "
+        "prerequisites/corequisites is null and the matching summary is 'none' when the course has none. "
+        "Each summary is its tree as one line, such as 'CSCI306 AND (MATH201 OR MATH223)'; "
         "an approval appears as exception: \"instructor approval\" and is never already satisfied, so tell "
         "the student they need it. '(empty OR group)' means the catalog data is broken for that course: "
         "tell the student rather than guessing. "
-        "Codes listed as prerequisites may be missing from the catalog, and corequisites may be free text "
-        "rather than course codes; check each with search_catalog before planning with it. "
+        "Codes listed as prerequisites or corequisites may be missing from the catalog; "
+        "check each with search_catalog before planning with it. "
         "If the course is in several catalog years, the error lists them: "
         "call again with catalog_year set to one."
     ),
@@ -261,7 +262,10 @@ def clean_label(label: str) -> str:
 def requirement_to_dict(requirement: Requirement) -> dict[str, Any]:
     """The requirement tree as JSON-ready dicts, with every exception label cleaned."""
     if isinstance(requirement, CourseRequirement):
-        return {"type": "course", "code": requirement.code}
+        course_dict: dict[str, Any] = {"type": "course", "code": requirement.code}
+        if requirement.min_grade is not None:
+            course_dict["min_grade"] = requirement.min_grade
+        return course_dict
     if isinstance(requirement, ExceptionRequirement):
         return {"type": "exception", "label": clean_label(requirement.label)}
     return {"type": requirement.type, "of": [requirement_to_dict(part) for part in requirement.of]}
@@ -277,7 +281,7 @@ def summarize_requirement(requirement: Requirement | None, *, top: bool = True) 
     if requirement is None:
         return "none"
     if isinstance(requirement, CourseRequirement):
-        return requirement.code
+        return requirement.code if requirement.min_grade is None else f"{requirement.code} ({requirement.min_grade} or better)"
     if isinstance(requirement, ExceptionRequirement):
         return f"exception: {json.dumps(clean_label(requirement.label), ensure_ascii=False)}"
     if not requirement.of:
@@ -374,12 +378,14 @@ def get_prerequisites(connection: sqlite3.Connection, tool_input: dict[str, Any]
         }
 
     prerequisites = course.prerequisites
+    corequisites = course.corequisites
     return {
         "code": course.code,
         "catalog_year": _shown_year(course.catalog_year),
         "prerequisites": requirement_to_dict(prerequisites) if prerequisites is not None else None,
         "summary": summarize_requirement(prerequisites),
-        "corequisites": list(course.corequisites),
+        "corequisites": requirement_to_dict(corequisites) if corequisites is not None else None,
+        "corequisites_summary": summarize_requirement(corequisites),
     }
 
 

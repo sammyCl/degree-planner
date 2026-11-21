@@ -272,13 +272,23 @@ def test_prerequisites_nested_and_or(connection: sqlite3.Connection) -> None:
             {"type": "OR", "of": [{"type": "course", "code": "MATH201"}, {"type": "course", "code": "MATH223"}]},
         ],
     }
-    assert result["corequisites"] == []
+    assert result["corequisites"] == {
+        "type": "OR",
+        "of": [{"type": "course", "code": "MATH201"}, {"type": "course", "code": "MATH223"}],
+    }
+    assert result["corequisites_summary"] == "MATH201 OR MATH223"
 
 
 def test_prerequisites_single_course(connection: sqlite3.Connection) -> None:
     result = get_prerequisites(connection, {"code": "MATH201"})
     assert result["prerequisites"] == {"type": "course", "code": "MATH112"}
     assert result["summary"] == "MATH112"
+
+
+def test_prerequisites_min_grade(connection: sqlite3.Connection) -> None:
+    result = get_prerequisites(connection, {"code": "CSCI306"})
+    assert result["prerequisites"] == {"type": "course", "code": "CSCI200", "min_grade": "C-"}
+    assert result["summary"] == "CSCI200 (C- or better)"
 
 
 def test_prerequisites_exception(connection: sqlite3.Connection) -> None:
@@ -295,7 +305,7 @@ def test_prerequisites_none(connection: sqlite3.Connection) -> None:
 
 def test_prerequisites_result_fields(connection: sqlite3.Connection) -> None:
     result = get_prerequisites(connection, {"code": "CSCI306"})
-    assert set(result) == {"code", "catalog_year", "prerequisites", "summary", "corequisites"}
+    assert set(result) == {"code", "catalog_year", "prerequisites", "summary", "corequisites", "corequisites_summary"}
 
 
 @pytest.mark.parametrize("code", ["csci400", "CSCI 400", "Csci-400", "  CSCI400 "])
@@ -307,12 +317,15 @@ def test_prerequisites_corequisites(tmp_path: Path) -> None:
     conn = load_courses(
         tmp_path,
         [
-            make_course("PHGN100", title="Physics I", corequisites=["MATH111"]),
+            make_course(
+                "PHGN100", title="Physics I", corequisites={"type": "course", "code": "MATH111"}
+            ),
             make_course("MATH111", title="Calculus I"),
         ],
     )
     result = get_prerequisites(conn, {"code": "PHGN100"})
-    assert result["corequisites"] == ["MATH111"]
+    assert result["corequisites"] == {"type": "course", "code": "MATH111"}
+    assert result["corequisites_summary"] == "MATH111"
     assert result["summary"] == "none"
 
 
