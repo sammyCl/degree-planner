@@ -19,4 +19,5 @@ Everything the team collected for the planner. Nothing here is private.
 Rebuild minors/ASIs/forms: `python -I data/tools/build_minors_json.py` (needs `pypdf`).
 Rebuild bachelor's programs: from `backend/`, `uv run python -I ../data/tools/build_bachelors_json.py` (needs `pypdf`, already in the backend environment); `json/bachelors.REVIEW.md` lists the same kinds of conflicts and gaps for the bachelor's PDFs. Tests: from `backend/`, `uv run pytest tests/test_bachelors_data.py`.
 Rebuild courses: `python3 data/tools/build_courses_json.py` (standard library only); `json/courses.REVIEW.md` lists everything it could not convert cleanly, and `json/courses.dropped-info.csv` lists each grade minimum and note the format could not hold. Tests for the prerequisite parser: from `backend/`, `uv run pytest ../data/tools`.
+Rebuild the setup page's program list (the backend has no list endpoint yet): `python3 data/tools/build_frontend_options.py` writes `frontend/src/setup/programOptions.json` from the program files in `json/`.
 Load everything into the database (each person builds their own; the `.db` file is not in git): from `backend/`, `uv run load-data ../data`.

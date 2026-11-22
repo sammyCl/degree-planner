@@ -61,3 +61,17 @@ export interface Plan {
     requirements_met: boolean
   }
 }
+
+// What the backend's POST /plans/submit-setup takes (docs/agent-request-format.md, owner: Midhat and Samantha).
+export interface Override {
+  type: 'exception_claimed'
+  code: string
+}
+
+export interface AgentRequest {
+  student: Plan['student']
+  semesters: number
+  start_term: string
+  include_summers: boolean
+  overrides: Override[]
+}
