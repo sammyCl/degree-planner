@@ -11,7 +11,7 @@ Everything the team collected for the planner. Nothing here is private.
 | `Minors and ASIs/` | One PDF per undergraduate minor, plus the general list | Abdallah |
 | `Forms/` | Registrar forms (Independent Study, double degree, transfer approval, ...) | Abdallah |
 | `Policies/` | Catalog policy pages (honors programs, academic regulations, degree requirements) | Abdallah |
-| `json/` | The PDFs turned into the format in [docs/data-format.md](../docs/data-format.md): `minors.json` (2026-2027), `asis.json` (2025-2026), `forms-policies.json` (Abdallah); `courses.json` (all 2,137 catalog courses with prerequisite logic, 2026-2027); `bachelors.json` (CS General Track, Mining, and the three AMS emphases, 2026-2027; Samantha) | Abdallah (courses: built for Samantha/Midhat's slices); Samantha (bachelor's) |
+| `json/` | The PDFs turned into the format in [docs/data-format.md](../docs/data-format.md): `minors.json` (2026-2027), `asis.json` (2025-2026), `forms-policies.json` (Abdallah); `courses.json` (all 2,137 catalog courses with prerequisite logic, 2026-2027); `bachelors.json` (all 21 bachelor's majors as 44 programs, tracks and focus areas separate, 2026-2027; Samantha built the first five, Abdallah the rest) | Abdallah (courses: built for Samantha/Midhat's slices); Samantha (bachelor's) |
 | `CONFLICT-LOG.md` | Every place two sources disagreed, how it was resolved, and the rules used. Add a row for each new conflict | Everyone |
 | `tools/` | Scripts that rebuild `json/` from the PDFs | Abdallah; `build_bachelors_json.py`: Samantha |
 
