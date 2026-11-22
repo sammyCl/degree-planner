@@ -15,7 +15,7 @@ Source of truth for scope: the team proposal (submitted Fri Nov 6) and [README.m
 - Status marks: `[ ]` not started, `[~]` in progress, `[x]` done, `[!]` blocked (write who or what blocks it).
 - Every task has a short name; a task shared by the whole team has the same name in every plan it appears in. **Needs** lists the names of tasks that must be done first, including tasks owned by someone else.
 - Priority: **P0** = core path, the product does not work without it. **P1** = should have. **P2** = stretch, first to cut (see "What to cut first").
-- Tick a box in the same commit or PR that finishes the task, and add a line to the status log at the bottom of your plan.
+- Tick a box in the same commit that finishes the task, and add a line to the status log at the bottom of your plan.
 - Asking Claude "what should I work on next?" or "what am I waiting on?": Claude reads all four plans, finds your unchecked tasks whose **Needs** are all done, and lists them by priority and date. For tasks that are waiting, it names the task and the owner you are waiting on, and says what that person should do first.
 - Claude only ticks a box when the team member says the task is done or the code and tests show it. It does not invent results, costs, or decisions (see [CLAUDE.md](../CLAUDE.md)).
 

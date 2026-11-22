@@ -48,8 +48,17 @@ Collected data follows the format the backend owner sets.
 
 ## Git
 
-- Work on a branch and merge through a pull request; never commit straight to `main`.
-- Never force-push, and ask before pushing or opening a pull request.
+We merge straight to `main` instead of opening pull requests. The team agreed because we mostly work in different areas, and waiting on manual PR merges left people building on stale code. Claude does the safety checks that a PR review would have done.
+
+- Work on a branch per task and commit there; never commit directly on `main`.
+- **When the user asks to push, merge, or ship** (their request is the permission; do not push `main` otherwise):
+  1. Commit everything on the branch, then `git fetch origin`.
+  2. Check the branch merges cleanly into `origin/main` (`git merge-tree --write-tree origin/main <branch>`). If there are conflicts, stop and show them to the user; never resolve them silently and never push.
+  3. Run the checks for the parts the change touches, and stop on any failure: backend `uv run pytest` (from `backend/`); frontend `npm test`, `npm run build` and `npm run lint` (from `frontend/`); data tools `uv run pytest ../data/tools`; for changes under `data/`, `uv run load-data ../data` must report no errors.
+  4. `git checkout main`, `git pull --ff-only`, `git merge --no-ff <branch>`, then `git push origin main`. If the push is rejected because someone pushed first, fetch and repeat from step 2.
+  5. Branch cleanup after a successful merge, for the branch that was just merged: Abdallah's is deleted automatically (locally and on the remote); for Midhat and Samantha, ask first. Never delete another member's branch.
+- If the change touches another member's part (see the table above), tell the user to message that owner before merging. Open a pull request only if the user asks for one.
+- Never force-push. Do not push other branches unless the user wants a backup.
 - Keep `.env` and secrets out of git (`.gitignore` covers `.env`).
 
 ## Plans and tracking
