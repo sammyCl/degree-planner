@@ -101,6 +101,56 @@ Slice: bachelor's (Samantha). Built by `tools/build_bachelors_json.py`; the gene
 | 21 | Applied Mathematics and Statistics BS | The PDF has three emphases (CAM, STATS, DS) with separate tables; Example 4 says only "AMS bachelor's". | One program each: `ams-bs-cam`, `ams-bs-stats`, `ams-bs-ds`. Example 4 uses `ams-bs-stats`. | 8 | Decided by Samantha, 2026-11-20 |
 | 22 | AMS BS, linear algebra | The PDF writes "MATH332 LINEAR ALGEBRA or 342". | MATH332 or MATH342 (the honors version). | — | Decided by Samantha, 2026-11-20 |
 
+## Bachelor's programs: the remaining majors (`json/bachelors.json`)
+
+Samantha built the first five programs for the examples (CS General Track, Mining, three AMS emphases). On 2026-11-22
+Abdallah added every other bachelor's major, so the file now has all 21 undergraduate PDFs as **44 programs**, built by
+the same script (`tools/build_bachelors_json.py`, one hand-written spec per program). Notes and flags per program are
+in `json/bachelors.REVIEW.md`.
+
+- **Tracks, emphases and focus areas are separate programs** (rule 8, still waiting on Midhat's decision): Chemical
+  Engineering 4 (base, Biological, Process, Honors Research), Chemistry 3 (Chemistry, Environmental Chemistry,
+  Biochemistry), Geological Engineering 3 (Environmental Geosciences, Engineering Geology and Geotechnics, Mineral and
+  Energy Resources), Business Engineering and Management Science 8 (base plus seven tracks), Quantitative Biosciences and
+  Engineering 2 (General, Honors), Computer Science 7 (the six focus areas other than General were added; General is
+  Samantha's `cs-bs-general-track`). Mechanical Engineering's "eight tracks" are only ways to choose the four ME
+  electives, not separate tables, so it is one program.
+- **Credits must add up.** Each program's groups are summed against the printed total and a test enforces it. All 44 do,
+  except the two QBE programs below.
+- **Source disagreements** (the CSV governs course facts, rule 2):
+  - QBE: the PDF counts CBEN321 Genetics as 4.0 credits, the CSV says 3.0, so both QBE programs add up to 129 against the
+    printed 130 (the PDF probably means Genetics plus its 1-credit lab CBEN331). Code kept, nothing added; recorded as a
+    known gap in `tests/test_bachelors_data.py` (`KNOWN_CREDIT_GAPS`).
+  - Quantum Systems: PHGN384 is a "new version" worth 3.0 in the PDF, 6.0 in the CSV and in the Engineering Physics PDF.
+    It is a 3-credit group, not a required course, so the total adds up to the PDF's 129.
+  - Honors programs: HNRS398 and HNRS498 are variable credit (1-6) in the CSV but 1.0 in the PDF, so they are explicit
+    1-credit groups.
+- **New courses with no catalog code yet** are open slots (any course), with the printed name in the label, so nothing
+  invents a code: Quantum Systems (EDNS311 Systems Engineering, "PHGNXXX Quantum Devices Laboratory"), Geological
+  Engineering Environmental Geosciences ("GEGN4XX Environmental Geosciences Design", the 1-credit geochemistry lab printed
+  as CHGN499L / CHGN406L, and Restricted Elective 1, which may be a new Paleoclimate or Surface Water Hydrology course).
+  Replace each with the real course when the catalog has it.
+- **Slots that name only a subject** ("MTGN Elective", "EBGN 300 or 400 level") are pools of that subject at an assumed
+  level (MTGN300-499, EBGN300-499, CHGN300-599 for Chemistry electives). The level is an assumption each time and is
+  noted in the review file.
+- **Open technical electives.** "Technical Electives are courses in any technical field" (Chemistry, Biochemistry,
+  Chemical Engineering, Engineering Physics' Engineering Science Elective, Design Engineering's Thematic Electives, the
+  Mineral and Energy Resources restricted elective) have no closed list, so they stay open groups; the UI should say
+  "confirm with the department" (same as the department-approved groups above).
+- **Long approved lists are read from the PDF by code** (Mechanical, Design Engineering, Chemical, Chemistry, BEMS,
+  QBE), keeping only codes the course CSV has, so a typo cannot add a course that does not exist.
+- **Placeholder lines** such as "AMFG5XX Non-seminar and research credit" are modelled as 500-level pools (500-597 so
+  that research and thesis codes are left out); that exclusion is approximate.
+- **Rules the format cannot express**, noted per program and not enforced: "at least 9 of 15 EE elective credits at the
+  400 level", "at least 2 of the technical electives with a CEEN prefix", "9 credits with the same prefix" (Design),
+  advisor-approval routes, and a course that may count toward two lists when it exceeds one list's minimum.
+- **A course on a choose-list that is also required** is removed from the list (CSCI460 in CS + Entrepreneurship,
+  GEGN212 in Geophysical Engineering, CHGN406 in Environmental Chemistry, ...), because the validator counts a course in
+  one group only.
+- **Tests changed to fit the larger file** (`tests/test_bachelors_data.py`, `tests/test_agent_tools.py`, both Samantha's):
+  the five example programs must still be present, but the file is no longer limited to them, and two pinned counts
+  (all programs, groups with no course list) were updated (158 then 164 programs; 139 no-list groups).
+
 ## Catalog years
 
 - Minors and forms/policies: 2026-2027. ASIs: 2025-2026 (see above). Bachelor's programs: 2026-2027.

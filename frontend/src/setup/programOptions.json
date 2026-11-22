@@ -17,13 +17,208 @@
    "level": "bachelor"
   },
   {
+   "id": "biochemistry-bs",
+   "name": "Bachelor of Science in Biochemistry",
+   "level": "bachelor"
+  },
+  {
+   "id": "bems-bs",
+   "name": "Bachelor of Science in Business Engineering and Management Science",
+   "level": "bachelor"
+  },
+  {
+   "id": "bems-bs-actuarial-science",
+   "name": "Bachelor of Science in Business Engineering and Management Science (Actuarial Science Track)",
+   "level": "bachelor"
+  },
+  {
+   "id": "bems-bs-computing",
+   "name": "Bachelor of Science in Business Engineering and Management Science (Computing Track)",
+   "level": "bachelor"
+  },
+  {
+   "id": "bems-bs-corporate-management",
+   "name": "Bachelor of Science in Business Engineering and Management Science (Corporate Management Track)",
+   "level": "bachelor"
+  },
+  {
+   "id": "bems-bs-energy-natural-resources",
+   "name": "Bachelor of Science in Business Engineering and Management Science (Energy and Natural Resources Management Track)",
+   "level": "bachelor"
+  },
+  {
+   "id": "bems-bs-engineering",
+   "name": "Bachelor of Science in Business Engineering and Management Science (Engineering Track)",
+   "level": "bachelor"
+  },
+  {
+   "id": "bems-bs-financial-economics",
+   "name": "Bachelor of Science in Business Engineering and Management Science (Financial Economics Track)",
+   "level": "bachelor"
+  },
+  {
+   "id": "bems-bs-operations-research",
+   "name": "Bachelor of Science in Business Engineering and Management Science (Operations Research Track)",
+   "level": "bachelor"
+  },
+  {
+   "id": "ceramic-engineering-bs",
+   "name": "Bachelor of Science in Ceramic Engineering",
+   "level": "bachelor"
+  },
+  {
+   "id": "chemical-engineering-bs",
+   "name": "Bachelor of Science in Chemical Engineering",
+   "level": "bachelor"
+  },
+  {
+   "id": "chemical-engineering-bs-biological",
+   "name": "Bachelor of Science in Chemical Engineering (Biological Engineering Track)",
+   "level": "bachelor"
+  },
+  {
+   "id": "chemical-engineering-bs-honors-research",
+   "name": "Bachelor of Science in Chemical Engineering (Honors Research Track)",
+   "level": "bachelor"
+  },
+  {
+   "id": "chemical-engineering-bs-process",
+   "name": "Bachelor of Science in Chemical Engineering (Process Engineering Track)",
+   "level": "bachelor"
+  },
+  {
+   "id": "chemistry-bs-biochemistry",
+   "name": "Bachelor of Science in Chemistry (Biochemistry Track)",
+   "level": "bachelor"
+  },
+  {
+   "id": "chemistry-bs-chemistry",
+   "name": "Bachelor of Science in Chemistry (Chemistry Track)",
+   "level": "bachelor"
+  },
+  {
+   "id": "chemistry-bs-environmental",
+   "name": "Bachelor of Science in Chemistry (Environmental Chemistry Track)",
+   "level": "bachelor"
+  },
+  {
+   "id": "civil-engineering-bs",
+   "name": "Bachelor of Science in Civil Engineering",
+   "level": "bachelor"
+  },
+  {
+   "id": "cs-bs-business",
+   "name": "Bachelor of Science in Computer Science (CS + Business)",
+   "level": "bachelor"
+  },
+  {
+   "id": "cs-bs-computer-engineering",
+   "name": "Bachelor of Science in Computer Science (CS + Computer Engineering)",
+   "level": "bachelor"
+  },
+  {
+   "id": "cs-bs-data-science",
+   "name": "Bachelor of Science in Computer Science (CS + Data Science)",
+   "level": "bachelor"
+  },
+  {
+   "id": "cs-bs-entrepreneurship",
+   "name": "Bachelor of Science in Computer Science (CS + Entrepreneurship and Innovation)",
+   "level": "bachelor"
+  },
+  {
+   "id": "cs-bs-robotics",
+   "name": "Bachelor of Science in Computer Science (CS + Robotics and Intelligent Systems)",
+   "level": "bachelor"
+  },
+  {
+   "id": "cs-bs-space",
+   "name": "Bachelor of Science in Computer Science (CS + Space)",
+   "level": "bachelor"
+  },
+  {
    "id": "cs-bs-general-track",
    "name": "Bachelor of Science in Computer Science (General Track)",
    "level": "bachelor"
   },
   {
+   "id": "construction-engineering-bs",
+   "name": "Bachelor of Science in Construction Engineering",
+   "level": "bachelor"
+  },
+  {
+   "id": "design-engineering-bs",
+   "name": "Bachelor of Science in Design Engineering",
+   "level": "bachelor"
+  },
+  {
+   "id": "ee-bs",
+   "name": "Bachelor of Science in Electrical Engineering",
+   "level": "bachelor"
+  },
+  {
+   "id": "engineering-physics-bs",
+   "name": "Bachelor of Science in Engineering Physics",
+   "level": "bachelor"
+  },
+  {
+   "id": "environmental-engineering-bs",
+   "name": "Bachelor of Science in Environmental Engineering",
+   "level": "bachelor"
+  },
+  {
+   "id": "geological-engineering-bs-engineering-geology",
+   "name": "Bachelor of Science in Geological Engineering (Engineering Geology and Geotechnics Track)",
+   "level": "bachelor"
+  },
+  {
+   "id": "geological-engineering-bs-environmental-geosciences",
+   "name": "Bachelor of Science in Geological Engineering (Environmental Geosciences Track)",
+   "level": "bachelor"
+  },
+  {
+   "id": "geological-engineering-bs-mineral-energy",
+   "name": "Bachelor of Science in Geological Engineering (Mineral and Energy Resources Exploration Track)",
+   "level": "bachelor"
+  },
+  {
+   "id": "geophysical-engineering-bs",
+   "name": "Bachelor of Science in Geophysical Engineering",
+   "level": "bachelor"
+  },
+  {
+   "id": "mechanical-engineering-bs",
+   "name": "Bachelor of Science in Mechanical Engineering",
+   "level": "bachelor"
+  },
+  {
+   "id": "mme-bs",
+   "name": "Bachelor of Science in Metallurgical and Materials Engineering",
+   "level": "bachelor"
+  },
+  {
    "id": "mining-bs",
    "name": "Bachelor of Science in Mining Engineering",
+   "level": "bachelor"
+  },
+  {
+   "id": "petroleum-engineering-bs",
+   "name": "Bachelor of Science in Petroleum Engineering",
+   "level": "bachelor"
+  },
+  {
+   "id": "qbe-bs-general",
+   "name": "Bachelor of Science in Quantitative Biosciences and Engineering (General Track)",
+   "level": "bachelor"
+  },
+  {
+   "id": "qbe-bs-honors",
+   "name": "Bachelor of Science in Quantitative Biosciences and Engineering (Honors Track)",
+   "level": "bachelor"
+  },
+  {
+   "id": "quantum-systems-engineering-bs",
+   "name": "Bachelor of Science in Quantum Systems Engineering",
    "level": "bachelor"
   },
   {

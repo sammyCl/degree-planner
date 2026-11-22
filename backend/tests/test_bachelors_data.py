@@ -12,8 +12,15 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 BACHELORS = REPO_ROOT / "data" / "json" / "bachelors.json"
 COURSES = REPO_ROOT / "data" / "json" / "courses.json"
 
+# The five programs the examples need (Samantha). The file now holds every bachelor's major (Abdallah, 2026-11-22),
+# so these must be present, but they are no longer the only ones.
 EXPECTED_IDS = {"cs-bs-general-track", "mining-bs", "ams-bs-cam", "ams-bs-stats", "ams-bs-ds"}
 EXPECTED_TOTALS = {"cs-bs-general-track": 128, "mining-bs": 131, "ams-bs-cam": 120, "ams-bs-stats": 120, "ams-bs-ds": 120}
+
+# Programs whose groups add up to less than the printed total, because the program PDF and the course CSV disagree on
+# a course's credits (see data/CONFLICT-LOG.md, "Bachelor's programs: the remaining majors"). QBE: the PDF counts
+# CBEN321 Genetics as 4.0 credits, the CSV says 3.0.
+KNOWN_CREDIT_GAPS = {"qbe-bs-general": 1.0, "qbe-bs-honors": 1.0}
 
 
 @pytest.fixture(scope="module")
@@ -26,16 +33,19 @@ def course_credits() -> dict[str, float]:
     return {c["code"]: c["credits"] for c in json.loads(COURSES.read_text())["courses"]}
 
 
-def test_file_holds_only_the_expected_programs(programs: list[Program]) -> None:
-    assert {p.program_id for p in programs} == EXPECTED_IDS
-    assert len(programs) == len(EXPECTED_IDS)
+def test_file_holds_the_example_programs_with_unique_ids(programs: list[Program]) -> None:
+    ids = [p.program_id for p in programs]
+    assert len(ids) == len(set(ids))
+    assert EXPECTED_IDS <= set(ids)
 
 
 def test_programs_are_bachelors_in_one_catalog_year(programs: list[Program]) -> None:
     for p in programs:
         assert p.degree_level == "bachelor", p.program_id
         assert p.catalog_year == "2026-2027", p.program_id
-        assert p.total_credits_required == EXPECTED_TOTALS[p.program_id]
+        assert p.total_credits_required > 0, p.program_id
+        if p.program_id in EXPECTED_TOTALS:
+            assert p.total_credits_required == EXPECTED_TOTALS[p.program_id]
 
 
 def test_group_ids_unique_within_each_program(programs: list[Program]) -> None:
@@ -66,7 +76,7 @@ def test_group_credits_add_up_to_the_program_total(programs: list[Program], cour
                 total += sum(course_credits[c] for c in g.courses or [])
             else:
                 total += g.credits_required or 0.0
-        assert total == pytest.approx(p.total_credits_required), p.program_id
+        assert total + KNOWN_CREDIT_GAPS.get(p.program_id, 0.0) == pytest.approx(p.total_credits_required), p.program_id
 
 
 def test_required_courses_are_not_also_electives(programs: list[Program]) -> None:
@@ -124,6 +134,7 @@ def test_loader_reads_the_file(tmp_path: Path) -> None:
     conn = sqlite3.connect(":memory:")
     report = refresh_database(tmp_path, conn)
     assert report.ok, report
-    assert report.programs_loaded == len(EXPECTED_IDS)
+    ids = {p["program_id"] for p in json.loads(BACHELORS.read_text())["programs"]}
+    assert report.programs_loaded == len(ids)
     rows = {r[0] for r in conn.execute("SELECT program_id FROM programs WHERE catalog_year = '2026-2027'")}
-    assert rows == EXPECTED_IDS
+    assert rows == ids
