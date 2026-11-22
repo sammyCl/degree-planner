@@ -1,6 +1,7 @@
 import { useId, useMemo, useRef, useState } from 'react'
 import type { AgentRequest } from '../types.ts'
 import { AddOnPicker } from './AddOnPicker.tsx'
+import { Dropdown } from './Dropdown.tsx'
 import { SegmentedControl } from './SegmentedControl.tsx'
 import { defaultStart, semesterLabels, SEASONS, type Season } from './terms.ts'
 import {
@@ -26,7 +27,7 @@ interface Props {
 
 export function SetupPage({ onSubmit, today }: Props) {
   const [now] = useState(() => today ?? new Date())
-  const ids = { major: useId(), season: useId(), year: useId(), semesters: useId() }
+  const ids = { major: useId(), semesters: useId() }
   const start = useMemo(() => defaultStart(now), [now])
   const thisYear = now.getFullYear()
   const years = Array.from({ length: 6 }, (_, i) => thisYear + i)
@@ -43,7 +44,7 @@ export function SetupPage({ onSubmit, today }: Props) {
   const [submitted, setSubmitted] = useState(false)
   const errors = validateSetup(form)
   const shown = submitted ? errors : {}
-  const majorRef = useRef<HTMLSelectElement>(null)
+  const majorRef = useRef<HTMLInputElement>(null)
   const semestersRef = useRef<HTMLInputElement>(null)
 
   const patch = (changes: Partial<SetupForm>) => setForm((f) => ({ ...f, ...changes }))
@@ -99,23 +100,17 @@ export function SetupPage({ onSubmit, today }: Props) {
             <label className="lbl" htmlFor={ids.major}>
               Program
             </label>
-            <div className="select">
-              <select
-                id={ids.major}
-                ref={majorRef}
-                value={form.programId}
-                aria-invalid={!!shown.programId}
-                aria-describedby={shown.programId ? `${ids.major}-err` : undefined}
-                onChange={(e) => patch({ programId: e.target.value })}
-              >
-                <option value="">Select your program...</option>
-                {majors.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <Dropdown
+              id={ids.major}
+              ref={majorRef}
+              searchable
+              placeholder="Select your program..."
+              options={majors.map((m) => ({ value: m.id, label: m.name }))}
+              value={form.programId}
+              invalid={!!shown.programId}
+              describedBy={shown.programId ? `${ids.major}-err` : undefined}
+              onChange={(programId) => patch({ programId })}
+            />
             {shown.programId && (
               <p className="err" id={`${ids.major}-err`} role="alert">
                 {shown.programId}
@@ -135,30 +130,18 @@ export function SetupPage({ onSubmit, today }: Props) {
           <div className="field">
             <div className="lbl">Starting term</div>
             <div className="row">
-              <div className="select">
-                <select
-                  aria-label="Starting season"
-                  id={ids.season}
-                  value={form.season}
-                  onChange={(e) => patch({ season: e.target.value as Season })}
-                >
-                  {SEASONS.map((s) => (
-                    <option key={s}>{s}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="select">
-                <select
-                  aria-label="Starting year"
-                  id={ids.year}
-                  value={form.year}
-                  onChange={(e) => patch({ year: Number(e.target.value) })}
-                >
-                  {years.map((y) => (
-                    <option key={y}>{y}</option>
-                  ))}
-                </select>
-              </div>
+              <Dropdown
+                label="Starting season"
+                options={SEASONS.map((s) => ({ value: s, label: s }))}
+                value={form.season}
+                onChange={(season) => patch({ season: season as Season })}
+              />
+              <Dropdown
+                label="Starting year"
+                options={years.map((y) => ({ value: String(y), label: String(y) }))}
+                value={String(form.year)}
+                onChange={(year) => patch({ year: Number(year) })}
+              />
             </div>
             {shown.year && (
               <p className="err" role="alert">

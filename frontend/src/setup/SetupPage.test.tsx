@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { SetupPage } from './SetupPage.tsx'
 
@@ -10,7 +10,14 @@ function setup() {
   return onSubmit
 }
 
-const program = () => screen.getByLabelText('Program') as HTMLSelectElement
+const program = () => screen.getByRole('combobox', { name: 'Program' }) as HTMLInputElement
+const CS = /Computer Science \(General Track\)/
+
+/** Open a dropdown and click an option, the way a student does. */
+function pick(combo: HTMLElement, option: string | RegExp) {
+  fireEvent.click(combo)
+  fireEvent.mouseDown(screen.getByRole('option', { name: option }))
+}
 const semesters = () => screen.getByLabelText(/Number of semesters/) as HTMLInputElement
 
 describe('SetupPage', () => {
@@ -34,11 +41,15 @@ describe('SetupPage', () => {
 
   it('lists programs for the chosen level and clears the choice when the level changes', () => {
     setup()
-    expect(within(program()).getByRole('option', { name: /Computer Science \(General Track\)/ })).toBeInTheDocument()
-    fireEvent.change(program(), { target: { value: 'cs-bs-general-track' } })
+    fireEvent.click(program())
+    expect(screen.getByRole('option', { name: CS })).toBeInTheDocument()
+    fireEvent.mouseDown(screen.getByRole('option', { name: CS }))
+    expect(program()).toHaveValue('Bachelor of Science in Computer Science (General Track)')
     fireEvent.click(screen.getByRole('button', { name: "Master's" }))
     expect(program()).toHaveValue('')
-    expect(within(program()).queryByRole('option', { name: /Bachelor of Science/ })).not.toBeInTheDocument()
+    fireEvent.click(program())
+    expect(screen.queryByRole('option', { name: /Bachelor of Science/ })).not.toBeInTheDocument()
+    expect(screen.getAllByRole('option').length).toBeGreaterThan(10)
     expect(semesters()).toHaveValue(4)
     // minors and ASIs are not offered to master's students
     expect(screen.queryByRole('combobox', { name: 'Search minors and ASIs' })).not.toBeInTheDocument()
@@ -46,11 +57,32 @@ describe('SetupPage', () => {
 
   it('rejects a semester count outside the level\'s limit', () => {
     const onSubmit = setup()
-    fireEvent.change(program(), { target: { value: 'cs-bs-general-track' } })
+    pick(program(), CS)
     fireEvent.change(semesters(), { target: { value: '19' } })
     fireEvent.click(screen.getByRole('button', { name: /Build my plan/ }))
     expect(onSubmit).not.toHaveBeenCalled()
     expect(screen.getByRole('alert')).toHaveTextContent('Choose between 1 and 18 semesters.')
+  })
+
+  it('filters the program list as you type and chooses with the keyboard', () => {
+    setup()
+    fireEvent.change(program(), { target: { value: 'mining' } })
+    const names = screen.getAllByRole('option').map((o) => o.textContent)
+    expect(names.length).toBeGreaterThan(0)
+    expect(names.every((n) => n!.toLowerCase().includes('mining'))).toBe(true)
+    fireEvent.keyDown(program(), { key: 'ArrowDown' })
+    fireEvent.keyDown(program(), { key: 'Enter' })
+    expect(program().value.toLowerCase()).toContain('mining')
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
+  })
+
+  it('changes the starting term with the season and year dropdowns', () => {
+    setup()
+    pick(screen.getByRole('combobox', { name: 'Starting season' }), 'Fall')
+    pick(screen.getByRole('combobox', { name: 'Starting year' }), '2028')
+    expect(screen.getByLabelText('Starting season')).toHaveValue('Fall')
+    expect(screen.getByLabelText('Starting year')).toHaveValue('2028')
+    expect(screen.getByText('Spring 2032')).toBeInTheDocument() // 8 semesters from Fall 2028
   })
 
   it('keeps the stepper inside the limits', () => {
@@ -86,7 +118,7 @@ describe('SetupPage', () => {
 
   it('submits the request in the backend format', () => {
     const onSubmit = setup()
-    fireEvent.change(program(), { target: { value: 'cs-bs-general-track' } })
+    pick(program(), CS)
     fireEvent.click(screen.getByRole('button', { name: /Build my plan/ }))
     expect(onSubmit).toHaveBeenCalledTimes(1)
     expect(onSubmit).toHaveBeenCalledWith({
