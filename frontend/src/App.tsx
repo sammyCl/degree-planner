@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getHealth } from './api.ts'
+import { PlannerPage } from './planner/PlannerPage.tsx'
+import { samplePlan } from './samplePlan.ts'
 import { SetupPage } from './setup/SetupPage.tsx'
 import type { AgentRequest } from './types.ts'
 import './App.css'
@@ -26,7 +28,7 @@ try {
 
 function App() {
   const [backend, setBackend] = useState<BackendStatus>('checking')
-  // Until the Planner page exists, a submitted setup shows the request it would send to the backend.
+  // A submitted setup shows the planner. Until "Connect setup to backend", it shows the sample plan, not the student's.
   const [request, setRequest] = useState<AgentRequest | null>(null)
 
   useEffect(() => {
@@ -64,14 +66,11 @@ function App() {
       </header>
 
       {request ? (
-        <main className="stub">
-          <h2>Setup received</h2>
-          <p>The Planner page is the next task. This is the request the setup page will send to the backend:</p>
-          <pre data-testid="request-json">{JSON.stringify(request, null, 2)}</pre>
-          <button type="button" className="btn" onClick={() => setRequest(null)}>
-            Back to setup
-          </button>
-        </main>
+        <PlannerPage
+          plan={samplePlan}
+          notice="This is a sample plan: the setup form is not yet connected to the backend, so it does not change what is shown here."
+          onBack={() => setRequest(null)}
+        />
       ) : (
         <SetupPage onSubmit={setRequest} />
       )}
