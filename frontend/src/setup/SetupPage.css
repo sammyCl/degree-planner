@@ -39,9 +39,17 @@
 }
 
 .field {
+  position: relative;
   padding: 14px 0;
   border-top: 1px solid var(--border);
-  animation: rise 420ms var(--ease-out) both;
+  /* "backwards" (not "both"): a finished animation must not keep the row in its own paint layer,
+     or later rows draw over an open dropdown. */
+  animation: rise 420ms var(--ease-out) backwards;
+}
+
+/* The row being used (an open dropdown) sits above the rows below it. */
+.field:focus-within {
+  z-index: 20;
 }
 
 .field:first-child {
