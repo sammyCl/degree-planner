@@ -27,7 +27,6 @@ export const SEMESTER_LIMITS: Record<Level, { min: number; max: number; default:
 }
 
 export const majorsFor = (level: Level): ProgramOption[] => PROGRAMS.filter((p) => p.level === level)
-export const addOns = (): ProgramOption[] => PROGRAMS.filter((p) => p.level === 'minor' || p.level === 'asi')
 /** Minors and ASIs are undergraduate programs, so the picker is shown for bachelor's and combined only. */
 export const allowsAddOns = (level: Level): boolean => level !== 'master'
 
@@ -73,3 +72,9 @@ export function buildRequest(form: SetupForm): AgentRequest {
 /** "Minor in Computer Science" becomes "Computer Science"; the kind is shown next to it. */
 export const shortName = (name: string): string =>
   name.replace(/^Minor in /, '').replace(/^Area of Special Interest in /, '')
+
+/** Minors and ASIs together, alphabetical by the name shown in the picker. */
+export const addOns = (): ProgramOption[] =>
+  PROGRAMS.filter((p) => p.level === 'minor' || p.level === 'asi').sort((a, b) =>
+    shortName(a.name).localeCompare(shortName(b.name)),
+  )
