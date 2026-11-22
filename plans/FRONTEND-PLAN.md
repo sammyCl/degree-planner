@@ -32,7 +32,7 @@ Until Plan format and API endpoints land, build against a hand-written sample pl
 | UI mockup | UI mockup of both pages (setup, planner with chat panel) and review with team | P0 | Nov 13 | | [x] |
 | Sample plan | Sample plan JSON (one degree, a few semesters, a deliberate broken prerequisite) to develop against; swap for the real format once Plan format exists | P0 | Nov 13 | | [x] |
 | Minors list | Data: list which minors, ASIs, certifications and forms are needed for the five examples (CS minor, Geophysical Engineering minor, Independent Study Credit form, Thorson's honors program notes) | P0 | Nov 13 | Five examples | [x] |
-| Stack decision | Join the stack decision (frontend framework, how it talks to the backend) | P0 | Nov 13 | | [ ] |
+| Stack decision | Join the stack decision (frontend framework, how it talks to the backend) | P0 | Nov 13 | | [x] |
 
 ### Week 2: Nov 16-20 (first end-to-end)
 
@@ -88,3 +88,4 @@ Never cut Setup page, Planner page, Connect setup to backend: they are the core 
 - 2026-11-17: Frontend scaffold done (code and tests show it): Vite + React + TypeScript in frontend/, /api proxied to the FastAPI backend, 2 passing tests, run commands in CLAUDE.md and README.md. Checked against Midhat's backend /health through the proxy.
 - 2026-11-19: Sample plan done (code and tests show it): frontend/src/samplePlan.json in Midhat's plan format (8 semesters of CS BS, real catalog courses, prerequisite edges, 3 deliberate flags), typed in src/types.ts, 5 integrity tests. Note: docs/plan-format.sample.json has wrong titles for CSCI306 and CSCI400 (catalog: Software Engineering, Principles of Programming Languages) for Midhat to fix.
 - 2026-11-19: UI mockup done and merged to main (PR #13, you said it is done): docs/ui-mockup.html, static mockup of the setup page and planner page with a scripted chat panel. Team review is by the PR; layout, wording and colors can still change. Real chat replies need Samantha's Chat logic endpoint.
+- 2026-11-22: Stack decision ticked (Midhat ticked it in the master plan on Nov 13; Abdallah confirmed). Bachelor's data and Agent loop ticked in the agent plan (Abdallah confirmed; code and data are on main: PR #24 bachelor's programs, PRs #14 and #27 agent tools and loop).
