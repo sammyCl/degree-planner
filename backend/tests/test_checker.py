@@ -53,9 +53,13 @@ BLOCKING = {"severity": "blocking", "claim": "EENG525 is only 3 of the 12 core c
 CONCERN = {"severity": "concern", "claim": "transfer needs a Degree Audit form", "url": "", "quote": ""}
 
 
+ALL_VERIFIED = {"program_requirements": True, "prerequisites": True, "credits": True}
+
+
 def answer(verdict: str, findings: list[dict], pages: list[str] | None = None, *, where: str = "structured_output",
-           **result: object) -> ClaudeRun:
-    body = {"verdict": verdict, "summary": "s", "findings": findings, "pages_read": [GOOD_PAGE] if pages is None else pages}
+           verified: dict | None = None, **result: object) -> ClaudeRun:
+    body = {"verdict": verdict, "summary": "s", "findings": findings, "pages_read": [GOOD_PAGE] if pages is None else pages,
+            "verified": ALL_VERIFIED if verified is None else verified}
     out = {"subtype": "success", "is_error": False, "num_turns": 7,
            "usage": {"input_tokens": 100, "cache_read_input_tokens": 50, "output_tokens": 20}} | result
     if where == "structured_output":
@@ -67,8 +71,8 @@ def answer(verdict: str, findings: list[dict], pages: list[str] | None = None, *
 
 # ------------------------------------------------------------------------------- the command
 
-def test_checker_md_loads_with_webfetch_only() -> None:
-    assert checker.AGENT.tools == ("WebFetch",)
+def test_checker_md_loads_with_webfetch_and_the_pdf_tools() -> None:
+    assert checker.AGENT.tools == ("WebFetch", "list_pdfs", "search_pdfs", "read_pdf_pages")
     assert checker.AGENT.name == "checker"
 
 
@@ -79,11 +83,15 @@ def test_agent_file_still_rejects_tools_the_agent_cannot_use() -> None:
     assert parse_agent(text, available_tools=["WebFetch"]).tools == ("WebFetch",)
 
 
-def test_command_allows_only_webfetch_on_mines_domains() -> None:
-    command = checker.checker_command()
+def test_command_allows_webfetch_on_mines_domains_and_the_pdf_tools(tmp_path: Path) -> None:
+    command = checker.checker_command(tmp_path / "mcp.json")
     assert command[command.index("--tools") + 1] == "WebFetch"
     allowed = command[command.index("--allowedTools") + 1:command.index("--strict-mcp-config")]
-    assert allowed and all(a.startswith("WebFetch(domain:") and a.endswith("mines.edu)") for a in allowed)
+    web = [a for a in allowed if a.startswith("WebFetch")]
+    assert web and all(a.startswith("WebFetch(domain:") and a.endswith("mines.edu)") for a in web)
+    assert [a for a in allowed if not a.startswith("WebFetch")] == [
+        "mcp__catalog__list_pdfs", "mcp__catalog__search_pdfs", "mcp__catalog__read_pdf_pages"]
+    assert command[command.index("--mcp-config") + 1] == str(tmp_path / "mcp.json")
     assert command[command.index("--setting-sources") + 1] == ""
     assert json.loads(command[command.index("--json-schema") + 1]) == checker.VERDICT_SCHEMA
     assert "--no-session-persistence" in command
@@ -108,7 +116,11 @@ def test_run_checker_passes_command_message_and_a_temp_dir(connection, ex2) -> N
 
     verdict = checker.run_checker(connection, ex2, plan_response(ex2), runner=runner)
     assert verdict.status == "does_not_work"
-    assert seen["command"] == checker.checker_command()
+    config = seen["cwd"] / "mcp.json"
+    assert seen["command"] == checker.checker_command(config)
+    server = checker.mcp_config()["mcpServers"]["catalog"]
+    assert server["args"][:2] == ["-m", "degree_planner_backend.agent.catalog_pdf_server"]
+    assert Path(server["args"][-1]) == REPO_ROOT / "data"
     assert "Review this degree plan." in seen["message"]
     assert "degree-planner-checker-" in str(seen["cwd"])
     assert verdict.usage == Usage(input_tokens=150, output_tokens=20, steps=7)
@@ -138,13 +150,17 @@ def test_the_final_message_is_read_when_there_is_no_structured_output() -> None:
 
 
 @pytest.mark.parametrize("run, reason", [
-    (answer("does_not_work", [BLOCKING | {"url": "https://example.com/catalog"}]), "without a Mines URL"),
-    (answer("does_not_work", [BLOCKING | {"url": "https://mines.edu.evil.com/x"}]), "without a Mines URL"),
-    (answer("does_not_work", [BLOCKING | {"quote": "  "}]), "without a Mines URL and quote"),
+    (answer("does_not_work", [BLOCKING | {"url": "https://example.com/catalog"}]), "without a Mines URL or a PDF page"),
+    (answer("does_not_work", [BLOCKING | {"url": "https://mines.edu.evil.com/x"}]), "without a Mines URL or a PDF page"),
+    (answer("does_not_work", [BLOCKING | {"quote": "  "}]), "without a Mines URL or a PDF page"),
     (answer("does_not_work", [CONCERN]), "no blocking finding"),
     (answer("works", [BLOCKING]), "lists blocking findings"),
-    (answer("works", [], pages=[]), "no Mines page was read"),
-    (answer("works", [], pages=["https://example.com"]), "no Mines page was read"),
+    (answer("works", [], pages=[]), "no Mines page or catalog PDF was read"),
+    (answer("works", [], pages=["https://example.com"]), "no Mines page or catalog PDF was read"),
+    (answer("works", [CONCERN], verified={"program_requirements": False, "prerequisites": False, "credits": True}),
+     "could not verify program requirements, prerequisites"),
+    (answer("works", [], verified={"program_requirements": True, "prerequisites": True, "credits": False}),
+     "could not verify credits"),
     (ClaudeRun(result={"subtype": "success", "result": "I think it works."}), "not JSON"),
     (ClaudeRun(result={"subtype": "success", "structured_output": {"verdict": "maybe"}}), "wrong shape"),
     (ClaudeRun(result={"subtype": "error_max_turns"}), "turns"),
@@ -168,3 +184,30 @@ def test_inconsistent_or_failed_answers_are_errors_not_verdicts(run: ClaudeRun, 
 ])
 def test_is_mines_url(url: str, ok: bool) -> None:
     assert checker.is_mines_url(url) is ok
+
+
+# --------------------------------------------------------------------------- PDF citations
+
+CS_PDF = "pdf:Undergraduate Programs/Computer Science/Computer Science.pdf#page=2"
+
+
+def test_a_pdf_citation_with_a_quote_on_that_page_counts() -> None:
+    finding = BLOCKING | {"url": CS_PDF, "quote": "CSCI370 ADVANCED SOFTWARE ENGINEERING"}
+    assert checker.parse_run(answer("does_not_work", [finding])).status == "does_not_work"
+
+
+def test_a_works_verdict_from_pdfs_alone_counts() -> None:
+    assert checker.parse_run(answer("works", [CONCERN], pages=[CS_PDF])).status == "works"
+
+
+@pytest.mark.parametrize("url, quote", [
+    (CS_PDF, "CSCI370 is offered only in the spring"),  # not on that page: made up
+    ("pdf:Undergraduate Programs/Computer Science/Computer Science.pdf#page=99", "CSCI370"),  # no such page
+    ("pdf:json/courses.json#page=1", "CSCI370"),  # not a catalog PDF
+    ("pdf:../secrets.pdf#page=1", "x"),
+    ("Undergraduate Programs/Computer Science/Computer Science.pdf, page 2", "CSCI370"),  # not the citation form
+])
+def test_a_pdf_citation_that_does_not_hold_up_is_an_error(url: str, quote: str) -> None:
+    verdict = checker.parse_run(answer("does_not_work", [BLOCKING | {"url": url, "quote": quote}]))
+    assert verdict.status == "error"
+    assert "PDF page that contains the quote" in (verdict.error or "")

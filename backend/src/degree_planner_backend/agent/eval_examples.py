@@ -96,6 +96,7 @@ def run_one(connection: sqlite3.Connection, example: Example, run_number: int, *
             "summary": verdict.summary,
             "findings": [f.model_dump() for f in verdict.findings],
             "pages_read": list(verdict.pages_read),
+            "verified": None if verdict.verified is None else verdict.verified.model_dump(),
             "usage": verdict.usage.model_dump(),
             "seconds": round(checker_seconds, 1),
         },
