@@ -14,10 +14,11 @@ verified the requirements, prerequisites and credits, and lists the pages read. 
 "error": not a pass, but reported apart from a real failure, so a checker that could not do its
 job is never mistaken for a plan that works.
 
-Terms offered are flagged, never failed: our course data does not yet record which terms every
-course is offered in, so the planner cannot be held to it. A blocking finding whose topic is
-"term_offered" is turned into a concern before the verdict is judged, and if nothing else blocks,
-a does_not_work verdict becomes works (still subject to the rules above).
+Some findings are flagged, never failed, because our data cannot record them yet, so the planner
+cannot be held to them: terms offered ("term_offered", BUG-045) and prerequisites of credits
+completed or class standing ("class_standing", BUG-040, e.g. EBGN321's 60 credit hours). A blocking
+finding with one of these topics is turned into a concern before the verdict is judged, and if
+nothing else blocks, a does_not_work verdict becomes works (still subject to the rules above).
 """
 
 from __future__ import annotations
@@ -49,9 +50,14 @@ AGENT = load_agent(Path(__file__).with_name("checker.md"), available_tools=[*BUI
 # WebFetch is allowed only on these hosts; in -p mode any other fetch is refused, not asked about.
 ALLOWED_DOMAINS = ("catalog.mines.edu", "www.mines.edu", "mines.edu", "registrar.mines.edu", "cs.mines.edu")
 TIMEOUT_SECONDS = 1200
-TOPICS = ("requirements", "prerequisites", "credits", "shared_credits", "transfer", "term_offered", "other")
-# Put in front of the claim of a blocking finding that was turned into a concern.
-TERM_FLAG = "[term offered: flagged, not failed] "
+TOPICS = ("requirements", "prerequisites", "class_standing", "credits", "shared_credits", "transfer",
+          "term_offered", "other")
+# Topics our data cannot check yet: a blocking finding with one becomes a concern, and its claim
+# starts with this text.
+FLAGGED_TOPICS = {
+    "term_offered": "[term offered: flagged, not failed] ",
+    "class_standing": "[class standing: flagged, not failed] ",
+}
 
 VERDICT_SCHEMA: dict[str, Any] = {
     "type": "object",
@@ -94,7 +100,8 @@ class Finding(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     severity: Literal["blocking", "concern"]
     # Default "other" so results saved before the field existed still load.
-    topic: Literal["requirements", "prerequisites", "credits", "shared_credits", "transfer", "term_offered", "other"] = "other"
+    topic: Literal["requirements", "prerequisites", "class_standing", "credits", "shared_credits", "transfer",
+                   "term_offered", "other"] = "other"
     claim: str
     url: str
     quote: str
@@ -264,10 +271,10 @@ def is_cited(finding: Finding, library: PdfLibrary) -> bool:
     return library.quote_on_page(finding.url, finding.quote)
 
 
-def flag_terms_offered(verdict: _RawVerdict) -> _RawVerdict:
-    """Turn blocking term-offered findings into concerns; with nothing left blocking, does_not_work becomes works."""
-    findings = [f.model_copy(update={"severity": "concern", "claim": TERM_FLAG + f.claim})
-                if f.severity == "blocking" and f.topic == "term_offered" else f
+def flag_unchecked_topics(verdict: _RawVerdict) -> _RawVerdict:
+    """Turn blocking findings on FLAGGED_TOPICS into concerns; with nothing left blocking, does_not_work becomes works."""
+    findings = [f.model_copy(update={"severity": "concern", "claim": FLAGGED_TOPICS[f.topic] + f.claim})
+                if f.severity == "blocking" and f.topic in FLAGGED_TOPICS else f
                 for f in verdict.findings]
     if findings == list(verdict.findings):
         return verdict
@@ -277,7 +284,7 @@ def flag_terms_offered(verdict: _RawVerdict) -> _RawVerdict:
 
 
 def _judge(verdict: _RawVerdict, usage: Usage, library: PdfLibrary) -> CheckerVerdict:
-    verdict = flag_terms_offered(verdict)
+    verdict = flag_unchecked_topics(verdict)
     blocking = [f for f in verdict.findings if f.severity == "blocking"]
     uncited = [f for f in blocking if not is_cited(f, library)]
     unverified = [name for name, ok in verdict.verified.model_dump().items() if not ok]

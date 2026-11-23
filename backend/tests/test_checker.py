@@ -243,7 +243,7 @@ def test_a_term_offered_finding_alone_is_flagged_and_the_plan_works() -> None:
     verdict = checker.parse_run(answer("does_not_work", [TERM, CONCERN]))
     assert verdict.status == "works" and verdict.blocking == ()
     flagged = verdict.findings[0]
-    assert flagged.severity == "concern" and flagged.claim.startswith(checker.TERM_FLAG)
+    assert flagged.severity == "concern" and flagged.claim.startswith(checker.FLAGGED_TOPICS["term_offered"])
 
 
 def test_a_term_offered_finding_without_a_source_is_still_only_a_concern() -> None:
@@ -267,3 +267,14 @@ def test_a_flagged_plan_still_needs_everything_verified() -> None:
 
 def test_the_prompt_says_terms_offered_never_fail_the_plan() -> None:
     assert "term_offered" in checker.AGENT.system_prompt and "never fail the plan" in checker.AGENT.system_prompt
+
+
+def test_a_class_standing_finding_is_flagged_like_a_term_finding() -> None:
+    standing = TERM | {"topic": "class_standing", "claim": "EBGN321 needs 60 credits; the student has 51"}
+    verdict = checker.parse_run(answer("does_not_work", [standing]))
+    assert verdict.status == "works"
+    assert verdict.findings[0].claim.startswith(checker.FLAGGED_TOPICS["class_standing"])
+
+
+def test_the_prompt_says_class_standing_never_fails_the_plan() -> None:
+    assert "class_standing" in checker.AGENT.system_prompt and "EBGN321" in checker.AGENT.system_prompt
