@@ -695,3 +695,301 @@ BUG-034  create_plan and update_plan never run the validator before saving
              test_check_plan_ignores_an_unknown_program_instead_of_crashing /
              test_check_plan_ignores_a_combined_program_s_unloaded_component
              in test_validator.py.
+
+BUG-035  Combined Mining BS+MS total is 152 credits, but its parts add to 155
+  Status:    Open
+  Owner:     Midhat Sajad (data: graduate and combined)
+  Where:     data/json/graduate-programs.json (mining-bs-ms-combined,
+             total_credits_required)
+  Found:     2026-11-22 by Samantha with Claude, defining Example 3 for the
+             local example eval; not yet checked against the catalog page
+  Steps:     read total_credits_required for mining-bs (data/json/
+             bachelors.json), mining-ms and mining-bs-ms-combined (data/json/
+             graduate-programs.json), and mining-ms's double_counts_with
+             entry for mining-bs
+  Actual:    mining-bs 131, mining-ms 30, shared_credit_limit 6, combined
+             152. 131 + 30 - 6 = 155, so the combined total is 3 credits
+             short of its parts. CONFLICT-LOG.md does not say where 152 came
+             from
+  Expected:  the combined total matches the catalog; if the catalog says 155
+             (or the parts are wrong instead), the numbers agree. Until then
+             a 152-154 credit plan can pass the validator while being short
+             of the two degrees
+  Fix idea:  check the Mining Engineering combined BS/MS page in the
+             2026-2027 Graduate Catalog (page 171 has the 6-credit
+             double-count rule) and fix whichever number is wrong
+  Also:      cs-bs-ms-combined has the opposite problem: 154 credits, but
+             cs-bs-general-track 128 + cs-ms-non-thesis-project-track 30 - 6
+             shared (CSCI561, CSCI564) = 152. Found the same day defining
+             Example 5
+
+BUG-036  The minor rule "at least 9 credits not used elsewhere" is never checked
+  Status:    Fixed
+  Owner:     Midhat Sajad (validator); Abdallah Salhi (minors data)
+  Where:     backend/src/degree_planner_backend/validator.py (double counting
+             across programs); data/json/minors.json (no double_counts_with
+             on any minor); data/json/forms-policies.json
+             (policy-minor-requirements, text only)
+  Found:     2026-11-22 by Samantha with Claude, defining Example 4 (AMS CAM
+             BS + CS minor) for the local example eval; read from the code
+             and data, not yet reproduced with a plan
+  Steps:     plan ams-bs-cam + computer-science-minor where the minor is
+             filled by CSCI200, MATH334, MATH307 and CSCI220, all of which
+             also fill AMS requirements (required courses and the Computing
+             Elective), then call check_plan
+  Actual:    each program is checked on its own; the only cross-program
+             limit is double_counts_with, which the CS minor does not have,
+             so 12 shared credits raise no flag
+  Expected:  a flag when fewer than 9 of the minor's credits are left
+             after taking out credits that fill another program's
+             requirements other than free electives (2026-2027
+             undergraduate catalog, Degree Information and Graduation
+             Information; the same rule applies to ASIs)
+  Fix idea:  a validator check for every minor and ASI that applies the
+             policy rule directly (rather than a hand-written
+             double_counts_with per minor), with a new flag type
+  Fixed in:  branch agent/eval-examples (Samantha with Claude, to be agreed
+             with Midhat and Abdallah before merging): validator.py checks
+             every minor and ASI on a plan that has a degree program, with a
+             requirement_unmet error when fewer than 9 of its credits are not
+             also needed by the degree (free electives excepted), read in the
+             student's favor as the eval's minor_unshared_credits check does.
+             The data needs no change. Covered by
+             tests/test_validator_minor_overlap.py
+
+BUG-037  Validator adds program totals, so a major + minor needs too many credits
+  Status:    Fixed
+  Owner:     Midhat Sajad (validator)
+  Where:     backend/src/degree_planner_backend/validator.py
+             (total_credits_required summed over student.programs)
+  Found:     2026-11-22 by Samantha with Claude, defining Example 4; read
+             from the code, not yet reproduced with a plan
+  Steps:     check a plan for ams-bs-cam (120) + computer-science-minor (18)
+  Actual:    total_credits_required is 138, and the agent loop answers
+             cannot_work below that, although shared courses (up to 9
+             credits for a minor, and minor courses used as free electives)
+             mean the real minimum is lower
+  Expected:  the required total counts shared credits once, so a plan that
+             meets both programs with the fewest courses is not rejected
+  Fix idea:  compute the total from the credits actually used, with shared
+             credits counted once up to the double-count rules (combined
+             programs already do this through their own total)
+  Also:      reproduced on Example 5 (backend/eval/results/2026-11-22T22-00-55):
+             with the semester caps the agent planned 161 credits, short of
+             the 172 (154 + the minor's 18) the validator asked for
+  Fixed in:  branch agent/eval-examples (Samantha with Claude, to be agreed
+             with Midhat before merging): a minor's or ASI's total no longer
+             adds to a degree's; it counts only when the student has no
+             degree program. The minor's courses are still required by its
+             groups, and how many may overlap the major is BUG-036 (still
+             open). Covered by tests/test_validator_totals.py
+
+BUG-038  The Thorson swap accepts a mix of the core and honors courses
+  Status:    Open
+  Owner:     Midhat Sajad (data format, validator)
+  Where:     docs/data-format.md (group kinds), validator.py; the stand-in is
+             the first-year-core group in data/json/bachelors.json, built by
+             data/tools/build_bachelors_json.py (thorson())
+  Found:     2026-11-22 by Samantha with Claude, fixing Thorson for Example 5;
+             a known limit of the stand-in, not yet reproduced with a plan
+  Steps:     plan cs-bs-general-track with HASS100 and HNRS105 (and not
+             EDNS151 or HNRS115), then call check_plan
+  Actual:    first-year-core is "6 credits from HASS100, EDNS151, HNRS105,
+             HNRS115", so HASS100 + HNRS105 meets it
+  Expected:  only HASS100 + EDNS151, or HNRS105 + HNRS115 (Thorson policy in
+             forms-policies.json: if either HNRS course is dropped, the
+             student takes HASS100 and EDNS151)
+  Fix idea:  a group kind that holds a requirement expression, like
+             prerequisites already use: OR(AND(HASS100, EDNS151),
+             AND(HNRS105, HNRS115)); the validator already evaluates these
+             for prerequisites. Then thorson() writes that group instead
+
+BUG-039  A plan cannot choose the credits of a variable-credit course
+  Status:    Open (kept on purpose as a test for plan editing)
+  Owner:     Samantha Clapp (check_plan/build_plan in agent/tools.py);
+             Midhat Sajad (validator, plan format); Abdallah Salhi (course
+             data converter, and editing a plan in the UI)
+  Where:     backend/src/degree_planner_backend/agent/tools.py (build_plan
+             takes credits from the catalog); data/json/courses.json
+             (credits_min/credits_max never filled in)
+  Found:     2026-11-22 by Samantha with Claude, defining Example 5
+  Steps:     look up CSCI599 (catalog: 0.5-6 credits), then try to plan it
+             at 1.5 credits with check_plan
+  Actual:    check_plan takes course codes only; every course gets the
+             catalog's single credits value. Independent Study is set to 3
+             credits as a stand-in (CONFLICT-LOG.md, Course catalog); other
+             variable-credit courses use the range's upper bound
+  Expected:  a plan (from the agent, or the student editing it on the
+             planner page) can set the credits of a variable-credit course
+             within its range, and the validator checks the amount
+  Fix idea:  fill credits_min/credits_max from the CSV ranges in
+             build_courses_json.py; let check_plan take {code, credits} for
+             a ranged course; flag an amount outside the range. Use this as
+             a test case when the plan-editing parts are built
+  Also:      with Independent Study at 3 credits, two programs cannot be met:
+             qbe-bs-honors (honors-research: 6 credits of BIOL499) and
+             chemistry-ms (independent_study: 6 credits of CHGN699). The
+             first is a known exception in test_choose_groups_can_be_met_
+             from_their_lists (tests/test_bachelors_data.py); the graduate
+             data tests have no such check
+
+BUG-040  EBGN321's 60-credit-hour prerequisite is missing from the data
+  Status:    Open
+  Owner:     Midhat Sajad (data format: a "credit hours completed"
+             prerequisite); Abdallah Salhi (course data converter)
+  Where:     data/json/courses.json (EBGN321 prerequisites: null);
+             docs/data-format.md (Requirement expressions)
+  Found:     2026-11-22 by the eval's adversarial checker on the first full
+             Example 1 run (backend/eval/results/2026-11-22T18-45-22), checked
+             by Samantha with Claude
+  Steps:     plan cs-bs-general-track with EBGN321 in Spring 2028, after
+             51 credits, then call check_plan
+  Actual:    no flag. The catalog's course entry
+             (data/Academic Catalog/mines-courses.csv) has no prerequisite;
+             the rule is only in the degree table note of every bachelor's
+             PDF, e.g. data/Undergraduate Programs/Computer Science/
+             Computer Science.pdf p. 2: "EBGN321 was added to the core, but
+             has a prerequisite of 60 credit hours"
+  Expected:  a broken_prerequisite flag when EBGN321 is planned before the
+             student has 60 credits completed or planned in earlier
+             semesters
+  Fix idea:  a Requirement type such as {"type": "credits_completed",
+             "min": 60}, checked by the validator against the credits before
+             that semester; set it on EBGN321 (and any other course with a
+             credit-hour prerequisite in its catalog text)
+  Note:      2026-11-23: until this is fixed, the eval's checker only flags
+             credit-hour and class-standing prerequisites, as concerns
+             (checker.py FLAGGED_TOPICS, topic class_standing)
+
+BUG-041  Equivalent courses both count (MATH213 and MATH223)
+  Status:    Fixed
+  Owner:     Midhat Sajad (validator, data format)
+  Where:     validator.py; data/json/courses.json (no equivalence field);
+             the "Equivalent with ..." text is at the start of many course
+             descriptions in data/Academic Catalog/mines-courses.csv
+  Found:     2026-11-22 by the eval's adversarial checker on the first full
+             Example 1 run (backend/eval/results/2026-11-22T18-45-22), checked
+             by Samantha with Claude
+  Steps:     plan cs-bs-general-track with both MATH213 and MATH223 (the
+             honors Calculus III), then call check_plan
+  Actual:    MATH213 fills the required course and MATH223 counts as 4
+             free-elective credits; the plan passes at 129 credits, though
+             without the duplicate it has 125 of 128
+  Expected:  only one of a set of equivalent courses counts toward the
+             degree; a flag for the duplicate
+  Fix idea:  an optional "equivalent_with" list on Course, filled by the
+             converter from the "Equivalent with X, Y" description prefix;
+             the validator counts at most one course of each equivalent set
+  Also:      the same gap broke prerequisites: HASS200, HASS202 and HASS400
+             need HASS100, and the catalog calls HNRS105 and HNRS115
+             equivalent to it, so a Thorson student got HASS100 planned
+             again (Example 5, backend/eval/results/2026-11-22T19-20-42)
+  Fixed in:  branch agent/eval-examples (Samantha with Claude, with the team
+             owners' agreement to be confirmed before merging):
+             Course.equivalent_with (models.py, docs/data-format.md), filled
+             both ways by build_courses_json.py from the "Equivalent with"
+             description prefix (84 courses); validator.py lets an
+             equivalent satisfy a prerequisite and a group, and counts only
+             the first of a set of equivalents, with a requirement_unmet
+             warning naming the duplicate. Covered by
+             tests/test_validator_equivalents.py
+
+BUG-042  "Required every semester" is not checked (EENG500 Graduate Seminar)
+  Status:    Open
+  Owner:     Midhat Sajad (validator, data format)
+  Where:     validator.py ("all" groups); data/json/graduate-programs.json
+             (ee-ms seminar group: the rule is only in the label)
+  Found:     2026-11-22 by the eval's deterministic checks on Example 2
+             (backend/eval/results/2026-11-22T19-20-42), checked by Samantha
+             with Claude
+  Steps:     plan ee-ms over 4 semesters with EENG500 only in Fall 2026, then
+             call check_plan
+  Actual:    no flag: an "all" group is met by one appearance, and a second
+             EENG500 would be dropped as a repeat anyway (BUG-027). The group
+             label says "required every fall and spring semester"
+  Expected:  a requirement_unmet flag for each fall or spring semester
+             without EENG500 (the same rule applies to other per-semester
+             seminars and colloquia, e.g. CBEN605)
+  Fix idea:  a group field such as "every_semester": true, set by the
+             graduate data for these seminars; the validator checks every
+             fall and spring semester, and repeats of such a course are
+             allowed (BUG-027)
+
+BUG-043  A requirement group cannot require 500-level courses (CS MS electives)
+  Status:    Open
+  Owner:     Midhat Sajad (data format, validator, graduate data)
+  Where:     backend/src/degree_planner_backend/models.py (RequirementGroup
+             has only a course list); validator.py (a choose_credits group
+             with no course list takes any course);
+             data/json/graduate-programs.json (cs-ms-non-thesis-project-track,
+             group "electives")
+  Found:     2026-11-23 by the eval's adversarial checker on Example 5
+             (backend/eval/results/2026-11-23T13-52-30), checked by Samantha
+             with Claude against graduate-programs.json
+  Steps:     plan cs-bs-ms-combined with only 9 credits of 500-level CSCI
+             electives (CSCI565, CSCI520, CSCI562) and 400-level CSCI courses
+             (CSCI403, 410, 421, 440, 404), then call check_plan
+  Actual:    no flag. The "electives" group (choose_credits 18, no course
+             list, label "any CSCI graduate course ...") is filled by any
+             planned course, so the 400-level courses count toward the MS
+  Expected:  a requirement_unmet flag: the MS has 6 core + 6 CSCI700 + 9
+             elective credits, 21 of 30. The Graduate Catalog says
+             undergraduate courses cannot fill graduate-degree requirements
+             (data/Academic Catalog/2026-2027 Graduate Catalog.pdf p. 14;
+             data/Graduate Programs/Computer Science/Computer Science.pdf
+             p. 2)
+  Fix idea:  a group field that limits which courses fill it, such as
+             {"subjects": ["CSCI"], "min_number": 500}, plus a rule that a
+             master's group never takes a course below 500; set it on every
+             graduate elective group whose label says "graduate course"
+
+BUG-044  A combined-program undergraduate can be planned into 700-level
+         credits of a non-thesis master's (CSCI700)
+  Status:    Open
+  Owner:     Midhat Sajad (validator, combined data)
+  Where:     validator.py (no rule on what a combined-program student may take
+             before the bachelor's is complete); data/json/
+             graduate-programs.json (cs-bs-ms-combined)
+  Found:     2026-11-23 by the eval's adversarial checker on Example 5
+             (backend/eval/results/2026-11-23T13-52-30), checked by Samantha
+             with Claude
+  Steps:     plan cs-bs-ms-combined with CSCI700 (6 credits) in Spring 2029
+             and HASS400, a bachelor's requirement, in Fall 2029, then call
+             check_plan
+  Actual:    no flag
+  Expected:  a flag: while a bachelor's requirement is still left, the
+             student is an undergraduate, and combined-program undergraduates
+             "may register for 700-level credits only if admitted to a
+             thesis-based program" (data/Graduate Programs/Combined
+             Undergraduate-Graduate Degree Programs/Combined
+             Undergraduate-Graduate Degree Programs.pdf p. 2);
+             cs-ms-non-thesis-project-track is not thesis-based
+  Fix idea:  find the first semester after the last bachelor's course; flag a
+             700-level course before it when the master's part is non-thesis.
+             The same boundary decides the 18 or 15 credit semester cap
+             (planner.md), so the validator could use it for that too
+
+BUG-045  Terms offered are not in the course data (summer only, spring
+         only, even years)
+  Status:    Open
+  Owner:     Abdallah Salhi (course data converter); Midhat Sajad (data
+             format, validator)
+  Where:     data/tools/build_courses_json.py; data/json/courses.json (no
+             terms field); validator.py
+  Found:     2026-11-22 by the eval's adversarial checker on Example 3
+             (backend/eval/results/2026-11-22T22-08-22), again 2026-11-23 on
+             Examples 3 and 5, checked by Samantha with Claude
+  Steps:     plan mining-bs-ms-combined with MNGN308 in Fall 2027 and MNGN536
+             in Spring 2031, or cs-bs-ms-combined with CSCI562 in Fall 2029,
+             then call check_plan
+  Actual:    no flag. The terms are only in the description text of
+             data/Academic Catalog/mines-courses.csv and
+             mines-graduate-courses.csv: "CSCI562 ... 3.0 (II)", MNGN308
+             "Taken as the first week of summer session", MNGN536 "Offered in
+             even years". Many courses give no terms at all (e.g. CSCI370)
+  Expected:  a warning when a course is planned in a term the catalog says it
+             is not offered; nothing when the catalog does not say
+  Fix idea:  the converter reads (I), (II), (S) and "even/odd years" into a
+             field such as "terms": ["spring"], "years": "even"; the
+             validator warns on a mismatch. Until then the eval's checker
+             only flags these (checker.py FLAGGED_TOPICS)

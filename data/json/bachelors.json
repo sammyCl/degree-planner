@@ -21,9 +21,7 @@
             "CHGN121",
             "PHGN100",
             "PHGN200",
-            "HASS100",
             "HASS215",
-            "EDNS151",
             "EBGN321",
             "CSM101",
             "CSM202",
@@ -39,6 +37,18 @@
             "CSCI406",
             "CSCI442"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -305,9 +315,7 @@
             "CHGN121",
             "PHGN100",
             "PHGN200",
-            "HASS100",
             "HASS215",
-            "EDNS151",
             "EBGN321",
             "CSM101",
             "CSM202",
@@ -323,6 +331,18 @@
             "CSCI406",
             "CSCI442"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -656,9 +676,7 @@
             "CHGN121",
             "PHGN100",
             "PHGN200",
-            "HASS100",
             "HASS215",
-            "EDNS151",
             "EBGN321",
             "CSM101",
             "CSM202",
@@ -674,6 +692,18 @@
             "CSCI406",
             "CSCI442"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -1045,9 +1075,7 @@
             "CHGN121",
             "PHGN100",
             "PHGN200",
-            "HASS100",
             "HASS215",
-            "EDNS151",
             "EBGN321",
             "CSM101",
             "CSM202",
@@ -1063,6 +1091,18 @@
             "CSCI406",
             "CSCI442"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -1366,9 +1406,7 @@
             "CHGN121",
             "PHGN100",
             "PHGN200",
-            "HASS100",
             "HASS215",
-            "EDNS151",
             "EBGN321",
             "CSM101",
             "CSM202",
@@ -1384,6 +1422,18 @@
             "CSCI406",
             "CSCI442"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -1798,9 +1848,7 @@
             "CHGN121",
             "PHGN100",
             "PHGN200",
-            "HASS100",
             "HASS215",
-            "EDNS151",
             "EBGN321",
             "CSM101",
             "CSM202",
@@ -1816,6 +1864,18 @@
             "CSCI406",
             "CSCI442"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -2150,9 +2210,7 @@
             "CHGN121",
             "PHGN100",
             "PHGN200",
-            "HASS100",
             "HASS215",
-            "EDNS151",
             "EBGN321",
             "CSM101",
             "CSM202",
@@ -2168,6 +2226,18 @@
             "CSCI406",
             "CSCI442"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -2496,9 +2566,7 @@
             "CHGN122",
             "PHGN100",
             "GEGN101",
-            "HASS100",
             "HASS215",
-            "EDNS151",
             "EBGN321",
             "CSM101",
             "CSM202",
@@ -2528,6 +2596,18 @@
             "MNGN438",
             "MNGN482"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -2733,9 +2813,7 @@
             "CHGN121",
             "PHGN100",
             "PHGN200",
-            "HASS100",
             "HASS215",
-            "EDNS151",
             "EBGN321",
             "CSM101",
             "CSM202",
@@ -2746,6 +2824,18 @@
             "MATH455",
             "MATH484"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -3036,9 +3126,7 @@
             "CHGN121",
             "PHGN100",
             "PHGN200",
-            "HASS100",
             "HASS215",
-            "EDNS151",
             "EBGN321",
             "CSM101",
             "CSM202",
@@ -3049,6 +3137,18 @@
             "MATH437",
             "MATH482"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -3338,9 +3438,7 @@
             "CHGN121",
             "PHGN100",
             "PHGN200",
-            "HASS100",
             "HASS215",
-            "EDNS151",
             "EBGN321",
             "CSM101",
             "CSM202",
@@ -3352,6 +3450,18 @@
             "MATH482",
             "CSCI470"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -3630,10 +3740,8 @@
           "courses": [
             "CHGN121",
             "MATH111",
-            "HASS100",
             "CSM101",
             "MATH112",
-            "EDNS151",
             "PHGN100",
             "CSM202",
             "CSCI128",
@@ -3659,6 +3767,18 @@
             "EDNS491",
             "EDNS492"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -3892,13 +4012,11 @@
           "courses": [
             "MATH111",
             "CHGN121",
-            "HASS100",
             "CSCI128",
             "CSM101",
             "MATH112",
             "CHGN122",
             "PHGN100",
-            "EDNS151",
             "MATH213",
             "PHGN200",
             "HASS215",
@@ -3921,6 +4039,18 @@
             "PHGN472",
             "PHGN482"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -4130,13 +4260,11 @@
             "CHGN121",
             "CSM101",
             "MATH111",
-            "HASS100",
             "CSCI128",
             "CHGN125",
             "PHGN100",
             "CSM202",
             "MATH112",
-            "EDNS151",
             "MTGN272",
             "MATH213",
             "PHGN200",
@@ -4163,6 +4291,18 @@
             "MTGN465",
             "MTGN465L"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -4327,13 +4467,11 @@
             "CHGN121",
             "CSM101",
             "MATH111",
-            "HASS100",
             "CSCI128",
             "CHGN125",
             "PHGN100",
             "CSM202",
             "MATH112",
-            "EDNS151",
             "MTGN272",
             "MATH213",
             "PHGN200",
@@ -4360,6 +4498,18 @@
             "MTGN445L",
             "MTGN461"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -4583,12 +4733,10 @@
           "courses": [
             "MATH111",
             "CHGN121",
-            "HASS100",
             "CSM101",
             "GEGN101",
             "MATH112",
             "PHGN100",
-            "EDNS151",
             "CSCI128",
             "MATH213",
             "GPGN228",
@@ -4612,6 +4760,18 @@
             "GPGN409",
             "GPGN438"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -4897,7 +5057,6 @@
             "GEGN101",
             "MATH111",
             "CHGN121",
-            "HASS100",
             "PHGN100",
             "MATH112",
             "CHGN122",
@@ -4907,7 +5066,6 @@
             "MATH213",
             "PHGN200",
             "PEGN201",
-            "EDNS151",
             "PEGN251",
             "PEGN308",
             "PEGN282",
@@ -4934,6 +5092,18 @@
             "PEGN426",
             "PEGN439"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -5106,13 +5276,11 @@
           "courses": [
             "MATH111",
             "CHGN121",
-            "HASS100",
             "CSM101",
             "CSCI128",
             "MATH112",
             "PHGN100",
             "CHGN122",
-            "EDNS151",
             "CEEN210",
             "MATH213",
             "PHGN200",
@@ -5135,6 +5303,18 @@
             "EDNS491",
             "EDNS492"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -5390,8 +5570,6 @@
             "MATH111",
             "CHGN121",
             "CSM101",
-            "HASS100",
-            "EDNS151",
             "MATH112",
             "PHGN100",
             "CSCI128",
@@ -5423,6 +5601,18 @@
             "CEEN422",
             "EDNS492"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -5641,12 +5831,10 @@
             "MATH111",
             "CHGN121",
             "GEGN101",
-            "HASS100",
             "CSM101",
             "MATH112",
             "CHGN122",
             "PHGN100",
-            "EDNS151",
             "MATH213",
             "CEEN241",
             "CSM202",
@@ -5667,6 +5855,18 @@
             "EDNS492",
             "CEEN480"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -5914,7 +6114,6 @@
             "MATH112",
             "PHGN100",
             "CHGN122",
-            "HASS100",
             "CSM202",
             "MATH213",
             "PHGN200",
@@ -5925,7 +6124,6 @@
             "CHGN335",
             "CHGN222",
             "CHGN224",
-            "EDNS151",
             "HASS215",
             "CHGN341",
             "CHGN351",
@@ -5940,6 +6138,18 @@
             "CHGN429",
             "EBGN321"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -6133,14 +6343,12 @@
           "courses": [
             "MATH111",
             "CHGN121",
-            "HASS100",
             "CSCI128",
             "CSM101",
             "MATH112",
             "CSCI200",
             "HASS215",
             "PHGN100",
-            "EDNS151",
             "MATH213",
             "MATH225",
             "CEEN241",
@@ -6164,6 +6372,18 @@
             "EDNS492",
             "CSCI581"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -6388,8 +6608,6 @@
           "courses": [
             "CHGN121",
             "CSM101",
-            "EDNS151",
-            "HASS100",
             "MATH111",
             "HASS215",
             "CSCI128",
@@ -6419,6 +6637,18 @@
             "MEGN471",
             "EDNS492"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -6872,7 +7102,6 @@
             "CBEN110",
             "CHGN121",
             "CSM101",
-            "HASS100",
             "MATH111",
             "CHGN122",
             "CSCI128",
@@ -6887,7 +7116,6 @@
             "CBEN200",
             "CBEN201",
             "CHGN222",
-            "EDNS151",
             "MATH225",
             "CBEN307",
             "CBEN357",
@@ -6904,6 +7132,18 @@
             "CBEN418",
             "EBGN321"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -7305,7 +7545,6 @@
             "CBEN110",
             "CHGN121",
             "CSM101",
-            "HASS100",
             "MATH111",
             "CHGN122",
             "CSCI128",
@@ -7320,7 +7559,6 @@
             "CBEN200",
             "CBEN201",
             "CHGN222",
-            "EDNS151",
             "MATH225",
             "CBEN307",
             "CBEN357",
@@ -7339,6 +7577,18 @@
             "CHGN428",
             "CBEN360"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -7573,7 +7823,6 @@
             "CBEN110",
             "CHGN121",
             "CSM101",
-            "HASS100",
             "MATH111",
             "CHGN122",
             "CSCI128",
@@ -7588,7 +7837,6 @@
             "CBEN200",
             "CBEN201",
             "CHGN222",
-            "EDNS151",
             "MATH225",
             "CBEN307",
             "CBEN357",
@@ -7606,6 +7854,18 @@
             "EBGN321",
             "CBEN365"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -7967,7 +8227,6 @@
             "CBEN110",
             "CHGN121",
             "CSM101",
-            "HASS100",
             "MATH111",
             "CHGN122",
             "CSCI128",
@@ -7982,7 +8241,6 @@
             "CBEN200",
             "CBEN201",
             "CHGN222",
-            "EDNS151",
             "MATH225",
             "CBEN307",
             "CBEN357",
@@ -8001,6 +8259,18 @@
             "CBEN368",
             "CBEN430"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -8257,7 +8527,6 @@
           "label": "Required core and Design Engineering courses",
           "kind": "all",
           "courses": [
-            "EDNS151",
             "EDNS200",
             "MATH111",
             "CHGN121",
@@ -8265,7 +8534,6 @@
             "MATH112",
             "PHGN100",
             "CSCI128",
-            "HASS100",
             "EDNS210",
             "MATH213",
             "PHGN200",
@@ -8284,6 +8552,18 @@
             "EDNS492",
             "EDNS450"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -8723,12 +9003,10 @@
           "courses": [
             "CHGN121",
             "CSM101",
-            "EDNS151",
             "CSCI128",
             "MATH111",
             "CHGN122",
             "MATH112",
-            "HASS100",
             "PHGN100",
             "CSM202",
             "MATH213",
@@ -8753,6 +9031,18 @@
             "EBGN321",
             "CHGN401"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -9012,7 +9302,6 @@
             "MATH111",
             "CHGN122",
             "MATH112",
-            "HASS100",
             "PHGN100",
             "CSM202",
             "MATH213",
@@ -9035,11 +9324,22 @@
             "CHGN428",
             "CHGN490",
             "EBGN321",
-            "EDNS151",
             "GEGN101",
             "CHGN406",
             "CHGN403"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -9313,12 +9613,10 @@
           "courses": [
             "CHGN121",
             "CSM101",
-            "EDNS151",
             "CSCI128",
             "MATH111",
             "CHGN122",
             "MATH112",
-            "HASS100",
             "PHGN100",
             "CSM202",
             "MATH213",
@@ -9346,6 +9644,18 @@
             "CHGN429",
             "CHGN401"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -9601,12 +9911,10 @@
             "GEGN101",
             "MATH111",
             "CHGN121",
-            "EDNS151",
             "CSM101",
             "PHGN100",
             "MATH112",
             "CSCI128",
-            "HASS100",
             "GEGN203",
             "CHGN122",
             "CEEN241",
@@ -9633,6 +9941,18 @@
             "GEGN466L",
             "GEGN470"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -9974,12 +10294,10 @@
             "GEGN101",
             "MATH111",
             "CHGN121",
-            "EDNS151",
             "CSM101",
             "PHGN100",
             "MATH112",
             "CSCI128",
-            "HASS100",
             "GEGN203",
             "CHGN122",
             "CEEN241",
@@ -10009,6 +10327,18 @@
             "GEGN469",
             "GEGN470"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -10182,12 +10512,10 @@
             "GEGN101",
             "MATH111",
             "CHGN121",
-            "EDNS151",
             "CSM101",
             "PHGN100",
             "MATH112",
             "CSCI128",
-            "HASS100",
             "GEGN203",
             "CHGN122",
             "CEEN241",
@@ -10213,6 +10541,18 @@
             "GEGN403",
             "GEGN439"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -10402,11 +10742,9 @@
             "CSCI128",
             "MATH111",
             "CHGN121",
-            "HASS100",
             "CSM101",
             "PHGN100",
             "MATH112",
-            "EDNS151",
             "EBGN201",
             "CSM202",
             "MATH213",
@@ -10426,6 +10764,18 @@
             "EBGN485",
             "EBGN490"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -10654,11 +11004,9 @@
             "CSCI128",
             "MATH111",
             "CHGN121",
-            "HASS100",
             "CSM101",
             "PHGN100",
             "MATH112",
-            "EDNS151",
             "EBGN201",
             "CSM202",
             "MATH213",
@@ -10678,6 +11026,18 @@
             "EBGN485",
             "EBGN490"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -10881,11 +11241,9 @@
             "CSCI128",
             "MATH111",
             "CHGN121",
-            "HASS100",
             "CSM101",
             "PHGN100",
             "MATH112",
-            "EDNS151",
             "EBGN201",
             "CSM202",
             "MATH213",
@@ -10905,6 +11263,18 @@
             "EBGN485",
             "EBGN490"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -11120,11 +11490,9 @@
             "CSCI128",
             "MATH111",
             "CHGN121",
-            "HASS100",
             "CSM101",
             "PHGN100",
             "MATH112",
-            "EDNS151",
             "EBGN201",
             "CSM202",
             "MATH213",
@@ -11144,6 +11512,18 @@
             "EBGN485",
             "EBGN490"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -11369,11 +11749,9 @@
             "CSCI128",
             "MATH111",
             "CHGN121",
-            "HASS100",
             "CSM101",
             "PHGN100",
             "MATH112",
-            "EDNS151",
             "EBGN201",
             "CSM202",
             "MATH213",
@@ -11393,6 +11771,18 @@
             "EBGN485",
             "EBGN490"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -11605,11 +11995,9 @@
             "CSCI128",
             "MATH111",
             "CHGN121",
-            "HASS100",
             "CSM101",
             "PHGN100",
             "MATH112",
-            "EDNS151",
             "EBGN201",
             "CSM202",
             "MATH213",
@@ -11629,6 +12017,18 @@
             "EBGN485",
             "EBGN490"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -11829,11 +12229,9 @@
             "CSCI128",
             "MATH111",
             "CHGN121",
-            "HASS100",
             "CSM101",
             "PHGN100",
             "MATH112",
-            "EDNS151",
             "EBGN201",
             "CSM202",
             "MATH213",
@@ -11853,6 +12251,18 @@
             "EBGN485",
             "EBGN490"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -12063,11 +12473,9 @@
             "CSCI128",
             "MATH111",
             "CHGN121",
-            "HASS100",
             "CSM101",
             "PHGN100",
             "MATH112",
-            "EDNS151",
             "EBGN201",
             "CSM202",
             "MATH213",
@@ -12087,6 +12495,18 @@
             "EBGN485",
             "EBGN490"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -12389,11 +12809,9 @@
             "CBEN110",
             "MATH111",
             "CHGN121",
-            "EDNS151",
             "CSM101",
             "MATH112",
             "CHGN122",
-            "HASS100",
             "CBEN120",
             "CHGN221",
             "CHGN223",
@@ -12416,6 +12834,18 @@
             "EBGN321",
             "CSCI478"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "success-wellness",
@@ -12645,11 +13075,9 @@
             "CBEN110",
             "MATH111",
             "CHGN121",
-            "EDNS151",
             "CSM101",
             "MATH112",
             "CHGN122",
-            "HASS100",
             "CBEN120",
             "CHGN221",
             "CHGN223",
@@ -12673,6 +13101,18 @@
             "CSCI478",
             "BIOL490"
           ]
+        },
+        {
+          "group_id": "first-year-core",
+          "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+          "kind": "choose_credits",
+          "courses": [
+            "HASS100",
+            "EDNS151",
+            "HNRS105",
+            "HNRS115"
+          ],
+          "credits_required": 6
         },
         {
           "group_id": "honors-research-methods",

@@ -22,6 +22,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Sequence
 
 from degree_planner_backend.agent.mcp_server import TOOL_DEFINITIONS
 
@@ -47,11 +48,13 @@ class AgentSpec:
     system_prompt: str
 
 
-def load_agent(path: Path) -> AgentSpec:
-    return parse_agent(path.read_text(encoding="utf-8"), source=str(path))
+def load_agent(path: Path, available_tools: Sequence[str] | None = None) -> AgentSpec:
+    return parse_agent(path.read_text(encoding="utf-8"), source=str(path), available_tools=available_tools)
 
 
-def parse_agent(text: str, source: str = "agent file") -> AgentSpec:
+def parse_agent(text: str, source: str = "agent file", available_tools: Sequence[str] | None = None) -> AgentSpec:
+    """available_tools: the tools this agent may list; by default the planner MCP server's tools.
+    The eval's checker (checker.md) passes Claude Code's built-in WebFetch instead."""
     lines = text.split("\n")
     if not lines or lines[0].strip() != _FENCE:
         raise AgentFileError(f"{source}: must start with a '---' line")
@@ -88,12 +91,12 @@ def parse_agent(text: str, source: str = "agent file") -> AgentSpec:
     if not (turns.isascii() and turns.isdigit() and 1 <= int(turns) <= MAX_TURNS_LIMIT):
         raise AgentFileError(f"{source}: maxTurns must be a whole number from 1 to {MAX_TURNS_LIMIT}, not {turns!r}")
 
-    available = [tool["name"] for tool in TOOL_DEFINITIONS]
+    available = list(available_tools) if available_tools is not None else [tool["name"] for tool in TOOL_DEFINITIONS]
     tools = tuple(name.strip() for name in fields["tools"].split(","))
     for name in tools:
         if name not in available:
             raise AgentFileError(
-                f"{source}: tool {name!r} is not one the planner server offers ({', '.join(available)})"
+                f"{source}: tool {name!r} is not one this agent can use ({', '.join(available)})"
             )
     if len(set(tools)) != len(tools):
         raise AgentFileError(f"{source}: a tool is listed twice")

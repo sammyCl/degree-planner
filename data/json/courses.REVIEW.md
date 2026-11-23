@@ -6,12 +6,14 @@ Regenerated every run; do not edit by hand. Rules: `data/CONFLICT-LOG.md`, secti
 
 - codes in both CSVs (merged): 947
 - corequisites kept as one exception (free text): 19
+- courses with an equivalent: 84
 - courses with no description: 101
 - courses written: 2137
-- credit ranges (upper bound used): 471
+- credit ranges (upper bound used): 311
 - credit/repeat notes dropped from prerequisites: 153
 - csv rows: 3168
 - graduate-only courses without a source URL: 6
+- independent study (set to 3 credits): 160
 - prerequisites kept as one exception (free text): 226
 - prerequisites partly free text (mixed): 8
 - prerequisites with a grade minimum (grade dropped): 67
@@ -478,129 +480,77 @@ Regenerated every run; do not edit by hand. Rules: `data/CONFLICT-LOG.md`, secti
 ## Prerequisite text that produced no requirement (0)
 
 
-## Variable-credit courses (upper bound used) (471)
+## Variable-credit courses (upper bound used) (311)
 
 - AMFG598: 1-6 -> 6
-- AMFG599: 1-6 -> 6
 - BIOL398: 0-6 -> 6
-- BIOL399: 1-6 -> 6
 - BIOL498: 0-6 -> 6
-- BIOL499: 0.5-6 -> 6
 - BIOL598: 0-6 -> 6
-- BIOL599: 0.5-6 -> 6
 - BIOL707: 1-15 -> 15
 - BIOLADD: 0-3 -> 3
 - CBEN198: 0-6 -> 6
-- CBEN199: 1-6 -> 6
 - CBEN298: 1-6 -> 6
-- CBEN299: 1-6 -> 6
 - CBEN340: 1-3 -> 3
 - CBEN350: 1-3 -> 3
 - CBEN351: 1-3 -> 3
 - CBEN398: 0-6 -> 6
-- CBEN399: 1-6 -> 6
 - CBEN418: 0-3 -> 3
 - CBEN435: 0-3 -> 3
 - CBEN450: 1-3 -> 3
 - CBEN451: 1-3 -> 3
 - CBEN497: 0-15 -> 15
 - CBEN498: 1-6 -> 6
-- CBEN499: 1-6 -> 6
 - CBEN513: 1-3 -> 3
 - CBEN535: 0-3 -> 3
 - CBEN598: 0-6 -> 6
-- CBEN599: 0.5-6 -> 6
 - CBEN608: 1-3 -> 3
 - CBEN609: 1-3 -> 3
-- CBEN699: 0.5-6 -> 6
 - CBEN707: 1-15 -> 15
 - CEEN198: 1-6 -> 6
-- CEEN199: 1-6 -> 6
 - CEEN298: 0-6 -> 6
-- CEEN299: 1-6 -> 6
 - CEEN398: 0-6 -> 6
-- CEEN399: 1-6 -> 6
 - CEEN498: 1-6 -> 6
-- CEEN499: 1-6 -> 6
 - CEEN550: 0-3 -> 3
 - CEEN598: 0-6 -> 6
-- CEEN599: 0.5-6 -> 6
-- CEEN599AA: 0.5-6 -> 6
-- CEEN599AB: 0.5-6 -> 6
-- CEEN599AC: 0.5-6 -> 6
-- CEEN599AD: 0.5-6 -> 6
-- CEEN599AE: 0.5-6 -> 6
-- CEEN599AF: 0.5-6 -> 6
-- CEEN599AG: 0.5-6 -> 6
-- CEEN599AH: 0.5-6 -> 6
-- CEEN599AI: 0.5-6 -> 6
-- CEEN599AJ: 0.5-6 -> 6
-- CEEN599AK: 0.5-6 -> 6
-- CEEN599AL: 0.5-6 -> 6
-- CEEN599AM: 0.5-6 -> 6
-- CEEN599AN: 0.5-6 -> 6
-- CEEN599AO: 0.5-6 -> 6
-- CEEN599AP: 0.5-6 -> 6
 - CEEN698: 0-6 -> 6
-- CEEN699: 0.5-6 -> 6
 - CEEN707: 1-15 -> 15
 - CHGC598: 1-6 -> 6
-- CHGC599: 0.5-6 -> 6
 - CHGC698: 1-6 -> 6
-- CHGC699: 0.5-6 -> 6
 - CHGC707: 0.5-15 -> 15
 - CHGN198: 1-6 -> 6
 - CHGN198LA: 0-6 -> 6
 - CHGN198LB: 0-6 -> 6
-- CHGN199: 1-6 -> 6
 - CHGN1XX: 0-6 -> 6
 - CHGN298: 1-6 -> 6
-- CHGN299: 1-6 -> 6
 - CHGN353: 0-4 -> 4
 - CHGN396: 1-5 -> 5
 - CHGN398: 1-6 -> 6
 - CHGN398LA: 1-6 -> 6
-- CHGN399: 1-6 -> 6
 - CHGN495: 1-5 -> 5
 - CHGN496A: 0-16 -> 16
 - CHGN497: 1-6 -> 6
 - CHGN498: 1-6 -> 6
-- CHGN499: 0.5-6 -> 6
 - CHGN597: 0-15 -> 15
 - CHGN598: 0-6 -> 6
-- CHGN599: 0.5-6 -> 6
 - CHGN698: 0-6 -> 6
-- CHGN699: 0.5-6 -> 6
 - CHGN707: 1-15 -> 15
 - CSCI198: 1-6 -> 6
-- CSCI199: 1-6 -> 6
 - CSCI1XX: 1-6 -> 6
 - CSCI298: 1-6 -> 6
-- CSCI299: 1-6 -> 6
 - CSCI340: 0-3 -> 3
 - CSCI398: 1-6 -> 6
-- CSCI399: 1-6 -> 6
 - CSCI436: 0-3 -> 3
 - CSCI498: 1-6 -> 6
-- CSCI499: 1-6 -> 6
 - CSCI597: 0-6 -> 6
 - CSCI598: 0-6 -> 6
-- CSCI599: 0.5-6 -> 6
 - CSCI698: 0-6 -> 6
-- CSCI699: 0.5-6 -> 6
 - CSCI700: 1-6 -> 6
 - CSCI707: 1-15 -> 15
-- CSED199: 1-6 -> 6
-- CSED299: 1-6 -> 6
-- CSED399: 1-6 -> 6
 - CSED465: 6-12 -> 12
 - CSED498: 0-6 -> 6
-- CSED499: 1-6 -> 6
 - CSED565: 6-12 -> 12
 - CSED598: 0-6 -> 6
-- CSED599: 1-6 -> 6
 - CSM198: 0-6 -> 6
-- CSM199: 0.5-6 -> 6
 - CSM298: 0-6 -> 6
 - CSM398: 0-6 -> 6
 - CSM497: 0-6 -> 6
@@ -608,117 +558,80 @@ Regenerated every run; do not edit by hand. Rules: `data/CONFLICT-LOG.md`, secti
 - CSM888: 3-12 -> 12
 - CSM999: 0-16 -> 16
 - DSCI598: 0-6 -> 6
-- DSCI599: 0.5-6 -> 6
 - EBGN198: 1-6 -> 6
-- EBGN199: 0.5-6 -> 6
 - EBGN1XX: 1-6 -> 6
 - EBGN298: 1-6 -> 6
-- EBGN299: 1-6 -> 6
 - EBGN397: 1-6 -> 6
 - EBGN398: 1-6 -> 6
-- EBGN399: 1-6 -> 6
 - EBGN403: 1-4 -> 4
 - EBGN497: 0-6 -> 6
 - EBGN498: 0.5-6 -> 6
-- EBGN499: 1-6 -> 6
 - EBGN598: 0-6 -> 6
-- EBGN599: 0.5-6 -> 6
 - EBGN698: 0-6 -> 6
-- EBGN699: 0.5-6 -> 6
 - EBGN707: 1-15 -> 15
 - EDNS198: 1-6 -> 6
-- EDNS199: 1-6 -> 6
 - EDNS298: 1-6 -> 6
-- EDNS299: 1-6 -> 6
 - EDNS398: 1-6 -> 6
-- EDNS399: 1-6 -> 6
 - EDNS492: 0-3 -> 3
 - EDNS497: 0-6 -> 6
 - EDNS498: 0-6 -> 6
-- EDNS499: 1-6 -> 6
 - EDNS597: 0-6 -> 6
 - EDNS598: 0-6 -> 6
-- EDNS599: 0.5-6 -> 6
 - EDNS707: 1-15 -> 15
 - EENG198: 1-6 -> 6
-- EENG199: 1-6 -> 6
 - EENG298: 1-6 -> 6
-- EENG299: 0.5-6 -> 6
 - EENG395: 1-3 -> 3
 - EENG398: 0-6 -> 6
-- EENG399: 1-6 -> 6
 - EENG495: 1-3 -> 3
 - EENG497: 0-15 -> 15
 - EENG498: 1-6 -> 6
-- EENG499: 1-6 -> 6
 - EENG597: 0-6 -> 6
 - EENG598: 0-6 -> 6
-- EENG599: 0.5-6 -> 6
 - EENG698: 0-6 -> 6
-- EENG699: 0.5-6 -> 6
 - EENG707: 1-15 -> 15
 - ENGY198: 1-6 -> 6
 - ENGY298: 1-6 -> 6
 - ENGY398: 0-6 -> 6
-- ENGY399: 0.5-6 -> 6
 - ENGY497: 0-6 -> 6
 - ENGY498: 0-6 -> 6
-- ENGY499: 0.5-6 -> 6
 - ENGY598: 0-6 -> 6
-- ENGY599: 0.5-6 -> 6
 - ENGY707: 1-15 -> 15
-- FEGN599: 0.5-6 -> 6
 - GEGN198: 1-6 -> 6
-- GEGN199: 1-6 -> 6
 - GEGN298: 1-6 -> 6
-- GEGN299: 1-6 -> 6
 - GEGN340: 1-3 -> 3
 - GEGN398: 1-6 -> 6
-- GEGN399: 1-6 -> 6
 - GEGN438: 0-4 -> 4
 - GEGN475: 0-3 -> 3
 - GEGN497: 0-15 -> 15
 - GEGN498: 1-6 -> 6
-- GEGN499: 1-6 -> 6
 - GEGN575: 0-3 -> 3
 - GEGN578: 1-3 -> 3
 - GEGN580: 0-3 -> 3
 - GEGN590: 1-6 -> 6
 - GEGN592: 1-6 -> 6
 - GEGN598: 0-6 -> 6
-- GEGN599: 0.5-6 -> 6
 - GEGN669: 1-2 -> 2
 - GEGN698: 0-6 -> 6
-- GEGN699: 0.5-6 -> 6
 - GEGN707: 1-15 -> 15
 - GEOL198: 1-6 -> 6
-- GEOL199: 1-6 -> 6
 - GEOL298: 1-6 -> 6
-- GEOL299: 1-6 -> 6
 - GEOL314: 0-4 -> 4
 - GEOL398: 1-6 -> 6
-- GEOL399: 1-6 -> 6
 - GEOL443: 1-3 -> 3
 - GEOL497: 0-15 -> 15
 - GEOL498: 1-6 -> 6
-- GEOL499: 1-6 -> 6
 - GEOL501: 0-4 -> 4
 - GEOL597: 0-15 -> 15
 - GEOL598: 0-3 -> 3
 - GEOL598LA: 0-6 -> 6
 - GEOL598LB: 0-6 -> 6
-- GEOL599: 0.5-6 -> 6
 - GEOL642: 1-3 -> 3
 - GEOL643: 1-3 -> 3
 - GEOL698: 0-6 -> 6
-- GEOL699: 0.5-6 -> 6
 - GEOL707: 1-15 -> 15
 - GPGN198: 1-6 -> 6
-- GPGN199: 1-6 -> 6
 - GPGN298: 1-6 -> 6
-- GPGN299: 1-6 -> 6
 - GPGN398: 1-6 -> 6
-- GPGN399: 1-6 -> 6
 - GPGN498: 1-6 -> 6
 - GPGN499: 1-6 -> 6
 - GPGN558: 0-3 -> 3
@@ -731,218 +644,148 @@ Regenerated every run; do not edit by hand. Rules: `data/CONFLICT-LOG.md`, secti
 - GPGN699: 0.5-6 -> 6
 - GPGN707: 1-15 -> 15
 - HASS198: 1-6 -> 6
-- HASS199: 1-6 -> 6
 - HASS1XX: 0-6 -> 6
 - HASS298: 1-6 -> 6
-- HASS299: 1-6 -> 6
 - HASS2XX: 0-6 -> 6
 - HASS398: 1-6 -> 6
-- HASS399: 1-6 -> 6
 - HASS498: 1-6 -> 6
-- HASS499: 1-6 -> 6
 - HASS598: 0-6 -> 6
-- HASS599: 0.5-6 -> 6
 - HASS601: 2-3 -> 3
 - HASS698: 0-6 -> 6
-- HASS699: 0.5-6 -> 6
 - HASS707: 1-15 -> 15
 - HNRS155: 1-3 -> 3
 - HNRS198: 0-6 -> 6
-- HNRS199: 1-6 -> 6
 - HNRS255: 1-3 -> 3
 - HNRS298: 1-6 -> 6
-- HNRS299: 1-6 -> 6
 - HNRS355: 1-3 -> 3
 - HNRS398: 1-6 -> 6
-- HNRS399: 1-6 -> 6
 - HNRS405: 1-3 -> 3
 - HNRS455: 1-3 -> 3
 - HNRS497: 0-6 -> 6
 - HNRS498: 1-6 -> 6
-- HNRS499: 1-6 -> 6
 - LICM198: 0.5-6 -> 6
 - LICM298: 0.5-6 -> 6
 - LIFL198: 1-6 -> 6
-- LIFL199: 1-6 -> 6
 - LIFL1XX: 0-12 -> 12
 - LIFL298: 1-6 -> 6
-- LIFL299: 0-6 -> 6
 - LIFL2XX: 0-12 -> 12
 - LIFL398: 1-6 -> 6
-- LIFL399: 1-6 -> 6
 - LIFL3XX: 0-12 -> 12
 - LIFL498: 1-6 -> 6
-- LIFL499: 1-6 -> 6
 - LIMU198: 0-6 -> 6
-- LIMU199: 1-6 -> 6
 - LIMU298: 1-6 -> 6
-- LIMU299: 1-6 -> 6
 - LIMU398: 1-6 -> 6
-- LIMU399: 1-6 -> 6
 - LIMU498: 1-6 -> 6
-- LIMU499: 1-6 -> 6
 - MAED465: 6-12 -> 12
 - MAED498: 0-6 -> 6
 - MAED562: 1-3 -> 3
 - MAED565: 6-12 -> 12
 - MAED598: 0-6 -> 6
-- MAED599: 0.5-6 -> 6
 - MATH198: 0-6 -> 6
-- MATH199: 1-6 -> 6
 - MATH1XX: 1-6 -> 6
 - MATH298: 1-6 -> 6
-- MATH299: 1-6 -> 6
 - MATH398: 0-6 -> 6
-- MATH399: 0.5-6 -> 6
 - MATH491: 1-3 -> 3
 - MATH498: 1-6 -> 6
-- MATH499: 0.5-6 -> 6
 - MATH598: 0-6 -> 6
-- MATH599: 0.5-6 -> 6
 - MATH698: 0-6 -> 6
-- MATH699: 0.5-6 -> 6
 - MATH707: 1-15 -> 15
 - MEGN298: 1-6 -> 6
-- MEGN299: 1-6 -> 6
 - MEGN398: 0-6 -> 6
-- MEGN399: 1-6 -> 6
 - MEGN497: 0-15 -> 15
 - MEGN498: 1-6 -> 6
-- MEGN499: 1-6 -> 6
 - MEGN598: 0-6 -> 6
-- MEGN599: 0.5-6 -> 6
 - MEGN698: 0-6 -> 6
-- MEGN699: 0.5-6 -> 6
 - MEGN707: 1-15 -> 15
 - MLGN535: 0-3 -> 3
 - MLGN597: 0.5-6 -> 6
 - MLGN598: 0-6 -> 6
 - MLGN599: 0.5-6 -> 6
 - MLGN698: 0-6 -> 6
-- MLGN699: 0.5-6 -> 6
 - MLGN707: 1-15 -> 15
 - MNGN198: 1-6 -> 6
-- MNGN199: 1-6 -> 6
 - MNGN298: 0-6 -> 6
-- MNGN299: 1-6 -> 6
 - MNGN340: 0-3 -> 3
 - MNGN398: 1-6 -> 6
-- MNGN399: 1-6 -> 6
 - MNGN444: 0-3 -> 3
 - MNGN498: 1-6 -> 6
-- MNGN499: 1-6 -> 6
 - MNGN511: 2-4 -> 4
 - MNGN523: 2-4 -> 4
 - MNGN598: 0-6 -> 6
-- MNGN599: 0.5-6 -> 6
 - MNGN698: 0-6 -> 6
-- MNGN699: 0.5-6 -> 6
 - MNGN700: 1-6 -> 6
 - MNGN707: 1-15 -> 15
 - MSGN198: 1-6 -> 6
-- MSGN199: 1-6 -> 6
 - MSGN298: 1-6 -> 6
-- MSGN299: 1-6 -> 6
 - MSGN398: 1-6 -> 6
-- MSGN399: 1-6 -> 6
 - MSGN498: 1-6 -> 6
-- MSGN499: 1-6 -> 6
-- MSGN599: 0.5-6 -> 6
 - MTGN198: 1-3 -> 3
-- MTGN199: 1-3 -> 3
 - MTGN219: 0-2 -> 2
 - MTGN298: 0-3 -> 3
-- MTGN299: 1-3 -> 3
 - MTGN340: 1-3 -> 3
 - MTGN398: 0-3 -> 3
-- MTGN399: 1-3 -> 3
 - MTGN435: 0-3 -> 3
 - MTGN498: 0-3 -> 3
 - MTGN498LA: 1-3 -> 3
 - MTGN498LB: 1-3 -> 3
 - MTGN498LC: 1-3 -> 3
-- MTGN499: 1-6 -> 6
 - MTGN511: 1-3 -> 3
 - MTGN512: 1-3 -> 3
 - MTGN535: 0-3 -> 3
 - MTGN598: 0-6 -> 6
 - MTGN598LA: 1-3 -> 3
-- MTGN599: 0.5-6 -> 6
 - MTGN698: 0-6 -> 6
-- MTGN699: 0.5-6 -> 6
 - MTGN700: 1-6 -> 6
 - MTGN707: 1-15 -> 15
 - NUGN598: 0-6 -> 6
-- NUGN599: 0.5-6 -> 6
 - NUGN698: 0-6 -> 6
-- NUGN699: 0.5-6 -> 6
 - NUGN707: 1-15 -> 15
 - ORWE498: 0-6 -> 6
 - ORWE598: 0-6 -> 6
-- ORWE599: 0.5-6 -> 6
 - PAGN198: 0.5-6 -> 6
 - PAGN1XX: 0-4 -> 4
 - PAGN298: 0.5-6 -> 6
-- PAGN299: 0.5-6 -> 6
 - PAGN398: 0.5-6 -> 6
 - PAGN498: 0.5-6 -> 6
 - PEGN198: 1-6 -> 6
-- PEGN199: 1-6 -> 6
 - PEGN298: 1-6 -> 6
-- PEGN299: 1-6 -> 6
 - PEGN308: 0-3 -> 3
 - PEGN340: 0-3 -> 3
 - PEGN398: 0-6 -> 6
 - PEGN398LA: 0-6 -> 6
-- PEGN399: 1-6 -> 6
 - PEGN438: 0-3 -> 3
 - PEGN497: 0-15 -> 15
 - PEGN498: 1-6 -> 6
-- PEGN499: 1-6 -> 6
 - PEGN598: 0-6 -> 6
 - PEGN598LA: 0-6 -> 6
-- PEGN599: 0.5-6 -> 6
 - PEGN698: 0-6 -> 6
-- PEGN699: 0.5-6 -> 6
 - PEGN707: 1-15 -> 15
 - PHGN198: 1-6 -> 6
-- PHGN199: 1-6 -> 6
 - PHGN1XX: 0-6 -> 6
 - PHGN215: 0-4 -> 4
 - PHGN298: 1-6 -> 6
-- PHGN299: 1-6 -> 6
 - PHGN340: 1-3 -> 3
 - PHGN398: 1-6 -> 6
-- PHGN399: 1-6 -> 6
 - PHGN435: 0-3 -> 3
 - PHGN497: 0-6 -> 6
 - PHGN498: 1-6 -> 6
-- PHGN499: 0.5-6 -> 6
 - PHGN535: 0-3 -> 3
 - PHGN597: 0-6 -> 6
 - PHGN598: 0-6 -> 6
-- PHGN599: 0.5-6 -> 6
 - PHGN698: 0-6 -> 6
-- PHGN699: 0.5-6 -> 6
 - PHGN707: 1-15 -> 15
 - ROBO298: 0-6 -> 6
 - ROBO598: 0-3 -> 3
-- ROBO599: 0.5-6 -> 6
 - ROBO707: 1-15 -> 15
-- SCED199: 1-6 -> 6
 - SCED262: 1-3 -> 3
-- SCED299: 1-6 -> 6
 - SCED398: 0-6 -> 6
 - SCED465: 6-12 -> 12
 - SCED498: 0-6 -> 6
-- SCED499: 0.5-6 -> 6
 - SCED562: 1-3 -> 3
 - SCED565: 6-12 -> 12
 - SCED598: 0-6 -> 6
-- SCED599: 0.5-6 -> 6
 - SPRS498: 0-6 -> 6
 - SPRS598: 0-6 -> 6
-- SPRS599: 0.5-6 -> 6
 - SPRS707: 1-15 -> 15
 - SYGN398: 1-6 -> 6
 - SYGN498: 1-6 -> 6
@@ -950,7 +793,355 @@ Regenerated every run; do not edit by hand. Rules: `data/CONFLICT-LOG.md`, secti
 - SYGN589: 1-6 -> 6
 - SYGN590: 1-6 -> 6
 - SYGN598: 0-6 -> 6
-- SYGN599: 0-6 -> 6
+
+## Independent Study courses (set to 3 credits, not the upper bound) (160)
+
+- AMFG599: 1-6 -> 3
+- BIOL399: 1-6 -> 3
+- BIOL499: 0.5-6 -> 3
+- BIOL599: 0.5-6 -> 3
+- CBEN199: 1-6 -> 3
+- CBEN299: 1-6 -> 3
+- CBEN399: 1-6 -> 3
+- CBEN499: 1-6 -> 3
+- CBEN599: 0.5-6 -> 3
+- CBEN699: 0.5-6 -> 3
+- CEEN199: 1-6 -> 3
+- CEEN299: 1-6 -> 3
+- CEEN399: 1-6 -> 3
+- CEEN499: 1-6 -> 3
+- CEEN599: 0.5-6 -> 3
+- CEEN599AA: 0.5-6 -> 3
+- CEEN599AB: 0.5-6 -> 3
+- CEEN599AC: 0.5-6 -> 3
+- CEEN599AD: 0.5-6 -> 3
+- CEEN599AE: 0.5-6 -> 3
+- CEEN599AF: 0.5-6 -> 3
+- CEEN599AG: 0.5-6 -> 3
+- CEEN599AH: 0.5-6 -> 3
+- CEEN599AI: 0.5-6 -> 3
+- CEEN599AJ: 0.5-6 -> 3
+- CEEN599AK: 0.5-6 -> 3
+- CEEN599AL: 0.5-6 -> 3
+- CEEN599AM: 0.5-6 -> 3
+- CEEN599AN: 0.5-6 -> 3
+- CEEN599AO: 0.5-6 -> 3
+- CEEN599AP: 0.5-6 -> 3
+- CEEN699: 0.5-6 -> 3
+- CHGC599: 0.5-6 -> 3
+- CHGC699: 0.5-6 -> 3
+- CHGN199: 1-6 -> 3
+- CHGN299: 1-6 -> 3
+- CHGN399: 1-6 -> 3
+- CHGN499: 0.5-6 -> 3
+- CHGN599: 0.5-6 -> 3
+- CHGN699: 0.5-6 -> 3
+- CSCI199: 1-6 -> 3
+- CSCI299: 1-6 -> 3
+- CSCI399: 1-6 -> 3
+- CSCI499: 1-6 -> 3
+- CSCI599: 0.5-6 -> 3
+- CSCI699: 0.5-6 -> 3
+- CSED199: 1-6 -> 3
+- CSED299: 1-6 -> 3
+- CSED399: 1-6 -> 3
+- CSED499: 1-6 -> 3
+- CSED599: 1-6 -> 3
+- CSM199: 0.5-6 -> 3
+- DSCI599: 0.5-6 -> 3
+- EBGN199: 0.5-6 -> 3
+- EBGN299: 1-6 -> 3
+- EBGN399: 1-6 -> 3
+- EBGN499: 1-6 -> 3
+- EBGN599: 0.5-6 -> 3
+- EBGN699: 0.5-6 -> 3
+- EDNS199: 1-6 -> 3
+- EDNS299: 1-6 -> 3
+- EDNS399: 1-6 -> 3
+- EDNS499: 1-6 -> 3
+- EDNS599: 0.5-6 -> 3
+- EENG199: 1-6 -> 3
+- EENG299: 0.5-6 -> 3
+- EENG399: 1-6 -> 3
+- EENG499: 1-6 -> 3
+- EENG599: 0.5-6 -> 3
+- EENG699: 0.5-6 -> 3
+- ENGY399: 0.5-6 -> 3
+- ENGY499: 0.5-6 -> 3
+- ENGY599: 0.5-6 -> 3
+- FEGN599: 0.5-6 -> 3
+- GEGN199: 1-6 -> 3
+- GEGN299: 1-6 -> 3
+- GEGN399: 1-6 -> 3
+- GEGN499: 1-6 -> 3
+- GEGN599: 0.5-6 -> 3
+- GEGN699: 0.5-6 -> 3
+- GEOL199: 1-6 -> 3
+- GEOL299: 1-6 -> 3
+- GEOL399: 1-6 -> 3
+- GEOL499: 1-6 -> 3
+- GEOL599: 0.5-6 -> 3
+- GEOL699: 0.5-6 -> 3
+- GPGN199: 1-6 -> 3
+- GPGN299: 1-6 -> 3
+- GPGN399: 1-6 -> 3
+- HASS199: 1-6 -> 3
+- HASS299: 1-6 -> 3
+- HASS399: 1-6 -> 3
+- HASS499: 1-6 -> 3
+- HASS599: 0.5-6 -> 3
+- HASS699: 0.5-6 -> 3
+- HNRS199: 1-6 -> 3
+- HNRS299: 1-6 -> 3
+- HNRS399: 1-6 -> 3
+- HNRS499: 1-6 -> 3
+- LIFL199: 1-6 -> 3
+- LIFL299: 0-6 -> 3
+- LIFL399: 1-6 -> 3
+- LIFL499: 1-6 -> 3
+- LIMU199: 1-6 -> 3
+- LIMU299: 1-6 -> 3
+- LIMU399: 1-6 -> 3
+- LIMU499: 1-6 -> 3
+- MAED599: 0.5-6 -> 3
+- MATH199: 1-6 -> 3
+- MATH299: 1-6 -> 3
+- MATH399: 0.5-6 -> 3
+- MATH499: 0.5-6 -> 3
+- MATH599: 0.5-6 -> 3
+- MATH699: 0.5-6 -> 3
+- MEGN299: 1-6 -> 3
+- MEGN399: 1-6 -> 3
+- MEGN499: 1-6 -> 3
+- MEGN599: 0.5-6 -> 3
+- MEGN699: 0.5-6 -> 3
+- MLGN699: 0.5-6 -> 3
+- MNGN199: 1-6 -> 3
+- MNGN299: 1-6 -> 3
+- MNGN399: 1-6 -> 3
+- MNGN499: 1-6 -> 3
+- MNGN599: 0.5-6 -> 3
+- MNGN699: 0.5-6 -> 3
+- MSGN199: 1-6 -> 3
+- MSGN299: 1-6 -> 3
+- MSGN399: 1-6 -> 3
+- MSGN499: 1-6 -> 3
+- MSGN599: 0.5-6 -> 3
+- MTGN199: 1-3 -> 3
+- MTGN299: 1-3 -> 3
+- MTGN399: 1-3 -> 3
+- MTGN499: 1-6 -> 3
+- MTGN599: 0.5-6 -> 3
+- MTGN699: 0.5-6 -> 3
+- NUGN599: 0.5-6 -> 3
+- NUGN699: 0.5-6 -> 3
+- ORWE599: 0.5-6 -> 3
+- PAGN299: 0.5-6 -> 3
+- PEGN199: 1-6 -> 3
+- PEGN299: 1-6 -> 3
+- PEGN399: 1-6 -> 3
+- PEGN499: 1-6 -> 3
+- PEGN599: 0.5-6 -> 3
+- PEGN699: 0.5-6 -> 3
+- PHGN199: 1-6 -> 3
+- PHGN299: 1-6 -> 3
+- PHGN399: 1-6 -> 3
+- PHGN499: 0.5-6 -> 3
+- PHGN599: 0.5-6 -> 3
+- PHGN699: 0.5-6 -> 3
+- ROBO599: 0.5-6 -> 3
+- SCED199: 1-6 -> 3
+- SCED299: 1-6 -> 3
+- SCED499: 0.5-6 -> 3
+- SCED599: 0.5-6 -> 3
+- SPRS599: 0.5-6 -> 3
+- SYGN599: 0-6 -> 3
+
+## Equivalent courses named in a description but not in the catalog CSVs (left out) (183)
+
+- CBEN110 -> BIOL110
+- CBEN120 -> CBEN323
+- CBEN201 -> CHEN201
+- CBEN304 -> CBEN404
+- CBEN305 -> CBEN405
+- CBEN320 -> CBEN410
+- CBEN421 -> CHEN421
+- CBEN421 -> EBGN421
+- CBEN555 -> MLGN555
+- CEEN267 -> EPIC267
+- CEEN303 -> ESGN355
+- CEEN381 -> CEEN481
+- CEEN381 -> ESGN459
+- CEEN470 -> BELS453
+- CEEN470 -> EGGN453
+- CEEN470 -> ESGN453
+- CEEN480 -> ESGN440
+- CEEN591 -> ESGN571
+- CEEN593 -> ESGN593
+- CHGN462 -> CHGN562
+- CHGN555 -> MLGN555
+- CSCI406 -> MATH406
+- CSCI437 -> CSCI512
+- CSCI437 -> EENG512
+- CSCI441 -> MATH441
+- CSCI444 -> MATH444
+- CSCI474 -> MATH474
+- CSCI507 -> CSCI512
+- CSCI507 -> EENG512
+- CSCI508 -> EENG508
+- CSCI544 -> MATH544
+- CSCI574 -> MATH574
+- EBGN301 -> EBGN411
+- EBGN302 -> EBGN412
+- EBGN303 -> EBGN390
+- EBGN321 -> CHEN421
+- EBGN330 -> ENGY330
+- EBGN403 -> EBGN402
+- EBGN655 -> EBGN650
+- EDNS151 -> EPIC151
+- EDNS155 -> EPIC155
+- EDNS198 -> EPIC198A
+- EDNS251 -> EPIC251
+- EDNS298 -> EPIC298A
+- EDNS299 -> EPIC299A
+- EDNS398 -> EPIC398A
+- EDNS399 -> EPIC399A
+- EDNS430 -> LAIS430
+- EDNS478 -> LAIS478
+- EDNS491 -> EGGN491
+- EDNS497 -> EPIC497A
+- EDNS498 -> EPIC498A
+- EDNS499 -> EPIC499A
+- EDNS578 -> LAIS578
+- EENG310 -> EENG388
+- EENG507 -> CSCI512
+- EENG507 -> EENG512
+- EENG510 -> CSCI510
+- EENG510 -> EGGN510
+- EENG527 -> EENG513
+- GEGN101 -> SYGN101
+- GEGN307 -> GEOL307
+- GEGN530 -> GEOL530
+- GEOL513 -> CHGC513
+- GPGN420 -> GPGN422
+- GPGN436 -> GPGN435
+- GPGN461 -> GPGN452
+- HASS100 -> CSM191
+- HASS100 -> CSM192
+- HASS100 -> HNRS198A
+- HASS100 -> LAIS100
+- HASS198 -> LAIS198A
+- HASS199 -> LAIS199A
+- HASS200 -> LAIS200
+- HASS200 -> SYGN200
+- HASS220 -> LAIS220
+- HASS226 -> LAIS226
+- HASS298 -> LAIS298A
+- HASS299 -> LAIS299A
+- HASS300 -> LAIS300
+- HASS301 -> LAIS301
+- HASS305 -> LAIS305
+- HASS307 -> LAIS307
+- HASS309 -> LAIS309
+- HASS315 -> LAIS315
+- HASS320 -> LAIS320
+- HASS323 -> LAIS323
+- HASS324 -> LAIS324
+- HASS326 -> LAIS326
+- HASS327 -> LAIS327
+- HASS328 -> LAIS328
+- HASS330 -> LAIS330
+- HASS339 -> LAIS339
+- HASS344 -> LAIS344
+- HASS365 -> LAIS365
+- HASS370 -> LAIS370
+- HASS376 -> LAIS376
+- HASS398 -> LAIS398A
+- HASS399 -> LAIS399A
+- HASS401 -> LAIS401
+- HASS404 -> LAIS404
+- HASS406 -> LAIS406
+- HASS407 -> LAIS407
+- HASS408 -> LAIS408
+- HASS410 -> LAIS410
+- HASS411 -> LAIS411
+- HASS412 -> LAIS412
+- HASS415 -> LAIS415
+- HASS416 -> LAIS416
+- HASS418 -> LAIS418
+- HASS419 -> LAIS419
+- HASS421 -> LAIS421
+- HASS423 -> LAIS423
+- HASS425 -> LAIS425
+- HASS429 -> LAIS429
+- HASS431 -> LAIS431
+- HASS435 -> LAIS435
+- HASS437 -> LAIS437
+- HASS439 -> LAIS439
+- HASS441 -> LAIS441
+- HASS448 -> LAIS448
+- HASS460 -> LAIS460
+- HASS464 -> LAIS464
+- HASS467 -> LAIS467
+- HASS485 -> LAIS485
+- HASS486 -> LAIS486
+- HASS487 -> LAIS487
+- HASS488 -> LAIS488
+- HASS490 -> ENGY490
+- HASS490 -> LAIS490
+- HASS498 -> LAIS498A
+- HASS499 -> LAIS499A
+- HASS521 -> LAIS521
+- HASS523 -> LAIS523
+- HASS525 -> LAIS525
+- HASS535 -> LAIS535
+- HASS541 -> LAIS541
+- HASS550 -> LAIS550
+- HASS560 -> LAIS560
+- HASS565 -> LAIS565
+- HASS586 -> LAIS586
+- HASS587 -> LAIS587
+- HASS588 -> LAIS588
+- HASS590 -> LAIS590
+- HASS598 -> LAIS598A
+- HASS599 -> LAIS599A
+- HASS601 -> LAIS601
+- HASS698 -> LAIS698A
+- HASS699 -> LAIS699A
+- HASS707 -> LAIS707
+- MATH201 -> MATH323
+- MATH301 -> MATH401
+- MATH307 -> CSCI407
+- MATH307 -> MATH407
+- MATH433 -> BELS331
+- MATH433 -> BELS433
+- MATH433 -> MACS433
+- MATH433 -> MATH331
+- MATH547 -> CSCI547
+- MATH692 -> CSCI692
+- MEGN212 -> MEGN312
+- MEGN324 -> MEGN424
+- MEGN381 -> MEGN380
+- MEGN485 -> EBGN456
+- MEGN501 -> EGGN501
+- MEGN569 -> CHEN569
+- MLGN535 -> CHEN435
+- MLGN535 -> CHEN535
+- MNGN490 -> ENGY490
+- MNGN490 -> LAIS490
+- MNGN509 -> GOGN506
+- MTGN202 -> SYGN202
+- MTGN300L -> MTGN302
+- MTGN456L -> MTGN458
+- MTGN475L -> MTGN477
+- PEGN419 -> GPGN419
+- PEGN439 -> GPGN439
+- PEGN591 -> PEGN615
+- PHGN433 -> PHGN333
+- PHGN435 -> CHEN435
+- PHGN435 -> CHEN535
+- PHGN535 -> CHEN435
+- PHGN535 -> CHEN535
 
 ## Grade minimums dropped from prerequisites (the data format has no grade field) (67)
 

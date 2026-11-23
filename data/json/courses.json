@@ -330,7 +330,7 @@
    "subject": "AMFG",
    "number": "599",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Director and Professor of Practice Craig A. Brice Carbon Capture, Utilization and Storage Degrees Offered • Master of Science (Non-Thesis) in Carbon Capture, Utilization and Storage • Carbon Capture, Utilization and Storage Certificate Program Description As global interest in carbon capture, utilization, and storage (CCUS) continues to grow, so does the demand for skilled professionals equipped to tackle its unique challenges. The Mines CCUS graduate certificate program addresses this critical need. By integrating world-renowned expertise in earth sciences, engineering, economics and business, this interdisciplinary program enables students to explore the unique challenges related to CCUS, climate change, and the energy transition while gaining the specialized skills needed to advance their careers. The Masters in Carbon Capture, Utilization and Storage (course-based) program is designed to give students a foundation in the technical, business, and community engagement aspects of CCUS to help them further their careers in the CCUS space. This non-thesis, online only program is structured to be of use for both those seeking to expand their career or those just getting started. The CCUS graduate certificate program is designed for professionals looking to enhance their expertise in carbon capture, utilization, and storage. The courses are fully asynchronous, eight weeks long, and offered online, providing flexibility for working professionals. Students need to complete three courses - two required and one elective - to earn the graduate certificate in CCUS. These courses can also be taken to count towards a graduate degree. Participants in this program can expect to: • Assess data on climate change, and the effects of greenhouse gases on climate. • Develop a solid foundation and proficiency in methods employed for the three aspects of carbon capture, utilization, and storage. • Learn workflow and practices in the industry. Assess efficiency of CCUS practices. • Develop skills to better communicate with colleagues in other disciplines in the organization. • Learn and understand fundamental concepts from well-known, experienced faculty in the field. Primary Contact Program Director: Yilin Fan https://ccus.mines.edu Masters in Carbon Capture, Utilization and Storage The program offers two degree options in Carbon Capture, Utilization, and Storage (CCUS): a Graduate Certificate and a Master of Science (Non-Thesis). The Master of Science (Non-Thesis) in CCUS is a fully online degree that provides students with an interdisciplinary foundation in the science, technology, and policy dimensions of carbon capture, utilization, and storage. The program requires the completion of 30 graduate credits, consisting of three core courses and seven electives. The core courses introduce fundamental perspectives on climate change and sustainability, the political economy of the energy transition, and include a capstone project. Elective courses allow students to tailor the program to their interests, with options spanning geological and non- geological CCUS, biological carbon capture and conversion, CO# reaction kinetics, Class VI well design and permitting, and related topics. This flexible curriculum equips graduates to address the technical, economic, and societal challenges of advancing CCUS technologies and strategies at scale. Program Requirements To receive the MSNT degree, students will need to complete at least 30 units of online coursework, which includes 9 units in core courses, including a 3-unit capstone course, and 21 credits of electives. Required Courses CCUS520 CLIMATE CHANGE AND SUSTAINABILITY 3.0 EBGN502 POLITICAL ECONOMY OF THE ENERGY TRANSITION 3.0 CCUS585 CARBON CAPTURE, UTILIZATION, AND STORAGE CAPSTONE 3.0 Total Semester Hrs 9.0",
    "prerequisites": null,
    "corequisites": null,
@@ -413,7 +413,7 @@
    "subject": "BIOL",
    "number": "399",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -538,7 +538,7 @@
    "subject": "BIOL",
    "number": "499",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,
@@ -651,7 +651,7 @@
    "subject": "BIOL",
    "number": "599",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -767,7 +767,7 @@
    "subject": "CBEN",
    "number": "199",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Individual research or special problem projects. Topics, content, and credit hours to be agreed upon by student and supervising faculty member. 1 to 6 semester hours. Repeatable for credit.",
    "prerequisites": {
     "type": "exception",
@@ -951,7 +951,7 @@
    "subject": "CBEN",
    "number": "299",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Individual research or special problem projects. Topics, content, and credit hours to be agreed upon by student and supervising faculty member. 1 to 6 semester hours. Repeatable for credit.",
    "prerequisites": {
     "type": "exception",
@@ -1675,7 +1675,7 @@
    "subject": "CBEN",
    "number": "399",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Individual research or special problem projects. Topics, content, and credit hours to be agreed upon by student and supervising faculty member. 1 to 6 semester hours. Repeatable for credit.",
    "prerequisites": {
     "type": "exception",
@@ -1913,7 +1913,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/chemeng/"
-   }
+   },
+   "equivalent_with": [
+    "CBEN511"
+   ]
   },
   {
    "code": "CBEN412",
@@ -2013,7 +2016,11 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/chemeng/"
-   }
+   },
+   "equivalent_with": [
+    "CHGN430",
+    "MLGN530"
+   ]
   },
   {
    "code": "CBEN416",
@@ -2136,7 +2143,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/chemeng/"
-   }
+   },
+   "equivalent_with": [
+    "EBGN321"
+   ]
   },
   {
    "code": "CBEN422",
@@ -2321,7 +2331,12 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/chemeng/"
-   }
+   },
+   "equivalent_with": [
+    "MLGN535",
+    "PHGN435",
+    "PHGN535"
+   ]
   },
   {
    "code": "CBEN440",
@@ -2529,7 +2544,11 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/chemeng/"
-   }
+   },
+   "equivalent_with": [
+    "MEGN469",
+    "MTGN469"
+   ]
   },
   {
    "code": "CBEN470",
@@ -2624,7 +2643,7 @@
    "subject": "CBEN",
    "number": "499",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Individual research or special problem projects. Topics, content, and credit hours to be agreed upon by student and supervising faculty member. 1 to 6 semester hours. Repeatable for credit.",
    "prerequisites": {
     "type": "exception",
@@ -2775,7 +2794,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/chemeng/"
-   }
+   },
+   "equivalent_with": [
+    "CBEN411"
+   ]
   },
   {
    "code": "CBEN513",
@@ -2979,7 +3001,12 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/chemeng/"
-   }
+   },
+   "equivalent_with": [
+    "MLGN535",
+    "PHGN435",
+    "PHGN535"
+   ]
   },
   {
    "code": "CBEN550",
@@ -3033,7 +3060,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/chemeng/"
-   }
+   },
+   "equivalent_with": [
+    "CHGN555"
+   ]
   },
   {
    "code": "CBEN568",
@@ -3064,7 +3094,12 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/chemeng/"
-   }
+   },
+   "equivalent_with": [
+    "MEGN569",
+    "MLGN569",
+    "MTGN569"
+   ]
   },
   {
    "code": "CBEN570",
@@ -3139,7 +3174,7 @@
    "subject": "CBEN",
    "number": "599",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -3382,7 +3417,7 @@
    "subject": "CBEN",
    "number": "699",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -3508,7 +3543,7 @@
    "subject": "CEEN",
    "number": "199",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -3584,7 +3619,7 @@
    "subject": "CEEN",
    "number": "299",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -4023,7 +4058,7 @@
    "subject": "CEEN",
    "number": "399",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -4176,7 +4211,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/civileng/"
-   }
+   },
+   "equivalent_with": [
+    "CEEN512"
+   ]
   },
   {
    "code": "CEEN415",
@@ -4363,7 +4401,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/civileng/"
-   }
+   },
+   "equivalent_with": [
+    "CEEN533"
+   ]
   },
   {
    "code": "CEEN439",
@@ -4677,7 +4718,11 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/civileng/"
-   }
+   },
+   "equivalent_with": [
+    "CEEN592",
+    "PEGN530"
+   ]
   },
   {
    "code": "CEEN493",
@@ -4729,7 +4774,7 @@
    "subject": "CEEN",
    "number": "499",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -4829,7 +4874,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/civileng/"
-   }
+   },
+   "equivalent_with": [
+    "CEEN411"
+   ]
   },
   {
    "code": "CEEN513",
@@ -5004,7 +5052,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/civileng/"
-   }
+   },
+   "equivalent_with": [
+    "CEEN433"
+   ]
   },
   {
    "code": "CEEN539",
@@ -5281,7 +5332,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/civileng/"
-   }
+   },
+   "equivalent_with": [
+    "MNGN556"
+   ]
   },
   {
    "code": "CEEN560",
@@ -5670,7 +5724,11 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/civileng/"
-   }
+   },
+   "equivalent_with": [
+    "CEEN492",
+    "PEGN530"
+   ]
   },
   {
    "code": "CEEN593",
@@ -5767,7 +5825,7 @@
    "subject": "CEEN",
    "number": "599",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -5781,7 +5839,7 @@
    "subject": "CEEN",
    "number": "599AA",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,
@@ -5795,7 +5853,7 @@
    "subject": "CEEN",
    "number": "599AB",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,
@@ -5809,7 +5867,7 @@
    "subject": "CEEN",
    "number": "599AC",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,
@@ -5823,7 +5881,7 @@
    "subject": "CEEN",
    "number": "599AD",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,
@@ -5837,7 +5895,7 @@
    "subject": "CEEN",
    "number": "599AE",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,
@@ -5851,7 +5909,7 @@
    "subject": "CEEN",
    "number": "599AF",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,
@@ -5865,7 +5923,7 @@
    "subject": "CEEN",
    "number": "599AG",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,
@@ -5879,7 +5937,7 @@
    "subject": "CEEN",
    "number": "599AH",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,
@@ -5893,7 +5951,7 @@
    "subject": "CEEN",
    "number": "599AI",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,
@@ -5907,7 +5965,7 @@
    "subject": "CEEN",
    "number": "599AJ",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,
@@ -5921,7 +5979,7 @@
    "subject": "CEEN",
    "number": "599AK",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,
@@ -5935,7 +5993,7 @@
    "subject": "CEEN",
    "number": "599AL",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,
@@ -5949,7 +6007,7 @@
    "subject": "CEEN",
    "number": "599AM",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,
@@ -5963,7 +6021,7 @@
    "subject": "CEEN",
    "number": "599AN",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,
@@ -5977,7 +6035,7 @@
    "subject": "CEEN",
    "number": "599AO",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,
@@ -5991,7 +6049,7 @@
    "subject": "CEEN",
    "number": "599AP",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,
@@ -6019,7 +6077,7 @@
    "subject": "CEEN",
    "number": "699",
    "title": "Advanced Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -6088,7 +6146,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/chemgeo/"
-   }
+   },
+   "equivalent_with": [
+    "CHGN403"
+   ]
   },
   {
    "code": "CHGC506",
@@ -6268,7 +6329,7 @@
    "subject": "CHGC",
    "number": "599",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -6296,7 +6357,7 @@
    "subject": "CHGC",
    "number": "699",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -6428,7 +6489,7 @@
    "subject": "CHGN",
    "number": "199",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -6591,7 +6652,7 @@
    "subject": "CHGN",
    "number": "299",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -6905,7 +6966,7 @@
    "subject": "CHGN",
    "number": "399",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -6955,7 +7016,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/chem/"
-   }
+   },
+   "equivalent_with": [
+    "CHGC505"
+   ]
   },
   {
    "code": "CHGN406",
@@ -7030,7 +7094,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/chem/"
-   }
+   },
+   "equivalent_with": [
+    "MLGN510"
+   ]
   },
   {
    "code": "CHGN411",
@@ -7190,7 +7257,11 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/chem/"
-   }
+   },
+   "equivalent_with": [
+    "CBEN415",
+    "MLGN530"
+   ]
   },
   {
    "code": "CHGN431",
@@ -7418,7 +7489,7 @@
    "subject": "CHGN",
    "number": "499",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -7773,7 +7844,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/chem/"
-   }
+   },
+   "equivalent_with": [
+    "CBEN555"
+   ]
   },
   {
    "code": "CHGN560",
@@ -7901,7 +7975,7 @@
    "subject": "CHGN",
    "number": "599",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -7946,7 +8020,7 @@
    "subject": "CHGN",
    "number": "699",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research, special problem projects, or internship supervised by a Chemistry faculty member, with student and instructor agreeing on a subject matter, content, deliverables, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -8047,7 +8121,7 @@
    "subject": "CSCI",
    "number": "199",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -8319,7 +8393,7 @@
    "subject": "CSCI",
    "number": "299",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -8532,7 +8606,7 @@
    "subject": "CSCI",
    "number": "399",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -8981,7 +9055,11 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/compsci/"
-   }
+   },
+   "equivalent_with": [
+    "CSCI507",
+    "EENG507"
+   ]
   },
   {
    "code": "CSCI440",
@@ -9016,7 +9094,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/compsci/"
-   }
+   },
+   "equivalent_with": [
+    "MATH440"
+   ]
   },
   {
    "code": "CSCI441",
@@ -9212,7 +9293,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/compsci/"
-   }
+   },
+   "equivalent_with": [
+    "CSCI555"
+   ]
   },
   {
    "code": "CSCI456",
@@ -9386,7 +9470,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/compsci/"
-   }
+   },
+   "equivalent_with": [
+    "CSCI573"
+   ]
   },
   {
    "code": "CSCI474",
@@ -9604,7 +9691,7 @@
    "subject": "CSCI",
    "number": "499",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -9642,7 +9729,11 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/compsci/"
-   }
+   },
+   "equivalent_with": [
+    "CSCI437",
+    "EENG507"
+   ]
   },
   {
    "code": "CSCI508",
@@ -9857,7 +9948,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/compsci/"
-   }
+   },
+   "equivalent_with": [
+    "CSCI455"
+   ]
   },
   {
    "code": "CSCI560",
@@ -10015,7 +10109,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/compsci/"
-   }
+   },
+   "equivalent_with": [
+    "CSCI473"
+   ]
   },
   {
    "code": "CSCI574",
@@ -10277,7 +10374,7 @@
    "subject": "CSCI",
    "number": "599",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -10322,7 +10419,7 @@
    "subject": "CSCI",
    "number": "699",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -10364,7 +10461,7 @@
    "subject": "CSED",
    "number": "199",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,
@@ -10378,7 +10475,7 @@
    "subject": "CSED",
    "number": "299",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,
@@ -10392,7 +10489,7 @@
    "subject": "CSED",
    "number": "399",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,
@@ -10504,7 +10601,7 @@
    "subject": "CSED",
    "number": "499",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,
@@ -10624,7 +10721,7 @@
    "subject": "CSED",
    "number": "599",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,
@@ -10680,7 +10777,7 @@
    "subject": "CSM",
    "number": "199",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,
@@ -11111,7 +11208,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/datascience/"
-   }
+   },
+   "equivalent_with": [
+    "MATH560"
+   ]
   },
   {
    "code": "DSCI561",
@@ -11137,7 +11237,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/datascience/"
-   }
+   },
+   "equivalent_with": [
+    "MATH561"
+   ]
   },
   {
    "code": "DSCI570",
@@ -11209,7 +11312,7 @@
    "subject": "DSCI",
    "number": "599",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Professors Soutir Bandyopadhyay, Applied Mathematics and Statistics Dorit Hammerling, Applied Mathematics & Statistics Teaching Professor Wendy Fisher, Computer Science Teaching Assistant Professors Nathan Lenssen, Applied Mathematics and Statistics Zibo Wang, Computer Science Research Associate Professor Zane Jobe, Geology and Geological Engineering",
    "prerequisites": null,
    "corequisites": null,
@@ -11237,7 +11340,7 @@
    "subject": "EBGN",
    "number": "199",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -11322,7 +11425,7 @@
    "subject": "EBGN",
    "number": "299",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -11536,7 +11639,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/econ/"
-   }
+   },
+   "equivalent_with": [
+    "CBEN421"
+   ]
   },
   {
    "code": "EBGN330",
@@ -11707,7 +11813,7 @@
    "subject": "EBGN",
    "number": "399",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -12210,7 +12316,7 @@
    "subject": "EBGN",
    "number": "499",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -13027,7 +13133,7 @@
    "subject": "EBGN",
    "number": "599",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -13195,7 +13301,7 @@
    "subject": "EBGN",
    "number": "699",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -13293,7 +13399,7 @@
    "subject": "EDNS",
    "number": "199",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -13459,7 +13565,7 @@
    "subject": "EDNS",
    "number": "299",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Equivalent with EPIC299A, (I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -13586,7 +13692,7 @@
    "subject": "EDNS",
    "number": "399",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Equivalent with EPIC399A, (I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -13821,7 +13927,7 @@
    "subject": "EDNS",
    "number": "499",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Equivalent with EPIC499A, (I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -14029,7 +14135,7 @@
    "subject": "EDNS",
    "number": "599",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree. Independent Study form must be completed and submitted to the Registrar.",
    "prerequisites": null,
    "corequisites": null,
@@ -14071,7 +14177,7 @@
    "subject": "EENG",
    "number": "199",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Individual research or special problem projects supervised by a faculty member, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -14178,7 +14284,7 @@
    "subject": "EENG",
    "number": "299",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Individual research or special problem projects supervised by a faculty member, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -14575,7 +14681,7 @@
    "subject": "EENG",
    "number": "399",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Individual research or special problem projects supervised by a faculty member, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -14896,7 +15002,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/electeng/"
-   }
+   },
+   "equivalent_with": [
+    "MEGN475"
+   ]
   },
   {
    "code": "EENG480",
@@ -14991,7 +15100,7 @@
    "subject": "EENG",
    "number": "499",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Individual research or special problem projects supervised by a faculty member, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -15026,7 +15135,11 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/electeng/"
-   }
+   },
+   "equivalent_with": [
+    "CSCI437",
+    "CSCI507"
+   ]
   },
   {
    "code": "EENG509",
@@ -15735,7 +15848,7 @@
    "subject": "EENG",
    "number": "599",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -15847,7 +15960,7 @@
    "subject": "EENG",
    "number": "699",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -15987,7 +16100,7 @@
    "subject": "ENGY",
    "number": "399",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Students can do individual research or special problem projects supervised by a faculty member. The student and instructor will agree on the subject matter, content, and credit hours.",
    "prerequisites": null,
    "corequisites": null,
@@ -16107,7 +16220,7 @@
    "subject": "ENGY",
    "number": "499",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Students can do individual research or special problem projects supervised by a faculty member. The student and instructor will agree on the subject matter, content, and credit hours.",
    "prerequisites": null,
    "corequisites": null,
@@ -16203,7 +16316,7 @@
    "subject": "ENGY",
    "number": "599",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -16338,7 +16451,7 @@
    "subject": "FEGN",
    "number": "599",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Geochemistry Program Description The Graduate Program in Geochemistry is an interdisciplinary program with the mission to educate students whose interests lie at the intersection of the geological, chemical, hydrological and environmental sciences. The Geochemistry Program consists of two subprograms, administering two MS and PhD degree tracks, two professional master's (non-thesis) degree programs, and a graduate certificate. The Geochemistry (GC) degree track pertains to the history and evolution of the Earth and its features, including but not limited to the chemical evolution of the crust and mantle, geochemistry of energy and mineral resources, aqueous geochemistry and fluid-rock/ fluid- mineral interactions and chemical mineralogy. The Environmental Biogeochemistry (EBGC) degree track pertains to the coupled chemical and biological processes of Earth's biosphere, and the changes in these processes caused by human activities. Primary Contact Program Director: Jim Ranville Program Coordinator: Rachel McDonald geochemistry.mines.edu Degrees Offered: • Master of Science/PhD (Geochemistry track) • Graduate Certificate of Analytical Geochemistry • Professional Master's Degree in Analytical Geochemistry • Professional Master's Degree in Environmental Geochemistry Master of Science and Doctor of Philosophy 1. Geochemistry degree track Prerequisites In order to identify any course deficiencies, each entering student will have an entrance interview with their temporary advisor or program director. Credit toward a graduate degree will not be granted for courses taken to fulfill deficiencies. Program Requirements The Master of Science (Geochemistry degree track) requires a minimum of 30 credits including: Course Work 18.0 Research Credits 6.0 Choice or Research or Coursework 6.0 Total Semester Hrs 30.0 Table 1 To ensure breadth of background, the course of study for the Master of Science (Geochemistry degree track) must include: CHGC503 INTRODUCTION TO GEOCHEMISTRY 3.0 CHGC504 METHODS IN GEOCHEMISTRY 3.0 Master of Science (Geochemistry) students select at least 12 credits of the following: CHGC509 INTRODUCTION TO AQUEOUS GEOCHEMISTRY 3.0",
    "prerequisites": null,
    "corequisites": null,
@@ -16380,7 +16493,7 @@
    "subject": "GEGN",
    "number": "199",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -16480,7 +16593,7 @@
    "subject": "GEGN",
    "number": "299",
    "title": "Independent Study in Engineering Geology or Engineering Hydrogeology",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -16691,7 +16804,7 @@
    "subject": "GEGN",
    "number": "399",
    "title": "Independent Study in Engineering Geology or Engineering Hydrogeology",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -16862,7 +16975,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/geoleng/"
-   }
+   },
+   "equivalent_with": [
+    "PEGN439"
+   ]
   },
   {
    "code": "GEGN466",
@@ -17105,7 +17221,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/geoleng/"
-   }
+   },
+   "equivalent_with": [
+    "GEGN581"
+   ]
   },
   {
    "code": "GEGN483",
@@ -17157,7 +17276,7 @@
    "subject": "GEGN",
    "number": "499",
    "title": "Independent Study in Engineering Geology or Engineering Hydrogeology",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -17252,7 +17371,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/geoleng/"
-   }
+   },
+   "equivalent_with": [
+    "MNGN418"
+   ]
   },
   {
    "code": "GEGN509",
@@ -17656,7 +17778,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/geoleng/"
-   }
+   },
+   "equivalent_with": [
+    "GEGN481"
+   ]
   },
   {
    "code": "GEGN582",
@@ -17879,7 +18004,7 @@
    "subject": "GEGN",
    "number": "599",
    "title": "Independent Study in Engineering Geology or Engineering Hydrogeology",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -18102,7 +18227,7 @@
    "subject": "GEGN",
    "number": "699",
    "title": "Independent Study in Engineering Geology or Engineering Hydrogeology",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -18206,7 +18331,7 @@
    "subject": "GEOL",
    "number": "199",
    "title": "Independent Study in Geology",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -18234,7 +18359,7 @@
    "subject": "GEOL",
    "number": "299",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,
@@ -18443,7 +18568,7 @@
    "subject": "GEOL",
    "number": "399",
    "title": "Independent Study in Geology",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -18573,7 +18698,7 @@
    "subject": "GEOL",
    "number": "499",
    "title": "Independent Study in Geology",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -19489,7 +19614,7 @@
    "subject": "GEOL",
    "number": "599",
    "title": "Independent Study in Geology",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -19809,7 +19934,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/geology/"
-   }
+   },
+   "equivalent_with": [
+    "PEGN660"
+   ]
   },
   {
    "code": "GEOL698",
@@ -19830,7 +19958,7 @@
    "subject": "GEOL",
    "number": "699",
    "title": "Independent Study in Geology",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -20000,7 +20128,7 @@
    "subject": "GPGN",
    "number": "199",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -20088,7 +20216,7 @@
    "subject": "GPGN",
    "number": "299",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -20190,7 +20318,7 @@
    "subject": "GPGN",
    "number": "399",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -20388,7 +20516,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/geophyseng/"
-   }
+   },
+   "equivalent_with": [
+    "GPGN555"
+   ]
   },
   {
    "code": "GPGN458",
@@ -20793,7 +20924,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/geophyseng/"
-   }
+   },
+   "equivalent_with": [
+    "GPGN455"
+   ]
   },
   {
    "code": "GPGN558",
@@ -21114,7 +21248,12 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/humanities/"
-   }
+   },
+   "equivalent_with": [
+    "HNRS105",
+    "HNRS115",
+    "HNRS198"
+   ]
   },
   {
    "code": "HASS101",
@@ -21194,7 +21333,7 @@
    "subject": "HASS",
    "number": "199",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Equivalent with LAIS199A, (I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -21353,7 +21492,7 @@
    "subject": "HASS",
    "number": "299",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Equivalent with LAIS299A, Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": {
@@ -22024,7 +22163,7 @@
    "subject": "HASS",
    "number": "399",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Equivalent with LAIS399A, Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": {
@@ -23053,7 +23192,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/humanities/"
-   }
+   },
+   "equivalent_with": [
+    "MNGN490"
+   ]
   },
   {
    "code": "HASS491",
@@ -23100,7 +23242,7 @@
    "subject": "HASS",
    "number": "499",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Equivalent with LAIS499A, (I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -23411,7 +23553,7 @@
    "subject": "HASS",
    "number": "599",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Equivalent with LAIS599A, (I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -23456,7 +23598,7 @@
    "subject": "HASS",
    "number": "699",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Equivalent with LAIS699A, (I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -23491,7 +23633,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/honors/"
-   }
+   },
+   "equivalent_with": [
+    "HASS100"
+   ]
   },
   {
    "code": "HNRS110",
@@ -23522,7 +23667,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/honors/"
-   }
+   },
+   "equivalent_with": [
+    "HASS100"
+   ]
   },
   {
    "code": "HNRS120",
@@ -23581,14 +23729,17 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/honors/"
-   }
+   },
+   "equivalent_with": [
+    "HASS100"
+   ]
   },
   {
    "code": "HNRS199",
    "subject": "HNRS",
    "number": "199",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Under special circumstances, a UHSP student may use this course number to register for an independent study project which substitutes for or enhances the regularly-scheduled UHSP curriculum seminars. Variable credit: 1 - 6 semester hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -23630,7 +23781,7 @@
    "subject": "HNRS",
    "number": "299",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Under special circumstances, a UHSP student may use this course number to register for an independent study project which substitutes for or enhances the regularly-scheduled UHSP curriculum seminars. Variable credit: 1 - 6 semester hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -23800,7 +23951,7 @@
    "subject": "HNRS",
    "number": "399",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Under special circumstances, a UHSP student may use this course number to register for an independent study project which substitutes for or enhances the regularly-scheduled UHSP curriculum seminars. Variable credit: 1 - 6 semester hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -24000,7 +24151,7 @@
    "subject": "HNRS",
    "number": "499",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Under special circumstances, a McBride student may use this course number to register for an independent study project which substitutes for or enhances the regularly-scheduled McBride curriculum seminars. Variable credit: 1 - 6 semester hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -24157,7 +24308,7 @@
    "subject": "LIFL",
    "number": "199",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -24213,7 +24364,7 @@
    "subject": "LIFL",
    "number": "299",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -24255,7 +24406,7 @@
    "subject": "LIFL",
    "number": "399",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -24297,7 +24448,7 @@
    "subject": "LIFL",
    "number": "499",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -24409,7 +24560,7 @@
    "subject": "LIMU",
    "number": "199",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -24493,7 +24644,7 @@
    "subject": "LIMU",
    "number": "299",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -24577,7 +24728,7 @@
    "subject": "LIMU",
    "number": "399",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -24703,7 +24854,7 @@
    "subject": "LIMU",
    "number": "499",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -24909,7 +25060,7 @@
    "subject": "MAED",
    "number": "599",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,
@@ -24964,7 +25115,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/math/"
-   }
+   },
+   "equivalent_with": [
+    "MATH122"
+   ]
   },
   {
    "code": "MATH122",
@@ -24981,7 +25135,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/math/"
-   }
+   },
+   "equivalent_with": [
+    "MATH112"
+   ]
   },
   {
    "code": "MATH198",
@@ -25002,7 +25159,7 @@
    "subject": "MATH",
    "number": "199",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -25078,7 +25235,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/math/"
-   }
+   },
+   "equivalent_with": [
+    "MATH223"
+   ]
   },
   {
    "code": "MATH223",
@@ -25104,7 +25264,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/math/"
-   }
+   },
+   "equivalent_with": [
+    "MATH213"
+   ]
   },
   {
    "code": "MATH225",
@@ -25142,7 +25305,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/math/"
-   }
+   },
+   "equivalent_with": [
+    "MATH235"
+   ]
   },
   {
    "code": "MATH235",
@@ -25172,7 +25338,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/math/"
-   }
+   },
+   "equivalent_with": [
+    "MATH225"
+   ]
   },
   {
    "code": "MATH298",
@@ -25193,7 +25362,7 @@
    "subject": "MATH",
    "number": "299",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -25500,7 +25669,7 @@
    "subject": "MATH",
    "number": "399",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -25766,7 +25935,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/math/"
-   }
+   },
+   "equivalent_with": [
+    "CSCI440"
+   ]
   },
   {
    "code": "MATH443",
@@ -25949,7 +26121,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/math/"
-   }
+   },
+   "equivalent_with": [
+    "MATH559"
+   ]
   },
   {
    "code": "MATH470",
@@ -26061,7 +26236,7 @@
    "subject": "MATH",
    "number": "499",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -26626,7 +26801,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/math/"
-   }
+   },
+   "equivalent_with": [
+    "MATH459"
+   ]
   },
   {
    "code": "MATH560",
@@ -26656,7 +26834,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/math/"
-   }
+   },
+   "equivalent_with": [
+    "DSCI560"
+   ]
   },
   {
    "code": "MATH561",
@@ -26682,7 +26863,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/math/"
-   }
+   },
+   "equivalent_with": [
+    "DSCI561"
+   ]
   },
   {
    "code": "MATH570",
@@ -26806,7 +26990,7 @@
    "subject": "MATH",
    "number": "599",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -26885,7 +27069,7 @@
    "subject": "MATH",
    "number": "699",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -27056,7 +27240,7 @@
    "subject": "MEGN",
    "number": "299",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -27307,7 +27491,7 @@
    "subject": "MEGN",
    "number": "399",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -27751,7 +27935,11 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/mecheng/"
-   }
+   },
+   "equivalent_with": [
+    "CBEN469",
+    "MTGN469"
+   ]
   },
   {
    "code": "MEGN471",
@@ -27807,7 +27995,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/mecheng/"
-   }
+   },
+   "equivalent_with": [
+    "EENG475"
+   ]
   },
   {
    "code": "MEGN479",
@@ -27934,7 +28125,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/mecheng/"
-   }
+   },
+   "equivalent_with": [
+    "MEGN587"
+   ]
   },
   {
    "code": "MEGN488",
@@ -27960,7 +28154,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/mecheng/"
-   }
+   },
+   "equivalent_with": [
+    "MEGN588"
+   ]
   },
   {
    "code": "MEGN497",
@@ -27995,7 +28192,7 @@
    "subject": "MEGN",
    "number": "499",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Individual research or special problem projects supervised by a faculty member, when a student and instructor agree on a subject matter, content, and credit hours. Note that MEGN499 does not count as an MEGN Teachnical Elective, though the course does count as a Free Elective.",
    "prerequisites": null,
    "corequisites": null,
@@ -28106,7 +28303,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/mecheng/"
-   }
+   },
+   "equivalent_with": [
+    "MTGN545"
+   ]
   },
   {
    "code": "MEGN514",
@@ -28575,7 +28775,12 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/mecheng/"
-   }
+   },
+   "equivalent_with": [
+    "CBEN569",
+    "MLGN569",
+    "MTGN569"
+   ]
   },
   {
    "code": "MEGN570",
@@ -28679,7 +28884,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/mecheng/"
-   }
+   },
+   "equivalent_with": [
+    "MEGN487"
+   ]
   },
   {
    "code": "MEGN588",
@@ -28696,7 +28904,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/mecheng/"
-   }
+   },
+   "equivalent_with": [
+    "MEGN488"
+   ]
   },
   {
    "code": "MEGN592",
@@ -28731,7 +28942,7 @@
    "subject": "MEGN",
    "number": "599",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -28810,7 +29021,7 @@
    "subject": "MEGN",
    "number": "699",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -28893,7 +29104,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/materialsci/"
-   }
+   },
+   "equivalent_with": [
+    "CHGN410"
+   ]
   },
   {
    "code": "MLGN512",
@@ -29085,7 +29299,11 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/materialsci/"
-   }
+   },
+   "equivalent_with": [
+    "CBEN415",
+    "CHGN430"
+   ]
   },
   {
    "code": "MLGN531",
@@ -29134,7 +29352,13 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/materialsci/"
-   }
+   },
+   "equivalent_with": [
+    "CBEN435",
+    "CBEN535",
+    "PHGN435",
+    "PHGN535"
+   ]
   },
   {
    "code": "MLGN536",
@@ -29251,7 +29475,12 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/materialsci/"
-   }
+   },
+   "equivalent_with": [
+    "CBEN569",
+    "MEGN569",
+    "MTGN569"
+   ]
   },
   {
    "code": "MLGN570",
@@ -29291,7 +29520,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/materialsci/"
-   }
+   },
+   "equivalent_with": [
+    "MTGN572"
+   ]
   },
   {
    "code": "MLGN583",
@@ -29457,7 +29689,7 @@
    "subject": "MLGN",
    "number": "699",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -29499,7 +29731,7 @@
    "subject": "MNGN",
    "number": "199",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) (WI) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -29619,7 +29851,7 @@
    "subject": "MNGN",
    "number": "299",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) (WI) Individual research or special problem projects supervised by a faculty member. When a student and instructor agree on a subject matter, content, method of assessment, and credit hours, it must be approved by the Department Head. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -30080,7 +30312,7 @@
    "subject": "MNGN",
    "number": "399",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) (WI) ) Individual research or special problem projects supervised by a faculty member. When a student and instructor agree on a subject matter, content, method of assessment, and credit hours, it must be approved by the Department Head. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -30268,7 +30500,11 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/miningeng/"
-   }
+   },
+   "equivalent_with": [
+    "GEGN508",
+    "MNGN508"
+   ]
   },
   {
    "code": "MNGN421",
@@ -30861,7 +31097,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/miningeng/"
-   }
+   },
+   "equivalent_with": [
+    "HASS490"
+   ]
   },
   {
    "code": "MNGN498",
@@ -30882,7 +31121,7 @@
    "subject": "MNGN",
    "number": "499",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) (WI) Individual research or special problem projects supervised by a faculty member. When a student and instructor agree on a subject matter, content, method of assessment, and credit hours, it must be approved by the Department Head. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -31046,7 +31285,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/miningeng/"
-   }
+   },
+   "equivalent_with": [
+    "MNGN418"
+   ]
   },
   {
    "code": "MNGN509",
@@ -31864,7 +32106,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/miningeng/"
-   }
+   },
+   "equivalent_with": [
+    "CEEN556"
+   ]
   },
   {
    "code": "MNGN557",
@@ -32220,7 +32465,7 @@
    "subject": "MNGN",
    "number": "599",
    "title": "Independent Study in Mining Engineering",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -32276,7 +32521,7 @@
    "subject": "MNGN",
    "number": "699",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -32360,7 +32605,7 @@
    "subject": "MSGN",
    "number": "199",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -32416,7 +32661,7 @@
    "subject": "MSGN",
    "number": "299",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -32500,7 +32745,7 @@
    "subject": "MSGN",
    "number": "399",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -32584,7 +32829,7 @@
    "subject": "MSGN",
    "number": "499",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -32598,7 +32843,7 @@
    "subject": "MSGN",
    "number": "599",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -33861,7 +34106,11 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/meteng/"
-   }
+   },
+   "equivalent_with": [
+    "CBEN469",
+    "MEGN469"
+   ]
   },
   {
    "code": "MTGN472",
@@ -34023,7 +34272,7 @@
    "subject": "MTGN",
    "number": "499",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Independent advanced-work leading to a comprehensive report. This work may take the form of conferences, library, and laboratory work. Selection of problem is arranged between student and a specific Department faculty-member. 1 to 3 semester hours. Repeatable for credit to a maximum of 6 hours.",
    "prerequisites": {
     "type": "exception",
@@ -34415,7 +34664,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/meteng/"
-   }
+   },
+   "equivalent_with": [
+    "MEGN511"
+   ]
   },
   {
    "code": "MTGN545L",
@@ -34624,7 +34876,12 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/meteng/"
-   }
+   },
+   "equivalent_with": [
+    "CBEN569",
+    "MEGN569",
+    "MLGN569"
+   ]
   },
   {
    "code": "MTGN570",
@@ -34664,7 +34921,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/meteng/"
-   }
+   },
+   "equivalent_with": [
+    "MLGN572"
+   ]
   },
   {
    "code": "MTGN573",
@@ -34761,7 +35021,7 @@
    "subject": "MTGN",
    "number": "599",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -34895,7 +35155,7 @@
    "subject": "MTGN",
    "number": "699",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -35179,7 +35439,7 @@
    "subject": "NUGN",
    "number": "599",
    "title": "Independent Study in Nuclear Engineering",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -35207,7 +35467,7 @@
    "subject": "NUGN",
    "number": "699",
    "title": "Independent Study in Nuclear Engineering",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -35412,7 +35672,7 @@
    "subject": "ORWE",
    "number": "599",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,
@@ -36174,7 +36434,7 @@
    "subject": "PAGN",
    "number": "299",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Students enrolling in these courses may be required to furnish their own equipment. Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -36244,7 +36504,7 @@
    "subject": "PEGN",
    "number": "199",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -36326,7 +36586,7 @@
    "subject": "PEGN",
    "number": "299",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -36599,7 +36859,7 @@
    "subject": "PEGN",
    "number": "399",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -36898,7 +37158,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/petroleumeng/"
-   }
+   },
+   "equivalent_with": [
+    "GEGN439"
+   ]
   },
   {
    "code": "PEGN440",
@@ -37159,7 +37422,7 @@
    "subject": "PEGN",
    "number": "499",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -37458,7 +37721,11 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/petroleumeng/"
-   }
+   },
+   "equivalent_with": [
+    "CEEN492",
+    "CEEN592"
+   ]
   },
   {
    "code": "PEGN540",
@@ -37749,7 +38016,7 @@
    "subject": "PEGN",
    "number": "599",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -37883,7 +38150,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/petroleumeng/"
-   }
+   },
+   "equivalent_with": [
+    "GEOL660"
+   ]
   },
   {
    "code": "PEGN681",
@@ -37918,7 +38188,7 @@
    "subject": "PEGN",
    "number": "699",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -37989,7 +38259,7 @@
    "subject": "PHGN",
    "number": "199",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I,II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -38077,7 +38347,7 @@
    "subject": "PHGN",
    "number": "299",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I,II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -38110,7 +38380,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/physics/"
-   }
+   },
+   "equivalent_with": [
+    "PHGN310"
+   ]
   },
   {
    "code": "PHGN310",
@@ -38136,7 +38409,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/physics/"
-   }
+   },
+   "equivalent_with": [
+    "PHGN300"
+   ]
   },
   {
    "code": "PHGN311",
@@ -38449,7 +38725,7 @@
    "subject": "PHGN",
    "number": "399",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I,II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -38666,7 +38942,13 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/physics/"
-   }
+   },
+   "equivalent_with": [
+    "CBEN435",
+    "CBEN535",
+    "MLGN535",
+    "PHGN535"
+   ]
   },
   {
    "code": "PHGN440",
@@ -39021,7 +39303,7 @@
    "subject": "PHGN",
    "number": "499",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I,II) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit; 1 to 6 credit hours. Repeatable for credit.",
    "prerequisites": null,
    "corequisites": null,
@@ -39365,7 +39647,13 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/physics/"
-   }
+   },
+   "equivalent_with": [
+    "CBEN435",
+    "CBEN535",
+    "MLGN535",
+    "PHGN435"
+   ]
   },
   {
    "code": "PHGN542",
@@ -39554,7 +39842,7 @@
    "subject": "PHGN",
    "number": "599",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -39711,7 +39999,7 @@
    "subject": "PHGN",
    "number": "699",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "(I, II, S) Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -40019,7 +40307,7 @@
    "subject": "ROBO",
    "number": "599",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Individual research or special problem projects supervised by a faculty member, also, when a student and instructor agree on a subject matter, content, and credit hours. Variable credit: 0.5 to 6 credit hours. Repeatable for credit under different topics/experience and maximums vary by department. Contact the Department for credit limits toward the degree.",
    "prerequisites": null,
    "corequisites": null,
@@ -40047,7 +40335,7 @@
    "subject": "SCED",
    "number": "199",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,
@@ -40075,7 +40363,7 @@
    "subject": "SCED",
    "number": "299",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,
@@ -40213,7 +40501,7 @@
    "subject": "SCED",
    "number": "499",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,
@@ -40351,7 +40639,7 @@
    "subject": "SCED",
    "number": "599",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Underground Construction and Tunnel Engineering Degrees Offered • Master's and PhD in Underground Construction and Tunneling Engineering",
    "prerequisites": null,
    "corequisites": null,
@@ -40616,7 +40904,7 @@
    "subject": "SPRS",
    "number": "599",
    "title": "Independent Study in Space Resources",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "Students can do Individual research or special projects supervised by a faculty member. The student and instructor will agree on the subject matter, content, and credit hours.",
    "prerequisites": {
     "type": "course",
@@ -40838,7 +41126,7 @@
    "subject": "SYGN",
    "number": "599",
    "title": "Independent Study",
-   "credits": 6.0,
+   "credits": 3.0,
    "description": "",
    "prerequisites": null,
    "corequisites": null,

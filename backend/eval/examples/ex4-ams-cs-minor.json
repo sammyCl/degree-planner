@@ -1,0 +1,24 @@
+{
+  "id": 4,
+  "name": "AMS bachelor's (CAM) with a Computer Science minor",
+  "difficulty": "medium",
+  "request": {
+    "student": {
+      "degree_level": "bachelor",
+      "programs": ["ams-bs-cam", "computer-science-minor"],
+      "catalog_year": "2026-2027",
+      "completed_courses": []
+    },
+    "semesters": 8,
+    "start_term": "Fall 2026",
+    "include_summers": false,
+    "overrides": []
+  },
+  "also_must": [
+    {"type": "max_semester_credits", "limit": 18},
+    {"type": "not_planned", "codes": ["HNRS105", "HNRS115"],
+     "why": "Not a Thorson student."},
+    {"type": "minor_unshared_credits", "minor": "computer-science-minor", "major": "ams-bs-cam", "min": 9,
+     "why": "Every minor: at least 9 of its credits not used for any other part of the degree except free electives (policy-minor-requirements; not checked by the validator, BUG-036)."}
+  ]
+}

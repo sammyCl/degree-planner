@@ -53,6 +53,64 @@ def _exception_labels(requirement: Requirement | None) -> list[str]:
     return [label for sub in requirement.of for label in _exception_labels(sub)]
 
 
+_ADD_ON_LEVELS = ("minor", "asi")
+# 2026-2027 undergraduate catalog (forms-policies.json, policy-minor-requirements and
+# policy-asi-requirements): at least 9 credits of a minor or ASI not used for any other part of
+# the degree except free electives.
+ADD_ON_UNSHARED_MIN = 9.0
+
+
+def _unshared_credits(
+    add_on: Program, degree_parts: list[Program], have: set[str], credits: dict[str, float]
+) -> tuple[float, list[str]]:
+    """Credits filling the minor or ASI that the degree does not also need, read in the student's
+    favor because a plan does not say which course fills which group:
+    - a course is shared when a degree part needs it: it is in an "all" group, or in a listed
+      choose group the plan's other courses do not already fill (a group with no list is free
+      electives, which may be shared);
+    - the add-on is filled group by group, unshared courses first, whole courses, up to each
+      group's credits; a group with no list takes any course not already counted for it.
+    Returns the unshared credits and the shared courses used."""
+    degree_all = {c for part in degree_parts for g in part.requirement_groups if g.kind == "all" for c in g.courses or []}
+
+    def is_shared(code: str) -> bool:
+        if code in degree_all:
+            return True
+        for part in degree_parts:
+            for g in part.requirement_groups:
+                if g.kind != "all" and g.courses and code in g.courses:
+                    others = sum(credits.get(c, 0.0) for c in g.courses if c in have and c != code and c not in degree_all)
+                    if others < (g.credits_required or 0.0):
+                        return True
+        return False
+
+    used: dict[str, bool] = {}
+    for group in add_on.requirement_groups:
+        if group.kind == "all":
+            for code in group.courses or []:
+                if code in have:
+                    used.setdefault(code, is_shared(code))
+            continue
+        pool = sorted(c for c in (group.courses or sorted(have)) if c in have and c not in used)
+        pool.sort(key=is_shared)  # unshared first; sort is stable, so code order otherwise
+        earned = 0.0
+        for code in pool:
+            if earned >= (group.credits_required or 0.0):
+                break
+            used[code] = is_shared(code)
+            earned += credits.get(code, 0.0)
+    unshared = sum(credits.get(c, 0.0) for c, shared in used.items() if not shared)
+    return unshared, sorted(c for c, shared in used.items() if shared)
+
+
+def _equivalents(connection: sqlite3.Connection, code: str, catalog_year: str) -> list[str]:
+    """Courses the catalog calls equivalent to code (BUG-041); [] for a code not in the catalog."""
+    try:
+        return list(get_course(connection, code, catalog_year).equivalent_with)
+    except NotFoundError:
+        return []
+
+
 def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
     student = plan.student
     catalog_year = student.catalog_year
@@ -93,7 +151,18 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
             )
         )
 
-    satisfied_before = {completed.code for completed in student.completed_courses}
+    equivalent: dict[str, list[str]] = {}
+
+    def with_equivalents(codes: set[str]) -> set[str]:
+        """codes plus their equivalent courses: an equivalent course satisfies a prerequisite (BUG-041)."""
+        out = set(codes)
+        for code in codes:
+            if code not in equivalent:
+                equivalent[code] = _equivalents(connection, code, catalog_year)
+            out.update(equivalent[code])
+        return out
+
+    satisfied_before = with_equivalents({completed.code for completed in student.completed_courses})
     for semester in semesters:
         for course in semester.courses:
             try:
@@ -126,21 +195,55 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                     False,
                 )
 
-        satisfied_before |= {course.code for course in semester.courses}
+        satisfied_before |= with_equivalents({course.code for course in semester.courses})
 
-    plan_codes = set(satisfied_before)
     code_credits: dict[str, float] = {completed.code: completed.credits for completed in student.completed_courses}
     for semester in semesters:
         for course in semester.courses:
             code_credits.setdefault(course.code, course.credits)
 
-    total_credits_required = 0.0
+    # Of a set of equivalent courses only the first (completed, then by semester) counts toward the
+    # degree; the others still satisfy prerequisites above but add no credits and fill no group
+    # (BUG-041). stand_in lets a group that lists one course be filled by its counted equivalent.
+    taken_in_order = [completed.code for completed in student.completed_courses] + [
+        course.code for semester in semesters for course in semester.courses
+    ]
+    plan_codes: set[str] = set()
+    duplicate_of: dict[str, str] = {}
+    for code in dict.fromkeys(taken_in_order):
+        twin = next((other for other in equivalent.get(code, []) if other in plan_codes), None)
+        if twin is None:
+            plan_codes.add(code)
+        else:
+            duplicate_of[code] = twin
+    stand_in: dict[str, str] = {}
+    for code in sorted(plan_codes):
+        for other in equivalent.get(code, []):
+            if other not in plan_codes:
+                stand_in.setdefault(other, code)
+    for code, twin in duplicate_of.items():
+        add_flag(
+            "requirement_unmet",
+            "warning",
+            next((cid for _, cid in code_to_course_ids.get(code, [])), None),
+            f"{code} is equivalent to {twin}, so only {twin} counts toward the degree; {code} adds no credits.",
+            False,
+        )
+
+    # A minor or ASI adds no credit total of its own on top of a degree (BUG-037): its groups make
+    # sure its courses are planned, and its courses may also be the degree's free electives. Its
+    # total counts only when the student has no degree program.
+    loaded = []
     for program_id in student.programs:
         try:
-            program = get_program(connection, program_id, catalog_year)
+            loaded.append(get_program(connection, program_id, catalog_year))
         except NotFoundError:
             continue
-        total_credits_required += program.total_credits_required
+    has_degree = any(p.degree_level not in _ADD_ON_LEVELS for p in loaded)
+    total_credits_required = 0.0
+    for program in loaded:
+        if not (has_degree and program.degree_level in _ADD_ON_LEVELS):
+            total_credits_required += program.total_credits_required
 
         requirement_programs: list[Program]
         if program.combines:
@@ -180,7 +283,7 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
 
             for group in all_groups:
                 listed = group.courses or []
-                missing = [code for code in listed if code not in plan_codes]
+                missing = [code for code in listed if code not in plan_codes and code not in stand_in]
                 if missing:
                     add_flag(
                         "requirement_unmet",
@@ -189,15 +292,16 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                         f"{req_program.name}: {group.label} is missing {', '.join(missing)}.",
                         False,
                     )
-                available -= set(listed)
+                available -= set(listed) | {stand_in[code] for code in listed if code in stand_in}
 
             for group in choose_with_list + choose_without_list:
                 candidates = group.courses if group.courses else sorted(available)
                 credits_required = group.credits_required or 0.0
                 earned = 0.0
                 claimed: set[str] = set()
-                for code in candidates:
-                    if code not in available:
+                for listed_code in candidates:
+                    code = listed_code if listed_code in available else stand_in.get(listed_code, "")
+                    if code not in available or code in claimed:
                         continue
                     if earned >= credits_required:
                         break
@@ -214,9 +318,37 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                     )
                 available -= claimed
 
+    # Every minor and ASI: at least 9 of its credits not used for any other part of the degree
+    # except free electives (BUG-036; policy-minor-requirements and policy-asi-requirements).
+    if has_degree:
+        degree_parts: list[Program] = []
+        for program in loaded:
+            if program.degree_level in _ADD_ON_LEVELS:
+                continue
+            if program.combines:
+                for component_id in program.combines:
+                    try:
+                        degree_parts.append(get_program(connection, component_id, catalog_year))
+                    except NotFoundError:
+                        continue
+            else:
+                degree_parts.append(program)
+        for add_on in (p for p in loaded if p.degree_level in _ADD_ON_LEVELS):
+            unshared, shared = _unshared_credits(add_on, degree_parts, plan_codes, code_credits)
+            if unshared < ADD_ON_UNSHARED_MIN:
+                add_flag(
+                    "requirement_unmet",
+                    "error",
+                    None,
+                    f"{add_on.name}: only {unshared:g} of its credits are not also used for the degree "
+                    f"(shared: {', '.join(shared) or 'none'}); at least {ADD_ON_UNSHARED_MIN:g} must not be, "
+                    "except free electives.",
+                    False,
+                )
+
     total_credits = sum(semester.total_credits for semester in semesters) + sum(
         completed.credits for completed in student.completed_courses
-    )
+    ) - sum(code_credits.get(code, 0.0) for code in duplicate_of)
     if total_credits < total_credits_required:
         add_flag(
             "credit_shortfall",

@@ -1,0 +1,31 @@
+{
+  "id": 3,
+  "name": "Combined mining bachelor's and master's",
+  "difficulty": "medium",
+  "request": {
+    "student": {
+      "degree_level": "combined",
+      "programs": ["mining-bs-ms-combined"],
+      "catalog_year": "2026-2027",
+      "completed_courses": []
+    },
+    "semesters": 10,
+    "start_term": "Fall 2026",
+    "include_summers": false,
+    "overrides": []
+  },
+  "also_must": [
+    {"type": "max_semester_credits", "limit": 18, "through": "Spring 2030",
+     "why": "Undergraduate semesters 1-8; same cap as Example 1."},
+    {"type": "max_semester_credits", "limit": 15, "from": "Fall 2030",
+     "why": "Graduate semesters 9-10; 2026-2027 Graduate Catalog, p. 8."},
+    {"type": "not_planned", "codes": ["HNRS105", "HNRS115"],
+     "why": "Not a Thorson student."},
+    {"type": "count_planned", "codes": ["MNGN508", "MNGN512", "MNGN516"], "exactly": 2,
+     "why": "Two of the three MS core courses are the double-counted courses (mining-ms double_counts_with)."},
+    {"type": "credits_from", "codes": ["MNGN508", "MNGN512", "MNGN516"], "through": "Spring 2030", "equals": 6,
+     "why": "Exactly 6 double-counted credits, taken while still an undergraduate (semester 8 or earlier) so they can count toward the BS. Graduate Catalog p. 171: up to 6 credits."},
+    {"type": "count_planned", "codes": ["MNGN625"], "exactly": 1,
+     "why": "Graduate Mining Seminar."}
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "id": 1,
+  "name": "General Computer Science bachelor's",
+  "difficulty": "simple",
+  "request": {
+    "student": {
+      "degree_level": "bachelor",
+      "programs": ["cs-bs-general-track"],
+      "catalog_year": "2026-2027",
+      "completed_courses": []
+    },
+    "semesters": 8,
+    "start_term": "Fall 2026",
+    "include_summers": false,
+    "overrides": []
+  },
+  "also_must": [
+    {"type": "max_semester_credits", "limit": 18},
+    {"type": "course_in_semester", "code": "CSCI370", "semesters": ["Spring 2029", "Fall 2029"],
+     "why": "The flowchart puts CSCI370 in the summer after junior year; with no summers it goes in the semester on either side of that summer (changed from Fall 2029 only on 2026-11-22: the agent is not told a preference, and the catalog gives none)."},
+    {"type": "not_planned", "codes": ["HNRS105", "HNRS115"],
+     "why": "Not a Thorson student, so the first-year core is HASS100 and EDNS151."},
+    {"type": "flowchart_match", "tolerance": 1, "min_matched": 20,
+     "why": "80% of the 25 named courses on the CS General Track flowchart (data/Undergraduate Programs/Computer Science/Computer Science.pdf, p. 2) land within one semester of their place. Placeholders (focus area, free, CAS, CSCI elective, S&W) and CSCI370 are not counted. The PDF prints the first year as one block; the first five courses are read as Fall, the last five as Spring.",
+     "flowchart": {
+       "Fall 2026": ["MATH111", "HASS100", "CHGN121", "CSM101", "CSCI128"],
+       "Spring 2027": ["MATH112", "PHGN100", "EDNS151", "CSCI200"],
+       "Fall 2027": ["MATH213", "CSM202", "PHGN200", "CSCI358", "CSCI210"],
+       "Spring 2028": ["MATH225", "HASS215", "CSCI220"],
+       "Fall 2028": ["MATH332", "MATH334", "CSCI306"],
+       "Spring 2029": ["EBGN321", "CSCI341", "CSCI406"],
+       "Fall 2029": ["CSCI400"],
+       "Spring 2030": ["CSCI442"]
+     }}
+  ]
+}

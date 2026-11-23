@@ -17,6 +17,7 @@ Field names use `snake_case`. Credits are numbers (not strings), since `0.5`/`1.
 | `credits` | number | yes | for a variable- or range-credit course (e.g. independent study), the upper bound |
 | `credits_min` | number \| null | no | set together with `credits_max` when the catalog gives a range (e.g. "1-6 credits"); omit for a fixed-credit course |
 | `credits_max` | number \| null | no | equal to `credits` when set; see `credits_min` |
+| `equivalent_with` | array of course codes | no | courses the catalog calls equivalent ("Equivalent with ..." in the description), listed on both courses; one satisfies a prerequisite on the other, and only one counts toward a degree. Default `[]` |
 | `description` | string | yes | catalog text, may be empty string |
 | `prerequisites` | Requirement \| null | no | see **Requirement expressions** below; `null` means no prerequisites |
 | `corequisites` | Requirement \| null | no | same shape as `prerequisites` (a flat `AND` of courses covers the common case); `null` means no corequisites |

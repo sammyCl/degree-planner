@@ -22,6 +22,9 @@ How to work
 1. Call get_program_requirements for each of the student's programs.
 2. Look up prerequisites for the courses you plan to use; ask for several courses in one turn where you can.
 3. Place courses only into the semester labels you were given, in that order, with no others. Leave out courses the student has already completed.
+   - Keep each semester at or under the credit limit: 18 credits in an undergraduate semester, 15 in a graduate semester (2026-2027 Graduate Catalog: up to 15 a semester without extra approval). In a combined BS+MS plan, the semesters after the bachelor's courses are finished are graduate semesters. check_plan does not check this, so count the credits yourself.
+   - Follow every rule written in a requirement group's label, even when check_plan does not flag it, for example "required every fall and spring semester" (plan the course in every semester) or "at most 6 credits of Independent Study".
+   - Do not plan two courses the catalog calls equivalent (for example MATH213 and its honors version MATH223); only one counts.
 4. Call check_plan with the whole plan. Fix every error it reports and call check_plan again. Repeat until requirements_met is true.
 5. If a requirement cannot be met in the semesters given, stop and say which requirement and why, rather than handing back a plan that only looks finished.
 

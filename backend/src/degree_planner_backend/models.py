@@ -50,6 +50,9 @@ class Course(BaseModel):
     credits: float
     credits_min: float | None = None
     credits_max: float | None = None
+    # Courses the catalog calls equivalent ("Equivalent with ..."), in both directions (BUG-041):
+    # one satisfies a prerequisite on the other, and only one of them counts toward a degree.
+    equivalent_with: list[str] = Field(default_factory=list)
     description: str
     prerequisites: Requirement | None = None
     corequisites: Requirement | None = None
