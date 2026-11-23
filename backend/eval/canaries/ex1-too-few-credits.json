@@ -1,0 +1,548 @@
+{
+  "status": "cannot_work",
+  "plan": {
+    "plan_id": null,
+    "student": {
+      "degree_level": "bachelor",
+      "programs": [
+        "cs-bs-general-track"
+      ],
+      "catalog_year": "2026-2027",
+      "completed_courses": []
+    },
+    "semesters": [
+      {
+        "semester_id": "sem-1",
+        "label": "Fall 2026",
+        "courses": [
+          {
+            "course_id": "sem-1-math111",
+            "code": "MATH111",
+            "title": "Calculus for Scientists and Engineers I",
+            "credits": 4.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-1-hass100",
+            "code": "HASS100",
+            "title": "Nature and Human Values",
+            "credits": 3.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-1-chgn121",
+            "code": "CHGN121",
+            "title": "Principles of Chemistry I",
+            "credits": 4.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-1-csm101",
+            "code": "CSM101",
+            "title": "Freshman Success Seminar",
+            "credits": 1.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-1-csci128",
+            "code": "CSCI128",
+            "title": "Computer Science for STEM",
+            "credits": 3.0,
+            "status": "planned"
+          }
+        ],
+        "total_credits": 15.0
+      },
+      {
+        "semester_id": "sem-2",
+        "label": "Spring 2027",
+        "courses": [
+          {
+            "course_id": "sem-2-math112",
+            "code": "MATH112",
+            "title": "Calculus for Scientists and Engineers II",
+            "credits": 4.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-2-phgn100",
+            "code": "PHGN100",
+            "title": "Physics I - Mechanics",
+            "credits": 4.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-2-pagn202",
+            "code": "PAGN202",
+            "title": "Soccer",
+            "credits": 1.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-2-edns151",
+            "code": "EDNS151",
+            "title": "Cornerstone - Design I",
+            "credits": 3.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-2-csci200",
+            "code": "CSCI200",
+            "title": "Foundational Programming Concepts + Design",
+            "credits": 3.0,
+            "status": "planned"
+          }
+        ],
+        "total_credits": 15.0
+      },
+      {
+        "semester_id": "sem-3",
+        "label": "Fall 2027",
+        "courses": [
+          {
+            "course_id": "sem-3-math213",
+            "code": "MATH213",
+            "title": "Calculus for Scientists and Engineers III",
+            "credits": 4.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-3-csm202",
+            "code": "CSM202",
+            "title": "Introduction to Student Well-Being at Mines",
+            "credits": 1.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-3-phgn200",
+            "code": "PHGN200",
+            "title": "Physics Ii-Electromagnetism and Optics",
+            "credits": 4.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-3-csci358",
+            "code": "CSCI358",
+            "title": "Discrete Mathematics",
+            "credits": 3.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-3-csci210",
+            "code": "CSCI210",
+            "title": "Systems Programming",
+            "credits": 3.0,
+            "status": "planned"
+          }
+        ],
+        "total_credits": 15.0
+      },
+      {
+        "semester_id": "sem-4",
+        "label": "Spring 2028",
+        "courses": [
+          {
+            "course_id": "sem-4-math225",
+            "code": "MATH225",
+            "title": "Differential Equations",
+            "credits": 3.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-4-hass215",
+            "code": "HASS215",
+            "title": "Futures",
+            "credits": 3.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-4-ebgn201",
+            "code": "EBGN201",
+            "title": "Principles of Economics",
+            "credits": 3.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-4-csci220",
+            "code": "CSCI220",
+            "title": "Data Structures and Algorithms",
+            "credits": 3.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-4-math201",
+            "code": "MATH201",
+            "title": "Introduction to Statistics",
+            "credits": 3.0,
+            "status": "planned"
+          }
+        ],
+        "total_credits": 15.0
+      },
+      {
+        "semester_id": "sem-5",
+        "label": "Fall 2028",
+        "courses": [
+          {
+            "course_id": "sem-5-math332",
+            "code": "MATH332",
+            "title": "Linear Algebra",
+            "credits": 3.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-5-math334",
+            "code": "MATH334",
+            "title": "Introduction to Probability",
+            "credits": 3.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-5-csci306",
+            "code": "CSCI306",
+            "title": "Software Engineering",
+            "credits": 3.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-5-csci403",
+            "code": "CSCI403",
+            "title": "Data Base Management",
+            "credits": 3.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-5-csci446",
+            "code": "CSCI446",
+            "title": "Web Applications",
+            "credits": 3.0,
+            "status": "planned"
+          }
+        ],
+        "total_credits": 15.0
+      },
+      {
+        "semester_id": "sem-6",
+        "label": "Spring 2029",
+        "courses": [
+          {
+            "course_id": "sem-6-ebgn321",
+            "code": "EBGN321",
+            "title": "Engineering Economics",
+            "credits": 3.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-6-hass200",
+            "code": "HASS200",
+            "title": "Global Studies",
+            "credits": 3.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-6-csci341",
+            "code": "CSCI341",
+            "title": "Computer Organization",
+            "credits": 3.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-6-csci406",
+            "code": "CSCI406",
+            "title": "Algorithms",
+            "credits": 3.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-6-csci432",
+            "code": "CSCI432",
+            "title": "Robot Ethics",
+            "credits": 3.0,
+            "status": "planned"
+          }
+        ],
+        "total_credits": 15.0
+      },
+      {
+        "semester_id": "sem-7",
+        "label": "Fall 2029",
+        "courses": [
+          {
+            "course_id": "sem-7-hass202",
+            "code": "HASS202",
+            "title": "Technical Communication",
+            "credits": 3.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-7-csci400",
+            "code": "CSCI400",
+            "title": "Principles of Programming Languages",
+            "credits": 3.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-7-csci370",
+            "code": "CSCI370",
+            "title": "Advanced Software Engineering",
+            "credits": 5.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-7-csci445",
+            "code": "CSCI445",
+            "title": "Web Programming",
+            "credits": 3.0,
+            "status": "planned"
+          }
+        ],
+        "total_credits": 14.0
+      },
+      {
+        "semester_id": "sem-8",
+        "label": "Spring 2030",
+        "courses": [
+          {
+            "course_id": "sem-8-hass400",
+            "code": "HASS400",
+            "title": "Advanced Short Fiction Writing Workshop",
+            "credits": 3.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-8-csci442",
+            "code": "CSCI442",
+            "title": "Operating Systems",
+            "credits": 3.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-8-lifl113",
+            "code": "LIFL113",
+            "title": "Spanish I",
+            "credits": 3.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-8-csci410",
+            "code": "CSCI410",
+            "title": "Elements of Computing Systems",
+            "credits": 3.0,
+            "status": "planned"
+          },
+          {
+            "course_id": "sem-8-csci475",
+            "code": "CSCI475",
+            "title": "Information Security and Privacy",
+            "credits": 3.0,
+            "status": "planned"
+          }
+        ],
+        "total_credits": 15.0
+      }
+    ],
+    "prerequisite_edges": [
+      {
+        "from": "sem-1-math111",
+        "to": "sem-2-math112"
+      },
+      {
+        "from": "sem-1-math111",
+        "to": "sem-2-phgn100"
+      },
+      {
+        "from": "sem-1-csci128",
+        "to": "sem-2-csci200"
+      },
+      {
+        "from": "sem-2-math112",
+        "to": "sem-3-math213"
+      },
+      {
+        "from": "sem-2-phgn100",
+        "to": "sem-3-phgn200"
+      },
+      {
+        "from": "sem-2-math112",
+        "to": "sem-3-csci358"
+      },
+      {
+        "from": "sem-2-csci200",
+        "to": "sem-3-csci210"
+      },
+      {
+        "from": "sem-2-math112",
+        "to": "sem-4-math225"
+      },
+      {
+        "from": "sem-2-csci200",
+        "to": "sem-4-csci220"
+      },
+      {
+        "from": "sem-3-csci358",
+        "to": "sem-4-csci220"
+      },
+      {
+        "from": "sem-5-math334",
+        "to": "sem-4-csci220"
+      },
+      {
+        "from": "sem-1-math111",
+        "to": "sem-4-math201"
+      },
+      {
+        "from": "sem-1-csci128",
+        "to": "sem-5-math332"
+      },
+      {
+        "from": "sem-2-math112",
+        "to": "sem-5-math332"
+      },
+      {
+        "from": "sem-2-phgn100",
+        "to": "sem-5-math332"
+      },
+      {
+        "from": "sem-1-csci128",
+        "to": "sem-5-math334"
+      },
+      {
+        "from": "sem-3-csci210",
+        "to": "sem-5-csci306"
+      },
+      {
+        "from": "sem-4-csci220",
+        "to": "sem-5-csci306"
+      },
+      {
+        "from": "sem-2-csci200",
+        "to": "sem-5-csci403"
+      },
+      {
+        "from": "sem-4-csci220",
+        "to": "sem-5-csci446"
+      },
+      {
+        "from": "sem-1-hass100",
+        "to": "sem-6-hass200"
+      },
+      {
+        "from": "sem-3-csci210",
+        "to": "sem-6-csci341"
+      },
+      {
+        "from": "sem-4-csci220",
+        "to": "sem-6-csci406"
+      },
+      {
+        "from": "sem-3-math213",
+        "to": "sem-6-csci406"
+      },
+      {
+        "from": "sem-3-csci358",
+        "to": "sem-6-csci406"
+      },
+      {
+        "from": "sem-2-csci200",
+        "to": "sem-6-csci432"
+      },
+      {
+        "from": "sem-4-math201",
+        "to": "sem-6-csci432"
+      },
+      {
+        "from": "sem-1-hass100",
+        "to": "sem-7-hass202"
+      },
+      {
+        "from": "sem-5-csci306",
+        "to": "sem-7-csci400"
+      },
+      {
+        "from": "sem-3-csci358",
+        "to": "sem-7-csci400"
+      },
+      {
+        "from": "sem-5-csci306",
+        "to": "sem-7-csci370"
+      },
+      {
+        "from": "sem-5-csci306",
+        "to": "sem-7-csci445"
+      },
+      {
+        "from": "sem-1-hass100",
+        "to": "sem-8-hass400"
+      },
+      {
+        "from": "sem-4-csci220",
+        "to": "sem-8-csci442"
+      },
+      {
+        "from": "sem-6-csci341",
+        "to": "sem-8-csci442"
+      },
+      {
+        "from": "sem-6-csci341",
+        "to": "sem-8-csci410"
+      },
+      {
+        "from": "sem-4-csci220",
+        "to": "sem-8-csci475"
+      },
+      {
+        "from": "sem-6-csci341",
+        "to": "sem-8-csci475"
+      },
+      {
+        "from": "sem-3-csci210",
+        "to": "sem-8-csci475"
+      }
+    ],
+    "flags": [
+      {
+        "flag_id": "flag-1",
+        "type": "exception_claimed",
+        "severity": "warning",
+        "course_id": "sem-1-math111",
+        "message": "MATH111 relies on a claimed exception (precalculus); confirm it still applies.",
+        "overridable": true,
+        "overridden": false
+      },
+      {
+        "flag_id": "flag-2",
+        "type": "credit_shortfall",
+        "severity": "error",
+        "course_id": null,
+        "message": "Bachelor of Science in Computer Science (General Track): Free Electives needs 18.0 credits, only 9.0 completed or planned.",
+        "overridable": false,
+        "overridden": false
+      },
+      {
+        "flag_id": "flag-3",
+        "type": "credit_shortfall",
+        "severity": "error",
+        "course_id": null,
+        "message": "Plan has 119.0 credits; needs 128.0.",
+        "overridable": false,
+        "overridden": false
+      }
+    ],
+    "summary": {
+      "total_credits": 119.0,
+      "total_credits_required": 128.0,
+      "requirements_met": false
+    }
+  },
+  "explanation": "Canary plan, written by hand.",
+  "problems": [
+    "Bachelor of Science in Computer Science (General Track): Free Electives needs 18.0 credits, only 9.0 completed or planned.",
+    "Plan has 119.0 credits; needs 128.0.",
+    "The plan does not meet every requirement of the student's programs yet."
+  ],
+  "usage": {
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "steps": 0
+  }
+}
