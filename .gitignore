@@ -17,3 +17,6 @@ Group 9_Project 4_Proposal.pdf
 # Local example eval: Example 5's input and the run results stay off GitHub
 backend/eval/examples/private/
 backend/eval/results/
+
+# Claude Code per-person settings (may hold local permissions)
+.claude/settings.local.json
