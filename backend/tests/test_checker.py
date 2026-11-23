@@ -72,7 +72,7 @@ def answer(verdict: str, findings: list[dict], pages: list[str] | None = None, *
 # ------------------------------------------------------------------------------- the command
 
 def test_checker_md_loads_with_webfetch_and_the_pdf_tools() -> None:
-    assert checker.AGENT.tools == ("WebFetch", "list_pdfs", "search_pdfs", "read_pdf_pages")
+    assert checker.AGENT.tools == ("WebFetch", "list_pdfs", "search_pdfs", "read_pdf_pages", "lookup_courses")
     assert checker.AGENT.name == "checker"
 
 
@@ -90,7 +90,8 @@ def test_command_allows_webfetch_on_mines_domains_and_the_pdf_tools(tmp_path: Pa
     web = [a for a in allowed if a.startswith("WebFetch")]
     assert web and all(a.startswith("WebFetch(domain:") and a.endswith("mines.edu)") for a in web)
     assert [a for a in allowed if not a.startswith("WebFetch")] == [
-        "mcp__catalog__list_pdfs", "mcp__catalog__search_pdfs", "mcp__catalog__read_pdf_pages"]
+        "mcp__catalog__list_pdfs", "mcp__catalog__search_pdfs", "mcp__catalog__read_pdf_pages",
+        "mcp__catalog__lookup_courses"]
     assert command[command.index("--mcp-config") + 1] == str(tmp_path / "mcp.json")
     assert command[command.index("--setting-sources") + 1] == ""
     assert json.loads(command[command.index("--json-schema") + 1]) == checker.VERDICT_SCHEMA
@@ -150,13 +151,13 @@ def test_the_final_message_is_read_when_there_is_no_structured_output() -> None:
 
 
 @pytest.mark.parametrize("run, reason", [
-    (answer("does_not_work", [BLOCKING | {"url": "https://example.com/catalog"}]), "without a Mines URL or a PDF page"),
-    (answer("does_not_work", [BLOCKING | {"url": "https://mines.edu.evil.com/x"}]), "without a Mines URL or a PDF page"),
-    (answer("does_not_work", [BLOCKING | {"quote": "  "}]), "without a Mines URL or a PDF page"),
+    (answer("does_not_work", [BLOCKING | {"url": "https://example.com/catalog"}]), "without a Mines URL, or a catalog"),
+    (answer("does_not_work", [BLOCKING | {"url": "https://mines.edu.evil.com/x"}]), "without a Mines URL, or a catalog"),
+    (answer("does_not_work", [BLOCKING | {"quote": "  "}]), "without a Mines URL, or a catalog"),
     (answer("does_not_work", [CONCERN]), "no blocking finding"),
     (answer("works", [BLOCKING]), "lists blocking findings"),
-    (answer("works", [], pages=[]), "no Mines page or catalog PDF was read"),
-    (answer("works", [], pages=["https://example.com"]), "no Mines page or catalog PDF was read"),
+    (answer("works", [], pages=[]), "no Mines page or catalog source was read"),
+    (answer("works", [], pages=["https://example.com"]), "no Mines page or catalog source was read"),
     (answer("works", [CONCERN], verified={"program_requirements": False, "prerequisites": False, "credits": True}),
      "could not verify program requirements, prerequisites"),
     (answer("works", [], verified={"program_requirements": True, "prerequisites": True, "credits": False}),
@@ -210,4 +211,18 @@ def test_a_works_verdict_from_pdfs_alone_counts() -> None:
 def test_a_pdf_citation_that_does_not_hold_up_is_an_error(url: str, quote: str) -> None:
     verdict = checker.parse_run(answer("does_not_work", [BLOCKING | {"url": url, "quote": quote}]))
     assert verdict.status == "error"
-    assert "PDF page that contains the quote" in (verdict.error or "")
+    assert "course entry that contains the quote" in (verdict.error or "")
+
+
+def test_a_course_entry_citation_with_a_quote_from_that_row_counts() -> None:
+    finding = BLOCKING | {"url": "csv:mines-courses.csv#CSCI210", "quote": "SYSTEMS PROGRAMMING"}
+    assert checker.parse_run(answer("does_not_work", [finding])).status == "does_not_work"
+
+
+@pytest.mark.parametrize("url, quote", [
+    ("csv:mines-courses.csv#CSCI210", "offered only in the summer"),  # not in that row
+    ("csv:mines-courses.csv#CSCI999", "x"),  # no such course
+    ("csv:courses.json#CSCI210", "SYSTEMS"),  # not a course list
+])
+def test_a_course_citation_that_does_not_hold_up_is_an_error(url: str, quote: str) -> None:
+    assert checker.parse_run(answer("does_not_work", [BLOCKING | {"url": url, "quote": quote}])).status == "error"

@@ -2,14 +2,14 @@
 
 run_checker(connection, example, response) gives the planner's final plan to a second headless
 Claude Code run (checker.md). Its tools are WebFetch, allowed only on Mines domains, and the
-read-only catalog PDF tools (catalog_pdf_server.py), for when the live catalog site cannot be
+read-only catalog tools (catalog_pdf_server.py: the PDFs and the catalog's course lists), for when the live catalog site cannot be
 reached. It tries to show the plan would not work and must answer with the JSON in VERDICT_SCHEMA.
 It deliberately gets neither our data/json nor the validator's flags, so its check is independent
 of them.
 
 The verdict is read strictly. "works" or "does_not_work" only when the answer is consistent:
-every blocking finding cites a source and quotes it (a Mines URL, or a PDF page whose text must
-contain the quote), does_not_work has at least one blocking finding, and works has none, says it
+every blocking finding cites a source and quotes it (a Mines URL, or a PDF page or course entry
+whose text must contain the quote), does_not_work has at least one blocking finding, and works has none, says it
 verified the requirements, prerequisites and credits, and lists the pages read. Anything else is
 "error": not a pass, but reported apart from a real failure, so a checker that could not do its
 job is never mistaken for a plan that works.
@@ -240,12 +240,12 @@ def parse_run(run: loop.ClaudeRun, library: PdfLibrary | None = None) -> Checker
     return _judge(verdict, usage, library or default_library())
 
 
-def is_pdf_citation(source: str, library: PdfLibrary) -> bool:
+def is_catalog_citation(source: str, library: PdfLibrary) -> bool:
     return library.page_text(source) is not None
 
 
 def is_cited(finding: Finding, library: PdfLibrary) -> bool:
-    """A Mines URL with a quote, or a real PDF page whose text contains the quote."""
+    """A Mines URL with a quote, or a real PDF page or course entry whose text contains the quote."""
     if not finding.quote.strip():
         return False
     if is_mines_url(finding.url):
@@ -259,7 +259,7 @@ def _judge(verdict: _RawVerdict, usage: Usage, library: PdfLibrary) -> CheckerVe
     unverified = [name for name, ok in verdict.verified.model_dump().items() if not ok]
     problem = None
     if uncited:
-        problem = (f"{len(uncited)} blocking finding(s) without a Mines URL or a PDF page that contains the quote: "
+        problem = (f"{len(uncited)} blocking finding(s) without a Mines URL, or a catalog PDF page or course entry that contains the quote: "
                    + "; ".join(f.claim[:80] for f in uncited))
     elif verdict.verdict == "does_not_work" and not blocking:
         problem = "verdict does_not_work but no blocking finding"
@@ -267,8 +267,8 @@ def _judge(verdict: _RawVerdict, usage: Usage, library: PdfLibrary) -> CheckerVe
         problem = "verdict works but it lists blocking findings"
     elif verdict.verdict == "works" and unverified:
         problem = "could not verify " + ", ".join(n.replace("_", " ") for n in unverified)
-    elif verdict.verdict == "works" and not any(is_mines_url(u) or is_pdf_citation(u, library) for u in verdict.pages_read):
-        problem = "verdict works but no Mines page or catalog PDF was read"
+    elif verdict.verdict == "works" and not any(is_mines_url(u) or is_catalog_citation(u, library) for u in verdict.pages_read):
+        problem = "verdict works but no Mines page or catalog source was read"
     return CheckerVerdict(
         status="error" if problem else verdict.verdict,
         summary=verdict.summary,

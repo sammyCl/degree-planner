@@ -53,6 +53,8 @@ def test_read_pages_is_capped_at_five(library: PdfLibrary) -> None:
     ("search_pdfs", {"query": "   "}, "some text"),
     ("search_pdfs", {"query": "x", "path": "nope.pdf"}, "no PDF at"),
     ("write_file", {}, "no tool named"),
+    ("lookup_courses", {"codes": []}, "list of 1 to 20"),
+    ("lookup_courses", {"codes": [f"CSCI{n}" for n in range(100, 121)]}, "list of 1 to 20"),
 ])
 def test_bad_calls_are_errors(library: PdfLibrary, name: str, args: dict, message: str) -> None:
     assert message in library.call(name, args)["error"]
@@ -67,4 +69,22 @@ def test_quote_on_page(library: PdfLibrary) -> None:
 
 
 def test_tool_names() -> None:
-    assert TOOL_NAMES == ("list_pdfs", "search_pdfs", "read_pdf_pages")
+    assert TOOL_NAMES == ("list_pdfs", "search_pdfs", "read_pdf_pages", "lookup_courses")
+
+
+def test_lookup_courses_returns_the_catalog_rows(library: PdfLibrary) -> None:
+    result = library.call("lookup_courses", {"codes": ["hass 202", "CSCI599", "NOPE100"]})
+    by_code = {}
+    for course in result["courses"]:
+        by_code.setdefault(course["code"], []).append(course)
+    assert "HASS202" in by_code
+    assert {c["citation"] for c in by_code["CSCI599"]} == {"csv:mines-courses.csv#CSCI599",
+                                                           "csv:mines-graduate-courses.csv#CSCI599"}
+    assert by_code["CSCI599"][0]["credits"] == "0.5-6"  # the catalog's own value, not our 3-credit stand-in
+    assert result["not_found"] == ["NOPE100"]
+
+
+def test_quote_in_a_course_row(library: PdfLibrary) -> None:
+    assert library.quote_on_page("csv:mines-courses.csv#CSCI210", "systems programming")
+    assert not library.quote_on_page("csv:mines-courses.csv#CSCI210", "summer only")
+    assert library.page_text("csv:mines-courses.csv#ZZZZ999") is None

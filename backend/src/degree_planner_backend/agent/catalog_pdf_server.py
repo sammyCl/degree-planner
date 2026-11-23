@@ -1,16 +1,20 @@
 """MCP server that lets the eval's checker read the Mines catalog PDFs in data/ (read-only).
 
 The live catalog site (catalog.mines.edu) can refuse connections, so the checker (checker.py) also
-gets the official PDFs the team collected: the 2026-2027 Undergraduate and Graduate Catalogs, every
-program, minor and certificate PDF, the policies and the forms. Only PDF files are offered; the
-team's own data (data/json) and the course CSVs are not, so the checker stays independent of how
-we turned those sources into data.
+gets the official PDFs the team collected (the 2026-2027 Undergraduate and Graduate Catalogs, every
+program, minor and certificate PDF, the policies and the forms) and the two raw course lists
+exported from the catalog (data/Academic Catalog/*.csv), for courses no PDF describes, such as HASS,
+PAGN and LIFL. The team's own data (data/json) is never offered, so the checker reads the catalog's
+own wording rather than how we turned it into data. (The course CSVs are what courses.json is built
+from, so for course facts the checker is less independent than for program rules; it still catches
+mistakes in our parsing of them.)
 
     python -m degree_planner_backend.agent.catalog_pdf_server --root ../data
 
-Tools: list_pdfs, search_pdfs, read_pdf_pages. Each page is cited as pdf:<path>#page=<n>, where
-<path> is relative to the root, for example
-pdf:Undergraduate Programs/Computer Science/Computer Science.pdf#page=2. Only stderr is used for
+Tools: list_pdfs, search_pdfs, read_pdf_pages, lookup_courses. Each PDF page is cited as
+pdf:<path>#page=<n>, where <path> is relative to the root, for example
+pdf:Undergraduate Programs/Computer Science/Computer Science.pdf#page=2; a course row as
+csv:<file>#<code>, for example csv:mines-courses.csv#HASS202. Only stderr is used for
 logging: stdout carries the MCP messages.
 """
 
@@ -18,6 +22,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import csv
 import json
 import logging
 import re
@@ -38,6 +43,9 @@ MAX_PAGES_PER_READ = 5
 MAX_RESULTS = 25
 SNIPPET = 300
 _CITATION = re.compile(r"^pdf:(?P<path>.+\.pdf)#page=(?P<page>[1-9][0-9]*)$")
+_COURSE_CITATION = re.compile(r"^csv:(?P<file>[^#/]+\.csv)#(?P<code>[A-Z]{3,4}[0-9]{3}[A-Z]{0,2})$")
+COURSE_FILES = ("mines-courses.csv", "mines-graduate-courses.csv")
+MAX_CODES = 20
 
 TOOL_DEFINITIONS: list[dict[str, Any]] = [
     {
@@ -79,6 +87,21 @@ TOOL_DEFINITIONS: list[dict[str, Any]] = [
             "additionalProperties": False,
         },
     },
+    {
+        "name": "lookup_courses",
+        "description": "Returns the catalog's own course entries for up to 20 course codes, from the course lists "
+                       "exported from the online catalog (undergraduate and graduate): title, credits, description "
+                       "(which often gives the terms offered, as (I) fall, (II) spring, (S) summer), prerequisites "
+                       "and corequisites, exactly as the catalog wrote them. Use it for any course, especially ones "
+                       "no PDF describes (HASS, PAGN, LIFL and other departments without a program PDF). A code may "
+                       "have one row in each list. Each row has the citation to use in a finding.",
+        "input_schema": {
+            "type": "object",
+            "properties": {"codes": {"type": "array", "items": {"type": "string"}, "minItems": 1, "maxItems": MAX_CODES}},
+            "required": ["codes"],
+            "additionalProperties": False,
+        },
+    },
 ]
 TOOL_NAMES = tuple(tool["name"] for tool in TOOL_DEFINITIONS)
 
@@ -102,6 +125,21 @@ class PdfLibrary:
             if "json" not in p.relative_to(self.root).parts
         )
         self._text: dict[str, list[str]] = {}
+        self._courses: dict[tuple[str, str], list[dict[str, str]]] | None = None
+
+    def courses(self) -> dict[tuple[str, str], list[dict[str, str]]]:
+        """(file, code) -> the CSV rows for that code, read the first time."""
+        if self._courses is None:
+            self._courses = {}
+            for name in COURSE_FILES:
+                path = self.root / "Academic Catalog" / name
+                if not path.exists():
+                    continue
+                with open(path, newline="", encoding="utf-8") as f:
+                    for row in csv.DictReader(f):
+                        code = row.get("course_number", "").strip()
+                        self._courses.setdefault((name, code), []).append(row)
+        return self._courses
 
     def pages(self, path: str) -> list[str]:
         if path not in self.paths:
@@ -112,7 +150,14 @@ class PdfLibrary:
         return self._text[path]
 
     def page_text(self, citation_text: str) -> str | None:
-        """The text of the page a citation names, or None if it names no real page."""
+        """The text a citation names (a PDF page, or every row of a course in one CSV), or None."""
+        c = _COURSE_CITATION.match(citation_text.strip())
+        if c:
+            rows = self.courses().get((c["file"], c["code"]))
+            if not rows:
+                return None
+            fields = ("course_number", "course_name", "credits", "description", "prerequisites", "corequisites")
+            return "\n".join(" ".join(row.get(k, "") for k in fields) for row in rows)
         m = _CITATION.match(citation_text.strip())
         if not m or m["path"] not in self.paths:
             return None
@@ -121,7 +166,7 @@ class PdfLibrary:
         return pages[number - 1] if number <= len(pages) else None
 
     def quote_on_page(self, citation_text: str, quote: str) -> bool:
-        """True when the quote appears on the cited page, ignoring case and spacing."""
+        """True when the quote appears in the cited page or course row, ignoring case and spacing."""
         text = self.page_text(citation_text)
         squashed = _squash(quote)
         return text is not None and bool(squashed) and squashed in _squash(text)
@@ -137,6 +182,8 @@ class PdfLibrary:
                 return self._search(args)
             if name == "read_pdf_pages":
                 return self._read(args)
+            if name == "lookup_courses":
+                return self._lookup(args)
         except KeyError as exc:
             return {"error": f"no PDF at {exc.args[0]!r}; use a path from list_pdfs."}
         return {"error": f"there is no tool named {name!r}; the tools are {', '.join(TOOL_NAMES)}."}
@@ -162,6 +209,24 @@ class PdfLibrary:
                         return {"matches": matches, "note": f"stopped at {MAX_RESULTS} matches; narrow the query or give a path"}
         return {"matches": matches} if matches else {"matches": [], "note": "no page contains that text"}
 
+    def _lookup(self, args: dict[str, Any]) -> dict[str, Any]:
+        codes = args.get("codes")
+        if not isinstance(codes, list) or not codes or len(codes) > MAX_CODES:
+            return {"error": f"codes must be a list of 1 to {MAX_CODES} course codes."}
+        found, missing = [], []
+        courses = self.courses()
+        for raw in codes:
+            code = re.sub(r"\s+", "", str(raw)).upper()
+            rows = [(name, row) for name in COURSE_FILES for row in courses.get((name, code), [])]
+            if rows:
+                found += [_course_entry(name, row) for name, row in rows]
+            else:
+                missing.append(code)
+        result: dict[str, Any] = {"courses": found}
+        if missing:
+            result["not_found"] = missing
+        return result
+
     def _read(self, args: dict[str, Any]) -> dict[str, Any]:
         path, first = args.get("path"), args.get("first_page")
         last = args.get("last_page", first)
@@ -175,6 +240,19 @@ class PdfLibrary:
         last = min(last, len(pages), first + MAX_PAGES_PER_READ - 1)
         return {"pages": [{"page": n, "citation": citation(path, n), "text": pages[n - 1]} for n in range(first, last + 1)],
                 "page_count": len(pages)}
+
+
+def _course_entry(name: str, row: dict[str, str]) -> dict[str, str]:
+    code = row.get("course_number", "").strip()
+    return {
+        "citation": f"csv:{name}#{code}",
+        "code": code,
+        "title": row.get("course_name", ""),
+        "credits": row.get("credits", ""),
+        "description": row.get("description", ""),
+        "prerequisites": row.get("prerequisites", ""),
+        "corequisites": row.get("corequisites", ""),
+    }
 
 
 def _squash_index(flat: str, squashed_prefix: str) -> int:
