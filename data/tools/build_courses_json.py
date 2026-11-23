@@ -29,6 +29,9 @@ CATALOG_YEAR = "2026-2027"
 # Credits for every course titled "Independent Study" (variable 0.5-6 or 1-6 in the catalog); see build().
 INDEPENDENT_STUDY_CREDITS = 3.0
 
+# "Equivalent with MATH223, This is ..." at the start of a description (BUG-041).
+EQUIVALENT = re.compile(r"^\s*Equivalent with ((?:[A-Z]{3,4}\s?\d{3}[A-Z]{0,2}\s*,\s*)*[A-Z]{3,4}\s?\d{3}[A-Z]{0,2})\b")
+
 SMALL = {"and", "or", "of", "the", "in", "for", "to", "a", "an", "on", "at", "by", "with", "from", "as"}
 ACRONYMS = {
     "CAD", "CAM", "CNC", "GIS", "GPS", "FEA", "CFD", "MEMS", "VLSI", "RF", "DC", "AC", "IC", "IT", "AI", "ML", "LED",
@@ -67,6 +70,33 @@ def credits(raw: str) -> tuple[float, bool]:
     if not m:
         raise ValueError(f"bad credits {raw!r}")
     return (float(m.group(2) or m.group(1)), m.group(2) is not None)  # a range uses its upper bound
+
+
+def equivalents(description: str) -> list[str]:
+    """Course codes named in a leading "Equivalent with ..." (placeholders like LAIS1XX do not match)."""
+    m = EQUIVALENT.match(description or "")
+    return [re.sub(r"\s+", "", c) for c in m.group(1).split(",")] if m else []
+
+
+def link_equivalents(courses: list[dict], notes: dict[str, list[str]], stats: Counter) -> None:
+    """Set equivalent_with on both courses of every pair, keeping only codes that are in the catalog."""
+    by_code = {c["code"]: c for c in courses}
+    pairs: set[tuple[str, str]] = set()
+    for c in courses:
+        for other in c.pop("_equivalent", []):
+            if other == c["code"]:
+                continue
+            if other not in by_code:
+                notes["equivalent not in catalog"].append(f"{c['code']} -> {other}")
+                continue
+            pairs.add(tuple(sorted((c["code"], other))))
+    for a, b in pairs:
+        by_code[a].setdefault("equivalent_with", []).append(b)
+        by_code[b].setdefault("equivalent_with", []).append(a)
+    for c in courses:
+        if "equivalent_with" in c:
+            c["equivalent_with"] = sorted(set(c["equivalent_with"]))
+            stats["courses with an equivalent"] += 1
 
 
 def load_rows() -> list[dict]:
@@ -164,6 +194,9 @@ def build() -> tuple[list[dict], dict[str, list[str]], Counter]:
             "corequisites": coreq,
             "catalog_year": CATALOG_YEAR,
         }
+        found = equivalents(r["description"])
+        if found:
+            course["_equivalent"] = found
         if not r["_grad"] and r["source_page"].startswith("http"):
             course["source"] = {"url": r["source_page"]}
         else:
@@ -185,6 +218,7 @@ def build() -> tuple[list[dict], dict[str, list[str]], Counter]:
             if ref not in known:
                 stats["references to codes not in the catalog"] += 1
                 notes["unknown references"].append(f"{code} -> {ref}")
+    link_equivalents(courses, notes, stats)
     stats["courses written"] = len(courses)
     stats["codes in both CSVs (merged)"] = sum(1 for r in merged if r["_in_both"])
     return courses, notes, stats
@@ -203,6 +237,7 @@ def write_review(notes: dict[str, list[str]], stats: Counter) -> None:
         "empty prerequisites": "Prerequisite text that produced no requirement",
         "credit ranges": "Variable-credit courses (upper bound used)",
         "independent study": "Independent Study courses (set to 3 credits, not the upper bound)",
+        "equivalent not in catalog": "Equivalent courses named in a description but not in the catalog CSVs (left out)",
     }
     for key, title in caps.items():
         items = notes.get(key, [])

@@ -842,7 +842,7 @@ BUG-040  EBGN321's 60-credit-hour prerequisite is missing from the data
              credit-hour prerequisite in its catalog text)
 
 BUG-041  Equivalent courses both count (MATH213 and MATH223)
-  Status:    Open
+  Status:    Fixed
   Owner:     Midhat Sajad (validator, data format)
   Where:     validator.py; data/json/courses.json (no equivalence field);
              the "Equivalent with ..." text is at the start of many course
@@ -860,3 +860,37 @@ BUG-041  Equivalent courses both count (MATH213 and MATH223)
   Fix idea:  an optional "equivalent_with" list on Course, filled by the
              converter from the "Equivalent with X, Y" description prefix;
              the validator counts at most one course of each equivalent set
+  Also:      the same gap broke prerequisites: HASS200, HASS202 and HASS400
+             need HASS100, and the catalog calls HNRS105 and HNRS115
+             equivalent to it, so a Thorson student got HASS100 planned
+             again (Example 5, backend/eval/results/2026-11-22T19-20-42)
+  Fixed in:  branch agent/eval-examples (Samantha with Claude, with the team
+             owners' agreement to be confirmed before merging):
+             Course.equivalent_with (models.py, docs/data-format.md), filled
+             both ways by build_courses_json.py from the "Equivalent with"
+             description prefix (84 courses); validator.py lets an
+             equivalent satisfy a prerequisite and a group, and counts only
+             the first of a set of equivalents, with a requirement_unmet
+             warning naming the duplicate. Covered by
+             tests/test_validator_equivalents.py
+
+BUG-042  "Required every semester" is not checked (EENG500 Graduate Seminar)
+  Status:    Open
+  Owner:     Midhat Sajad (validator, data format)
+  Where:     validator.py ("all" groups); data/json/graduate-programs.json
+             (ee-ms seminar group: the rule is only in the label)
+  Found:     2026-11-22 by the eval's deterministic checks on Example 2
+             (backend/eval/results/2026-11-22T19-20-42), checked by Samantha
+             with Claude
+  Steps:     plan ee-ms over 4 semesters with EENG500 only in Fall 2026, then
+             call check_plan
+  Actual:    no flag: an "all" group is met by one appearance, and a second
+             EENG500 would be dropped as a repeat anyway (BUG-027). The group
+             label says "required every fall and spring semester"
+  Expected:  a requirement_unmet flag for each fall or spring semester
+             without EENG500 (the same rule applies to other per-semester
+             seminars and colloquia, e.g. CBEN605)
+  Fix idea:  a group field such as "every_semester": true, set by the
+             graduate data for these seminars; the validator checks every
+             fall and spring semester, and repeats of such a course are
+             allowed (BUG-027)

@@ -1913,7 +1913,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/chemeng/"
-   }
+   },
+   "equivalent_with": [
+    "CBEN511"
+   ]
   },
   {
    "code": "CBEN412",
@@ -2013,7 +2016,11 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/chemeng/"
-   }
+   },
+   "equivalent_with": [
+    "CHGN430",
+    "MLGN530"
+   ]
   },
   {
    "code": "CBEN416",
@@ -2136,7 +2143,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/chemeng/"
-   }
+   },
+   "equivalent_with": [
+    "EBGN321"
+   ]
   },
   {
    "code": "CBEN422",
@@ -2321,7 +2331,12 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/chemeng/"
-   }
+   },
+   "equivalent_with": [
+    "MLGN535",
+    "PHGN435",
+    "PHGN535"
+   ]
   },
   {
    "code": "CBEN440",
@@ -2529,7 +2544,11 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/chemeng/"
-   }
+   },
+   "equivalent_with": [
+    "MEGN469",
+    "MTGN469"
+   ]
   },
   {
    "code": "CBEN470",
@@ -2775,7 +2794,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/chemeng/"
-   }
+   },
+   "equivalent_with": [
+    "CBEN411"
+   ]
   },
   {
    "code": "CBEN513",
@@ -2979,7 +3001,12 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/chemeng/"
-   }
+   },
+   "equivalent_with": [
+    "MLGN535",
+    "PHGN435",
+    "PHGN535"
+   ]
   },
   {
    "code": "CBEN550",
@@ -3033,7 +3060,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/chemeng/"
-   }
+   },
+   "equivalent_with": [
+    "CHGN555"
+   ]
   },
   {
    "code": "CBEN568",
@@ -3064,7 +3094,12 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/chemeng/"
-   }
+   },
+   "equivalent_with": [
+    "MEGN569",
+    "MLGN569",
+    "MTGN569"
+   ]
   },
   {
    "code": "CBEN570",
@@ -4176,7 +4211,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/civileng/"
-   }
+   },
+   "equivalent_with": [
+    "CEEN512"
+   ]
   },
   {
    "code": "CEEN415",
@@ -4363,7 +4401,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/civileng/"
-   }
+   },
+   "equivalent_with": [
+    "CEEN533"
+   ]
   },
   {
    "code": "CEEN439",
@@ -4677,7 +4718,11 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/civileng/"
-   }
+   },
+   "equivalent_with": [
+    "CEEN592",
+    "PEGN530"
+   ]
   },
   {
    "code": "CEEN493",
@@ -4829,7 +4874,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/civileng/"
-   }
+   },
+   "equivalent_with": [
+    "CEEN411"
+   ]
   },
   {
    "code": "CEEN513",
@@ -5004,7 +5052,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/civileng/"
-   }
+   },
+   "equivalent_with": [
+    "CEEN433"
+   ]
   },
   {
    "code": "CEEN539",
@@ -5281,7 +5332,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/civileng/"
-   }
+   },
+   "equivalent_with": [
+    "MNGN556"
+   ]
   },
   {
    "code": "CEEN560",
@@ -5670,7 +5724,11 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/civileng/"
-   }
+   },
+   "equivalent_with": [
+    "CEEN492",
+    "PEGN530"
+   ]
   },
   {
    "code": "CEEN593",
@@ -6088,7 +6146,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/chemgeo/"
-   }
+   },
+   "equivalent_with": [
+    "CHGN403"
+   ]
   },
   {
    "code": "CHGC506",
@@ -6955,7 +7016,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/chem/"
-   }
+   },
+   "equivalent_with": [
+    "CHGC505"
+   ]
   },
   {
    "code": "CHGN406",
@@ -7030,7 +7094,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/chem/"
-   }
+   },
+   "equivalent_with": [
+    "MLGN510"
+   ]
   },
   {
    "code": "CHGN411",
@@ -7190,7 +7257,11 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/chem/"
-   }
+   },
+   "equivalent_with": [
+    "CBEN415",
+    "MLGN530"
+   ]
   },
   {
    "code": "CHGN431",
@@ -7773,7 +7844,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/chem/"
-   }
+   },
+   "equivalent_with": [
+    "CBEN555"
+   ]
   },
   {
    "code": "CHGN560",
@@ -8981,7 +9055,11 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/compsci/"
-   }
+   },
+   "equivalent_with": [
+    "CSCI507",
+    "EENG507"
+   ]
   },
   {
    "code": "CSCI440",
@@ -9016,7 +9094,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/compsci/"
-   }
+   },
+   "equivalent_with": [
+    "MATH440"
+   ]
   },
   {
    "code": "CSCI441",
@@ -9212,7 +9293,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/compsci/"
-   }
+   },
+   "equivalent_with": [
+    "CSCI555"
+   ]
   },
   {
    "code": "CSCI456",
@@ -9386,7 +9470,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/compsci/"
-   }
+   },
+   "equivalent_with": [
+    "CSCI573"
+   ]
   },
   {
    "code": "CSCI474",
@@ -9642,7 +9729,11 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/compsci/"
-   }
+   },
+   "equivalent_with": [
+    "CSCI437",
+    "EENG507"
+   ]
   },
   {
    "code": "CSCI508",
@@ -9857,7 +9948,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/compsci/"
-   }
+   },
+   "equivalent_with": [
+    "CSCI455"
+   ]
   },
   {
    "code": "CSCI560",
@@ -10015,7 +10109,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/compsci/"
-   }
+   },
+   "equivalent_with": [
+    "CSCI473"
+   ]
   },
   {
    "code": "CSCI574",
@@ -11111,7 +11208,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/datascience/"
-   }
+   },
+   "equivalent_with": [
+    "MATH560"
+   ]
   },
   {
    "code": "DSCI561",
@@ -11137,7 +11237,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/datascience/"
-   }
+   },
+   "equivalent_with": [
+    "MATH561"
+   ]
   },
   {
    "code": "DSCI570",
@@ -11536,7 +11639,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/econ/"
-   }
+   },
+   "equivalent_with": [
+    "CBEN421"
+   ]
   },
   {
    "code": "EBGN330",
@@ -14896,7 +15002,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/electeng/"
-   }
+   },
+   "equivalent_with": [
+    "MEGN475"
+   ]
   },
   {
    "code": "EENG480",
@@ -15026,7 +15135,11 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/electeng/"
-   }
+   },
+   "equivalent_with": [
+    "CSCI437",
+    "CSCI507"
+   ]
   },
   {
    "code": "EENG509",
@@ -16862,7 +16975,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/geoleng/"
-   }
+   },
+   "equivalent_with": [
+    "PEGN439"
+   ]
   },
   {
    "code": "GEGN466",
@@ -17105,7 +17221,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/geoleng/"
-   }
+   },
+   "equivalent_with": [
+    "GEGN581"
+   ]
   },
   {
    "code": "GEGN483",
@@ -17252,7 +17371,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/geoleng/"
-   }
+   },
+   "equivalent_with": [
+    "MNGN418"
+   ]
   },
   {
    "code": "GEGN509",
@@ -17656,7 +17778,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/geoleng/"
-   }
+   },
+   "equivalent_with": [
+    "GEGN481"
+   ]
   },
   {
    "code": "GEGN582",
@@ -19809,7 +19934,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/geology/"
-   }
+   },
+   "equivalent_with": [
+    "PEGN660"
+   ]
   },
   {
    "code": "GEOL698",
@@ -20388,7 +20516,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/geophyseng/"
-   }
+   },
+   "equivalent_with": [
+    "GPGN555"
+   ]
   },
   {
    "code": "GPGN458",
@@ -20793,7 +20924,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/geophyseng/"
-   }
+   },
+   "equivalent_with": [
+    "GPGN455"
+   ]
   },
   {
    "code": "GPGN558",
@@ -21114,7 +21248,12 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/humanities/"
-   }
+   },
+   "equivalent_with": [
+    "HNRS105",
+    "HNRS115",
+    "HNRS198"
+   ]
   },
   {
    "code": "HASS101",
@@ -23053,7 +23192,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/humanities/"
-   }
+   },
+   "equivalent_with": [
+    "MNGN490"
+   ]
   },
   {
    "code": "HASS491",
@@ -23491,7 +23633,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/honors/"
-   }
+   },
+   "equivalent_with": [
+    "HASS100"
+   ]
   },
   {
    "code": "HNRS110",
@@ -23522,7 +23667,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/honors/"
-   }
+   },
+   "equivalent_with": [
+    "HASS100"
+   ]
   },
   {
    "code": "HNRS120",
@@ -23581,7 +23729,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/honors/"
-   }
+   },
+   "equivalent_with": [
+    "HASS100"
+   ]
   },
   {
    "code": "HNRS199",
@@ -24964,7 +25115,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/math/"
-   }
+   },
+   "equivalent_with": [
+    "MATH122"
+   ]
   },
   {
    "code": "MATH122",
@@ -24981,7 +25135,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/math/"
-   }
+   },
+   "equivalent_with": [
+    "MATH112"
+   ]
   },
   {
    "code": "MATH198",
@@ -25078,7 +25235,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/math/"
-   }
+   },
+   "equivalent_with": [
+    "MATH223"
+   ]
   },
   {
    "code": "MATH223",
@@ -25104,7 +25264,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/math/"
-   }
+   },
+   "equivalent_with": [
+    "MATH213"
+   ]
   },
   {
    "code": "MATH225",
@@ -25142,7 +25305,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/math/"
-   }
+   },
+   "equivalent_with": [
+    "MATH235"
+   ]
   },
   {
    "code": "MATH235",
@@ -25172,7 +25338,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/math/"
-   }
+   },
+   "equivalent_with": [
+    "MATH225"
+   ]
   },
   {
    "code": "MATH298",
@@ -25766,7 +25935,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/math/"
-   }
+   },
+   "equivalent_with": [
+    "CSCI440"
+   ]
   },
   {
    "code": "MATH443",
@@ -25949,7 +26121,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/math/"
-   }
+   },
+   "equivalent_with": [
+    "MATH559"
+   ]
   },
   {
    "code": "MATH470",
@@ -26626,7 +26801,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/math/"
-   }
+   },
+   "equivalent_with": [
+    "MATH459"
+   ]
   },
   {
    "code": "MATH560",
@@ -26656,7 +26834,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/math/"
-   }
+   },
+   "equivalent_with": [
+    "DSCI560"
+   ]
   },
   {
    "code": "MATH561",
@@ -26682,7 +26863,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/math/"
-   }
+   },
+   "equivalent_with": [
+    "DSCI561"
+   ]
   },
   {
    "code": "MATH570",
@@ -27751,7 +27935,11 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/mecheng/"
-   }
+   },
+   "equivalent_with": [
+    "CBEN469",
+    "MTGN469"
+   ]
   },
   {
    "code": "MEGN471",
@@ -27807,7 +27995,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/mecheng/"
-   }
+   },
+   "equivalent_with": [
+    "EENG475"
+   ]
   },
   {
    "code": "MEGN479",
@@ -27934,7 +28125,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/mecheng/"
-   }
+   },
+   "equivalent_with": [
+    "MEGN587"
+   ]
   },
   {
    "code": "MEGN488",
@@ -27960,7 +28154,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/mecheng/"
-   }
+   },
+   "equivalent_with": [
+    "MEGN588"
+   ]
   },
   {
    "code": "MEGN497",
@@ -28106,7 +28303,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/mecheng/"
-   }
+   },
+   "equivalent_with": [
+    "MTGN545"
+   ]
   },
   {
    "code": "MEGN514",
@@ -28575,7 +28775,12 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/mecheng/"
-   }
+   },
+   "equivalent_with": [
+    "CBEN569",
+    "MLGN569",
+    "MTGN569"
+   ]
   },
   {
    "code": "MEGN570",
@@ -28679,7 +28884,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/mecheng/"
-   }
+   },
+   "equivalent_with": [
+    "MEGN487"
+   ]
   },
   {
    "code": "MEGN588",
@@ -28696,7 +28904,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/mecheng/"
-   }
+   },
+   "equivalent_with": [
+    "MEGN488"
+   ]
   },
   {
    "code": "MEGN592",
@@ -28893,7 +29104,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/materialsci/"
-   }
+   },
+   "equivalent_with": [
+    "CHGN410"
+   ]
   },
   {
    "code": "MLGN512",
@@ -29085,7 +29299,11 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/materialsci/"
-   }
+   },
+   "equivalent_with": [
+    "CBEN415",
+    "CHGN430"
+   ]
   },
   {
    "code": "MLGN531",
@@ -29134,7 +29352,13 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/materialsci/"
-   }
+   },
+   "equivalent_with": [
+    "CBEN435",
+    "CBEN535",
+    "PHGN435",
+    "PHGN535"
+   ]
   },
   {
    "code": "MLGN536",
@@ -29251,7 +29475,12 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/materialsci/"
-   }
+   },
+   "equivalent_with": [
+    "CBEN569",
+    "MEGN569",
+    "MTGN569"
+   ]
   },
   {
    "code": "MLGN570",
@@ -29291,7 +29520,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/materialsci/"
-   }
+   },
+   "equivalent_with": [
+    "MTGN572"
+   ]
   },
   {
    "code": "MLGN583",
@@ -30268,7 +30500,11 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/miningeng/"
-   }
+   },
+   "equivalent_with": [
+    "GEGN508",
+    "MNGN508"
+   ]
   },
   {
    "code": "MNGN421",
@@ -30861,7 +31097,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/miningeng/"
-   }
+   },
+   "equivalent_with": [
+    "HASS490"
+   ]
   },
   {
    "code": "MNGN498",
@@ -31046,7 +31285,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/miningeng/"
-   }
+   },
+   "equivalent_with": [
+    "MNGN418"
+   ]
   },
   {
    "code": "MNGN509",
@@ -31864,7 +32106,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/miningeng/"
-   }
+   },
+   "equivalent_with": [
+    "CEEN556"
+   ]
   },
   {
    "code": "MNGN557",
@@ -33861,7 +34106,11 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/meteng/"
-   }
+   },
+   "equivalent_with": [
+    "CBEN469",
+    "MEGN469"
+   ]
   },
   {
    "code": "MTGN472",
@@ -34415,7 +34664,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/meteng/"
-   }
+   },
+   "equivalent_with": [
+    "MEGN511"
+   ]
   },
   {
    "code": "MTGN545L",
@@ -34624,7 +34876,12 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/meteng/"
-   }
+   },
+   "equivalent_with": [
+    "CBEN569",
+    "MEGN569",
+    "MLGN569"
+   ]
   },
   {
    "code": "MTGN570",
@@ -34664,7 +34921,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/meteng/"
-   }
+   },
+   "equivalent_with": [
+    "MLGN572"
+   ]
   },
   {
    "code": "MTGN573",
@@ -36898,7 +37158,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/petroleumeng/"
-   }
+   },
+   "equivalent_with": [
+    "GEGN439"
+   ]
   },
   {
    "code": "PEGN440",
@@ -37458,7 +37721,11 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/petroleumeng/"
-   }
+   },
+   "equivalent_with": [
+    "CEEN492",
+    "CEEN592"
+   ]
   },
   {
    "code": "PEGN540",
@@ -37883,7 +38150,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/petroleumeng/"
-   }
+   },
+   "equivalent_with": [
+    "GEOL660"
+   ]
   },
   {
    "code": "PEGN681",
@@ -38110,7 +38380,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/physics/"
-   }
+   },
+   "equivalent_with": [
+    "PHGN310"
+   ]
   },
   {
    "code": "PHGN310",
@@ -38136,7 +38409,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/physics/"
-   }
+   },
+   "equivalent_with": [
+    "PHGN300"
+   ]
   },
   {
    "code": "PHGN311",
@@ -38666,7 +38942,13 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/physics/"
-   }
+   },
+   "equivalent_with": [
+    "CBEN435",
+    "CBEN535",
+    "MLGN535",
+    "PHGN535"
+   ]
   },
   {
    "code": "PHGN440",
@@ -39365,7 +39647,13 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/physics/"
-   }
+   },
+   "equivalent_with": [
+    "CBEN435",
+    "CBEN535",
+    "MLGN535",
+    "PHGN435"
+   ]
   },
   {
    "code": "PHGN542",
