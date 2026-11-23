@@ -132,12 +132,14 @@ def claude_command(config_path: Path) -> list[str]:
     ]
 
 
-def run_claude(command: list[str], first_message: str, cwd: Path) -> ClaudeRun:
+def run_claude(command: list[str], first_message: str, cwd: Path, timeout: float | None = None) -> ClaudeRun:
     """Run `claude -p` with the first message on stdin. Runs in the temporary directory, so no
-    project's CLAUDE.md is picked up."""
+    project's CLAUDE.md is picked up. timeout defaults to TIMEOUT_SECONDS, read at call time; the
+    eval's checker passes a longer one."""
+    timeout = TIMEOUT_SECONDS if timeout is None else timeout
     try:
         completed = subprocess.run(
-            command, input=first_message, capture_output=True, text=True, cwd=cwd, timeout=TIMEOUT_SECONDS,
+            command, input=first_message, capture_output=True, text=True, cwd=cwd, timeout=timeout,
         )
     except FileNotFoundError as exc:
         raise ClaudeCodeError(f"{CLAUDE_COMMAND!r} is not installed or not on PATH") from exc
