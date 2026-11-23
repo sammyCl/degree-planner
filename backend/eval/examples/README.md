@@ -8,7 +8,7 @@ Each file has:
 - `request`: an agent request, exactly as the backend sends it (`docs/agent-request-format.md`)
 - `also_must`: checks on the agent's plan, on top of the validator returning `ok`. Each check has a `type`, its fields, and an optional `why` saying where the rule comes from.
 
-An example passes only if the validator says `ok`, every `also_must` check holds, and the adversarial checker (live Mines websites) finds no blocking problem. Example 5 also needs Sammy's review.
+An example passes only if the validator says `ok`, every `also_must` check holds, and the adversarial checker (live Mines websites) finds no blocking problem. A course planned in a term it is not offered is only flagged, as a concern, because our course data does not record terms offered for every course yet. Example 5 also needs Sammy's review.
 
 ## Check types
 

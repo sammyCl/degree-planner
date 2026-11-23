@@ -13,6 +13,11 @@ whose text must contain the quote), does_not_work has at least one blocking find
 verified the requirements, prerequisites and credits, and lists the pages read. Anything else is
 "error": not a pass, but reported apart from a real failure, so a checker that could not do its
 job is never mistaken for a plan that works.
+
+Terms offered are flagged, never failed: our course data does not yet record which terms every
+course is offered in, so the planner cannot be held to it. A blocking finding whose topic is
+"term_offered" is turned into a concern before the verdict is judged, and if nothing else blocks,
+a does_not_work verdict becomes works (still subject to the rules above).
 """
 
 from __future__ import annotations
@@ -44,6 +49,9 @@ AGENT = load_agent(Path(__file__).with_name("checker.md"), available_tools=[*BUI
 # WebFetch is allowed only on these hosts; in -p mode any other fetch is refused, not asked about.
 ALLOWED_DOMAINS = ("catalog.mines.edu", "www.mines.edu", "mines.edu", "registrar.mines.edu", "cs.mines.edu")
 TIMEOUT_SECONDS = 1200
+TOPICS = ("requirements", "prerequisites", "credits", "shared_credits", "transfer", "term_offered", "other")
+# Put in front of the claim of a blocking finding that was turned into a concern.
+TERM_FLAG = "[term offered: flagged, not failed] "
 
 VERDICT_SCHEMA: dict[str, Any] = {
     "type": "object",
@@ -57,9 +65,10 @@ VERDICT_SCHEMA: dict[str, Any] = {
             "items": {
                 "type": "object",
                 "additionalProperties": False,
-                "required": ["severity", "claim", "url", "quote"],
+                "required": ["severity", "topic", "claim", "url", "quote"],
                 "properties": {
                     "severity": {"type": "string", "enum": ["blocking", "concern"]},
+                    "topic": {"type": "string", "enum": list(TOPICS)},
                     "claim": {"type": "string"},
                     "url": {"type": "string"},
                     "quote": {"type": "string"},
@@ -84,6 +93,8 @@ VERDICT_SCHEMA: dict[str, Any] = {
 class Finding(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     severity: Literal["blocking", "concern"]
+    # Default "other" so results saved before the field existed still load.
+    topic: Literal["requirements", "prerequisites", "credits", "shared_credits", "transfer", "term_offered", "other"] = "other"
     claim: str
     url: str
     quote: str
@@ -253,7 +264,20 @@ def is_cited(finding: Finding, library: PdfLibrary) -> bool:
     return library.quote_on_page(finding.url, finding.quote)
 
 
+def flag_terms_offered(verdict: _RawVerdict) -> _RawVerdict:
+    """Turn blocking term-offered findings into concerns; with nothing left blocking, does_not_work becomes works."""
+    findings = [f.model_copy(update={"severity": "concern", "claim": TERM_FLAG + f.claim})
+                if f.severity == "blocking" and f.topic == "term_offered" else f
+                for f in verdict.findings]
+    if findings == list(verdict.findings):
+        return verdict
+    still_blocked = any(f.severity == "blocking" for f in findings)
+    return verdict.model_copy(update={"findings": findings,
+                                      "verdict": verdict.verdict if still_blocked else "works"})
+
+
 def _judge(verdict: _RawVerdict, usage: Usage, library: PdfLibrary) -> CheckerVerdict:
+    verdict = flag_terms_offered(verdict)
     blocking = [f for f in verdict.findings if f.severity == "blocking"]
     uncited = [f for f in blocking if not is_cited(f, library)]
     unverified = [name for name, ok in verdict.verified.model_dump().items() if not ok]

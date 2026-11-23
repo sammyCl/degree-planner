@@ -226,3 +226,44 @@ def test_a_course_entry_citation_with_a_quote_from_that_row_counts() -> None:
 ])
 def test_a_course_citation_that_does_not_hold_up_is_an_error(url: str, quote: str) -> None:
     assert checker.parse_run(answer("does_not_work", [BLOCKING | {"url": url, "quote": quote}])).status == "error"
+
+
+# ------------------------------------------------------------------------------- terms offered
+
+TERM = {"severity": "blocking", "topic": "term_offered", "claim": "MNGN308 is summer only but planned in Fall 2027",
+        "url": GOOD_PAGE, "quote": "12 credits of core courses"}
+
+
+def test_the_schema_asks_for_a_topic_on_every_finding() -> None:
+    item = checker.VERDICT_SCHEMA["properties"]["findings"]["items"]
+    assert "topic" in item["required"] and "term_offered" in item["properties"]["topic"]["enum"]
+
+
+def test_a_term_offered_finding_alone_is_flagged_and_the_plan_works() -> None:
+    verdict = checker.parse_run(answer("does_not_work", [TERM, CONCERN]))
+    assert verdict.status == "works" and verdict.blocking == ()
+    flagged = verdict.findings[0]
+    assert flagged.severity == "concern" and flagged.claim.startswith(checker.TERM_FLAG)
+
+
+def test_a_term_offered_finding_without_a_source_is_still_only_a_concern() -> None:
+    # Concerns need no citation, so an uncited term finding does not make the answer an error.
+    verdict = checker.parse_run(answer("does_not_work", [TERM | {"url": "", "quote": ""}]))
+    assert verdict.status == "works"
+
+
+def test_another_blocking_finding_still_fails_the_plan() -> None:
+    verdict = checker.parse_run(answer("does_not_work", [TERM, BLOCKING]))
+    assert verdict.status == "does_not_work"
+    assert [f.claim for f in verdict.blocking] == [BLOCKING["claim"]]
+    assert verdict.findings[0].severity == "concern"
+
+
+def test_a_flagged_plan_still_needs_everything_verified() -> None:
+    verdict = checker.parse_run(answer("does_not_work", [TERM],
+                                       verified={"program_requirements": True, "prerequisites": True, "credits": False}))
+    assert verdict.status == "error" and "could not verify credits" in (verdict.error or "")
+
+
+def test_the_prompt_says_terms_offered_never_fail_the_plan() -> None:
+    assert "term_offered" in checker.AGENT.system_prompt and "never fail the plan" in checker.AGENT.system_prompt
