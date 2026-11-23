@@ -964,7 +964,10 @@ CHECK_PLAN_TOOL: dict[str, Any] = {
         "the student their programs must be chosen first; transcript_duplicate means the record lists a "
         "completed course twice with different credits and the smaller was used, so ask the student to "
         "check their transcript. "
-        "already_completed and duplicate_course warnings mean that course was left out of the plan; "
+        "already_completed and duplicate_course warnings mean that course was left out of the plan, so do not "
+        "tell the student it is there. A course may appear in more than one semester only when a program "
+        "requires it every semester, it is a 0-credit seminar, or it is a PAGN course; any other repeat is "
+        "left out. "
         "a final 'more' entry means the list was cut, so fix the ones shown first. "
         "exception_claimed is a warning only the student can override, and open_exceptions lists the "
         "courses whose exception the student has not decided yet: requirements_met can be true while "
@@ -1066,6 +1069,39 @@ def _parse_semesters(tool_input: dict[str, Any]) -> list[tuple[str, list[str]]]:
     return semesters
 
 
+# A group label like "required every fall and spring semester" (EENG500 Graduate Seminar).
+_EVERY_SEMESTER = re.compile(r"\bevery\s+(?:fall\s+and\s+spring\s+)?semester\b", re.IGNORECASE)
+
+
+def _every_semester_codes(connection: sqlite3.Connection, program_ids: list[str], year: str) -> set[str]:
+    """Courses in a requirement group whose label says it is required every semester, in the
+    student's programs and their components. Programs that cannot be found are skipped here; they
+    are reported below."""
+    codes: set[str] = set()
+    pending, seen = list(program_ids), set()
+    while pending:
+        program_id = pending.pop()
+        if program_id in seen:
+            continue
+        seen.add(program_id)
+        try:
+            program = lookups.get_program(connection, program_id, year)
+        except lookups.NotFoundError:
+            continue
+        pending += list(program.combines)
+        for group in program.requirement_groups:
+            if _EVERY_SEMESTER.search(group.label or "") and group.courses:
+                codes.update(group.courses)
+    return codes
+
+
+def may_repeat(code: str, credits: float, every_semester: set[str]) -> bool:
+    """A course that may be planned in more than one semester: one a program requires every
+    semester, a 0-credit seminar or colloquium, or a PAGN physical activity course (BUG-027, BUG-042).
+    It still counts once toward a requirement group; each semester's credits count toward the total."""
+    return code in every_semester or credits == 0 or code.startswith("PAGN")
+
+
 def build_plan(connection: sqlite3.Connection, context: StudentContext, semesters: list[tuple[str, list[str]]]) -> BuiltPlan:
     """Turn semesters of course codes into a Plan: catalog titles and credits, generated course ids,
     the student's record, and their overrides. Unknown courses, already-completed courses, and repeats
@@ -1102,20 +1138,29 @@ def build_plan(connection: sqlite3.Connection, context: StudentContext, semester
     seen: set[str] = set()
     course_codes: dict[str, str] = {}
     plan_semesters: list[Semester] = []
+    every_semester = _every_semester_codes(connection, list(dict.fromkeys(student.programs)), year)
 
     for index, (label, codes) in enumerate(semesters, start=1):
         planned: list[PlannedCourse] = []
+        in_this_semester: set[str] = set()
         for code in codes:
-            if code in completed:
-                warnings.append(_issue("already_completed", code, f"{code} is already completed; left out of the plan."))
+            if code in in_this_semester:
+                warnings.append(_issue("duplicate_course", code, f"{code} is planned twice in {label}; only one counts."))
                 continue
-            if code in seen:
-                warnings.append(_issue("duplicate_course", code, f"{code} is planned more than once; only the first counts."))
-                continue
-            seen.add(code)
             try:
                 course = lookups.get_course(connection, code, year)
             except lookups.NotFoundError:
+                course = None
+            repeatable = course is not None and may_repeat(code, course.credits, every_semester)
+            if code in completed and not repeatable:
+                warnings.append(_issue("already_completed", code, f"{code} is already completed; left out of the plan."))
+                continue
+            if code in seen and not repeatable:
+                warnings.append(_issue("duplicate_course", code, f"{code} is planned more than once; only the first counts."))
+                continue
+            seen.add(code)
+            in_this_semester.add(code)
+            if course is None:
                 unknown.append(code)
                 errors.append(_issue("unknown_course", code, f"{code} is not in the {_shown_year(year)} catalog; left out of the plan."))
                 continue

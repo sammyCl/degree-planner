@@ -1941,3 +1941,63 @@ def test_build_plan_keeps_the_original_record_for_saving(plan_db: sqlite3.Connec
     assert built.validation_plan.student.programs == ["t-minor"]
     assert [c.code for c in built.validation_plan.student.completed_courses] == ["CSCI100"]
     assert built.plan.semesters == built.validation_plan.semesters
+
+
+# ------------------------------------------------------------- courses allowed in several semesters
+
+@pytest.fixture
+def repeat_db(tmp_path: Path) -> sqlite3.Connection:
+    """A seminar required every semester, a 0-credit colloquium, a PAGN course and an ordinary course."""
+    # make_course fixes credits at 3, so the 0- and 1-credit courses are set after.
+    courses = [make_course("EENG600"), make_course("CBEN605") | {"credits": 0.0},
+               make_course("PAGN202") | {"credits": 1.0}, make_course("CSCI100")]
+    program = make_program("t-ms", degree_level="master", total_credits_required=3, requirement_groups=[
+        {"group_id": "seminar", "label": "Graduate Seminar (EENG600, required every fall and spring semester)",
+         "kind": "all", "courses": ["EENG600"]}])
+    (tmp_path / "courses.json").write_text(json.dumps({"courses": courses}))
+    (tmp_path / "programs.json").write_text(json.dumps({"programs": [program]}))
+    conn = sqlite3.connect(":memory:")
+    assert refresh_database(tmp_path, conn).ok
+    return conn
+
+
+def planned_codes(result: dict) -> list[list[str]]:
+    return [semester["courses"] for semester in result["semesters"]]
+
+
+def test_a_course_required_every_semester_stays_in_every_semester(repeat_db: sqlite3.Connection) -> None:
+    result = check_plan(repeat_db, sems(["EENG600"], ["EENG600"], ["EENG600"]), StudentContext(student(["t-ms"])))
+    assert planned_codes(result) == [["EENG600"], ["EENG600"], ["EENG600"]]
+    assert "duplicate_course" not in issue_types(result["warnings"])
+    assert result["total_credits"] == 9  # each semester's credits count toward the total
+
+
+def test_zero_credit_and_pagn_courses_may_repeat_but_others_may_not(repeat_db: sqlite3.Connection) -> None:
+    result = check_plan(repeat_db, sems(["CBEN605", "PAGN202", "CSCI100"], ["CBEN605", "PAGN202", "CSCI100"]),
+                        StudentContext(student(["t-ms"])))
+    assert planned_codes(result) == [["CBEN605", "PAGN202", "CSCI100"], ["CBEN605", "PAGN202"]]
+    assert issue_types(result["warnings"]) == ["duplicate_course"]
+
+
+def test_a_repeatable_course_may_follow_a_completed_one(repeat_db: sqlite3.Connection) -> None:
+    result = check_plan(repeat_db, sems(["PAGN202", "EENG600"]),
+                        StudentContext(student(["t-ms"], completed=[("PAGN202", 1.0), ("EENG600", 3.0)])))
+    assert planned_codes(result) == [["PAGN202", "EENG600"]]
+
+
+def test_a_course_twice_in_one_semester_still_counts_once(repeat_db: sqlite3.Connection) -> None:
+    result = check_plan(repeat_db, sems(["PAGN202", "PAGN202"]), StudentContext(student(["t-ms"])))
+    assert planned_codes(result) == [["PAGN202"]]
+    assert result["warnings"][0]["message"] == "PAGN202 is planned twice in Term 1; only one counts."
+
+
+def test_every_semester_label_is_read_from_a_combined_program_s_components(tmp_path: Path) -> None:
+    combined = make_program("t-combined", degree_level="combined", combines=["t-ms"], requirement_groups=[])
+    ms = make_program("t-ms", degree_level="master", requirement_groups=[
+        {"group_id": "s", "label": "Seminar, required every semester", "kind": "all", "courses": ["CSCI100"]}])
+    (tmp_path / "courses.json").write_text(json.dumps({"courses": [make_course("CSCI100")]}))
+    (tmp_path / "programs.json").write_text(json.dumps({"programs": [combined, ms]}))
+    conn = sqlite3.connect(":memory:")
+    assert refresh_database(tmp_path, conn).ok
+    result = check_plan(conn, sems(["CSCI100"], ["CSCI100"]), StudentContext(student(["t-combined"])))
+    assert planned_codes(result) == [["CSCI100"], ["CSCI100"]]
