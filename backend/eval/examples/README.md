@@ -17,7 +17,7 @@ Semesters are named by their labels (`"Fall 2029"`). `from` and `through` are in
 | type | fields | holds when |
 |---|---|---|
 | `max_semester_credits` | `limit`, `from`, `through` | no semester in the range has more than `limit` credits |
-| `course_in_semester` | `code`, `semester` | `code` is planned in `semester` |
+| `course_in_semester` | `code`, and `semester` or `semesters` | `code` is planned in `semester` (or one of `semesters`) |
 | `not_planned` | `codes` | none of `codes` is planned |
 | `completed_not_planned` | | no course in the request's `completed_courses` is planned again |
 | `planned_credits` | `equals` | the planned (not completed) credits add up to `equals` |

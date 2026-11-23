@@ -41,9 +41,21 @@ class MaxSemesterCredits(_Check):
 
 
 class CourseInSemester(_Check):
+    """The course is planned in one of the semesters given (semester for one, semesters for several)."""
     type: Literal["course_in_semester"]
     code: str
-    semester: str
+    semester: str | None = None
+    semesters: list[str] | None = None
+
+    @model_validator(mode="after")
+    def _one_way(self) -> CourseInSemester:
+        if (self.semester is None) == (self.semesters is None) or self.semesters == []:
+            raise ValueError("course_in_semester needs exactly one of semester or a non-empty semesters")
+        return self
+
+    @property
+    def allowed(self) -> list[str]:
+        return [self.semester] if self.semester is not None else list(self.semesters or [])
 
 
 class NotPlanned(_Check):
@@ -127,6 +139,7 @@ class Example(BaseModel):
         labels = self.request.semester_labels()
         for check in self.also_must:
             named = [getattr(check, name, None) for name in ("from_", "through", "semester")]
+            named += getattr(check, "semesters", None) or []
             if isinstance(check, FlowchartMatch):
                 named += list(check.flowchart)
             for label in named:
@@ -229,9 +242,10 @@ def _run(connection: sqlite3.Connection, example: Example, plan: Plan, check: Ch
 
     if isinstance(check, CourseInSemester):
         where = [label for _, label, code, _ in planned if code == check.code]
-        ok = check.semester in where
-        return CheckResult(check.type, ok, f"{check.code} in {check.semester}" if ok
-                           else f"{check.code} is in {', '.join(where) or 'no semester'}, not {check.semester}")
+        allowed = " or ".join(check.allowed)
+        hit = next((label for label in where if label in check.allowed), None)
+        return CheckResult(check.type, hit is not None, f"{check.code} in {hit}" if hit
+                           else f"{check.code} is in {', '.join(where) or 'no semester'}, not {allowed}")
 
     if isinstance(check, NotPlanned):
         found = sorted({c for c in codes_planned if c in check.codes})

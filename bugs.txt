@@ -815,3 +815,48 @@ BUG-039  A plan cannot choose the credits of a variable-credit course
              first is a known exception in test_choose_groups_can_be_met_
              from_their_lists (tests/test_bachelors_data.py); the graduate
              data tests have no such check
+
+BUG-040  EBGN321's 60-credit-hour prerequisite is missing from the data
+  Status:    Open
+  Owner:     Midhat Sajad (data format: a "credit hours completed"
+             prerequisite); Abdallah Salhi (course data converter)
+  Where:     data/json/courses.json (EBGN321 prerequisites: null);
+             docs/data-format.md (Requirement expressions)
+  Found:     2026-11-22 by the eval's adversarial checker on the first full
+             Example 1 run (backend/eval/results/2026-11-22T18-45-22), checked
+             by Samantha with Claude
+  Steps:     plan cs-bs-general-track with EBGN321 in Spring 2028, after
+             51 credits, then call check_plan
+  Actual:    no flag. The catalog's course entry
+             (data/Academic Catalog/mines-courses.csv) has no prerequisite;
+             the rule is only in the degree table note of every bachelor's
+             PDF, e.g. data/Undergraduate Programs/Computer Science/
+             Computer Science.pdf p. 2: "EBGN321 was added to the core, but
+             has a prerequisite of 60 credit hours"
+  Expected:  a broken_prerequisite flag when EBGN321 is planned before the
+             student has 60 credits completed or planned in earlier
+             semesters
+  Fix idea:  a Requirement type such as {"type": "credits_completed",
+             "min": 60}, checked by the validator against the credits before
+             that semester; set it on EBGN321 (and any other course with a
+             credit-hour prerequisite in its catalog text)
+
+BUG-041  Equivalent courses both count (MATH213 and MATH223)
+  Status:    Open
+  Owner:     Midhat Sajad (validator, data format)
+  Where:     validator.py; data/json/courses.json (no equivalence field);
+             the "Equivalent with ..." text is at the start of many course
+             descriptions in data/Academic Catalog/mines-courses.csv
+  Found:     2026-11-22 by the eval's adversarial checker on the first full
+             Example 1 run (backend/eval/results/2026-11-22T18-45-22), checked
+             by Samantha with Claude
+  Steps:     plan cs-bs-general-track with both MATH213 and MATH223 (the
+             honors Calculus III), then call check_plan
+  Actual:    MATH213 fills the required course and MATH223 counts as 4
+             free-elective credits; the plan passes at 129 credits, though
+             without the duplicate it has 125 of 128
+  Expected:  only one of a set of equivalent courses counts toward the
+             degree; a flag for the duplicate
+  Fix idea:  an optional "equivalent_with" list on Course, filled by the
+             converter from the "Equivalent with X, Y" description prefix;
+             the validator counts at most one course of each equivalent set

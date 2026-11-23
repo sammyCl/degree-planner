@@ -16,8 +16,8 @@
   },
   "also_must": [
     {"type": "max_semester_credits", "limit": 18},
-    {"type": "course_in_semester", "code": "CSCI370", "semester": "Fall 2029",
-     "why": "The flowchart puts CSCI370 in the summer after junior year; with no summers it goes in Senior Fall."},
+    {"type": "course_in_semester", "code": "CSCI370", "semesters": ["Spring 2029", "Fall 2029"],
+     "why": "The flowchart puts CSCI370 in the summer after junior year; with no summers it goes in the semester on either side of that summer (changed from Fall 2029 only on 2026-11-22: the agent is not told a preference, and the catalog gives none)."},
     {"type": "not_planned", "codes": ["HNRS105", "HNRS115"],
      "why": "Not a Thorson student, so the first-year core is HASS100 and EDNS151."},
     {"type": "flowchart_match", "tolerance": 1, "min_matched": 20,
