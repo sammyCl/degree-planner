@@ -54,6 +54,53 @@ def _exception_labels(requirement: Requirement | None) -> list[str]:
 
 
 _ADD_ON_LEVELS = ("minor", "asi")
+# 2026-2027 undergraduate catalog (forms-policies.json, policy-minor-requirements and
+# policy-asi-requirements): at least 9 credits of a minor or ASI not used for any other part of
+# the degree except free electives.
+ADD_ON_UNSHARED_MIN = 9.0
+
+
+def _unshared_credits(
+    add_on: Program, degree_parts: list[Program], have: set[str], credits: dict[str, float]
+) -> tuple[float, list[str]]:
+    """Credits filling the minor or ASI that the degree does not also need, read in the student's
+    favor because a plan does not say which course fills which group:
+    - a course is shared when a degree part needs it: it is in an "all" group, or in a listed
+      choose group the plan's other courses do not already fill (a group with no list is free
+      electives, which may be shared);
+    - the add-on is filled group by group, unshared courses first, whole courses, up to each
+      group's credits; a group with no list takes any course not already counted for it.
+    Returns the unshared credits and the shared courses used."""
+    degree_all = {c for part in degree_parts for g in part.requirement_groups if g.kind == "all" for c in g.courses or []}
+
+    def is_shared(code: str) -> bool:
+        if code in degree_all:
+            return True
+        for part in degree_parts:
+            for g in part.requirement_groups:
+                if g.kind != "all" and g.courses and code in g.courses:
+                    others = sum(credits.get(c, 0.0) for c in g.courses if c in have and c != code and c not in degree_all)
+                    if others < (g.credits_required or 0.0):
+                        return True
+        return False
+
+    used: dict[str, bool] = {}
+    for group in add_on.requirement_groups:
+        if group.kind == "all":
+            for code in group.courses or []:
+                if code in have:
+                    used.setdefault(code, is_shared(code))
+            continue
+        pool = sorted(c for c in (group.courses or sorted(have)) if c in have and c not in used)
+        pool.sort(key=is_shared)  # unshared first; sort is stable, so code order otherwise
+        earned = 0.0
+        for code in pool:
+            if earned >= (group.credits_required or 0.0):
+                break
+            used[code] = is_shared(code)
+            earned += credits.get(code, 0.0)
+    unshared = sum(credits.get(c, 0.0) for c, shared in used.items() if not shared)
+    return unshared, sorted(c for c, shared in used.items() if shared)
 
 
 def _equivalents(connection: sqlite3.Connection, code: str, catalog_year: str) -> list[str]:
@@ -270,6 +317,34 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                         False,
                     )
                 available -= claimed
+
+    # Every minor and ASI: at least 9 of its credits not used for any other part of the degree
+    # except free electives (BUG-036; policy-minor-requirements and policy-asi-requirements).
+    if has_degree:
+        degree_parts: list[Program] = []
+        for program in loaded:
+            if program.degree_level in _ADD_ON_LEVELS:
+                continue
+            if program.combines:
+                for component_id in program.combines:
+                    try:
+                        degree_parts.append(get_program(connection, component_id, catalog_year))
+                    except NotFoundError:
+                        continue
+            else:
+                degree_parts.append(program)
+        for add_on in (p for p in loaded if p.degree_level in _ADD_ON_LEVELS):
+            unshared, shared = _unshared_credits(add_on, degree_parts, plan_codes, code_credits)
+            if unshared < ADD_ON_UNSHARED_MIN:
+                add_flag(
+                    "requirement_unmet",
+                    "error",
+                    None,
+                    f"{add_on.name}: only {unshared:g} of its credits are not also used for the degree "
+                    f"(shared: {', '.join(shared) or 'none'}); at least {ADD_ON_UNSHARED_MIN:g} must not be, "
+                    "except free electives.",
+                    False,
+                )
 
     total_credits = sum(semester.total_credits for semester in semesters) + sum(
         completed.credits for completed in student.completed_courses

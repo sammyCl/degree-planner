@@ -724,7 +724,7 @@ BUG-035  Combined Mining BS+MS total is 152 credits, but its parts add to 155
              Example 5
 
 BUG-036  The minor rule "at least 9 credits not used elsewhere" is never checked
-  Status:    Open
+  Status:    Fixed
   Owner:     Midhat Sajad (validator); Abdallah Salhi (minors data)
   Where:     backend/src/degree_planner_backend/validator.py (double counting
              across programs); data/json/minors.json (no double_counts_with
@@ -748,6 +748,14 @@ BUG-036  The minor rule "at least 9 credits not used elsewhere" is never checked
   Fix idea:  a validator check for every minor and ASI that applies the
              policy rule directly (rather than a hand-written
              double_counts_with per minor), with a new flag type
+  Fixed in:  branch agent/eval-examples (Samantha with Claude, to be agreed
+             with Midhat and Abdallah before merging): validator.py checks
+             every minor and ASI on a plan that has a degree program, with a
+             requirement_unmet error when fewer than 9 of its credits are not
+             also needed by the degree (free electives excepted), read in the
+             student's favor as the eval's minor_unshared_credits check does.
+             The data needs no change. Covered by
+             tests/test_validator_minor_overlap.py
 
 BUG-037  Validator adds program totals, so a major + minor needs too many credits
   Status:    Fixed
