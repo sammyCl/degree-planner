@@ -26,6 +26,8 @@ OUT = ROOT / "data" / "json" / "courses.json"
 DROPPED = ROOT / "data" / "json" / "courses.dropped-info.csv"  # CSV, not JSON: the loader reads every .json under data/
 REVIEW = ROOT / "data" / "json" / "courses.REVIEW.md"
 CATALOG_YEAR = "2026-2027"
+# Credits for every course titled "Independent Study" (variable 0.5-6 or 1-6 in the catalog); see build().
+INDEPENDENT_STUDY_CREDITS = 3.0
 
 SMALL = {"and", "or", "of", "the", "in", "for", "to", "a", "an", "on", "at", "by", "with", "from", "as"}
 ACRONYMS = {
@@ -122,7 +124,13 @@ def build() -> tuple[list[dict], dict[str, list[str]], Counter]:
         code = r["course_number"].strip()
         subject = r["subject"].strip()
         cr, ranged = credits(r["credits"])
-        if ranged:
+        if "INDEPENDENT STUDY" in r["course_name"].upper():
+            # Team decision (Samantha, 2026-11-22): plan Independent Study at a typical 3 credits rather than the
+            # range's upper bound (6), until a plan can choose the credits (BUG-039).
+            cr = INDEPENDENT_STUDY_CREDITS
+            stats["independent study (set to 3 credits)"] += 1
+            notes["independent study"].append(f"{code}: {r['credits']} -> {cr:g}")
+        elif ranged:
             stats["credit ranges (upper bound used)"] += 1
             notes["credit ranges"].append(f"{code}: {r['credits']} -> {cr:g}")
         pre = parse_prerequisites(r["prerequisites"])
@@ -194,6 +202,7 @@ def write_review(notes: dict[str, list[str]], stats: Counter) -> None:
         "conflicts": "Duplicate codes whose CSV rows disagree (undergraduate row kept)",
         "empty prerequisites": "Prerequisite text that produced no requirement",
         "credit ranges": "Variable-credit courses (upper bound used)",
+        "independent study": "Independent Study courses (set to 3 credits, not the upper bound)",
     }
     for key, title in caps.items():
         items = notes.get(key, [])

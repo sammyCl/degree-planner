@@ -89,12 +89,22 @@ def test_required_courses_are_not_also_electives(programs: list[Program]) -> Non
                 assert overlap == set(), f"{p.program_id}/{g.group_id}: {sorted(overlap)}"
 
 
+# Groups that cannot be met yet from one pass through their list, because Independent Study is stored as 3 credits
+# (data/CONFLICT-LOG.md, Course catalog) and a plan can neither take it twice (BUG-027) nor choose its credits
+# (BUG-039). QBE Honors needs 6 credits of BIOL499 over two semesters. Remove an entry once those bugs are fixed.
+KNOWN_UNMEETABLE_GROUPS = {("qbe-bs-honors", "honors-research")}
+
+
 def test_choose_groups_can_be_met_from_their_lists(programs: list[Program], course_credits: dict[str, float]) -> None:
     for p in programs:
         for g in p.requirement_groups:
             if g.kind == "choose_credits" and g.courses:
                 available = sum(course_credits[c] for c in g.courses)
-                assert available >= (g.credits_required or 0.0), f"{p.program_id}/{g.group_id}"
+                if (p.program_id, g.group_id) in KNOWN_UNMEETABLE_GROUPS:
+                    # Fails once the group can be met, so the exception is not left behind after the fix.
+                    assert available < (g.credits_required or 0.0), f"{p.program_id}/{g.group_id} can be met now; remove it from KNOWN_UNMEETABLE_GROUPS"
+                else:
+                    assert available >= (g.credits_required or 0.0), f"{p.program_id}/{g.group_id}"
 
 
 def test_success_wellness_matches_the_registrar_table(programs: list[Program], course_credits: dict[str, float]) -> None:

@@ -695,3 +695,123 @@ BUG-034  create_plan and update_plan never run the validator before saving
              test_check_plan_ignores_an_unknown_program_instead_of_crashing /
              test_check_plan_ignores_a_combined_program_s_unloaded_component
              in test_validator.py.
+
+BUG-035  Combined Mining BS+MS total is 152 credits, but its parts add to 155
+  Status:    Open
+  Owner:     Midhat Sajad (data: graduate and combined)
+  Where:     data/json/graduate-programs.json (mining-bs-ms-combined,
+             total_credits_required)
+  Found:     2026-11-22 by Samantha with Claude, defining Example 3 for the
+             local example eval; not yet checked against the catalog page
+  Steps:     read total_credits_required for mining-bs (data/json/
+             bachelors.json), mining-ms and mining-bs-ms-combined (data/json/
+             graduate-programs.json), and mining-ms's double_counts_with
+             entry for mining-bs
+  Actual:    mining-bs 131, mining-ms 30, shared_credit_limit 6, combined
+             152. 131 + 30 - 6 = 155, so the combined total is 3 credits
+             short of its parts. CONFLICT-LOG.md does not say where 152 came
+             from
+  Expected:  the combined total matches the catalog; if the catalog says 155
+             (or the parts are wrong instead), the numbers agree. Until then
+             a 152-154 credit plan can pass the validator while being short
+             of the two degrees
+  Fix idea:  check the Mining Engineering combined BS/MS page in the
+             2026-2027 Graduate Catalog (page 171 has the 6-credit
+             double-count rule) and fix whichever number is wrong
+  Also:      cs-bs-ms-combined has the opposite problem: 154 credits, but
+             cs-bs-general-track 128 + cs-ms-non-thesis-project-track 30 - 6
+             shared (CSCI561, CSCI564) = 152. Found the same day defining
+             Example 5
+
+BUG-036  The minor rule "at least 9 credits not used elsewhere" is never checked
+  Status:    Open
+  Owner:     Midhat Sajad (validator); Abdallah Salhi (minors data)
+  Where:     backend/src/degree_planner_backend/validator.py (double counting
+             across programs); data/json/minors.json (no double_counts_with
+             on any minor); data/json/forms-policies.json
+             (policy-minor-requirements, text only)
+  Found:     2026-11-22 by Samantha with Claude, defining Example 4 (AMS CAM
+             BS + CS minor) for the local example eval; read from the code
+             and data, not yet reproduced with a plan
+  Steps:     plan ams-bs-cam + computer-science-minor where the minor is
+             filled by CSCI200, MATH334, MATH307 and CSCI220, all of which
+             also fill AMS requirements (required courses and the Computing
+             Elective), then call check_plan
+  Actual:    each program is checked on its own; the only cross-program
+             limit is double_counts_with, which the CS minor does not have,
+             so 12 shared credits raise no flag
+  Expected:  a flag when fewer than 9 of the minor's credits are left
+             after taking out credits that fill another program's
+             requirements other than free electives (2026-2027
+             undergraduate catalog, Degree Information and Graduation
+             Information; the same rule applies to ASIs)
+  Fix idea:  a validator check for every minor and ASI that applies the
+             policy rule directly (rather than a hand-written
+             double_counts_with per minor), with a new flag type
+
+BUG-037  Validator adds program totals, so a major + minor needs too many credits
+  Status:    Open
+  Owner:     Midhat Sajad (validator)
+  Where:     backend/src/degree_planner_backend/validator.py
+             (total_credits_required summed over student.programs)
+  Found:     2026-11-22 by Samantha with Claude, defining Example 4; read
+             from the code, not yet reproduced with a plan
+  Steps:     check a plan for ams-bs-cam (120) + computer-science-minor (18)
+  Actual:    total_credits_required is 138, and the agent loop answers
+             cannot_work below that, although shared courses (up to 9
+             credits for a minor, and minor courses used as free electives)
+             mean the real minimum is lower
+  Expected:  the required total counts shared credits once, so a plan that
+             meets both programs with the fewest courses is not rejected
+  Fix idea:  compute the total from the credits actually used, with shared
+             credits counted once up to the double-count rules (combined
+             programs already do this through their own total)
+
+BUG-038  The Thorson swap accepts a mix of the core and honors courses
+  Status:    Open
+  Owner:     Midhat Sajad (data format, validator)
+  Where:     docs/data-format.md (group kinds), validator.py; the stand-in is
+             the first-year-core group in data/json/bachelors.json, built by
+             data/tools/build_bachelors_json.py (thorson())
+  Found:     2026-11-22 by Samantha with Claude, fixing Thorson for Example 5;
+             a known limit of the stand-in, not yet reproduced with a plan
+  Steps:     plan cs-bs-general-track with HASS100 and HNRS105 (and not
+             EDNS151 or HNRS115), then call check_plan
+  Actual:    first-year-core is "6 credits from HASS100, EDNS151, HNRS105,
+             HNRS115", so HASS100 + HNRS105 meets it
+  Expected:  only HASS100 + EDNS151, or HNRS105 + HNRS115 (Thorson policy in
+             forms-policies.json: if either HNRS course is dropped, the
+             student takes HASS100 and EDNS151)
+  Fix idea:  a group kind that holds a requirement expression, like
+             prerequisites already use: OR(AND(HASS100, EDNS151),
+             AND(HNRS105, HNRS115)); the validator already evaluates these
+             for prerequisites. Then thorson() writes that group instead
+
+BUG-039  A plan cannot choose the credits of a variable-credit course
+  Status:    Open (kept on purpose as a test for plan editing)
+  Owner:     Samantha Clapp (check_plan/build_plan in agent/tools.py);
+             Midhat Sajad (validator, plan format); Abdallah Salhi (course
+             data converter, and editing a plan in the UI)
+  Where:     backend/src/degree_planner_backend/agent/tools.py (build_plan
+             takes credits from the catalog); data/json/courses.json
+             (credits_min/credits_max never filled in)
+  Found:     2026-11-22 by Samantha with Claude, defining Example 5
+  Steps:     look up CSCI599 (catalog: 0.5-6 credits), then try to plan it
+             at 1.5 credits with check_plan
+  Actual:    check_plan takes course codes only; every course gets the
+             catalog's single credits value. Independent Study is set to 3
+             credits as a stand-in (CONFLICT-LOG.md, Course catalog); other
+             variable-credit courses use the range's upper bound
+  Expected:  a plan (from the agent, or the student editing it on the
+             planner page) can set the credits of a variable-credit course
+             within its range, and the validator checks the amount
+  Fix idea:  fill credits_min/credits_max from the CSV ranges in
+             build_courses_json.py; let check_plan take {code, credits} for
+             a ranged course; flag an amount outside the range. Use this as
+             a test case when the plan-editing parts are built
+  Also:      with Independent Study at 3 credits, two programs cannot be met:
+             qbe-bs-honors (honors-research: 6 credits of BIOL499) and
+             chemistry-ms (independent_study: 6 credits of CHGN699). The
+             first is a known exception in test_choose_groups_can_be_met_
+             from_their_lists (tests/test_bachelors_data.py); the graduate
+             data tests have no such check

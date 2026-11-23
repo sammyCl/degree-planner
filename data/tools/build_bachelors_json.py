@@ -111,6 +111,26 @@ def P(program_id, name, total, groups):
     return {"program_id": program_id, "name": name, "total": total, "groups": groups}
 
 
+# Thorson First-Year Honors: HNRS105 + HNRS115 replace HASS100 + EDNS151 for all majors (policy-thorson-first-year-
+# honors in forms-policies.json). The format has no "this pair or that pair" group, so the two core courses move out
+# of the required list into one 6-credit choice of the four. It also accepts a mix such as HASS100 + HNRS105, which
+# the policy does not allow; the exact rule needs a new group kind (BUG-038).
+THORSON_PAIR = ("HASS100", "EDNS151")
+THORSON_OPTIONS = ["HASS100", "EDNS151", "HNRS105", "HNRS115"]
+
+
+def thorson(groups):
+    """Move HASS100 and EDNS151 out of the "all" group that lists both into a choice that also takes the Thorson
+    courses, placed right after that group. Returns the new groups, or None when no group lists both."""
+    for k, grp in enumerate(groups):
+        if grp["kind"] == "all" and all(c in grp.get("courses", []) for c in THORSON_PAIR):
+            kept = dict(grp, courses=[c for c in grp["courses"] if c not in THORSON_PAIR])
+            choice = PICK("first-year-core", "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+                          6, list(THORSON_OPTIONS))
+            return groups[:k] + [kept, choice] + groups[k + 1:]
+    return None
+
+
 # ---------------------------------------------------------------- shared core pieces
 
 def cas_groups(x, mid_credits=6, upper_credits=3):
@@ -1089,6 +1109,12 @@ def main():
     for pdf_name, spec in SPECS:
         x = Ctx(pdf_name, courses)
         for p in spec(x):
+            swapped = thorson(p["groups"])
+            if swapped is None:
+                review.append("- **%s**: no required group lists both HASS100 and EDNS151, so the Thorson substitution "
+                              "was not applied." % p["name"])
+            else:
+                p = dict(p, groups=swapped)
             programs.append({
                 "program_id": p["program_id"],
                 "name": p["name"],
