@@ -1,0 +1,30 @@
+{
+  "id": 2,
+  "name": "General EE master's with transfer credits",
+  "difficulty": "simple",
+  "request": {
+    "student": {
+      "degree_level": "master",
+      "programs": ["ee-ms"],
+      "catalog_year": "2026-2027",
+      "completed_courses": [
+        {"code": "EENG509", "credits": 3.0, "term": "transfer", "transfer_from": "Front Range State University"},
+        {"code": "EENG510", "credits": 3.0, "term": "transfer", "transfer_from": "Front Range State University"}
+      ]
+    },
+    "semesters": 4,
+    "start_term": "Fall 2026",
+    "include_summers": false,
+    "overrides": []
+  },
+  "also_must": [
+    {"type": "max_semester_credits", "limit": 15,
+     "why": "2026-2027 Graduate Catalog, p. 8: up to 15 credits a semester without extra approval."},
+    {"type": "completed_not_planned",
+     "why": "EENG509 and EENG510 are filled by the transfer credits."},
+    {"type": "planned_credits", "equals": 24,
+     "why": "30 credits for the MS minus the 6 transfer credits; with the validator's total check, this means the transfer credits count."},
+    {"type": "in_every_semester", "code": "EENG500",
+     "why": "Graduate Seminar, required every fall and spring."}
+  ]
+}

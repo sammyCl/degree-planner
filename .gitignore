@@ -13,3 +13,7 @@ summaries/
 
 # Team proposal, kept out of the public repo
 Group 9_Project 4_Proposal.pdf
+
+# Local example eval: Example 5's input and the run results stay off GitHub
+backend/eval/examples/private/
+backend/eval/results/
