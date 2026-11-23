@@ -58,7 +58,7 @@ Today is Thu Nov 12. Dates marked "target" are our own; the others come from the
 |---|---|---|---|---|---|
 | Stack decision | Decide stack (Python version, package manager, web framework, frontend approach, database) and record in DECISIONS.md and CLAUDE.md. Gotcha: `uv run` fails in paths with a colon; this repo path has none | P0 | Nov 13 | | [x] |
 | Five examples | Agree the five examples' exact inputs and "right output" and where they live in the repo (Samantha writes them up; everyone reviews) | P0 | Nov 13 | | [ ] |
-| Catalog sources | Choose catalog sources (Mines online catalog pages, department pages, forms) and decide scrape vs. export vs. giving the agent pages directly | P0 | Nov 13 | | [ ] |
+| Catalog sources | Choose catalog sources (Mines online catalog pages, department pages, forms) and decide scrape vs. export vs. giving the agent pages directly | P0 | Nov 13 | | [x] |
 | User conversation | Write up the real-user conversation (who, role, what it costs them today, their words) and confirm Nov 20 and Nov 24 dates with the user | P0 | Nov 16 | | [ ] |
 | Presentation day | Confirm which presentation day (Dec 3 or Dec 8) | P1 | Nov 16 | | [ ] |
 | Integration day | Integration day: run the whole path on Example 1, fix seams | P0 | Nov 20 | Lookups, API endpoints, Agent loop, Connect setup to backend | [ ] |
@@ -118,3 +118,4 @@ The proposal text lists different cut orders (one major and one minor only; then
 
 - 2026-11-12: Plans created from the proposal and README. No tasks started in these plans yet.
 - 2026-11-13: Stack decision done (Midhat): Python 3.12, `uv`, FastAPI, SQLite. Recorded in DECISIONS.md and CLAUDE.md (PR #7).
+- 2026-11-23: Catalog sources done (Midhat, team agreed): one-time export and hand-reviewed conversion, not a live or scheduled scraper, and not giving the agent raw catalog pages directly; matches what all three data slices were already built as. Unblocks Catalog scraper in BACKEND-PLAN.md (the existing one-time `load-data` loader already satisfies it). Decision write-up given to the team to copy into DECISIONS.md.
