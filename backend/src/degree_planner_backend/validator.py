@@ -53,6 +53,9 @@ def _exception_labels(requirement: Requirement | None) -> list[str]:
     return [label for sub in requirement.of for label in _exception_labels(sub)]
 
 
+_ADD_ON_LEVELS = ("minor", "asi")
+
+
 def _equivalents(connection: sqlite3.Connection, code: str, catalog_year: str) -> list[str]:
     """Courses the catalog calls equivalent to code (BUG-041); [] for a code not in the catalog."""
     try:
@@ -180,13 +183,20 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
             False,
         )
 
-    total_credits_required = 0.0
+    # A minor or ASI adds no credit total of its own on top of a degree (BUG-037): its groups make
+    # sure its courses are planned, and its courses may also be the degree's free electives. Its
+    # total counts only when the student has no degree program.
+    loaded = []
     for program_id in student.programs:
         try:
-            program = get_program(connection, program_id, catalog_year)
+            loaded.append(get_program(connection, program_id, catalog_year))
         except NotFoundError:
             continue
-        total_credits_required += program.total_credits_required
+    has_degree = any(p.degree_level not in _ADD_ON_LEVELS for p in loaded)
+    total_credits_required = 0.0
+    for program in loaded:
+        if not (has_degree and program.degree_level in _ADD_ON_LEVELS):
+            total_credits_required += program.total_credits_required
 
         requirement_programs: list[Program]
         if program.combines:

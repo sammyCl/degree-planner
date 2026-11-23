@@ -750,7 +750,7 @@ BUG-036  The minor rule "at least 9 credits not used elsewhere" is never checked
              double_counts_with per minor), with a new flag type
 
 BUG-037  Validator adds program totals, so a major + minor needs too many credits
-  Status:    Open
+  Status:    Fixed
   Owner:     Midhat Sajad (validator)
   Where:     backend/src/degree_planner_backend/validator.py
              (total_credits_required summed over student.programs)
@@ -766,6 +766,15 @@ BUG-037  Validator adds program totals, so a major + minor needs too many credit
   Fix idea:  compute the total from the credits actually used, with shared
              credits counted once up to the double-count rules (combined
              programs already do this through their own total)
+  Also:      reproduced on Example 5 (backend/eval/results/2026-11-22T22-00-55):
+             with the semester caps the agent planned 161 credits, short of
+             the 172 (154 + the minor's 18) the validator asked for
+  Fixed in:  branch agent/eval-examples (Samantha with Claude, to be agreed
+             with Midhat before merging): a minor's or ASI's total no longer
+             adds to a degree's; it counts only when the student has no
+             degree program. The minor's courses are still required by its
+             groups, and how many may overlap the major is BUG-036 (still
+             open). Covered by tests/test_validator_totals.py
 
 BUG-038  The Thorson swap accepts a mix of the core and honors courses
   Status:    Open
