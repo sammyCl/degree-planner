@@ -61,15 +61,17 @@ A bachelor's, master's, PhD, minor, or ASI. A combined BS+MS is its own program 
 
 ### Requirement group
 
-One row of the requirements table: either a fixed list a student must all take, or an elective choice.
+One row of the requirements table: either a fixed list a student must all take, an elective choice,
+or a logical rule over courses.
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | `group_id` | string | yes | unique within the program |
 | `label` | string | yes | e.g. `"Math and Science"` |
-| `kind` | string | yes | `all` (take every course listed) or `choose_credits` (take enough of the listed courses, or any course if `courses` is omitted, to reach `credits_required`) |
-| `courses` | array of course codes | no | omit for "any course counts" electives |
-| `credits_required` | number | required if `kind` is `choose_credits` | |
+| `kind` | string | yes | `all` (take every course listed), `choose_credits` (take enough of the listed courses, or any course if `courses` is omitted, to reach `credits_required`), or `requirement` (the group is met only when `requirement` resolves true; for a rule a flat list or credit count can't express, such as "this pair of courses, or that pair, never a mix") |
+| `courses` | array of course codes | no | omit for "any course counts" electives; for `requirement`, may still list every course the expression mentions (for display and catalog checks), but the validator decides whether the group is met from `requirement`, not this list |
+| `credits_required` | number | required if `kind` is `choose_credits` or `requirement` | for `requirement`, a nominal credit count for bookkeeping only (e.g. so a printed program total adds up), not what the validator checks |
+| `requirement` | Requirement | required if `kind` is `requirement` | same shape as a course's `prerequisites`/`corequisites` (see **Requirement expressions**), e.g. `{"type": "OR", "of": [{"type": "AND", "of": [course A, course B]}, {"type": "AND", "of": [course C, course D]}]}` for "A and B, or C and D" |
 | `every_semester` | boolean | no | only meaningful when `kind` is `all`; the listed course(s) must be planned in every fall and spring semester of the plan, not just once anywhere (e.g. a 0-credit graduate seminar required each term). Default `false` |
 
 ### Combined and double-counted credits

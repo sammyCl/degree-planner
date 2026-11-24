@@ -54,6 +54,29 @@ def _course_codes(requirement: Requirement | None) -> list[str]:
     return [code for sub in requirement.of for code in _course_codes(sub)]
 
 
+def _satisfied_branch(requirement: Requirement, satisfied_codes: set[str]) -> list[str] | None:
+    """The course codes of one combination requirement describes that satisfied_codes meets (the
+    first OR branch that works, every course of an AND), or None if no combination does (BUG-038:
+    a "requirement" group, e.g. the Thorson swap, is met by one specific pair, never a mix)."""
+    if requirement.type == "course":
+        return [requirement.code] if requirement.code in satisfied_codes else None
+    if requirement.type == "exception":
+        return []
+    if requirement.type == "AND":
+        codes: list[str] = []
+        for sub in requirement.of:
+            sub_codes = _satisfied_branch(sub, satisfied_codes)
+            if sub_codes is None:
+                return None
+            codes.extend(sub_codes)
+        return codes
+    for sub in requirement.of:  # OR
+        sub_codes = _satisfied_branch(sub, satisfied_codes)
+        if sub_codes is not None:
+            return sub_codes
+    return None
+
+
 def _exception_labels(requirement: Requirement | None) -> list[str]:
     if requirement is None or requirement.type == "course":
         return []
@@ -318,15 +341,18 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                         False,
                     )
 
-            # A course counts toward at most one group of this program (BUG-025): "all" groups
-            # claim their fixed courses first, then choose_credits groups with an explicit list,
-            # in the order they're declared, then choose_credits groups with no list (free
-            # electives) take whatever is left. Cross-program double counting is unaffected;
-            # that's double_counts_with's job, above.
+            # A course counts toward at most one group of this program (BUG-025): "all" groups and
+            # "requirement" groups (BUG-038) claim their courses first, then choose_credits groups
+            # with an explicit list, in the order they're declared, then choose_credits groups with
+            # no list (free electives) take whatever is left. Cross-program double counting is
+            # unaffected; that's double_counts_with's job, above.
             available = set(plan_codes)
             all_groups = [g for g in req_program.requirement_groups if g.kind == "all"]
-            choose_with_list = [g for g in req_program.requirement_groups if g.kind != "all" and g.courses]
-            choose_without_list = [g for g in req_program.requirement_groups if g.kind != "all" and not g.courses]
+            requirement_groups_kind = [g for g in req_program.requirement_groups if g.kind == "requirement"]
+            choose_with_list = [g for g in req_program.requirement_groups if g.kind == "choose_credits" and g.courses]
+            choose_without_list = [
+                g for g in req_program.requirement_groups if g.kind == "choose_credits" and not g.courses
+            ]
 
             for group in all_groups:
                 listed = group.courses or []
@@ -357,6 +383,21 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                                 False,
                             )
                 available -= set(listed) | {stand_in[code] for code in listed if code in stand_in}
+
+            for group in requirement_groups_kind:
+                assert group.requirement is not None  # enforced by the model
+                satisfied_codes = plan_codes | set(stand_in.keys())
+                branch = _satisfied_branch(group.requirement, satisfied_codes)
+                if branch is None:
+                    add_flag(
+                        "requirement_unmet",
+                        "error",
+                        None,
+                        f"{req_program.name}: {group.label} needs {_describe(group.requirement)}.",
+                        False,
+                    )
+                else:
+                    available -= set(branch) | {stand_in[code] for code in branch if code in stand_in}
 
             for group in choose_with_list + choose_without_list:
                 candidates = group.courses if group.courses else sorted(available)
