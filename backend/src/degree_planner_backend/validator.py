@@ -8,11 +8,20 @@ by the agent's `check_plan` tool.
 
 from __future__ import annotations
 
+import re
 import sqlite3
 
 from degree_planner_backend.lookups import NotFoundError, get_course, get_program
 from degree_planner_backend.models import Program, Requirement
 from degree_planner_backend.plan_models import Edge, Flag, FlagSeverity, FlagType, Plan, Semester, Summary
+
+_GRADUATE_LEVELS = ("master", "phd")
+
+
+def _course_number(code: str) -> int | None:
+    """The numeric part of a course code (e.g. 562 for "CSCI562"), or None if it has none."""
+    match = re.search(r"\d+", code)
+    return int(match.group()) if match else None
 
 
 def _resolve(requirement: Requirement | None, satisfied_codes: set[str]) -> bool:
@@ -256,6 +265,44 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
         else:
             requirement_programs = [program]
 
+        if program.combines:
+            # A combined-program student is still an undergraduate until the bachelor's part is
+            # done, and may take 700-level credits before then only in a thesis-based master's/PhD
+            # (BUG-044). thesis_based is None (unknown) for most programs on purpose, so this only
+            # fires where the data says the master's/PhD part is known non-thesis.
+            bachelor_part = next((p for p in requirement_programs if p.degree_level == "bachelor"), None)
+            grad_part = next(
+                (p for p in requirement_programs if p.degree_level in _GRADUATE_LEVELS and p.thesis_based is False),
+                None,
+            )
+            if bachelor_part is not None and grad_part is not None:
+                bachelor_codes = {c for g in bachelor_part.requirement_groups for c in (g.courses or [])}
+                bachelor_semesters = [
+                    index
+                    for code in bachelor_codes
+                    if code in plan_codes
+                    for index, _ in code_to_course_ids.get(code, [])
+                ]
+                if bachelor_semesters:
+                    last_bachelor_semester = max(bachelor_semesters)
+                    grad_codes = {c for g in grad_part.requirement_groups for c in (g.courses or [])}
+                    for code in grad_codes:
+                        if code not in plan_codes or (_course_number(code) or 0) < 700:
+                            continue
+                        for index, course_id in code_to_course_ids.get(code, []):
+                            if index <= last_bachelor_semester:
+                                add_flag(
+                                    "ineligible_course",
+                                    "error",
+                                    course_id,
+                                    f"{code} is a 700-level course in {grad_part.name}, a non-thesis "
+                                    f"program; {bachelor_part.name} still has work planned through "
+                                    f"{semesters[last_bachelor_semester].label}. Combined-program "
+                                    "undergraduates may take 700-level credits only in a thesis-based "
+                                    "program.",
+                                    False,
+                                )
+
         for req_program in requirement_programs:
             for double_count in req_program.double_counts_with:
                 shared_used = sum(
@@ -296,6 +343,13 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
 
             for group in choose_with_list + choose_without_list:
                 candidates = group.courses if group.courses else sorted(available)
+                # A graduate-degree elective group with no fixed course list still can't be filled
+                # by an undergraduate-level course (BUG-043): the Graduate Catalog says
+                # undergraduate courses don't count toward a graduate degree's requirements. A
+                # group that does list its courses is trusted as-is (e.g. a combined program's
+                # project group may deliberately list a 700-level course for a master's student).
+                if not group.courses and req_program.degree_level in _GRADUATE_LEVELS:
+                    candidates = [code for code in candidates if (_course_number(code) or 0) >= 500]
                 credits_required = group.credits_required or 0.0
                 earned = 0.0
                 claimed: set[str] = set()

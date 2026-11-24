@@ -64,7 +64,7 @@ What the validator found wrong, attached to a specific course placement so the f
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | `flag_id` | string | yes | |
-| `type` | string | yes | `broken_prerequisite`, `credit_shortfall`, `requirement_unmet`, `double_count_exceeded`, `exception_claimed` |
+| `type` | string | yes | `broken_prerequisite`, `credit_shortfall`, `requirement_unmet`, `double_count_exceeded`, `exception_claimed`, `ineligible_course` |
 | `severity` | string | yes | `error` (the plan is invalid) or `warning` (needs the student's attention but is not by itself invalid, e.g. a claimed exception) |
 | `course_id` | course_id \| null | yes | `null` for a plan-wide flag like `requirement_unmet` |
 | `message` | string | yes | shown to the student as-is |

@@ -89,6 +89,10 @@ class Program(BaseModel):
     requirement_groups: list[RequirementGroup]
     combines: list[str] = Field(default_factory=list)
     double_counts_with: list[DoubleCount] = Field(default_factory=list)
+    # Only meaningful for degree_level "master"/"phd" (BUG-044): a combined-program undergraduate
+    # may take 700-level credits only if the master's/PhD part is thesis-based. None means unknown,
+    # so the validator does not flag it rather than guess.
+    thesis_based: bool | None = None
 
 
 class Form(BaseModel):
