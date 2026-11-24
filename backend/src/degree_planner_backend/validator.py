@@ -16,6 +16,11 @@ from degree_planner_backend.models import Program, Requirement
 from degree_planner_backend.plan_models import Edge, Flag, FlagSeverity, FlagType, Plan, Semester, Summary
 
 _GRADUATE_LEVELS = ("master", "phd")
+# 2026-2027 Graduate Catalog: up to 15 credits a semester without extra approval for a graduate
+# student; 18 for an undergraduate (BUG-026a). The same numbers the agent's planner.md already
+# tells the model to count for itself, since check_plan didn't check this until now.
+_SEMESTER_CREDIT_LIMIT_GRADUATE = 15.0
+_SEMESTER_CREDIT_LIMIT_UNDERGRAD = 18.0
 
 
 def _course_number(code: str) -> int | None:
@@ -77,12 +82,22 @@ def _satisfied_branch(requirement: Requirement, satisfied_codes: set[str]) -> li
     return None
 
 
-def _exception_labels(requirement: Requirement | None) -> list[str]:
+def _needed_exception_labels(requirement: Requirement | None, satisfied_codes: set[str]) -> list[str]:
+    """Exception labels actually relied on to satisfy requirement (BUG-026d): an OR branch that
+    needs an exception isn't flagged once a sibling branch is already satisfied by a plain course
+    (OR(CSCI100, exception) with CSCI100 taken shouldn't raise exception_claimed). Every branch of
+    an AND is still needed regardless. If nothing resolves, every branch is shown (broken_
+    prerequisite is flagged separately; this lists what would clear it)."""
     if requirement is None or requirement.type == "course":
         return []
     if requirement.type == "exception":
         return [requirement.label]
-    return [label for sub in requirement.of for label in _exception_labels(sub)]
+    if requirement.type == "AND":
+        return [label for sub in requirement.of for label in _needed_exception_labels(sub, satisfied_codes)]
+    for sub in requirement.of:  # OR: the first branch that resolves is the one relied on
+        if _resolve(sub, satisfied_codes):
+            return _needed_exception_labels(sub, satisfied_codes)
+    return [label for sub in requirement.of for label in _needed_exception_labels(sub, satisfied_codes)]
 
 
 _ADD_ON_LEVELS = ("minor", "asi")
@@ -208,7 +223,7 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                     _, from_id = min(candidates, key=lambda pair: pair[0])
                     edges.append(Edge(**{"from": from_id, "to": course.course_id}))
 
-            for label in _exception_labels(requirement):
+            for label in _needed_exception_labels(requirement, satisfied_before):
                 add_flag(
                     "exception_claimed",
                     "warning",
@@ -273,6 +288,10 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
             continue
     has_degree = any(p.degree_level not in _ADD_ON_LEVELS for p in loaded)
     total_credits_required = 0.0
+    # The first semester after a combined program's bachelor's part is done (BUG-026a: that's also
+    # when the per-semester credit limit switches from undergraduate to graduate), or None if the
+    # student isn't in a combined program or hasn't planned any of the bachelor's required courses.
+    combined_boundary_semester: int | None = None
     for program in loaded:
         if not (has_degree and program.degree_level in _ADD_ON_LEVELS):
             total_credits_required += program.total_credits_required
@@ -298,7 +317,7 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                 (p for p in requirement_programs if p.degree_level in _GRADUATE_LEVELS and p.thesis_based is False),
                 None,
             )
-            if bachelor_part is not None and grad_part is not None:
+            if bachelor_part is not None:
                 bachelor_codes = {c for g in bachelor_part.requirement_groups for c in (g.courses or [])}
                 bachelor_semesters = [
                     index
@@ -308,23 +327,25 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                 ]
                 if bachelor_semesters:
                     last_bachelor_semester = max(bachelor_semesters)
-                    grad_codes = {c for g in grad_part.requirement_groups for c in (g.courses or [])}
-                    for code in grad_codes:
-                        if code not in plan_codes or (_course_number(code) or 0) < 700:
-                            continue
-                        for index, course_id in code_to_course_ids.get(code, []):
-                            if index <= last_bachelor_semester:
-                                add_flag(
-                                    "ineligible_course",
-                                    "error",
-                                    course_id,
-                                    f"{code} is a 700-level course in {grad_part.name}, a non-thesis "
-                                    f"program; {bachelor_part.name} still has work planned through "
-                                    f"{semesters[last_bachelor_semester].label}. Combined-program "
-                                    "undergraduates may take 700-level credits only in a thesis-based "
-                                    "program.",
-                                    False,
-                                )
+                    combined_boundary_semester = last_bachelor_semester
+                    if grad_part is not None:
+                        grad_codes = {c for g in grad_part.requirement_groups for c in (g.courses or [])}
+                        for code in grad_codes:
+                            if code not in plan_codes or (_course_number(code) or 0) < 700:
+                                continue
+                            for index, course_id in code_to_course_ids.get(code, []):
+                                if index <= last_bachelor_semester:
+                                    add_flag(
+                                        "ineligible_course",
+                                        "error",
+                                        course_id,
+                                        f"{code} is a 700-level course in {grad_part.name}, a non-thesis "
+                                        f"program; {bachelor_part.name} still has work planned through "
+                                        f"{semesters[last_bachelor_semester].label}. Combined-program "
+                                        "undergraduates may take 700-level credits only in a thesis-based "
+                                        "program.",
+                                        False,
+                                    )
 
         for req_program in requirement_programs:
             for double_count in req_program.double_counts_with:
@@ -429,6 +450,27 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                         False,
                     )
                 available -= claimed
+
+    # No semester over the Mines per-term credit limit (BUG-026a): graduate throughout for a
+    # master's/PhD student, graduate only after the bachelor's part is done for a combined student,
+    # undergraduate otherwise.
+    for index, semester in enumerate(semesters):
+        if student.degree_level in _GRADUATE_LEVELS or (
+            combined_boundary_semester is not None and index > combined_boundary_semester
+        ):
+            limit = _SEMESTER_CREDIT_LIMIT_GRADUATE
+        else:
+            limit = _SEMESTER_CREDIT_LIMIT_UNDERGRAD
+        if semester.total_credits > limit:
+            add_flag(
+                "semester_overload",
+                "error",
+                None,
+                f"{semester.label} has {semester.total_credits:g} credits, over the {limit:g}-credit "
+                f"limit for {'a graduate' if limit == _SEMESTER_CREDIT_LIMIT_GRADUATE else 'an undergraduate'} "
+                "semester.",
+                False,
+            )
 
     # Every minor and ASI: at least 9 of its credits not used for any other part of the degree
     # except free electives (BUG-036; policy-minor-requirements and policy-asi-requirements).

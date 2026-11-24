@@ -363,7 +363,7 @@ BUG-015  Design note: tool errors carry no machine-readable kind
              error in both tools, at the same time as the loop that uses it.
 
 BUG-016  No bachelor's or graduate programs are loaded, only minors and ASIs
-  Status:    Open
+  Status:    Fixed
   Owner:     Samantha Clapp (bachelor's data) and Midhat Sajad (graduate and
              combined data)
   Where:     data/json/ (has minors.json, asis.json, forms-policies.json only)
@@ -380,6 +380,14 @@ BUG-016  No bachelor's or graduate programs are loaded, only minors and ASIs
   Expected:  the programs for the five examples are in data/json
   Fix idea:  part of the Bachelor's data and Graduate data tasks; see also
              BUG-003 (course catalog not loaded).
+  Fixed in:  not marked earlier; found already resolved, 2026-11-24 (Midhat).
+             Stale by the time it was checked: data/json/bachelors.json (44
+             programs, Samantha/Abdallah) and data/json/graduate-programs.json
+             (120 programs, Midhat) both exist and load; `uv run load-data
+             ../data` now reports 164 programs total, including every -bs,
+             -ms and combined program the five examples need. No code change;
+             this was a side effect of the Bachelor's data and Graduate data
+             tasks both landing, just never ticked here.
 
 BUG-017  Form fields are not checked when data is loaded
   Status:    Open
@@ -652,7 +660,7 @@ BUG-025  One course can count toward several requirement groups
 
 BUG-026  Validator gaps: no credit cap per semester, no corequisite check,
          empty "all" groups always met, OR-with-exception still flagged
-  Status:    Open
+  Status:    Open ((a) and (d) are fixed)
   Owner:     Midhat Sajad (validator, data format)
   Where:     backend/src/degree_planner_backend/validator.py, docs/plan-format.md
   Found:     2026-11-19 by check_plan adversarial test agent, reproduced by
@@ -670,6 +678,38 @@ BUG-026  Validator gaps: no credit cap per semester, no corequisite check,
   Fix idea:  one new flag type each for (a) and (b); treat (c) as malformed
              data; only collect exception labels from branches that are
              actually needed.
+  Fixed in:  not yet committed (backend: Midhat), (a) and (d) only, exactly
+             the fix idea above:
+             (a) new "semester_overload" flag type (plan_models.py,
+             docs/plan-format.md); validator.py flags a semester over 18
+             credits (undergraduate) or 15 (graduate; the same numbers
+             planner.md already tells the agent to self-police, "check_plan
+             does not check this" — that comment is now stale). For a
+             combined-program student, the limit becomes 15 only in the
+             first semester after the bachelor's part's last planned
+             required course is done (reusing BUG-044's boundary logic,
+             generalized to not require a known non-thesis master's/PhD).
+             (d) validator.py's new _needed_exception_labels replaces
+             _exception_labels: for an OR, only the first branch that
+             resolves true contributes its exception labels, so
+             OR(CSCI100, exception) no longer raises exception_claimed once
+             CSCI100 is satisfied. Every branch of an AND is still needed
+             regardless; if nothing resolves, every branch is shown (the
+             broken_prerequisite flag covers the failure itself).
+             Covered by test_validator_semester_credit_cap.py (6 tests) and
+             test_validator_needed_exceptions.py (2 tests).
+  Note:      2026-11-24: (c) was also tried and held back (backend: Midhat).
+             Rejecting an "all" group with no courses at the model means it
+             can no longer load at all, but
+             test_program_all_group_without_courses_is_flagged in
+             test_agent_tools.py depends on agent/tools.py's existing lenient
+             handling (loads the program, adds a "kind 'all' with no
+             courses" data_warning). Same call as the other held-back bugs
+             (007, 010, 014, 017, 022, 023(a), 028 — see those entries and
+             the message sent to Samantha, 2026-11-24): reject at load, or
+             keep tolerating it at the tool layer. (b) is still blocked on
+             BUG-012 (corequisites are still free text, not structured
+             codes); not attempted.
 
 BUG-027  Courses that may be repeated for credit cannot be marked
   Status:    Open

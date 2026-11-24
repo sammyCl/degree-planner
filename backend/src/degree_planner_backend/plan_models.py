@@ -66,6 +66,7 @@ FlagType = Literal[
     "double_count_exceeded",
     "exception_claimed",
     "ineligible_course",
+    "semester_overload",
 ]
 FlagSeverity = Literal["error", "warning"]
 

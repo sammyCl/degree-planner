@@ -111,6 +111,11 @@ class RequirementGroup(BaseModel):
             raise ValueError(f"credits_required is required when kind is {self.kind!r}")
         if self.kind == "requirement" and self.requirement is None:
             raise ValueError("requirement is required when kind is 'requirement'")
+        # BUG-026(c) (held back): rejecting an "all" group with no courses here means it can no
+        # longer load at all, but agent/tools.py already handles this leniently today — it loads
+        # the program and adds a "kind 'all' with no courses" data_warning, which
+        # test_program_all_group_without_courses_is_flagged depends on. Same call as the other
+        # held-back bugs (see bugs.txt): reject at load, or keep tolerating it at the tool layer.
         return self
 
 
