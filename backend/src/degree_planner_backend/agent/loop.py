@@ -24,7 +24,7 @@ from typing import Any, Callable
 
 from degree_planner_backend import validator
 from degree_planner_backend.agent import tools
-from degree_planner_backend.agent.agent_file import load_agent
+from degree_planner_backend.agent.agent_file import AgentSpec, load_agent
 from degree_planner_backend.agent.mcp_server import SERVER_NAME, context_for
 from degree_planner_backend.agent.request_models import (
     EXPLANATION_MAX,
@@ -115,18 +115,21 @@ def run_agent(connection: sqlite3.Connection, request: AgentRequest, runner: Run
     return _build_response(connection, context_for(request), plan_input, final_text.strip(), stop_problem, usage)
 
 
-def claude_command(config_path: Path) -> list[str]:
+def claude_command(config_path: Path, agent: AgentSpec | None = None) -> list[str]:
+    """The `claude -p` command for the planner (planner.md), or for another agent file such as the
+    chatbot's chat.md."""
+    agent = agent or AGENT
     return [
         CLAUDE_COMMAND,
         "-p",
-        "--system-prompt", SYSTEM_PROMPT,
+        "--system-prompt", agent.system_prompt,
         "--tools", "",  # no built-in tools: no files, shell or web, only the planner's
         "--strict-mcp-config", "--mcp-config", str(config_path),
-        "--allowedTools", *ALLOWED_TOOLS,
+        "--allowedTools", *[f"mcp__{SERVER_NAME}__{name}" for name in agent.tools],
         "--setting-sources", "",  # ignore the machine's Claude Code settings, hooks and plugins
-        "--model", MODEL,
-        "--effort", EFFORT,
-        "--max-turns", str(STEP_LIMIT),
+        "--model", agent.model,
+        "--effort", agent.effort,
+        "--max-turns", str(agent.max_turns),
         "--output-format", "json",
         "--no-session-persistence",
     ]
@@ -156,7 +159,12 @@ def run_claude(command: list[str], first_message: str, cwd: Path, timeout: float
     return ClaudeRun(result=result)
 
 
-def _mcp_config(db_path: Path, request_path: Path, plan_path: Path) -> dict[str, Any]:
+def _mcp_config(db_path: Path, request_path: Path, plan_path: Path, mode: str = "plan",
+                trace_path: Path | None = None) -> dict[str, Any]:
+    # The planner's arguments stay as they were; chat adds --mode chat and --trace (mcp_server.py).
+    extra = ["--mode", mode] if mode != "plan" else []
+    if trace_path is not None:
+        extra += ["--trace", str(trace_path)]
     return {
         "mcpServers": {
             SERVER_NAME: {
@@ -166,6 +174,7 @@ def _mcp_config(db_path: Path, request_path: Path, plan_path: Path) -> dict[str,
                 "args": [
                     "-m", "degree_planner_backend.agent.mcp_server",
                     "--db", str(db_path), "--request", str(request_path), "--plan", str(plan_path),
+                    *extra,
                 ],
             }
         }

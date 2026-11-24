@@ -4,6 +4,8 @@ from pathlib import Path
 
 from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
 
+from degree_planner_backend.agent.chat_loop import run_chat
+from degree_planner_backend.agent.chat_models import ChatRequest, ChatResponse
 from degree_planner_backend.agent.loop import ClaudeCodeError, run_agent
 from degree_planner_backend.agent.request_models import AgentRequest, AgentResponse
 from degree_planner_backend.db import get_db
@@ -59,6 +61,20 @@ def submit_setup(request: AgentRequest, connection: sqlite3.Connection = Depends
     except ClaudeCodeError as exc:
         # The agent itself could not run (not installed, not signed in) - a server problem, not
         # something wrong with the student's setup, so 503 rather than 400.
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+# Note for Midhat (from Samantha, agent/chat branch): this endpoint is new in your file. It only
+# calls the chat loop (agent/chat_loop.py); nothing else in main.py changed. The format is
+# docs/chat-format.md. The proposal is not saved here: the page saves it with POST /plans or
+# PUT /plans/{plan_id} when the student clicks Apply, so the plan store is untouched.
+@app.post("/plans/chat", response_model=ChatResponse)
+def chat(request: ChatRequest, connection: sqlite3.Connection = Depends(get_db)) -> ChatResponse:
+    """One chat message from the planner page: the chatbot's reply and any proposed plan change."""
+    try:
+        return run_chat(connection, request)
+    except ClaudeCodeError as exc:
+        # Same as submit_setup: the agent could not run at all, a server problem.
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 

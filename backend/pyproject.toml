@@ -15,6 +15,7 @@ dependencies = [
 [project.scripts]
 load-data = "degree_planner_backend.data_loader:main"
 try-agent = "degree_planner_backend.agent.try_agent:main"
+try-chat = "degree_planner_backend.agent.try_chat:main"
 eval-examples = "degree_planner_backend.agent.eval_examples:main"
 
 [dependency-groups]
