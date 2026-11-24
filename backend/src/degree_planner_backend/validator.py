@@ -339,6 +339,23 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                         f"{req_program.name}: {group.label} is missing {', '.join(missing)}.",
                         False,
                     )
+                if group.every_semester:
+                    # BUG-042: a 0-credit graduate seminar required every fall and spring
+                    # semester isn't met by appearing once anywhere, unlike a normal "all" group.
+                    for semester in semesters:
+                        if not semester.label.startswith(("Fall", "Spring")):
+                            continue
+                        semester_codes = {course.code for course in semester.courses}
+                        still_missing = [code for code in listed if code not in semester_codes]
+                        if still_missing:
+                            add_flag(
+                                "requirement_unmet",
+                                "error",
+                                None,
+                                f"{req_program.name}: {group.label} needs {', '.join(still_missing)} "
+                                f"in every fall and spring semester; missing in {semester.label}.",
+                                False,
+                            )
                 available -= set(listed) | {stand_in[code] for code in listed if code in stand_in}
 
             for group in choose_with_list + choose_without_list:

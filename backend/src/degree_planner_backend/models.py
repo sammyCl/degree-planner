@@ -66,6 +66,9 @@ class RequirementGroup(BaseModel):
     kind: Literal["all", "choose_credits"]
     courses: list[str] | None = None
     credits_required: float | None = None
+    # Only meaningful for an "all" group (BUG-042): its courses must be planned in every fall and
+    # spring semester of the plan, not just once anywhere (e.g. a 0-credit graduate seminar).
+    every_semester: bool = False
 
     @model_validator(mode="after")
     def _check_credits_required(self) -> RequirementGroup:

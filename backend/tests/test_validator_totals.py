@@ -56,4 +56,5 @@ def test_examples_4_and_5_on_the_real_data() -> None:
     conn = sqlite3.connect(":memory:")
     assert refresh_database(REPO_ROOT / "data" / "json", conn).ok
     assert required(conn, ["ams-bs-cam", "computer-science-minor"]) == 120
-    assert required(conn, ["cs-bs-ms-combined", "geophysics-geophysical-engineering-minor"], "combined") == 154
+    # BUG-035: cs-bs-ms-combined is 152 (128 + 30 - 6 shared), not the old placeholder 154
+    assert required(conn, ["cs-bs-ms-combined", "geophysics-geophysical-engineering-minor"], "combined") == 152
