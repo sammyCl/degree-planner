@@ -203,23 +203,23 @@ def test_flowchart_match_counts_courses_within_the_tolerance() -> None:
 # --------------------------------------------------------------------- minor_unshared_credits
 
 def minor_db(tmp_path: Path) -> sqlite3.Connection:
-    """A major and an 18-credit minor that overlap on A100 (major "all"), C100 (major choose group)."""
+    """A major and an 18-credit minor that overlap on AAA100 (major "all"), CCC100 (major choose group)."""
     def course(code: str) -> dict:
-        return {"code": code, "subject": code[:1] + "AAA", "number": code[1:], "title": code, "credits": 3.0,
+        return {"code": code, "subject": code[:-3] + "AAA", "number": code[-3:], "title": code, "credits": 3.0,
                 "description": "", "catalog_year": "2026-2027"}
 
-    codes = ["A100", "B100", "C100", "D100", "E100", "F100", "G100", "H100", "J100"]
+    codes = ["AAA100", "BBB100", "CCC100", "DDD100", "EEE100", "FFF100", "GGG100", "HHH100", "JJJ100"]
     programs = [
         {"program_id": "t-major", "name": "Major", "degree_level": "bachelor", "catalog_year": "2026-2027",
          "total_credits_required": 30, "requirement_groups": [
-             {"group_id": "req", "label": "req", "kind": "all", "courses": ["A100", "B100"]},
-             {"group_id": "pick", "label": "pick", "kind": "choose_credits", "courses": ["C100", "D100"],
+             {"group_id": "req", "label": "req", "kind": "all", "courses": ["AAA100", "BBB100"]},
+             {"group_id": "pick", "label": "pick", "kind": "choose_credits", "courses": ["CCC100", "DDD100"],
               "credits_required": 3},
              {"group_id": "free", "label": "free", "kind": "choose_credits", "credits_required": 6}]},
         {"program_id": "t-minor", "name": "Minor", "degree_level": "minor", "catalog_year": "2026-2027",
          "total_credits_required": 18, "requirement_groups": [
-             {"group_id": "core", "label": "core", "kind": "all", "courses": ["A100", "E100"]},
-             {"group_id": "pick", "label": "pick", "kind": "choose_credits", "courses": ["C100", "F100", "G100"],
+             {"group_id": "core", "label": "core", "kind": "all", "courses": ["AAA100", "EEE100"]},
+             {"group_id": "pick", "label": "pick", "kind": "choose_credits", "courses": ["CCC100", "FFF100", "GGG100"],
               "credits_required": 6},
              {"group_id": "any", "label": "any", "kind": "choose_credits", "credits_required": 6}]},
     ]
@@ -235,9 +235,9 @@ MINOR_CHECK = {"type": "minor_unshared_credits", "minor": "t-minor", "major": "t
 
 def test_minor_with_enough_unshared_credits_passes(tmp_path: Path) -> None:
     conn = minor_db(tmp_path)
-    # Minor: A100 (shared) and E100; pick: F100 and G100 (unshared, preferred); any: H100 and J100 (taken in code order).
-    plan = {"Fall 2026": [("A100", 3), ("B100", 3), ("D100", 3)], "Spring 2027": [("E100", 3), ("F100", 3), ("G100", 3)],
-            "Fall 2027": [("H100", 3), ("J100", 3)]}
+    # Minor: AAA100 (shared) and EEE100; pick: FFF100 and GGG100 (unshared, preferred); any: HHH100 and JJJ100 (taken in code order).
+    plan = {"Fall 2026": [("AAA100", 3), ("BBB100", 3), ("DDD100", 3)], "Spring 2027": [("EEE100", 3), ("FFF100", 3), ("GGG100", 3)],
+            "Fall 2027": [("HHH100", 3), ("JJJ100", 3)]}
     verdict = deterministic_verdict(conn, example(MINOR_CHECK), response(plan))
     assert verdict.passed, verdict.results
     assert "15 minor credits not shared" in verdict.results[-1].detail
@@ -245,23 +245,23 @@ def test_minor_with_enough_unshared_credits_passes(tmp_path: Path) -> None:
 
 def test_minor_built_from_major_courses_fails(tmp_path: Path) -> None:
     conn = minor_db(tmp_path)
-    # C100 is the only course in the major's pick group, so the major needs it: shared. The minor's
-    # "any" group can only take B100 (major "all"), so A100, C100, B100 are shared and only E100, F100 are not.
+    # CCC100 is the only course in the major's pick group, so the major needs it: shared. The minor's
+    # "any" group can only take BBB100 (major "all"), so AAA100, CCC100, BBB100 are shared and only EEE100, FFF100 are not.
     # No completed courses: a completed course the major does not list would fill "any" unshared.
     ex = example(MINOR_CHECK, student={"degree_level": "bachelor", "programs": ["t-major", "t-minor"],
                                        "catalog_year": "2026-2027", "completed_courses": []})
-    plan = {"Fall 2026": [("A100", 3), ("B100", 3), ("C100", 3)], "Spring 2027": [("E100", 3), ("F100", 3)]}
+    plan = {"Fall 2026": [("AAA100", 3), ("BBB100", 3), ("CCC100", 3)], "Spring 2027": [("EEE100", 3), ("FFF100", 3)]}
     verdict = deterministic_verdict(conn, ex, response(plan))
     result = verdict.results[-1]
     assert not result.passed
     assert "6 minor credits not shared" in result.detail
-    assert "A100, B100, C100" in result.detail
+    assert "AAA100, BBB100, CCC100" in result.detail
 
 
 def test_a_course_the_major_does_not_need_is_not_shared(tmp_path: Path) -> None:
     conn = minor_db(tmp_path)
-    # D100 fills the major's pick group, so C100 is spare and counts as unshared for the minor.
-    plan = {"Fall 2026": [("A100", 3), ("B100", 3), ("C100", 3), ("D100", 3)], "Spring 2027": [("E100", 3), ("F100", 3)]}
+    # DDD100 fills the major's pick group, so CCC100 is spare and counts as unshared for the minor.
+    plan = {"Fall 2026": [("AAA100", 3), ("BBB100", 3), ("CCC100", 3), ("DDD100", 3)], "Spring 2027": [("EEE100", 3), ("FFF100", 3)]}
     result = deterministic_verdict(conn, example(MINOR_CHECK), response(plan)).results[-1]
     assert result.passed, result.detail
 
@@ -270,10 +270,10 @@ def test_completed_courses_count_for_the_minor(tmp_path: Path) -> None:
     conn = minor_db(tmp_path)
     ex = example(MINOR_CHECK, student={"degree_level": "bachelor", "programs": ["t-major", "t-minor"],
                                        "catalog_year": "2026-2027",
-                                       "completed_courses": [{"code": "G100", "credits": 3.0, "term": "transfer"}]})
-    plan = {"Fall 2026": [("A100", 3), ("B100", 3), ("D100", 3)], "Spring 2027": [("E100", 3), ("F100", 3)]}
+                                       "completed_courses": [{"code": "GGG100", "credits": 3.0, "term": "transfer"}]})
+    plan = {"Fall 2026": [("AAA100", 3), ("BBB100", 3), ("DDD100", 3)], "Spring 2027": [("EEE100", 3), ("FFF100", 3)]}
     result = deterministic_verdict(conn, ex, response(plan)).results[-1]
-    assert result.passed, result.detail  # E100, F100, G100 unshared
+    assert result.passed, result.detail  # EEE100, FFF100, GGG100 unshared
 
 
 def test_example_4_overlap_on_the_real_data_fails(tmp_path: Path) -> None:

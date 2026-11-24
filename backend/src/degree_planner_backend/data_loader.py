@@ -13,11 +13,15 @@ import sqlite3
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import TypeVar
 
-from pydantic import ValidationError
+from pydantic import BaseModel, ValidationError
+from pydantic_core import PydanticSerializationError
 
 from degree_planner_backend.db import get_connection, init_schema
-from degree_planner_backend.models import DataFile
+from degree_planner_backend.models import Course, Form, Program
+
+ModelT = TypeVar("ModelT", bound=BaseModel)
 
 
 @dataclass
@@ -33,17 +37,31 @@ class LoadReport:
         return not self.errors
 
 
-def _parse_file(path: Path) -> tuple[DataFile | None, list[str]]:
+def _validate_row(model: type[ModelT], raw: object, label: str) -> tuple[ModelT | None, str | None]:
+    try:
+        obj = model.model_validate(raw)
+        # BUG-009: a course whose prerequisites nest too deep can parse here but then blow the
+        # recursion limit (or fail to serialize at all) on every later read; reject it at load
+        # instead of storing something every search will then trip over.
+        model.model_validate_json(obj.model_dump_json())
+    except ValidationError as exc:
+        messages = "; ".join(
+            f"{'.'.join(str(part) for part in error['loc'])}: {error['msg']}" for error in exc.errors()
+        )
+        return None, f"{label}: {messages}"
+    except (RecursionError, PydanticSerializationError):
+        return None, f"{label}: prerequisites are nested too deeply to be read back"
+    return obj, None
+
+
+def _parse_file(path: Path) -> tuple[dict | None, list[str]]:
     try:
         raw = json.loads(path.read_text())
     except json.JSONDecodeError as exc:
         return None, [f"invalid JSON: {exc}"]
-
-    try:
-        return DataFile.model_validate(raw), []
-    except ValidationError as exc:
-        errors = [f"{'.'.join(str(part) for part in error['loc'])}: {error['msg']}" for error in exc.errors()]
-        return None, errors
+    if not isinstance(raw, dict):
+        return None, ["top level must be an object with courses/programs/forms"]
+    return raw, []
 
 
 def refresh_database(data_dir: Path, connection: sqlite3.Connection) -> LoadReport:
@@ -53,31 +71,67 @@ def refresh_database(data_dir: Path, connection: sqlite3.Connection) -> LoadRepo
     connection.execute("DELETE FROM programs")
     connection.execute("DELETE FROM forms")
 
+    # BUG-018: a form_id repeated across (or within) files silently replaces the earlier one; still
+    # loaded (last one wins, as before), but now reported instead of hidden.
+    seen_form_ids: dict[str, str] = {}
+
     for path in sorted(data_dir.rglob("*.json")):
-        data_file, errors = _parse_file(path)
+        raw, errors = _parse_file(path)
         if errors:
             report.errors[str(path)] = errors
             continue
+        assert raw is not None
 
-        assert data_file is not None
-        for course in data_file.courses:
+        file_errors: list[str] = []
+        file_catalog_year = raw.get("catalog_year") if isinstance(raw.get("catalog_year"), str) else None
+
+        for index, item in enumerate(raw.get("courses") or []):
+            course, error = _validate_row(Course, item, f"courses[{index}]")
+            if error:
+                file_errors.append(error)
+                continue
+            assert course is not None
             connection.execute(
                 "INSERT OR REPLACE INTO courses (code, catalog_year, data) VALUES (?, ?, ?)",
                 (course.code, course.catalog_year, course.model_dump_json()),
             )
             report.courses_loaded += 1
-        for program in data_file.programs:
+
+        for index, item in enumerate(raw.get("programs") or []):
+            program, error = _validate_row(Program, item, f"programs[{index}]")
+            if error:
+                file_errors.append(error)
+                continue
+            assert program is not None
             connection.execute(
                 "INSERT OR REPLACE INTO programs (program_id, catalog_year, data) VALUES (?, ?, ?)",
                 (program.program_id, program.catalog_year, program.model_dump_json()),
             )
             report.programs_loaded += 1
-        for form in data_file.forms:
+
+        for index, item in enumerate(raw.get("forms") or []):
+            # BUG-019: a form with no catalog_year of its own takes the file's.
+            if file_catalog_year and isinstance(item, dict) and "catalog_year" not in item:
+                item = {**item, "catalog_year": file_catalog_year}
+            form, error = _validate_row(Form, item, f"forms[{index}]")
+            if error:
+                file_errors.append(error)
+                continue
+            assert form is not None
+            if form.form_id in seen_form_ids:
+                file_errors.append(
+                    f"forms[{index}]: form_id {form.form_id!r} was already loaded from "
+                    f"{seen_form_ids[form.form_id]}; this one replaces it"
+                )
+            seen_form_ids[form.form_id] = str(path)
             connection.execute(
                 "INSERT OR REPLACE INTO forms (form_id, data) VALUES (?, ?)",
                 (form.form_id, form.model_dump_json()),
             )
             report.forms_loaded += 1
+
+        if file_errors:
+            report.errors[str(path)] = file_errors
         report.files_loaded += 1
 
     connection.commit()

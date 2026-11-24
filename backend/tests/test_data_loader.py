@@ -68,7 +68,9 @@ def test_refresh_database_reports_error_per_file_without_aborting(tmp_path: Path
     assert len(report.errors) == 1
     error_file = next(iter(report.errors))
     assert error_file.endswith("bad.json")
-    assert report.files_loaded == 1
+    # bad.json is still a valid JSON file, just with one bad course row (per-row validation), so
+    # it still counts as loaded; its course is skipped and logged, not the whole file.
+    assert report.files_loaded == 2
     assert report.courses_loaded == 1
 
 

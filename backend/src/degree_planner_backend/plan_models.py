@@ -8,20 +8,32 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class CompletedCourse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     code: str
-    credits: float
+    # BUG-029: negative credits would reach the validator's credit totals; ge=0 (not gt=0) because
+    # a 0-credit completed course is real (e.g. EENG500 Graduate Seminar).
+    credits: float = Field(ge=0, allow_inf_nan=False)
     term: str
     transfer_from: str | None = None
 
 
 class Student(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     degree_level: Literal["bachelor", "master", "phd", "combined", "minor", "asi"]
+    # BUG-028 (held back): agent/tools.py's check_plan has its own test for an empty programs list
+    # (no_programs error), built by constructing Student(programs=[]) directly; rejecting that at
+    # the model means that test can no longer build its scenario. Needs reconciling with that path
+    # before this can reject here instead.
     programs: list[str]
     catalog_year: str
     completed_courses: list[CompletedCourse] = Field(default_factory=list)
 
 
 class PlannedCourse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     course_id: str
     code: str
     title: str
@@ -30,6 +42,8 @@ class PlannedCourse(BaseModel):
 
 
 class Semester(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     semester_id: str
     label: str
     courses: list[PlannedCourse] = Field(default_factory=list)
@@ -37,7 +51,9 @@ class Semester(BaseModel):
 
 
 class Edge(BaseModel):
-    model_config = ConfigDict(populate_by_name=True)
+    # BUG-031: serialize_by_alias=True so model_dump_json() writes "from" by default, the same as
+    # FastAPI's response encoding; code that dumped without by_alias=True used to get "from_".
+    model_config = ConfigDict(populate_by_name=True, serialize_by_alias=True, extra="forbid")
 
     from_: str = Field(alias="from")
     to: str
@@ -55,6 +71,8 @@ FlagSeverity = Literal["error", "warning"]
 
 
 class Flag(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     flag_id: str
     type: FlagType
     severity: FlagSeverity
@@ -65,12 +83,16 @@ class Flag(BaseModel):
 
 
 class Summary(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     total_credits: float
     total_credits_required: float
     requirements_met: bool
 
 
 class Plan(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     plan_id: str | None = None
     student: Student
     semesters: list[Semester]

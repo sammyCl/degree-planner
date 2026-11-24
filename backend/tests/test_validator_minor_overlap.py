@@ -14,26 +14,26 @@ from degree_planner_backend.plan_models import Plan, PlannedCourse, Semester, St
 from degree_planner_backend.validator import check_plan
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-CODES = ["A100", "B100", "C100", "D100", "E100", "F100", "G100", "H100"]
+CODES = ["AAA100", "BBB100", "CCC100", "DDD100", "EEE100", "FFF100", "GGG100", "HHH100"]
 
 
 @pytest.fixture
 def connection(tmp_path: Path) -> sqlite3.Connection:
-    courses = [{"code": c, "subject": "AAAA", "number": c[1:], "title": c, "credits": 3.0, "description": "",
+    courses = [{"code": c, "subject": "AAAA", "number": c[-3:], "title": c, "credits": 3.0, "description": "",
                 "catalog_year": "2026-2027"} for c in CODES]
     major = {"program_id": "t-bs", "name": "Major", "degree_level": "bachelor", "catalog_year": "2026-2027",
              "total_credits_required": 15, "requirement_groups": [
-                 {"group_id": "req", "label": "req", "kind": "all", "courses": ["A100", "B100"]},
-                 {"group_id": "pick", "label": "pick", "kind": "choose_credits", "courses": ["C100", "D100"],
+                 {"group_id": "req", "label": "req", "kind": "all", "courses": ["AAA100", "BBB100"]},
+                 {"group_id": "pick", "label": "pick", "kind": "choose_credits", "courses": ["CCC100", "DDD100"],
                   "credits_required": 3},
                  {"group_id": "free", "label": "free", "kind": "choose_credits", "credits_required": 6}]}
 
     def add_on(program_id: str, level: str) -> dict:
         return {"program_id": program_id, "name": program_id, "degree_level": level, "catalog_year": "2026-2027",
                 "total_credits_required": 12, "requirement_groups": [
-                    {"group_id": "core", "label": "core", "kind": "all", "courses": ["A100", "E100"]},
+                    {"group_id": "core", "label": "core", "kind": "all", "courses": ["AAA100", "EEE100"]},
                     {"group_id": "pick", "label": "pick", "kind": "choose_credits",
-                     "courses": ["C100", "F100", "G100"], "credits_required": 6}]}
+                     "courses": ["CCC100", "FFF100", "GGG100"], "credits_required": 6}]}
 
     (tmp_path / "courses.json").write_text(json.dumps({"courses": courses}))
     (tmp_path / "programs.json").write_text(json.dumps({"programs": [major, add_on("t-minor", "minor"),
@@ -58,28 +58,28 @@ def overlap_errors(checked: Plan) -> list[str]:
 
 
 def test_a_minor_mostly_made_of_major_courses_is_flagged(connection) -> None:
-    # A100 (major "all") and C100 (the major's only pick) are shared; only E100 is not: 3 < 9.
-    checked = check_plan(connection, plan(["t-bs", "t-minor"], ["A100", "B100", "C100"], ["E100", "H100"]))
+    # AAA100 (major "all") and CCC100 (the major's only pick) are shared; only EEE100 is not: 3 < 9.
+    checked = check_plan(connection, plan(["t-bs", "t-minor"], ["AAA100", "BBB100", "CCC100"], ["EEE100", "HHH100"]))
     (message,) = overlap_errors(checked)
     assert message.startswith("t-minor: only 3 of its credits")
-    assert "shared: A100, C100" in message
+    assert "shared: AAA100, CCC100" in message
     assert not checked.summary.requirements_met
 
 
 def test_free_electives_and_spare_courses_are_not_shared(connection) -> None:
-    # D100 fills the major's pick, so C100 is spare; with E100 and F100: 9 unshared (A100 shared).
-    checked = check_plan(connection, plan(["t-bs", "t-minor"], ["A100", "B100", "C100", "D100"], ["E100", "F100"]))
+    # DDD100 fills the major's pick, so CCC100 is spare; with EEE100 and FFF100: 9 unshared (AAA100 shared).
+    checked = check_plan(connection, plan(["t-bs", "t-minor"], ["AAA100", "BBB100", "CCC100", "DDD100"], ["EEE100", "FFF100"]))
     assert overlap_errors(checked) == []
 
 
 def test_an_asi_follows_the_same_rule(connection) -> None:
-    checked = check_plan(connection, plan(["t-bs", "t-asi"], ["A100", "B100", "C100"], ["E100", "H100"]))
+    checked = check_plan(connection, plan(["t-bs", "t-asi"], ["AAA100", "BBB100", "CCC100"], ["EEE100", "HHH100"]))
     assert overlap_errors(checked) == [overlap_errors(checked)[0]]
     assert overlap_errors(checked)[0].startswith("t-asi:")
 
 
 def test_a_minor_alone_has_nothing_to_overlap(connection) -> None:
-    checked = check_plan(connection, plan(["t-minor"], ["A100", "B100", "C100"], ["E100"], level="minor"))
+    checked = check_plan(connection, plan(["t-minor"], ["AAA100", "BBB100", "CCC100"], ["EEE100"], level="minor"))
     assert overlap_errors(checked) == []
 
 
