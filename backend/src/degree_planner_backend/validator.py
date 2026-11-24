@@ -82,22 +82,20 @@ def _satisfied_branch(requirement: Requirement, satisfied_codes: set[str]) -> li
     return None
 
 
-def _needed_exception_labels(requirement: Requirement | None, satisfied_codes: set[str]) -> list[str]:
-    """Exception labels actually relied on to satisfy requirement (BUG-026d): an OR branch that
-    needs an exception isn't flagged once a sibling branch is already satisfied by a plain course
-    (OR(CSCI100, exception) with CSCI100 taken shouldn't raise exception_claimed). Every branch of
-    an AND is still needed regardless. If nothing resolves, every branch is shown (broken_
-    prerequisite is flagged separately; this lists what would clear it)."""
+def _exception_labels(requirement: Requirement | None) -> list[str]:
+    # BUG-026(d) (held back): an earlier version of this only returned labels for branches "needed"
+    # to satisfy an OR (e.g. not OR(CSCI100, exception) once CSCI100 is satisfied). Reverted: the
+    # chatbot's whole Exception handling feature (chat_tools.py's open_exceptions/accept_exception,
+    # test_chat_tools.py, test_chat_loop.py) is built on this unconditionally surfacing every
+    # exception a course's prerequisites could rely on, regardless of whether another branch is
+    # already satisfied — e.g. test_accept_an_exception_the_student_was_granted plans TEST101 (which
+    # would satisfy OR(TEST101, exception)) in an earlier semester and still expects TEST201 to show
+    # as an open exception. Needs Samantha's call, same shape as the other held-back bugs.
     if requirement is None or requirement.type == "course":
         return []
     if requirement.type == "exception":
         return [requirement.label]
-    if requirement.type == "AND":
-        return [label for sub in requirement.of for label in _needed_exception_labels(sub, satisfied_codes)]
-    for sub in requirement.of:  # OR: the first branch that resolves is the one relied on
-        if _resolve(sub, satisfied_codes):
-            return _needed_exception_labels(sub, satisfied_codes)
-    return [label for sub in requirement.of for label in _needed_exception_labels(sub, satisfied_codes)]
+    return [label for sub in requirement.of for label in _exception_labels(sub)]
 
 
 _ADD_ON_LEVELS = ("minor", "asi")
@@ -223,7 +221,7 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                     _, from_id = min(candidates, key=lambda pair: pair[0])
                     edges.append(Edge(**{"from": from_id, "to": course.course_id}))
 
-            for label in _needed_exception_labels(requirement, satisfied_before):
+            for label in _exception_labels(requirement):
                 add_flag(
                     "exception_claimed",
                     "warning",
