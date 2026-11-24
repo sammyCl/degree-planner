@@ -119,8 +119,8 @@ def test_check_plan_flags_double_count_over_the_cap(tmp_path: Path) -> None:
             {
                 "courses": [
                     {
-                        "code": "X100",
-                        "subject": "X",
+                        "code": "XXX100",
+                        "subject": "XXX",
                         "number": "100",
                         "title": "Shared Course",
                         "credits": 3.0,
@@ -135,10 +135,10 @@ def test_check_plan_flags_double_count_over_the_cap(tmp_path: Path) -> None:
                         "name": "Program A",
                         "degree_level": "bachelor",
                         "catalog_year": "2099-2000",
-                        "total_credits_required": 0,
+                        "total_credits_required": 1,
                         "requirement_groups": [],
                         "double_counts_with": [
-                            {"program_id": "prog-b", "shared_courses": ["X100"], "shared_credit_limit": 2}
+                            {"program_id": "prog-b", "shared_courses": ["XXX100"], "shared_credit_limit": 2}
                         ],
                     },
                     {
@@ -146,7 +146,7 @@ def test_check_plan_flags_double_count_over_the_cap(tmp_path: Path) -> None:
                         "name": "Program B",
                         "degree_level": "bachelor",
                         "catalog_year": "2099-2000",
-                        "total_credits_required": 0,
+                        "total_credits_required": 1,
                         "requirement_groups": [],
                     },
                 ],
@@ -169,7 +169,7 @@ def test_check_plan_flags_double_count_over_the_cap(tmp_path: Path) -> None:
                     "semester_id": "sem-1",
                     "label": "Term 1",
                     "courses": [
-                        {"course_id": "sem-1-x100", "code": "X100", "title": "Shared Course", "credits": 3.0, "status": "planned"}
+                        {"course_id": "sem-1-xxx100", "code": "XXX100", "title": "Shared Course", "credits": 3.0, "status": "planned"}
                     ],
                     "total_credits": 0.0,
                 }
@@ -194,9 +194,9 @@ def test_check_plan_does_not_let_free_electives_recount_a_fixed_group_s_courses(
         json.dumps(
             {
                 "courses": [
-                    {"code": "X100", "subject": "X", "number": "100", "title": "X100", "credits": 3.0,
+                    {"code": "XXX100", "subject": "XXX", "number": "100", "title": "XXX100", "credits": 3.0,
                      "description": "", "prerequisites": None, "catalog_year": "2099-2000"},
-                    {"code": "X200", "subject": "X", "number": "200", "title": "X200", "credits": 3.0,
+                    {"code": "XXX200", "subject": "XXX", "number": "200", "title": "XXX200", "credits": 3.0,
                      "description": "", "prerequisites": None, "catalog_year": "2099-2000"},
                 ],
                 "programs": [
@@ -205,9 +205,9 @@ def test_check_plan_does_not_let_free_electives_recount_a_fixed_group_s_courses(
                         "name": "Core and Free Electives Program",
                         "degree_level": "bachelor",
                         "catalog_year": "2099-2000",
-                        "total_credits_required": 0,
+                        "total_credits_required": 1,
                         "requirement_groups": [
-                            {"group_id": "core", "label": "Core", "kind": "all", "courses": ["X100", "X200"]},
+                            {"group_id": "core", "label": "Core", "kind": "all", "courses": ["XXX100", "XXX200"]},
                             {"group_id": "free", "label": "Free Electives", "kind": "choose_credits", "credits_required": 6},
                         ],
                     }
@@ -231,8 +231,8 @@ def test_check_plan_does_not_let_free_electives_recount_a_fixed_group_s_courses(
                     "semester_id": "sem-1",
                     "label": "Term 1",
                     "courses": [
-                        {"course_id": "sem-1-x100", "code": "X100", "title": "X100", "credits": 3.0, "status": "planned"},
-                        {"course_id": "sem-1-x200", "code": "X200", "title": "X200", "credits": 3.0, "status": "planned"},
+                        {"course_id": "sem-1-xxx100", "code": "XXX100", "title": "XXX100", "credits": 3.0, "status": "planned"},
+                        {"course_id": "sem-1-xxx200", "code": "XXX200", "title": "XXX200", "credits": 3.0, "status": "planned"},
                     ],
                     "total_credits": 0.0,
                 }
@@ -271,7 +271,7 @@ def test_check_plan_lets_a_shared_candidate_satisfy_only_one_choose_credits_grou
                         "name": "A/B Program",
                         "degree_level": "bachelor",
                         "catalog_year": "2099-2000",
-                        "total_credits_required": 0,
+                        "total_credits_required": 1,
                         "requirement_groups": [
                             {"group_id": "a", "label": "Group A", "kind": "choose_credits",
                              "courses": ["MATH201", "CSCI100"], "credits_required": 3},

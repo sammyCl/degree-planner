@@ -22,7 +22,7 @@ def connection(tmp_path: Path) -> sqlite3.Connection:
             "name": "Test M.S.",
             "degree_level": "master",
             "catalog_year": "2026-2027",
-            "total_credits_required": 0,
+            "total_credits_required": 30,
             "requirement_groups": [
                 {"group_id": "seminar", "label": "Graduate Seminar", "kind": "all",
                  "courses": ["EENG500"], "every_semester": True},

@@ -34,7 +34,12 @@ _CREDITS = re.compile(r"\d+\.\d+")
 _TRANSFER_FROM = re.compile(r"\(([^)]+)\)")
 _TRANSFER_HEADING = re.compile(r"transfer credit", re.IGNORECASE)
 _APL_HEADING = re.compile(r"\b(ap|advanced placement)\s*credit\b", re.IGNORECASE)
-_TERM_HEADING = re.compile(r"^(Fall|Spring|Summer)\s+\d{4}$", re.IGNORECASE)
+# BUG-033: [0-9] instead of \d, which also matches other scripts' digits (e.g. full-width "２０２４").
+_TERM_HEADING = re.compile(r"^(Fall|Spring|Summer)\s+([0-9]{4})$", re.IGNORECASE)
+# The agent request format's start_term floor (request_models.py's START_YEAR_MIN): a transcript
+# heading outside a sensible range (e.g. "SUMMER 0001") is not a real term, just text that happens
+# to match the shape.
+_TERM_YEAR_MIN = 2000
 
 _CSV_REQUIRED_COLUMNS = {"code", "credits", "term"}
 
@@ -86,7 +91,8 @@ def _parse_transcript_lines(lines: list[str]) -> list[CompletedCourse]:
         if _APL_HEADING.search(line):
             term = "aplcredit"
             continue
-        if _TERM_HEADING.match(line):
+        term_match = _TERM_HEADING.match(line)
+        if term_match and int(term_match.group(2)) >= _TERM_YEAR_MIN:
             term = line
             continue
 

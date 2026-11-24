@@ -18,6 +18,13 @@ class NotFoundError(LookupError):
 class AmbiguousLookupError(LookupError):
     """More than one catalog year matches; the caller must pass catalog_year."""
 
+    def __init__(self, message: str, years: list[str] | None = None):
+        # BUG-023: years as data (not just embedded in the message text), so a caller does not have
+        # to parse them back out of English. Optional so existing code that builds this exception
+        # from just a message (e.g. to test message-parsing directly) still works.
+        super().__init__(message)
+        self.years = years or []
+
 
 def _resolve_catalog_year(
     connection: sqlite3.Connection, table: str, id_column: str, id_value: str, catalog_year: str | None
@@ -29,8 +36,23 @@ def _resolve_catalog_year(
         raise NotFoundError(f"no {table} row for {id_column}={id_value!r}")
     if len(rows) > 1:
         years = sorted(row[0] for row in rows)
-        raise AmbiguousLookupError(f"{id_value!r} exists in catalog years {years}; pass catalog_year to disambiguate")
+        raise AmbiguousLookupError(
+            f"{id_value!r} exists in catalog years {years}; pass catalog_year to disambiguate", years
+        )
     return rows[0][0]
+
+
+def catalog_years(connection: sqlite3.Connection) -> list[str]:
+    """Every catalog year with at least one loaded course (BUG-013), so a caller can tell a year
+    that just isn't loaded apart from a query that matches nothing."""
+    rows = connection.execute("SELECT DISTINCT catalog_year FROM courses").fetchall()
+    return sorted(row[0] for row in rows)
+
+
+def program_ids(connection: sqlite3.Connection) -> list[str]:
+    """Every loaded program_id (BUG-020), so a caller can suggest a close match for a typo'd id."""
+    rows = connection.execute("SELECT DISTINCT program_id FROM programs").fetchall()
+    return sorted(row[0] for row in rows)
 
 
 def get_course(connection: sqlite3.Connection, code: str, catalog_year: str | None = None) -> Course:
