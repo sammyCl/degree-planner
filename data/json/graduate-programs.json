@@ -544,7 +544,7 @@
       "name": "Computer Science, Combined B.S./M.S. (Non-Thesis, Project Track)",
       "degree_level": "combined",
       "catalog_year": "2026-2027",
-      "total_credits_required": 154,
+      "total_credits_required": 152,
       "requirement_groups": [],
       "combines": [
         "cs-bs-general-track",
@@ -654,7 +654,8 @@
           "kind": "all",
           "courses": [
             "EENG500"
-          ]
+          ],
+          "every_semester": true
         },
         {
           "group_id": "ee_core",
@@ -1545,7 +1546,7 @@
       "name": "Mining Engineering, Combined B.S./M.S.",
       "degree_level": "combined",
       "catalog_year": "2026-2027",
-      "total_credits_required": 152,
+      "total_credits_required": 155,
       "requirement_groups": [],
       "combines": [
         "mining-bs",

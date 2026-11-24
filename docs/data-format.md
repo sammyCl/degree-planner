@@ -70,6 +70,7 @@ One row of the requirements table: either a fixed list a student must all take, 
 | `kind` | string | yes | `all` (take every course listed) or `choose_credits` (take enough of the listed courses, or any course if `courses` is omitted, to reach `credits_required`) |
 | `courses` | array of course codes | no | omit for "any course counts" electives |
 | `credits_required` | number | required if `kind` is `choose_credits` | |
+| `every_semester` | boolean | no | only meaningful when `kind` is `all`; the listed course(s) must be planned in every fall and spring semester of the plan, not just once anywhere (e.g. a 0-credit graduate seminar required each term). Default `false` |
 
 ### Combined and double-counted credits
 

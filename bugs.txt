@@ -697,7 +697,7 @@ BUG-034  create_plan and update_plan never run the validator before saving
              in test_validator.py.
 
 BUG-035  Combined Mining BS+MS total is 152 credits, but its parts add to 155
-  Status:    Open
+  Status:    Fixed
   Owner:     Midhat Sajad (data: graduate and combined)
   Where:     data/json/graduate-programs.json (mining-bs-ms-combined,
              total_credits_required)
@@ -722,6 +722,16 @@ BUG-035  Combined Mining BS+MS total is 152 credits, but its parts add to 155
              cs-bs-general-track 128 + cs-ms-non-thesis-project-track 30 - 6
              shared (CSCI561, CSCI564) = 152. Found the same day defining
              Example 5
+  Fixed in:  not yet committed (backend: Midhat). Neither department's PDF
+             in data/Graduate Programs/ states a combined-program total
+             separately from the general "up to 6 credits double-counted"
+             rule (Combined Undergraduate-Graduate Degree Programs.pdf), so
+             there is no catalog number to defer to; set
+             mining-bs-ms-combined to 155 (131 + 30 - 6) and
+             cs-bs-ms-combined to 152 (128 + 30 - 6) in
+             data/json/graduate-programs.json, matching the arithmetic this
+             bug already worked out. Updated the stale note in
+             plans/BACKEND-PLAN.md that recorded the old placeholder numbers.
 
 BUG-036  The minor rule "at least 9 credits not used elsewhere" is never checked
   Status:    Fixed
@@ -895,7 +905,7 @@ BUG-041  Equivalent courses both count (MATH213 and MATH223)
              tests/test_validator_equivalents.py
 
 BUG-042  "Required every semester" is not checked (EENG500 Graduate Seminar)
-  Status:    Open
+  Status:    Fixed
   Owner:     Midhat Sajad (validator, data format)
   Where:     validator.py ("all" groups); data/json/graduate-programs.json
              (ee-ms seminar group: the rule is only in the label)
@@ -914,6 +924,18 @@ BUG-042  "Required every semester" is not checked (EENG500 Graduate Seminar)
              graduate data for these seminars; the validator checks every
              fall and spring semester, and repeats of such a course are
              allowed (BUG-027)
+  Fixed in:  not yet committed (backend: Midhat), exactly the fix idea
+             above: RequirementGroup.every_semester (models.py,
+             docs/data-format.md); for an "all" group with it set, the
+             validator flags each fall/spring semester (by label prefix)
+             missing the listed course(s), on top of the existing "missing
+             from the whole plan" check. Set every_semester: true on ee-ms's
+             seminar group only (data/json/graduate-programs.json); left
+             similarly worded seminar groups in other departments (e.g.
+             MTGN501 "enroll every semester", CEEN590/CEEN596 "two semesters
+             required") unset, since their exact policies weren't checked
+             here and the field would need to match each one's wording.
+             Covered by test_validator_every_semester.py.
 
 BUG-043  A requirement group cannot require 500-level courses (CS MS electives)
   Status:    Fixed
