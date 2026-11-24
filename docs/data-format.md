@@ -57,6 +57,7 @@ A bachelor's, master's, PhD, minor, or ASI. A combined BS+MS is its own program 
 | `total_credits_required` | number | yes | |
 | `requirement_groups` | array of RequirementGroup | yes | see below |
 | `combines` | array of program_id | no | only on a `combined` program, e.g. `["mining-bs", "mining-ms"]` |
+| `thesis_based` | boolean \| null | no | only meaningful when `degree_level` is `master` or `phd`; whether the program is thesis-based. `null`/omitted means unknown. A combined program's non-thesis master's/PhD part limits when its student may take 700-level credits (see below) |
 
 ### Requirement group
 
@@ -81,6 +82,8 @@ Examples 3, 4, and 5 need credits that count toward two programs at once (a comb
 ```
 
 This says: these specific courses, up to this many credits, count toward both this program's total and the named program's total. The validator reads this to avoid flagging the overlap as an error and to enforce the cap.
+
+A combined program's undergraduate may take 700-level credits before finishing the bachelor's part only if the master's/PhD part is thesis-based (Graduate Programs catalog, Combined Undergraduate-Graduate Degree Programs). The validator flags a 700-level course from the master's/PhD part's `requirement_groups` planned no later than the bachelor's part's last planned required course, when that part's `thesis_based` is explicitly `false`.
 
 ## Form or policy
 

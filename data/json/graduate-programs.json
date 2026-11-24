@@ -557,6 +557,7 @@
       "degree_level": "master",
       "catalog_year": "2026-2027",
       "total_credits_required": 30,
+      "thesis_based": false,
       "requirement_groups": [
         {
           "group_id": "core",

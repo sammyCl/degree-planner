@@ -916,7 +916,7 @@ BUG-042  "Required every semester" is not checked (EENG500 Graduate Seminar)
              allowed (BUG-027)
 
 BUG-043  A requirement group cannot require 500-level courses (CS MS electives)
-  Status:    Open
+  Status:    Fixed
   Owner:     Midhat Sajad (data format, validator, graduate data)
   Where:     backend/src/degree_planner_backend/models.py (RequirementGroup
              has only a course list); validator.py (a choose_credits group
@@ -942,10 +942,19 @@ BUG-043  A requirement group cannot require 500-level courses (CS MS electives)
              {"subjects": ["CSCI"], "min_number": 500}, plus a rule that a
              master's group never takes a course below 500; set it on every
              graduate elective group whose label says "graduate course"
+  Fixed in:  not yet committed (backend: Midhat). Took the general-rule half
+             of the fix idea instead of the per-group field: validator.py's
+             choose_credits loop now drops courses numbered below 500 from
+             the candidate pool for any program whose degree_level is
+             "master" or "phd", but only when the group has no explicit
+             course list (an explicit list, like the MS Project group's
+             [CSCI700], is trusted as-is). This covers every graduate
+             program's free-elective-style group, not just CS MS's, with no
+             data edit needed. Covered by test_validator_graduate_electives.py.
 
 BUG-044  A combined-program undergraduate can be planned into 700-level
          credits of a non-thesis master's (CSCI700)
-  Status:    Open
+  Status:    Fixed
   Owner:     Midhat Sajad (validator, combined data)
   Where:     validator.py (no rule on what a combined-program student may take
              before the bachelor's is complete); data/json/
@@ -968,6 +977,18 @@ BUG-044  A combined-program undergraduate can be planned into 700-level
              700-level course before it when the master's part is non-thesis.
              The same boundary decides the 18 or 15 credit semester cap
              (planner.md), so the validator could use it for that too
+  Fixed in:  not yet committed (backend: Midhat), exactly the fix idea above.
+             Added a Program.thesis_based (true/false/null) field, docs/
+             data-format.md updated; null means unknown, so a program is
+             never flagged just because the field is unset. Set
+             thesis_based: false on cs-ms-non-thesis-project-track in
+             data/json/graduate-programs.json; left every other graduate
+             program's field unset rather than guess. validator.py finds the
+             last semester with a planned bachelor's-component requirement
+             course and flags any 700-level course from the master's/PhD
+             component at or before it, under a new "ineligible_course" flag
+             type (added to plan_models.py and docs/plan-format.md). Covered
+             by test_validator_combined_eligibility.py.
 
 BUG-045  Terms offered are not in the course data (summer only, spring
          only, even years)
