@@ -410,3 +410,46 @@ def test_chat_server_edits_and_saves(db_path: Path, tmp_path: Path) -> None:
     assert move.is_error is False
     assert bad.is_error is True
     assert json.loads((tmp_path / "state.json").read_text())["semesters"][1]["courses"] == ["TEST102", "TEST301"]
+
+
+# --- tool-call trace (mcp_server.ChatTools) -----------------------------------------------------
+
+
+def test_chat_tools_write_one_trace_line_per_call(db_path: Path, state_path: Path, tmp_path: Path) -> None:
+    trace = tmp_path / "trace.jsonl"
+    chat = ChatTools(sqlite3.connect(db_path), make_request(), state_path, trace)
+    chat.call("get_current_plan", {})
+    chat.call("move_course", {"code": "TEST999", "to_label": "Fall 2026"})
+    chat.call("search_catalog", ["not", "a", "dict"])
+    chat.call("no_such_tool", {})
+
+    lines = [json.loads(line) for line in trace.read_text().splitlines()]
+    assert [(l["tool"], l["ok"]) for l in lines] == [
+        ("get_current_plan", True), ("move_course", False), ("search_catalog", False), ("no_such_tool", False),
+    ]
+    assert "not in the plan" in lines[1]["error"]
+    assert lines[2]["input"] == '["not", "a", "dict"]'
+
+
+def test_trace_line_is_capped(db_path: Path, state_path: Path, tmp_path: Path) -> None:
+    from degree_planner_backend.agent.mcp_server import TRACE_TEXT_MAX
+
+    trace = tmp_path / "trace.jsonl"
+    chat = ChatTools(sqlite3.connect(db_path), make_request(), state_path, trace)
+    chat.call("search_catalog", {"query": "x" * 5000})
+
+    line = json.loads(trace.read_text())
+    assert len(line["input"]) == TRACE_TEXT_MAX
+
+
+def test_unwritable_trace_never_breaks_a_tool_call(db_path: Path, state_path: Path, tmp_path: Path) -> None:
+    chat = ChatTools(sqlite3.connect(db_path), make_request(), state_path, tmp_path / "no-such-dir" / "trace.jsonl")
+
+    assert "error" not in chat.call("get_current_plan", {})
+
+
+def test_no_trace_without_a_path(db_path: Path, state_path: Path, tmp_path: Path) -> None:
+    chat = ChatTools(sqlite3.connect(db_path), make_request(), state_path)
+    chat.call("get_current_plan", {})
+
+    assert not list(tmp_path.glob("*.jsonl"))

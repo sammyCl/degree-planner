@@ -61,7 +61,7 @@ def files(tmp_path: Path) -> tuple[Path, Path]:
 
 
 def fake_run_chat(response: ChatResponse, seen: list | None = None):
-    def run(connection, request, runner=None):
+    def run(connection, request, runner=None, trace=None):
         if seen is not None:
             seen.append(request)
         return response
@@ -180,7 +180,7 @@ def test_missing_database(files, tmp_path, capsys) -> None:
 def test_claude_code_not_available(files, monkeypatch, capsys) -> None:
     request, db = files
 
-    def broken(connection, request, runner=None):
+    def broken(connection, request, runner=None, trace=None):
         raise loop.ClaudeCodeError("'claude' is not installed or not on PATH")
 
     monkeypatch.setattr(chat_loop, "run_chat", broken)
@@ -191,9 +191,27 @@ def test_claude_code_not_available(files, monkeypatch, capsys) -> None:
 def test_database_is_opened_read_only(files, monkeypatch) -> None:
     request, db = files
 
-    def writes(connection, request, runner=None):
+    def writes(connection, request, runner=None, trace=None):
         connection.execute("CREATE TABLE t (x)")
 
     monkeypatch.setattr(chat_loop, "run_chat", writes)
     with pytest.raises(sqlite3.OperationalError, match="readonly"):
         try_chat.main([str(request), "--db", str(db)])
+
+
+def test_prints_the_tool_calls(files, monkeypatch, capsys) -> None:
+    request, db = files
+
+    def run(connection, request, runner=None, trace=None):
+        trace.extend([
+            {"tool": "get_prerequisites", "input": '{"code": "CSCI403"}', "ok": True, "error": None},
+            {"tool": "replace_course", "input": '{"old_code": "CSCI400"}', "ok": False, "error": "Not changed: x"},
+        ])
+        return ANSWER
+
+    monkeypatch.setattr(chat_loop, "run_chat", run)
+    assert try_chat.main([str(request), "--db", str(db)]) == 0
+    out = capsys.readouterr().out
+    assert "tool calls (2):" in out
+    assert '1. get_prerequisites {"code": "CSCI403"} -> ok' in out
+    assert "2. replace_course" in out and "-> error: Not changed: x" in out

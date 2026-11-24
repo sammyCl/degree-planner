@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import sqlite3
 import tempfile
 from collections import Counter
@@ -58,8 +59,13 @@ STOPPED_REPLY = (
 EMPTY_REPLY = "I finished without writing a reply. Please check any changes listed here before you apply them."
 
 
-def run_chat(connection: sqlite3.Connection, request: ChatRequest, runner: Runner | None = None) -> ChatResponse:
-    """Answer the last student message in request and return the reply with any proposal."""
+def run_chat(connection: sqlite3.Connection, request: ChatRequest, runner: Runner | None = None,
+             trace: list[dict[str, Any]] | None = None) -> ChatResponse:
+    """Answer the last student message in request and return the reply with any proposal.
+
+    trace, when given, is filled with one entry per tool call the chatbot made, in order: tool,
+    input (as JSON text), ok, error. For checking a run by hand (try-chat); the response never
+    carries it."""
     runner = runner or run_claude
     with tempfile.TemporaryDirectory(prefix="degree-planner-chat-") as tmp:
         work = Path(tmp)
@@ -67,10 +73,19 @@ def run_chat(connection: sqlite3.Connection, request: ChatRequest, runner: Runne
         request_path.write_text(request.model_dump_json(by_alias=True))
         state_path = work / "chat-state.json"
         config_path = work / "mcp.json"
-        config_path.write_text(json.dumps(_mcp_config(_database_file(connection, work), request_path, state_path, mode="chat")))
+        trace_path = work / "chat-trace.jsonl"
+        config_path.write_text(json.dumps(
+            _mcp_config(_database_file(connection, work), request_path, state_path, mode="chat", trace_path=trace_path)
+        ))
 
         run = runner(claude_command(config_path, CHAT_AGENT), first_message(request), work)
         state_text = state_path.read_text() if state_path.exists() else None
+        calls = _read_trace(trace_path)
+
+    # Tool names only: inputs can hold search text, and the log is not the place for it.
+    logger.info("chat: %d tool calls: %s", len(calls), ", ".join(c["tool"] for c in calls) or "none")
+    if trace is not None:
+        trace.extend(calls)
 
     if run.timed_out:
         return _stopped(TIMEOUT_PROBLEM, Usage(input_tokens=0, output_tokens=0, steps=0))
@@ -83,9 +98,47 @@ def run_chat(connection: sqlite3.Connection, request: ChatRequest, runner: Runne
         return _stopped(STOPPED_PROBLEM, usage)
 
     final_text = result.get("result", "") if isinstance(result.get("result"), str) else ""
-    final_text = final_text.strip()
+    final_text = plain_text(final_text).strip()
     reply = final_text[:MESSAGE_MAX] if _has_visible_text(final_text) else EMPTY_REPLY
     return _build_response(connection, request, state_text, reply, usage)
+
+
+_MD_LINK = re.compile(r"\[([^\]\n]+)\]\((https?://[^)\s]+)\)")
+_MD_HEADING = re.compile(r"^[ \t]{0,3}#{1,6}[ \t]+", re.MULTILINE)
+_MD_STAR_BULLET = re.compile(r"^([ \t]*)[*+][ \t]+", re.MULTILINE)
+_MD_ITALIC = re.compile(r"(?<![\w*])\*(?![\s*])([^*\n]*?[^\s*])\*(?![\w*])")
+
+
+def plain_text(text: str) -> str:
+    """The reply with Markdown taken out, because the chat panel shows plain text: bold and code
+    markers go, a heading keeps only its words, a link becomes "text (url)", and a "*" bullet
+    becomes "- ". chat.md already asks for no Markdown; this is the safety net. None of these
+    characters appear in a course code, a label or a normal sentence."""
+    text = _MD_LINK.sub(r"\1 (\2)", text)
+    text = text.replace("**", "").replace("__", "").replace("`", "")
+    text = _MD_HEADING.sub("", text)
+    text = _MD_STAR_BULLET.sub(r"\1- ", text)
+    return _MD_ITALIC.sub(r"\1", text)
+
+
+def _read_trace(path: Path) -> list[dict[str, Any]]:
+    """The tool calls the server recorded; a line that is not a trace entry is skipped."""
+    if not path.exists():
+        return []
+    calls = []
+    for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+        try:
+            entry = json.loads(line)
+        except ValueError:
+            continue
+        if isinstance(entry, dict) and isinstance(entry.get("tool"), str):
+            calls.append({
+                "tool": entry["tool"],
+                "input": entry.get("input") if isinstance(entry.get("input"), str) else "",
+                "ok": entry.get("ok") is True,
+                "error": entry.get("error") if isinstance(entry.get("error"), str) else None,
+            })
+    return calls
 
 
 def first_message(request: ChatRequest) -> str:

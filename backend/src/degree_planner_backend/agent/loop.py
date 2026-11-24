@@ -159,9 +159,12 @@ def run_claude(command: list[str], first_message: str, cwd: Path, timeout: float
     return ClaudeRun(result=result)
 
 
-def _mcp_config(db_path: Path, request_path: Path, plan_path: Path, mode: str = "plan") -> dict[str, Any]:
-    # The planner's arguments stay as they were; chat adds --mode chat (mcp_server.py).
+def _mcp_config(db_path: Path, request_path: Path, plan_path: Path, mode: str = "plan",
+                trace_path: Path | None = None) -> dict[str, Any]:
+    # The planner's arguments stay as they were; chat adds --mode chat and --trace (mcp_server.py).
     extra = ["--mode", mode] if mode != "plan" else []
+    if trace_path is not None:
+        extra += ["--trace", str(trace_path)]
     return {
         "mcpServers": {
             SERVER_NAME: {

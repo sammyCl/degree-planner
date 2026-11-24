@@ -111,7 +111,8 @@ class FakeClaude:
         option = {self.server_args[i]: self.server_args[i + 1] for i in range(2, len(self.server_args), 2)}
         assert option["--mode"] == "chat"
         request = ChatRequest.model_validate_json(Path(option["--request"]).read_text())
-        chat = ChatTools(sqlite3.connect(option["--db"]), request, Path(option["--plan"]))
+        trace = Path(option["--trace"]) if "--trace" in option else None
+        chat = ChatTools(sqlite3.connect(option["--db"]), request, Path(option["--plan"]), trace)
         self.tool_results = [chat.call(name, tool_input) for name, tool_input in self.calls]
         return ClaudeRun(result=self.result, timed_out=self.timed_out)
 
@@ -144,7 +145,9 @@ def test_command_uses_the_chat_agent(connection: sqlite3.Connection) -> None:
     allowed = command[command.index("--allowedTools") + 1: command.index("--setting-sources")]
     assert "mcp__planner__move_course" in allowed and "mcp__planner__check_plan" not in allowed
     assert command[command.index("--tools") + 1] == ""
-    assert fake.server_args[-2:] == ["--mode", "chat"]
+    option = {fake.server_args[i]: fake.server_args[i + 1] for i in range(2, len(fake.server_args), 2)}
+    assert option["--mode"] == "chat"
+    assert option["--trace"].endswith("chat-trace.jsonl")
 
 
 def test_first_message_keeps_student_text_quoted() -> None:
@@ -431,3 +434,83 @@ def test_plan_changes_with_a_repeated_seminar() -> None:
 
 def test_plan_changes_none() -> None:
     assert plan_changes(LABELS, [["TEST101"], [], []], [["TEST101"], [], []]) == []
+
+
+# --- tool-call trace ----------------------------------------------------------------------------
+
+
+def test_trace_lists_every_tool_call_in_order(connection: sqlite3.Connection) -> None:
+    fake = FakeClaude([
+        ("get_current_plan", {}),
+        ("get_prerequisites", {"code": "TEST302"}),
+        ("replace_course", {"old_code": "TEST301", "new_code": "TEST999"}),
+        ("replace_course", {"old_code": "TEST301", "new_code": "TEST302"}),
+    ])
+    trace: list = []
+    run_chat(connection, make_request(), runner=fake, trace=trace)
+
+    assert [c["tool"] for c in trace] == ["get_current_plan", "get_prerequisites", "replace_course", "replace_course"]
+    assert [c["ok"] for c in trace] == [True, True, False, True]
+    assert "Not changed" in trace[2]["error"] and trace[3]["error"] is None
+    assert json.loads(trace[3]["input"]) == {"old_code": "TEST301", "new_code": "TEST302"}
+
+
+def test_trace_is_optional_and_not_in_the_response(connection: sqlite3.Connection) -> None:
+    response = run_chat(connection, make_request(), runner=FakeClaude([("get_current_plan", {})]))
+
+    assert "trace" not in response.model_dump() and "tool" not in response.model_dump_json()
+
+
+def test_trace_with_no_calls(connection: sqlite3.Connection) -> None:
+    trace: list = []
+    run_chat(connection, make_request(), runner=FakeClaude(), trace=trace)
+    assert trace == []
+
+
+def test_bad_trace_lines_are_skipped(tmp_path: Path) -> None:
+    path = tmp_path / "trace.jsonl"
+    path.write_text('{"tool": "move_course", "input": "{}", "ok": true, "error": null}\nnot json\n[1]\n{"no": "tool"}\n')
+
+    assert [c["tool"] for c in chat_loop._read_trace(path)] == ["move_course"]
+    assert chat_loop._read_trace(tmp_path / "missing.jsonl") == []
+
+
+def test_server_log_names_tools_but_not_inputs(connection: sqlite3.Connection, caplog: pytest.LogCaptureFixture) -> None:
+    fake = FakeClaude([("search_catalog", {"query": "secret search words"})])
+    with caplog.at_level("INFO", logger="degree_planner_backend.agent.chat_loop"):
+        run_chat(connection, make_request(), runner=fake)
+
+    assert "1 tool calls: search_catalog" in caplog.text
+    assert "secret search words" not in caplog.text
+
+
+# --- plain-text replies -------------------------------------------------------------------------
+
+
+def test_markdown_is_taken_out_of_the_reply(connection: sqlite3.Connection) -> None:
+    text = "## Plan\nI propose **moving TEST301** to `Spring 2027`.\n* It frees *Fall 2027*.\nSee [the catalog](https://catalog.mines.edu/x)."
+    response = run_chat(connection, make_request(), runner=FakeClaude(result=claude_result(text)))
+
+    assert response.reply == (
+        "Plan\nI propose moving TEST301 to Spring 2027.\n- It frees Fall 2027.\n"
+        "See the catalog (https://catalog.mines.edu/x)."
+    )
+
+
+def test_markdown_only_reply_gets_the_fallback(connection: sqlite3.Connection) -> None:
+    response = run_chat(connection, make_request(), runner=FakeClaude(result=claude_result("**  **\n``")))
+    assert response.reply == EMPTY_REPLY
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Move CSCI400 from Spring 2027 to Fall 2027.",
+        "- First, keep MATH201.\n- Then add CSCI403.",
+        "3 * 4 = 12 credits, and a*b*c stays.",
+        "Use snake_case names? No, codes look like EENG500A.",
+        "Fall 2027 (18 credits) is full.",
+    ],
+)
+def test_plain_text_leaves_plain_text_alone(text: str) -> None:
+    assert chat_loop.plain_text(text) == text

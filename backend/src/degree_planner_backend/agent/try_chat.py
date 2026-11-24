@@ -8,6 +8,9 @@
 if the file's last message is the student's, --say replaces it; if it is the assistant's, --say
 adds the student's message after it. Without --say the file must end with a student message.
 
+The output lists every tool call the chatbot made, in order, with its input and whether it worked,
+so you can check for example that it looked up prerequisites before a swap.
+
 This calls Claude Code for real, on the signed-in Claude Code account, so it uses plan usage.
 The automated tests never do; this is for trying a conversation by hand after changing chat.md.
 """
@@ -41,13 +44,19 @@ def with_message(raw: Any, say: str) -> Any:
     return raw | {"messages": messages + [{"role": "student", "text": say}]}
 
 
-def summarize(request: ChatRequest, response: ChatResponse, seconds: float) -> str:
+def summarize(request: ChatRequest, response: ChatResponse, seconds: float,
+              calls: list[dict[str, Any]] | None = None) -> str:
     usage = response.usage
     lines = [
         f"student: {request.messages[-1].text}",
         f"steps: {usage.steps} of {chat_loop.CHAT_STEP_LIMIT}   tokens: {usage.input_tokens} in, "
         f"{usage.output_tokens} out   time: {seconds:.0f}s",
     ]
+    if calls is not None:
+        lines.append(f"tool calls ({len(calls)}):" if calls else "tool calls: none")
+        for number, call in enumerate(calls, start=1):
+            outcome = "ok" if call["ok"] else f"error: {call['error']}"
+            lines.append(f"  {number}. {call['tool']} {call['input']} -> {outcome}")
     if response.problems:
         lines.append("problems:")
         lines += [f"  - {problem}" for problem in response.problems]
@@ -114,15 +123,16 @@ def main(argv: list[str] | None = None) -> int:
 
     connection = sqlite3.connect(f"{args.db.resolve().as_uri()}?mode=ro", uri=True)
     started = time.monotonic()
+    calls: list[dict[str, Any]] = []
     try:
-        response = chat_loop.run_chat(connection, request)
+        response = chat_loop.run_chat(connection, request, trace=calls)
     except loop.ClaudeCodeError as exc:
         print(f"Claude Code could not run: {exc}. Is it installed and signed in (run `claude` once)?", file=sys.stderr)
         return 1
     finally:
         connection.close()
 
-    print(summarize(request, response, time.monotonic() - started))
+    print(summarize(request, response, time.monotonic() - started, calls))
     if args.json:
         # by_alias: prerequisite edges are written as "from", not "from_" (BUG-031).
         args.json.write_text(response.model_dump_json(by_alias=True, indent=2))
