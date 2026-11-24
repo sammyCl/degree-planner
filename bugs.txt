@@ -993,3 +993,73 @@ BUG-045  Terms offered are not in the course data (summer only, spring
              field such as "terms": ["spring"], "years": "even"; the
              validator warns on a mismatch. Until then the eval's checker
              only flags these (checker.py FLAGGED_TOPICS)
+
+BUG-046  A lone surrogate in a request body gives 500 instead of 422 (all
+         JSON endpoints)
+  Status:    Open
+  Owner:     Midhat Sajad (backend API)
+  Where:     backend/src/degree_planner_backend/main.py (FastAPI's default
+             RequestValidationError handler)
+  Found:     2026-11-24 by the chatbot's adversarial test agent on
+             /plans/chat, reproduced on /plans/check by Samantha with Claude
+  Steps:     POST /plans/check with the raw body
+             {"student": {"degree_level": "bachelor", "programs":
+             ["x\ud800"], "catalog_year": "2026-2027"}, "semesters": 5}
+             (\ud800 is a lone surrogate, valid JSON escape but not valid
+             text)
+  Actual:    500 Internal Server Error. Pydantic rejects the value, then
+             FastAPI's 422 handler echoes the input back and encoding the
+             response as UTF-8 raises UnicodeEncodeError. An ordinary bad
+             body ({"student": 5}) gets 422 as it should
+  Expected:  422 with a validation message, like any other bad body
+  Fix idea:  add an exception handler for RequestValidationError that
+             leaves out each error's "input" (or encodes it with
+             errors="replace")
+
+BUG-047  CSCI478's prerequisite is stored as an exception, so every plan
+         with CSCI478 gets an exception warning
+  Status:    Open
+  Owner:     Samantha Clapp (bachelor's data: course entries); Abdallah
+             Salhi (prerequisite parser)
+  Where:     data/Academic Catalog/mines-courses.csv (CSCI478 row);
+             data/tools/prereq_parser.py; data/json/courses.json
+  Found:     2026-11-24 by the chatbot's real-model test runs (the chatbot
+             itself called the wording "garbled"), checked by Samantha with
+             Claude
+  Steps:     look at CSCI478 in data/json/courses.json, or plan
+             cs-bs-general-track with CSCI128 in Fall 2026 and CSCI478 in a
+             later semester, then call check_plan
+  Actual:    prerequisites is {"type": "exception", "label": "CSCI101 or
+             CSCI102 CSCI128"}, so check_plan lists CSCI478 in
+             open_exceptions even though CSCI128 is planned. The catalog CSV
+             itself has "CSCI101 or CSCI102 CSCI128" with no "or" or "and"
+             before CSCI128, and the parser keeps text it cannot read as one
+             exception. CSCI478 is the only course in mines-courses.csv with
+             this pattern
+  Expected:  a course prerequisite (most likely "one of CSCI101, CSCI102,
+             CSCI128"; check the Mines catalog page for CSCI478 first) and no
+             exception warning
+  Fix idea:  confirm the wording on catalog.mines.edu, then correct the
+             CSCI478 entry (a fix in the slice, or a known-fix rule in the
+             parser), and rebuild courses.json
+
+BUG-048  get_forms has no course substitution form, so the chatbot cannot
+         point a student to one
+  Status:    Open
+  Owner:     Abdallah Salhi (forms data)
+  Where:     data/json/forms-policies.json
+  Found:     2026-11-24 by the chatbot's real-model test runs (a student
+             asks to count MATH307 for MATH332), checked by Samantha with
+             Claude
+  Steps:     get_forms {"program_id": "cs-bs-general-track"}
+  Actual:    12 forms and policies (independent study, double degree,
+             transfer course approval, ...); none is for a course
+             substitution or a requirement waiver. The chatbot correctly
+             says it cannot accept a substitution and invents no form, but
+             the student gets no next step
+  Expected:  the form or process Mines uses for a course substitution (if
+             there is one), so the chatbot can name it
+  Fix idea:  look for the registrar's or the department's substitution or
+             petition form and add it to forms-policies.json in the data
+             format; if Mines has none, note that, and the chatbot will keep
+             saying to ask the advisor
