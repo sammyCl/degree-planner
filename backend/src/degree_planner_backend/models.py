@@ -84,21 +84,33 @@ class Course(BaseModel):
 class RequirementGroup(BaseModel):
     group_id: str
     label: str
-    kind: Literal["all", "choose_credits"]
+    # "requirement" (BUG-038): the group's real rule is a logical AND/OR of courses, not a flat
+    # list or a credit count (e.g. the Thorson first-year-core swap: HASS100+EDNS151, or
+    # HNRS105+HNRS115, never a mix of the two pairs). Its `requirement` field decides whether the
+    # group is met; `courses` may still list every course it mentions, for display and catalog
+    # checks only.
+    kind: Literal["all", "choose_credits", "requirement"]
     courses: list[str] | None = None
     # BUG-022 (held back): several of agent/tools.py's existing adversarial tests deliberately
     # store a program with credits_required/total_credits_required missing, zero or negative and
     # expect it to load with a data_warning, not be rejected by the loader. Needs Samantha to fold
     # this into that handling before it can reject at load.
+    # Also used for a "requirement" group's nominal credit count (bookkeeping only, e.g. for a
+    # printed total to add up); the validator decides whether the group is met from `requirement`
+    # alone, never from this number.
     credits_required: float | None = None
     # Only meaningful for an "all" group (BUG-042): its courses must be planned in every fall and
     # spring semester of the plan, not just once anywhere (e.g. a 0-credit graduate seminar).
     every_semester: bool = False
+    # Only for kind "requirement".
+    requirement: Requirement | None = None
 
     @model_validator(mode="after")
     def _check_credits_required(self) -> RequirementGroup:
-        if self.kind == "choose_credits" and self.credits_required is None:
-            raise ValueError("credits_required is required when kind is 'choose_credits'")
+        if self.kind in ("choose_credits", "requirement") and self.credits_required is None:
+            raise ValueError(f"credits_required is required when kind is {self.kind!r}")
+        if self.kind == "requirement" and self.requirement is None:
+            raise ValueError("requirement is required when kind is 'requirement'")
         return self
 
 

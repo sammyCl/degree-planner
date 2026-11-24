@@ -107,27 +107,48 @@ def PICK(gid, label, credits, courses=None):
     return g(gid, label, "choose_credits", courses, credits)
 
 
+def course_req(code):
+    return {"type": "course", "code": code}
+
+
+def and_req(codes):
+    return {"type": "AND", "of": [course_req(c) for c in codes]}
+
+
+def REQUIRE(gid, label, credits, requirement, courses=None):
+    d = g(gid, label, "requirement", courses, credits)
+    d["requirement"] = requirement
+    return d
+
+
 def P(program_id, name, total, groups):
     return {"program_id": program_id, "name": name, "total": total, "groups": groups}
 
 
 # Thorson First-Year Honors: HNRS105 + HNRS115 replace HASS100 + EDNS151 for all majors (policy-thorson-first-year-
-# honors in forms-policies.json). The format has no "this pair or that pair" group, so the two core courses move out
-# of the required list into one 6-credit choice of the four. It also accepts a mix such as HASS100 + HNRS105, which
-# the policy does not allow; the exact rule needs a new group kind (BUG-038).
+# honors in forms-policies.json). The two core courses move out of the required list into a "requirement" group
+# (BUG-038) that holds the real either/or rule, so a mix such as HASS100 + HNRS105 is correctly rejected.
+# credits_required here is nominal (the base pair's total, 3+3), for the printed program total to add up; the
+# honors pair is 7 credits (HNRS105 3 + HNRS115 4), a one-credit difference the catalog text doesn't explain
+# (policy-thorson-first-year-honors's own note says to confirm with the Honors office).
 THORSON_PAIR = ("HASS100", "EDNS151")
-THORSON_OPTIONS = ["HASS100", "EDNS151", "HNRS105", "HNRS115"]
+THORSON_HNRS_PAIR = ("HNRS105", "HNRS115")
 
 
 def thorson(groups):
-    """Move HASS100 and EDNS151 out of the "all" group that lists both into a choice that also takes the Thorson
-    courses, placed right after that group. Returns the new groups, or None when no group lists both."""
+    """Move HASS100 and EDNS151 out of the "all" group that lists both into a "requirement" group that holds the
+    Thorson swap's real rule. Returns the new groups, or None when no group lists both."""
     for k, grp in enumerate(groups):
         if grp["kind"] == "all" and all(c in grp.get("courses", []) for c in THORSON_PAIR):
             kept = dict(grp, courses=[c for c in grp["courses"] if c not in THORSON_PAIR])
-            choice = PICK("first-year-core", "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-                          6, list(THORSON_OPTIONS))
-            return groups[:k] + [kept, choice] + groups[k + 1:]
+            swap = REQUIRE(
+                "first-year-core",
+                "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+                6,
+                {"type": "OR", "of": [and_req(THORSON_PAIR), and_req(THORSON_HNRS_PAIR)]},
+                courses=sorted(THORSON_PAIR + THORSON_HNRS_PAIR),
+            )
+            return groups[:k] + [kept, swap] + groups[k + 1:]
     return None
 
 
@@ -1091,7 +1112,7 @@ SPECS = [
 # ---------------------------------------------------------------- build
 
 def group_credits(courses, grp):
-    if grp["kind"] == "choose_credits":
+    if grp["kind"] in ("choose_credits", "requirement"):
         return grp["credits_required"], []
     total, unknown = 0.0, []
     for code in grp.get("courses", []):

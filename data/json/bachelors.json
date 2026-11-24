@@ -41,14 +41,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -335,14 +366,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -696,14 +758,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -1095,14 +1188,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -1426,14 +1550,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -1868,14 +2023,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -2230,14 +2416,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -2600,14 +2817,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -2828,14 +3076,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -3141,14 +3420,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -3454,14 +3764,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -3771,14 +4112,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -4043,14 +4415,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -4295,14 +4698,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -4502,14 +4936,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -4764,14 +5229,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -5096,14 +5592,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -5307,14 +5834,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -5605,14 +6163,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -5859,14 +6448,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -6142,14 +6762,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -6376,14 +7027,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -6641,14 +7323,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -7136,14 +7849,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -7581,14 +8325,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -7858,14 +8633,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -8263,14 +9069,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -8556,14 +9393,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -9035,14 +9903,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -9332,14 +10231,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -9648,14 +10578,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -9945,14 +10906,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -10331,14 +11323,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -10545,14 +11568,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -10768,14 +11822,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -11030,14 +12115,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -11267,14 +12383,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -11516,14 +12663,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -11775,14 +12953,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -12021,14 +13230,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -12255,14 +13495,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -12499,14 +13770,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -12838,14 +14140,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "success-wellness",
@@ -13105,14 +14438,45 @@
         {
           "group_id": "first-year-core",
           "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
-          "kind": "choose_credits",
+          "kind": "requirement",
           "courses": [
-            "HASS100",
             "EDNS151",
+            "HASS100",
             "HNRS105",
             "HNRS115"
           ],
-          "credits_required": 6
+          "credits_required": 6,
+          "requirement": {
+            "type": "OR",
+            "of": [
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HASS100"
+                  },
+                  {
+                    "type": "course",
+                    "code": "EDNS151"
+                  }
+                ]
+              },
+              {
+                "type": "AND",
+                "of": [
+                  {
+                    "type": "course",
+                    "code": "HNRS105"
+                  },
+                  {
+                    "type": "course",
+                    "code": "HNRS115"
+                  }
+                ]
+              }
+            ]
+          }
         },
         {
           "group_id": "honors-research-methods",

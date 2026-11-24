@@ -957,7 +957,7 @@ BUG-037  Validator adds program totals, so a major + minor needs too many credit
              open). Covered by tests/test_validator_totals.py
 
 BUG-038  The Thorson swap accepts a mix of the core and honors courses
-  Status:    Open
+  Status:    Fixed
   Owner:     Midhat Sajad (data format, validator)
   Where:     docs/data-format.md (group kinds), validator.py; the stand-in is
              the first-year-core group in data/json/bachelors.json, built by
@@ -975,6 +975,25 @@ BUG-038  The Thorson swap accepts a mix of the core and honors courses
              prerequisites already use: OR(AND(HASS100, EDNS151),
              AND(HNRS105, HNRS115)); the validator already evaluates these
              for prerequisites. Then thorson() writes that group instead
+  Fixed in:  not yet committed (backend: Midhat), exactly the fix idea above.
+             RequirementGroup gained a third kind, "requirement", with a
+             `requirement` field holding the same AND/OR/course/exception
+             shape as a course's prerequisites (models.py, docs/data-format.md);
+             credits_required is now also required for this kind, but only as
+             a nominal bookkeeping number (e.g. so a printed program total
+             still adds up), never what decides whether the group is met.
+             validator.py's new _satisfied_branch walks the expression and
+             returns the specific combination of courses that satisfied it
+             (so only that combination is claimed from the program's
+             available-courses pool, same as BUG-025), or None, flagging
+             requirement_unmet with _describe(requirement) (already used for
+             broken_prerequisite messages) when nothing satisfies it.
+             data/tools/build_bachelors_json.py's thorson() now writes this
+             group instead of a flat 6-credit choose_credits over all four
+             courses; regenerated data/json/bachelors.json (all 44 programs
+             that have the pair; bachelors.REVIEW.md is unchanged). Covered by
+             test_validator_requirement_group.py (781 backend tests pass, 4
+             new); `uv run load-data ../data` still loads cleanly.
 
 BUG-039  A plan cannot choose the credits of a variable-credit course
   Status:    Open (kept on purpose as a test for plan editing)
