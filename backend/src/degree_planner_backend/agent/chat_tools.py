@@ -300,6 +300,12 @@ class ChatSession:
         kept_after = [semester["courses"] for semester in result["semesters"]]
         if added is not None:
             code, index = added
+            # An edit never adds and removes the same course in one semester (a move to its own
+            # semester and a replace with itself are refused above), so these two checks suffice.
+            if code in before["semesters"][index]["courses"]:
+                # The validator keeps one copy per semester, so the edit would do nothing (an add)
+                # or quietly turn into a removal (a replace or a move).
+                raise _BadInput(f"Not changed: {code} is already planned in {self.labels[index]}.")
             if code not in kept_after[index]:
                 raise _BadInput(f"Not changed: {self._reason(result, code, index)}")
         for index, semester in enumerate(before["semesters"]):

@@ -70,7 +70,7 @@ def run_chat(connection: sqlite3.Connection, request: ChatRequest, runner: Runne
         config_path.write_text(json.dumps(_mcp_config(_database_file(connection, work), request_path, state_path, mode="chat")))
 
         run = runner(claude_command(config_path, CHAT_AGENT), first_message(request), work)
-        state = json.loads(state_path.read_text()) if state_path.exists() else None
+        state_text = state_path.read_text() if state_path.exists() else None
 
     if run.timed_out:
         return _stopped(TIMEOUT_PROBLEM, Usage(input_tokens=0, output_tokens=0, steps=0))
@@ -85,7 +85,7 @@ def run_chat(connection: sqlite3.Connection, request: ChatRequest, runner: Runne
     final_text = result.get("result", "") if isinstance(result.get("result"), str) else ""
     final_text = final_text.strip()
     reply = final_text[:MESSAGE_MAX] if _has_visible_text(final_text) else EMPTY_REPLY
-    return _build_response(connection, request, state, reply, usage)
+    return _build_response(connection, request, state_text, reply, usage)
 
 
 def first_message(request: ChatRequest) -> str:
@@ -113,12 +113,45 @@ def _stopped(problem: str, usage: Usage) -> ChatResponse:
     return ChatResponse(reply=STOPPED_REPLY, problems=(problem,), usage=usage)
 
 
-def _accepted(state: dict[str, Any] | None, request: ChatRequest) -> list[Override]:
+class _BadState(ValueError):
+    """The saved working plan is not what the server writes: a bug, never the student's doing."""
+
+
+def _parse_state(text: str, labels: list[str]) -> tuple[list[list[str]], list[Any]]:
+    """The saved working plan (semesters of codes, with the request's labels in order) and the raw
+    accepted overrides. Anything else raises _BadState, so run_chat never crashes on it."""
+    try:
+        data = json.loads(text)
+    except ValueError as exc:
+        raise _BadState("not JSON") from exc
+    if not isinstance(data, dict):
+        raise _BadState("not an object")
+    saved = data.get("semesters")
+    if not isinstance(saved, list) or not all(isinstance(s, dict) for s in saved):
+        raise _BadState("semesters is not a list of objects")
+    if [s.get("label") for s in saved] != labels:
+        raise _BadState("the semesters do not match the request's labels")
+    semesters: list[list[str]] = []
+    for s in saved:
+        codes = s.get("courses")
+        if not isinstance(codes, list) or not all(isinstance(c, str) for c in codes):
+            raise _BadState("courses is not a list of codes")
+        cleaned = [tools._clean_stored_code(c) for c in codes]
+        if not all(tools._COURSE_CODE.fullmatch(c) for c in cleaned):
+            raise _BadState("a saved code is not a course code")
+        semesters.append(cleaned)
+    overrides = data.get("accepted_overrides", [])
+    if not isinstance(overrides, list):
+        raise _BadState("accepted_overrides is not a list")
+    return semesters, overrides
+
+
+def _accepted(raw_overrides: list[Any], request: ChatRequest) -> list[Override]:
     """The exceptions the model accepted, read back through Override so only overridable types and
     real course codes count; ones the request already had are not new."""
     already = {(o.type, o.code) for o in request.overrides}
     accepted: list[Override] = []
-    for raw in (state or {}).get("accepted_overrides", []):
+    for raw in raw_overrides:
         try:
             override = Override.model_validate(raw)
         except ValidationError:
@@ -134,10 +167,16 @@ def _planned_codes(plan: Plan) -> list[list[str]]:
     return [[tools._clean_stored_code(c.code) for c in s.courses if c.status == "planned"] for s in plan.semesters]
 
 
+def _board_codes(plan: Plan) -> list[list[str]]:
+    """Every row on the board, planned or completed: what Apply replaces."""
+    return [[tools._clean_stored_code(c.code) for c in s.courses] for s in plan.semesters]
+
+
 def _build(connection: sqlite3.Connection, request: ChatRequest, semesters: list[list[str]],
-           overrides: list[Override]) -> tuple[Plan, list[str]]:
+           overrides: list[Override]) -> tuple[Plan, list[str], list[str]]:
     """Rebuild and validate semesters of codes with the request's labels and record, as the
-    planner's loop does: returns the checked plan and its open errors."""
+    planner's loop does: returns the checked plan, its open errors, and the codes whose exception
+    is still open."""
     context = tools.StudentContext(
         student=request.plan.student,
         overrides=frozenset((o.type, o.code) for o in overrides),
@@ -156,7 +195,11 @@ def _build(connection: sqlite3.Connection, request: ChatRequest, semesters: list
         flag.message for flag in checked.flags
         if flag.severity == "error" and not (flag.overridden and flag.type in tools.OVERRIDABLE_FLAG_TYPES)
     ]
-    return plan, open_errors
+    open_exceptions = sorted({
+        built.course_codes[flag.course_id] for flag in checked.flags
+        if flag.type == EXCEPTION_TYPE and not flag.overridden and flag.course_id in built.course_codes
+    })
+    return plan, open_errors, open_exceptions
 
 
 def plan_changes(labels: list[str], before: list[list[str]], after: list[list[str]]) -> list[PlanChange]:
@@ -179,28 +222,37 @@ def plan_changes(labels: list[str], before: list[list[str]], after: list[list[st
     return changes
 
 
-def _build_response(connection: sqlite3.Connection, request: ChatRequest, state: dict[str, Any] | None,
+def _build_response(connection: sqlite3.Connection, request: ChatRequest, state_text: str | None,
                     reply: str, usage: Usage) -> ChatResponse:
-    if state is None:  # no edit was accepted: a question answered, or a question asked back
+    if state_text is None:  # no edit was accepted: a question answered, or a question asked back
         return ChatResponse(reply=reply, usage=usage)
 
     labels = request.semester_labels()
-    saved = state.get("semesters")
-    if not isinstance(saved, list) or [s.get("label") if isinstance(s, dict) else None for s in saved] != labels:
+    try:
+        edited, raw_overrides = _parse_state(state_text, labels)
+    except _BadState as exc:
         # The server writes this file itself, so this is a bug, not something the student did.
-        logger.error("chat: the saved working plan does not match the request's semesters")
+        logger.error("chat: the saved working plan is not usable: %s", exc)
         return ChatResponse(reply=STOPPED_REPLY, problems=(STOPPED_PROBLEM,), usage=usage)
-    edited = [list(s.get("courses", [])) for s in saved]
-    accepted = _accepted(state, request)
 
-    # Both sides go through build_plan, so a course the board already had that build_plan leaves out
-    # (an unknown code, say) is not reported as a change the chatbot made.
-    baseline, _ = _build(connection, request, _planned_codes(request.plan), list(request.overrides))
-    proposed, open_errors = _build(connection, request, edited, list(request.overrides) + accepted)
-    changes = plan_changes(labels, _planned_codes(baseline), _planned_codes(proposed))
+    baseline, _, _ = _build(connection, request, _planned_codes(request.plan), list(request.overrides))
+    accepted = _accepted(raw_overrides, request)
+    proposed, open_errors, open_exceptions = _build(connection, request, edited, list(request.overrides) + accepted)
+    proposed_codes = _planned_codes(proposed)
 
-    if not changes and not accepted:  # edits that cancel out, such as a move and its move back
-        return ChatResponse(reply=reply, usage=usage)
+    # An exception accepted for a course the model later removed or replaced is not proposed.
+    still_planned = {code for codes in proposed_codes for code in codes}
+    accepted = [o for o in accepted if o.code in still_planned]
+
+    # Whether there is a proposal at all depends only on the model's own edits: both sides go
+    # through build_plan, so courses build_plan always leaves out do not count as an edit.
+    if not plan_changes(labels, _planned_codes(baseline), proposed_codes) and not accepted:
+        return ChatResponse(reply=reply, usage=usage)  # no edit, or edits that cancel out
+
+    # What is shown is everything Apply would change on the board, compared with the board as sent:
+    # completed rows and courses build_plan left out (unknown, repeated, already completed) are not
+    # in proposed_plan, so they show as removes instead of vanishing silently.
+    changes = plan_changes(labels, _board_codes(request.plan), proposed_codes)
     if len(changes) > CHANGES_MAX:
         return ChatResponse(reply=STOPPED_REPLY, problems=(TOO_MANY_CHANGES_PROBLEM,), usage=usage)
 
@@ -211,5 +263,6 @@ def _build_response(connection: sqlite3.Connection, request: ChatRequest, state:
         changes=tuple(changes),
         accepted_overrides=tuple(accepted),
         still_open=tuple(still_open),
+        open_exceptions=tuple(open_exceptions),
         usage=usage,
     )

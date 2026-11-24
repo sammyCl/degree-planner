@@ -100,6 +100,7 @@
   "still_open": [
     "CSCI400 requires one of MATH201/MATH223 to be completed in an earlier semester, and neither is in the plan yet."
   ],
+  "open_exceptions": [],
   "problems": [],
   "usage": {
     "input_tokens": 18400,

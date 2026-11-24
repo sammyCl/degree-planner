@@ -259,6 +259,37 @@ def test_add_later_copy_is_refused(session: ChatSession) -> None:
     assert "Not changed" in session.call("add_course", {"code": "TEST101", "label": "Fall 2027"})["error"]
 
 
+@pytest.mark.parametrize(
+    ("tool", "tool_input"),
+    [
+        ("add_course", {"code": "TEST101", "label": "Fall 2026"}),
+        ("replace_course", {"old_code": "TEST302", "new_code": "TEST101"}),
+    ],
+)
+def test_edit_onto_a_course_already_in_that_semester_is_refused(db_path: Path, state_path: Path, tool: str, tool_input: dict) -> None:
+    # The validator keeps one copy per semester, so these would do nothing or turn into a removal.
+    board = {"Fall 2026": ["TEST101", "TEST302"], "Spring 2027": ["TEST102"], "Fall 2027": ["TEST301"]}
+    session = ChatSession(sqlite3.connect(db_path), make_request(board), state_path)
+
+    assert "already planned in Fall 2026" in session.call(tool, tool_input)["error"]
+    assert not state_path.exists()
+
+
+def test_move_a_seminar_onto_a_semester_that_has_it_is_refused(db_path: Path, state_path: Path) -> None:
+    board = {"Fall 2026": ["TEST101", "TEST050"], "Spring 2027": ["TEST102", "TEST050"], "Fall 2027": ["TEST301"]}
+    session = ChatSession(sqlite3.connect(db_path), make_request(board), state_path)
+
+    result = session.call("move_course", {"code": "TEST050", "to_label": "Spring 2027", "from_label": "Fall 2026"})
+    assert "already planned in Spring 2027" in result["error"]
+    assert not state_path.exists()
+
+
+def test_repeated_adds_do_not_fill_the_semester(session: ChatSession) -> None:
+    for _ in range(15):
+        assert "already planned" in session.call("add_course", {"code": "TEST101", "label": "Fall 2026"})["error"]
+    assert "error" not in session.call("add_course", {"code": "TEST302", "label": "Fall 2026"})
+
+
 def test_add_needs_a_label(session: ChatSession) -> None:
     assert "label must be one of" in session.call("add_course", {"code": "TEST302"})["error"]
 

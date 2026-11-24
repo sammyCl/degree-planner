@@ -23,7 +23,7 @@ from degree_planner_backend.agent.request_models import (
     _has_visible_text,
     semesters_max,
 )
-from degree_planner_backend.agent.tools import _COURSE_CODE, _clean_stored_code
+from degree_planner_backend.agent.tools import COURSES_PER_SEMESTER_MAX, _COURSE_CODE, _clean_stored_code
 from degree_planner_backend.plan_models import Plan
 
 # One message, either way. The chatbot's reply has the same limit as the planner's explanation.
@@ -32,6 +32,19 @@ MESSAGE_MAX = EXPLANATION_MAX  # 4000
 MESSAGES_MAX = 40
 # Plan changes one reply may propose: a student asks for one or two at a time.
 CHANGES_MAX = 30
+
+_SEASON_ORDER = {"Spring": 0, "Summer": 1, "Fall": 2}
+
+
+def _term_key(label: str) -> tuple[int, int]:
+    """("Fall 2026") -> (2026, 2), so labels sort in calendar order. label must match _TERM."""
+    match = _TERM.fullmatch(label)
+    assert match is not None
+    return int(match.group(2)), _SEASON_ORDER[match.group(1)]
+
+
+def _is_course_code(value: str) -> bool:
+    return bool(_COURSE_CODE.fullmatch(_clean_stored_code(value)))
 
 
 class ChatMessage(BaseModel):
@@ -92,6 +105,21 @@ class ChatRequest(BaseModel):
                 raise ValueError(f'semester label {label!r} must look like "Fall 2026"')
         if len(set(labels)) != len(labels):
             raise ValueError("each semester label must appear once")
+        # The validator checks prerequisites in list order, so the list must be in calendar order.
+        keys = [_term_key(label) for label in labels]
+        if keys != sorted(keys):
+            raise ValueError("semesters must be in calendar order, earliest first")
+        # The same limits the chat tools work within (tools.py), so every board the request
+        # accepts is one the tools can read.
+        for semester in self.plan.semesters:
+            planned = [c for c in semester.courses if c.status == "planned"]
+            if len(planned) > COURSES_PER_SEMESTER_MAX:
+                raise ValueError(
+                    f"{semester.label} has {len(planned)} planned courses; at most {COURSES_PER_SEMESTER_MAX}"
+                )
+            for course in semester.courses:
+                if not _is_course_code(course.code):
+                    raise ValueError(f"{semester.label} has a course whose code is not like CSCI101")
         return self
 
     def semester_labels(self) -> list[str]:
@@ -147,6 +175,8 @@ class ChatResponse(BaseModel):
     still_open: error flags still open in the proposed plan, so a change that breaks something is
         shown rather than hidden. A proposal does not have to pass the validator: the student may
         want the change anyway.
+    open_exceptions: course codes in the proposed plan whose exception the student has not decided
+        yet (exception_claimed warnings not overridden), so the panel can ask about each one.
     problems: why the run stopped early (step limit, timeout, error); then there is no proposal.
     """
 
@@ -157,6 +187,7 @@ class ChatResponse(BaseModel):
     changes: tuple[PlanChange, ...] = Field(default=(), max_length=CHANGES_MAX)
     accepted_overrides: tuple[Override, ...] = Field(default=(), max_length=OVERRIDES_MAX)
     still_open: tuple[str, ...] = Field(default=(), max_length=PROBLEMS_MAX)
+    open_exceptions: tuple[str, ...] = Field(default=(), max_length=OVERRIDES_MAX)
     problems: tuple[str, ...] = Field(default=(), max_length=PROBLEMS_MAX)
     usage: Usage
 
@@ -171,6 +202,17 @@ class ChatResponse(BaseModel):
     @classmethod
     def _drop_duplicate_overrides(cls, value: tuple[Override, ...]) -> tuple[Override, ...]:
         return _unique_overrides(value)
+
+    @field_validator("open_exceptions")
+    @classmethod
+    def _check_open_exceptions(cls, value: tuple[str, ...]) -> tuple[str, ...]:
+        codes = []
+        for raw in value:
+            code = _clean_stored_code(raw)
+            if not _COURSE_CODE.fullmatch(code):
+                raise ValueError(f"{raw!r} is not a course code like CSCI101")
+            codes.append(code)
+        return tuple(dict.fromkeys(codes))
 
     @field_validator("still_open", "problems")
     @classmethod
@@ -188,8 +230,8 @@ class ChatResponse(BaseModel):
         if self.proposed_plan is None:
             if proposes:
                 raise ValueError("changes or accepted_overrides need a proposed_plan")
-            if self.still_open:
-                raise ValueError("still_open needs a proposed_plan")
+            if self.still_open or self.open_exceptions:
+                raise ValueError("still_open and open_exceptions need a proposed_plan")
         else:
             if not proposes:
                 raise ValueError("a proposed_plan must change something or accept an exception")

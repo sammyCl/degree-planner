@@ -239,13 +239,142 @@ def test_accept_an_exception(connection: sqlite3.Connection) -> None:
     assert flags and all(f.overridden for f in flags)
 
 
-def test_unknown_course_on_the_board_is_not_a_change(connection: sqlite3.Connection) -> None:
-    board = {"Fall 2026": ["TEST101", "TEST999"], "Spring 2027": ["TEST102"], "Fall 2027": ["TEST301"]}
+def test_courses_apply_would_drop_are_listed_as_removes(connection: sqlite3.Connection) -> None:
+    # Apply replaces the board with proposed_plan, so anything build_plan leaves out (an unknown
+    # course, a repeat, a completed row) must show as a change, not vanish silently.
+    board = {"Fall 2026": ["TEST101", "TEST999", "TEST302"], "Spring 2027": ["TEST102", "TEST302"], "Fall 2027": ["TEST301"]}
+    request = make_request(board)
+    plan = request.plan.model_dump(by_alias=True)
+    plan["semesters"][2]["courses"].append(
+        {"course_id": "done-test201", "code": "TEST201", "title": "x", "credits": 3.0, "status": "completed"}
+    )
     fake = FakeClaude([("move_course", {"code": "TEST301", "to_label": "Spring 2027"})])
+    response = run_chat(connection, make_request(plan=plan), runner=fake)
+
+    assert sorted(changes(response), key=str) == sorted([
+        ("move", "TEST301", "Fall 2027", "Spring 2027"),
+        ("remove", "TEST999", "Fall 2026", None),
+        ("remove", "TEST302", "Spring 2027", None),
+        ("remove", "TEST201", "Fall 2027", None),
+    ], key=str)
+    assert any("TEST999" in line for line in response.still_open)
+    # Every change listed is really the difference between the board and the proposal.
+    assert where(response.proposed_plan) == {"Fall 2026": ["TEST101", "TEST302"], "Spring 2027": ["TEST102", "TEST301"], "Fall 2027": []}
+
+
+def test_board_drops_alone_are_not_a_proposal(connection: sqlite3.Connection) -> None:
+    # The model's own edits cancel out, so nothing is proposed, even though the board has a course
+    # build_plan would leave out.
+    board = {"Fall 2026": ["TEST101", "TEST999"], "Spring 2027": ["TEST102"], "Fall 2027": ["TEST301"]}
+    fake = FakeClaude([
+        ("move_course", {"code": "TEST301", "to_label": "Spring 2027"}),
+        ("move_course", {"code": "TEST301", "to_label": "Fall 2027"}),
+    ])
+    assert run_chat(connection, make_request(board), runner=fake).proposed_plan is None
+
+
+def test_exception_accepted_then_removed_is_not_proposed(connection: sqlite3.Connection) -> None:
+    board = {"Fall 2026": ["TEST101"], "Spring 2027": ["TEST102"], "Fall 2027": ["TEST201"]}
+    fake = FakeClaude([
+        ("accept_exception", {"code": "TEST201"}),
+        ("replace_course", {"old_code": "TEST201", "new_code": "TEST301"}),
+    ])
     response = run_chat(connection, make_request(board), runner=fake)
 
+    assert "error" not in fake.tool_results[0]
+    assert response.accepted_overrides == ()
+    assert changes(response) == [("remove", "TEST201", "Fall 2027", None), ("add", "TEST301", None, "Fall 2027")]
+
+
+def test_exception_accepted_then_removed_alone_is_no_proposal(connection: sqlite3.Connection) -> None:
+    board = {"Fall 2026": ["TEST101"], "Spring 2027": ["TEST102"], "Fall 2027": ["TEST201", "TEST301"]}
+    fake = FakeClaude([
+        ("accept_exception", {"code": "TEST201"}),
+        ("remove_course", {"code": "TEST201"}),
+        ("add_course", {"code": "TEST201", "label": "Fall 2027"}),
+    ])
+    # Net: TEST201 is back where it was and its exception is accepted, so that is the proposal.
+    response = run_chat(connection, make_request(board), runner=fake)
+    assert [(o.code) for o in response.accepted_overrides] == ["TEST201"]
+    assert response.changes == ()
+
+
+def test_open_exceptions_in_the_proposal(connection: sqlite3.Connection) -> None:
+    fake = FakeClaude([("replace_course", {"old_code": "TEST301", "new_code": "TEST201"})])
+    response = run_chat(connection, make_request(), runner=fake)
+
+    assert response.open_exceptions == ("TEST201",)
+    assert response.still_open == ()  # an exception is a warning, not an error
+
+
+def test_accepted_exception_is_not_open(connection: sqlite3.Connection) -> None:
+    fake = FakeClaude([
+        ("replace_course", {"old_code": "TEST301", "new_code": "TEST201"}),
+        ("accept_exception", {"code": "TEST201"}),
+    ])
+    response = run_chat(connection, make_request(), runner=fake)
+
+    assert response.open_exceptions == ()
+    assert [o.code for o in response.accepted_overrides] == ["TEST201"]
+
+
+class StateWriter(FakeClaude):
+    """A fake run that writes a given state file, as a buggy server might."""
+
+    def __init__(self, text: str) -> None:
+        super().__init__()
+        self.text = text
+
+    def __call__(self, command, first_message, cwd):
+        run = super().__call__(command, first_message, cwd)
+        config = json.loads(Path(command[command.index("--mcp-config") + 1]).read_text())
+        args = config["mcpServers"]["planner"]["args"]
+        Path(args[args.index("--plan") + 1]).write_text(self.text)
+        return run
+
+
+def _state(semesters=None, **extra) -> str:
+    if semesters is None:
+        semesters = [{"label": label, "courses": codes} for label, codes in BOARD.items()]
+    return json.dumps({"semesters": semesters} | extra)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "{not json",
+        "[]",
+        '"text"',
+        json.dumps({"semesters": "no"}),
+        json.dumps({"semesters": [1, 2, 3]}),
+        _state([{"label": "Fall 2026", "courses": ["TEST101"]}]),  # labels do not match
+        _state([{"label": label, "courses": None} for label in LABELS]),
+        _state([{"label": label, "courses": [1]} for label in LABELS]),
+        _state([{"label": label, "courses": ["Calc I"]} for label in LABELS]),
+        _state(accepted_overrides=5),
+    ],
+)
+def test_bad_state_file_gives_the_stopped_reply(connection: sqlite3.Connection, text: str) -> None:
+    response = run_chat(connection, make_request(), runner=StateWriter(text))
+
+    assert response.problems == (STOPPED_PROBLEM,)
+    assert response.reply == STOPPED_REPLY
+    assert response.proposed_plan is None
+
+
+def test_state_file_with_lowercase_codes_is_cleaned(connection: sqlite3.Connection) -> None:
+    semesters = [{"label": "Fall 2026", "courses": ["test101"]}, {"label": "Spring 2027", "courses": ["TEST102", "test 301"]},
+                 {"label": "Fall 2027", "courses": []}]
+    response = run_chat(connection, make_request(), runner=StateWriter(_state(semesters)))
+
     assert changes(response) == [("move", "TEST301", "Fall 2027", "Spring 2027")]
-    assert any("TEST999" in line for line in response.still_open)
+
+
+def test_state_file_bad_override_is_ignored(connection: sqlite3.Connection) -> None:
+    text = _state(accepted_overrides=[{"type": "broken_prerequisite", "code": "TEST102"}, "junk"])
+    response = run_chat(connection, make_request(), runner=StateWriter(text))
+
+    assert response.proposed_plan is None and response.problems == ()
 
 
 # --- runs that stop -----------------------------------------------------------------------------
