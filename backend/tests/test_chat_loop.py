@@ -554,3 +554,50 @@ def test_reply_gets_both_safety_nets(connection: sqlite3.Connection) -> None:
     response = run_chat(connection, make_request(), runner=FakeClaude(result=claude_result(text)))
 
     assert response.reply == "The plan does not meet its requirements because exceptions still to decide has TEST201."
+
+
+# --- cleaning cases from the third adversarial review (2026-11-24) -------------------------------
+
+
+@pytest.mark.parametrize(
+    ("text", "clean"),
+    [
+        # F3: a "+" line means added and must stay a "+".
+        ("Fall 2029 changes:\n+ 3 credits (CSCI403 in)\n- 3 credits (HASS202 out)",
+         "Fall 2029 changes:\n+ 3 credits (CSCI403 in)\n- 3 credits (HASS202 out)"),
+        # F6: questions, tense, negation and mixed scope keep their meaning.
+        ("Is requirements_met true? Not yet.", "Does the plan meet its requirements? Not yet."),
+        ("requirements_met was false before; now requirements_met is true.",
+         "The plan did not meet its requirements before; now the plan meets its requirements."),
+        ("requirements_met: true for the major, false for the minor",
+         "Whether the plan meets its requirements: true for the major, false for the minor"),
+        ("requirements_met is true only if you take CSCI406.", "The plan meets its requirements only if you take CSCI406."),
+        # F7: whole tool names, any letter case, URLs left alone, no "the the", no capital after e.g.
+        ("I used mcp__planner__move_course and Open_Exceptions.", "I used a move and exceptions still to decide."),
+        ("See https://catalog.mines.edu/check_plan/x for more.", "See https://catalog.mines.edu/check_plan/x for more."),
+        ("Look at the semesters_over_credit_limit list.", "Look at the semesters over their credit limit list."),
+        ("Some tools (e.g. check_plan) ran.", "Some tools (e.g. the plan check) ran."),
+        ("Fall 2027: total_credits is 18.", "Fall 2027: the total credits is 18."),
+        # F8: tables, strikethrough, HTML, closing #s, setext headings, quotes, rules, _italic_.
+        ("| Semester | Credits |\n|---|---|\n| Fall 2026 | 15 |", "Semester, Credits\nFall 2026, 15"),
+        ("~~old~~ new <b>bold</b> and _italic_ text", "old new bold and italic text"),
+        ("## Heading ##\nTitle\n=====\n> quoted line\n---\n* item", "Heading\nTitle\nquoted line\n- item"),
+        ("1. requirements_met is true.\n2. Fall 2027 has room.", "1. The plan meets its requirements.\n2. Fall 2027 has room."),
+    ],
+)
+def test_clean_reply_review_cases(text: str, clean: str) -> None:
+    assert chat_loop.clean_reply(text) == clean
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Email registrar@mines.edu or see https://www.mines.edu/a_b_c.",
+        "snake_case_words stay, and 2 * 3 = 6 credits.",
+        "Spring 2029: 18 credits, Fall 2029: 17 credits.",
+        "- First item\n- Second item",
+        "If 3 < 4 and 5 > 2, nothing changes.",
+    ],
+)
+def test_clean_reply_leaves_plain_text_alone(text: str) -> None:
+    assert chat_loop.clean_reply(text) == text

@@ -98,40 +98,63 @@ def run_chat(connection: sqlite3.Connection, request: ChatRequest, runner: Runne
         return _stopped(STOPPED_PROBLEM, usage)
 
     final_text = result.get("result", "") if isinstance(result.get("result"), str) else ""
-    final_text = plain_words(plain_text(final_text)).strip()
+    final_text = clean_reply(final_text).strip()
     reply = final_text[:MESSAGE_MAX] if _has_visible_text(final_text) else EMPTY_REPLY
     return _build_response(connection, request, state_text, reply, usage)
 
 
+def clean_reply(text: str) -> str:
+    """The reply as the chat panel should show it: field names in plain words first (so a name with
+    "__" in it is read whole), then Markdown taken out."""
+    return plain_text(plain_words(text))
+
+
 _MD_LINK = re.compile(r"\[([^\]\n]+)\]\((https?://[^)\s]+)\)")
-_MD_HEADING = re.compile(r"^[ \t]{0,3}#{1,6}[ \t]+", re.MULTILINE)
-_MD_STAR_BULLET = re.compile(r"^([ \t]*)[*+][ \t]+", re.MULTILINE)
+_MD_TABLE_RULE = re.compile(r"^[ \t]*\|?[ \t]*:?-{3,}:?[ \t]*(?:\|[ \t]*:?-{3,}:?[ \t]*)*\|?[ \t]*$\n?", re.MULTILINE)
+_MD_TABLE_ROW = re.compile(r"^[ \t]*\|(.*)\|[ \t]*$", re.MULTILINE)
+_MD_HEADING = re.compile(r"^[ \t]{0,3}#{1,6}[ \t]+(.*?)(?:[ \t]+#+)?[ \t]*$", re.MULTILINE)
+_MD_RULE_LINE = re.compile(r"^[ \t]*(?:={3,}|-{3,}|\*{3,}|_{3,})[ \t]*$\n?", re.MULTILINE)
+_MD_QUOTE = re.compile(r"^[ \t]*>[ \t]?", re.MULTILINE)
+# Only "*" bullets become "- ": a "+ 3 credits" line means added, so it is left as it is.
+_MD_STAR_BULLET = re.compile(r"^([ \t]*)\*[ \t]+", re.MULTILINE)
+_HTML_TAG = re.compile(r"</?[A-Za-z][A-Za-z0-9]*(?:\s[^<>\n]*)?/?>")
+_MD_UNDER_BOLD = re.compile(r"(?<!\w)__(?=\S)(.+?)(?<=\S)__(?!\w)")
 _MD_ITALIC = re.compile(r"(?<![\w*])\*(?![\s*])([^*\n]*?[^\s*])\*(?![\w*])")
+_MD_UNDER_ITALIC = re.compile(r"(?<![\w_])_(?=[^\s_])([^_\n]*?[^\s_])_(?![\w_])")
+
+
+def _table_row(match: re.Match[str]) -> str:
+    cells = [cell.strip() for cell in match.group(1).split("|")]
+    return ", ".join(cell for cell in cells if cell)
 
 
 def plain_text(text: str) -> str:
-    """The reply with Markdown taken out, because the chat panel shows plain text: bold and code
-    markers go, a heading keeps only its words, a link becomes "text (url)", and a "*" bullet
-    becomes "- ". chat.md already asks for no Markdown; this is the safety net. None of these
-    characters appear in a course code, a label or a normal sentence."""
+    """The reply with Markdown taken out, because the chat panel shows plain text: a table row
+    becomes its cells joined by commas, a heading keeps only its words, a link becomes
+    "text (url)", a "*" bullet becomes "- ", and bold, italics, strikethrough, code marks, quote
+    marks, rules and HTML tags go. chat.md already asks for no Markdown; this is the safety net.
+    None of these change a course code, a label, a number or an ordinary sentence."""
     text = _MD_LINK.sub(r"\1 (\2)", text)
-    text = text.replace("**", "").replace("__", "").replace("`", "")
-    text = _MD_HEADING.sub("", text)
+    text = _MD_TABLE_RULE.sub("", text)
+    text = _MD_TABLE_ROW.sub(_table_row, text)
+    text = _MD_HEADING.sub(r"\1", text)
+    text = _MD_RULE_LINE.sub("", text)
+    text = _MD_QUOTE.sub("", text)
     text = _MD_STAR_BULLET.sub(r"\1- ", text)
-    return _MD_ITALIC.sub(r"\1", text)
+    text = _HTML_TAG.sub("", text)
+    text = text.replace("**", "").replace("~~", "").replace("`", "")
+    text = _MD_UNDER_BOLD.sub(r"\1", text)
+    text = _MD_ITALIC.sub(r"\1", text)
+    return _MD_UNDER_ITALIC.sub(r"\1", text)
 
 
-# Tool and field names the student should never see, with the plain words used instead. Phrases
-# about requirements_met come first, so "requirements_met is false" reads as a sentence.
-_FIELD_PHRASES = [
-    (re.compile(r"\brequirements_met\s*(?:is|was|=|:)?\s*true\b", re.IGNORECASE), "the plan meets its requirements"),
-    (re.compile(r"\brequirements_met\s*(?:is|was|=|:)?\s*false\b", re.IGNORECASE), "the plan does not meet its requirements"),
-]
+# Tool and field names the student should never see, with the plain words used instead.
 _FIELD_WORDS = {
     "requirements_met": "whether the plan meets its requirements",
     "total_credits_required": "the credits required",
     "total_credits": "the total credits",
     "semesters_over_credit_limit": "the semesters over their credit limit",
+    "completed_on_board": "courses already completed",
     "credit_limit": "credit limit",
     "open_exceptions": "exceptions still to decide",
     "still_open": "open problems",
@@ -159,24 +182,61 @@ _FIELD_WORDS = {
 }
 # Longest name first, so total_credits_required is not read as total_credits; mcp__planner__ too.
 _FIELD_NAME = re.compile(
-    r"(?<![\w])(?:mcp__planner__)?(" + "|".join(sorted(map(re.escape, _FIELD_WORDS), key=len, reverse=True)) + r")(?![\w])"
+    r"(?<![\w])(?:mcp__planner__)?(" + "|".join(sorted(map(re.escape, _FIELD_WORDS), key=len, reverse=True)) + r")(?![\w])",
+    re.IGNORECASE,
 )
+# "Is requirements_met true?" asks a question; it reads as one.
+_MET_QUESTION = re.compile(r"\b(?:is|are)\s+(?:the\s+)?requirements_met\s+(?:true|false)\s*\?", re.IGNORECASE)
+_MET_PHRASE = re.compile(r"\brequirements_met\s*(is|was|=|:)?\s*(true|false)\b", re.IGNORECASE)
+_NEGATED_BEFORE = re.compile(r"\b(?:not|is|isn't|whether|if)\s*$", re.IGNORECASE)
+_SENTENCE_REST = re.compile(r"[^.!?;\n]*")
+_TRUE_FALSE = re.compile(r"\b(?:true|false)\b", re.IGNORECASE)
+_THE_BEFORE = re.compile(r"\bthe\s+$", re.IGNORECASE)
+_SENTENCE_START = re.compile(r"(?:^|[.!?]\s+|\n)[ \t]*(?:[-*+][ \t]+|>[ \t]*|#{1,6}[ \t]+|\d+[.)][ \t]+)?[*_`~]*$")
+_ABBREVIATION_BEFORE = re.compile(r"\b(?:e\.g|i\.e|etc|vs)\.\s+[*_`~]*$", re.IGNORECASE)
+
+
+def _met_phrase(match: re.Match[str]) -> str:
+    """"requirements_met is false" as a sentence, except where the sentence would come out wrong:
+    after "not", "is" or "whether", or when the same sentence gives another true or false (a mixed
+    "true for the major, false for the minor"). Those are left for the word rewrite."""
+    before = match.string[: match.start()]
+    rest = _SENTENCE_REST.match(match.string, match.end()).group(0)
+    if _NEGATED_BEFORE.search(before) or _TRUE_FALSE.search(rest):
+        return match.group(0)
+    past = (match.group(1) or "").lower() == "was"
+    met = match.group(2).lower() == "true"
+    if past:
+        words = "the plan met its requirements" if met else "the plan did not meet its requirements"
+    else:
+        words = "the plan meets its requirements" if met else "the plan does not meet its requirements"
+    return _in_sentence(match, words)
+
+
+def _field_word(match: re.Match[str]) -> str:
+    before = match.string[: match.start()]
+    token = re.split(r"\s", before)[-1] if before else ""
+    if "://" in token or token.lower().startswith("www."):
+        return match.group(0)  # inside a URL: leave the address alone
+    words = _FIELD_WORDS[match.group(1).lower()]
+    if words.startswith("the ") and _THE_BEFORE.search(before):
+        words = words[4:]  # "the open_exceptions list" -> "the exceptions still to decide list"
+    return _in_sentence(match, words)
 
 
 def plain_words(text: str) -> str:
     """The reply with the tools' field and tool names put in plain words. chat.md already asks for
     plain words; this is the safety net. Course codes have no underscore, so they are never touched."""
-    for pattern, words in _FIELD_PHRASES:
-        text = pattern.sub(lambda m, words=words: _in_sentence(m, words), text)
-    return _FIELD_NAME.sub(lambda m: _in_sentence(m, _FIELD_WORDS[m.group(1)]), text)
-
-
-_SENTENCE_START = re.compile(r"(?:^|[.!?:]\s+|\n)[ \t]*(?:- )?$")
+    text = _MET_QUESTION.sub(lambda m: _in_sentence(m, "does the plan meet its requirements?"), text)
+    text = _MET_PHRASE.sub(_met_phrase, text)
+    return _FIELD_NAME.sub(_field_word, text)
 
 
 def _in_sentence(match: re.Match[str], words: str) -> str:
-    """words, capitalized when the name it replaces starts a sentence or a list line."""
-    if _SENTENCE_START.search(match.string[: match.start()]):
+    """words, capitalized when the name it replaces starts a sentence or a list line (not after an
+    abbreviation such as "e.g.")."""
+    before = match.string[: match.start()]
+    if _SENTENCE_START.search(before) and not _ABBREVIATION_BEFORE.search(before):
         return words[:1].upper() + words[1:]
     return words
 

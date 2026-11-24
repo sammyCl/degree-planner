@@ -56,9 +56,11 @@ _RESULT_NOTE = (
     "Returns the same result as check_plan for the whole plan after the change: requirements_met, "
     "total_credits, total_credits_required, semesters, errors, warnings, unknown_courses and open_exceptions. "
     "Each semester also has credit_limit (the most credits it may hold) and room (credits left under the "
-    "limit, negative when over), and semesters_over_credit_limit lists the semesters over their limit: use "
-    "these numbers instead of adding credits yourself. A course fits in a semester only if its credits are at "
-    "most that semester's room."
+    "limit, negative when over) and completed_on_board (courses the board shows as already completed: not in "
+    "the plan and not counted in room), and semesters_over_credit_limit lists the semesters over their limit: "
+    "use these numbers instead of adding credits yourself. A course fits in a semester only if its credits are "
+    "at most that semester's room. An edit that is refused returns only an error and changes nothing; call "
+    "get_current_plan if you need the numbers again."
 )
 _CODE = {"type": "string", "description": "Course code such as 'CSCI400'."}
 _LABEL = {"type": "string", "description": "A semester label from the plan, such as 'Fall 2027'."}
@@ -176,6 +178,12 @@ class ChatSession:
         # Only planned courses: completed ones come from the student's record, not the board.
         self.semesters: list[list[str]] = [
             [_clean_stored_code(c.code) for c in semester.courses if c.status == "planned"]
+            for semester in request.plan.semesters
+        ]
+        # Completed rows on the board: not in the plan, but shown to the model so it does not plan
+        # into a semester that is already done.
+        self.completed_on_board: list[list[str]] = [
+            [_clean_stored_code(c.code) for c in semester.courses if c.status == "completed"]
             for semester in request.plan.semesters
         ]
         self.overrides: set[tuple[str, str]] = {(o.type, o.code) for o in request.overrides}
@@ -301,15 +309,17 @@ class ChatSession:
         return self._with_credit_room(result)
 
     def _with_credit_room(self, result: ToolResult) -> ToolResult:
-        """Adds each semester's credit_limit and room, and the semesters over their limit."""
+        """Adds each semester's credit_limit, room and completed_on_board, and the semesters over
+        their limit."""
         if "error" in result:
             return result
         limit = credit_limit(self.student.degree_level)
         over = []
-        for semester in result["semesters"]:
+        for semester, completed in zip(result["semesters"], self.completed_on_board):
             credits = semester["credits"]
             semester["credit_limit"] = limit
             semester["room"] = round(limit - credits, 2)
+            semester["completed_on_board"] = completed
             if credits > limit:
                 over.append(semester["label"])
         result["semesters_over_credit_limit"] = over

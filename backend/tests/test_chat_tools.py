@@ -517,3 +517,25 @@ def test_tool_descriptions_tell_the_model_to_use_room() -> None:
     from degree_planner_backend.agent.chat_tools import CHAT_EDIT_TOOLS
 
     assert all("room" in tool["description"] for tool in CHAT_EDIT_TOOLS)
+
+
+def test_completed_rows_are_reported_but_not_counted(db_path: Path, state_path: Path) -> None:
+    request = make_request()
+    plan = request.plan.model_dump(by_alias=True)
+    plan["semesters"][0]["courses"] = [
+        {"course_id": "done-test302", "code": "TEST302", "title": "x", "credits": 3.0, "status": "completed"},
+    ]
+    session = ChatSession(sqlite3.connect(db_path), make_request(plan=plan), state_path)
+    result = session.call("get_current_plan", {})
+
+    fall = result["semesters"][0]
+    assert fall["completed_on_board"] == ["TEST302"] and fall["courses"] == [] and fall["room"] == 18
+    assert result["semesters"][1]["completed_on_board"] == []
+
+
+def test_tool_descriptions_explain_refused_edits_and_completed_rows() -> None:
+    from degree_planner_backend.agent.chat_tools import CHAT_EDIT_TOOLS
+
+    for tool in CHAT_EDIT_TOOLS:
+        assert "completed_on_board" in tool["description"]
+        assert "refused returns only an error" in tool["description"]
