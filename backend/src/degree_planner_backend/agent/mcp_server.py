@@ -1,15 +1,18 @@
-"""MCP server that gives Claude Code the planner's tools (the five in tools.py).
+"""MCP server that gives Claude Code the planner's tools (the five in tools.py), or in chat mode
+the chatbot's tools (the four catalog lookups and the six in chat_tools.py).
 
 The agent loop (loop.py) runs `claude -p`, and Claude Code starts this server as a child process
 for one request. Run as:
 
-    python -m degree_planner_backend.agent.mcp_server --db DB --request REQUEST.json --plan PLAN.json
+    python -m degree_planner_backend.agent.mcp_server --db DB --request REQUEST.json --plan PLAN.json [--mode chat]
 
 --db       the SQLite catalog, opened read-only
---request  the AgentRequest, written by the loop: the student's record, overrides and semester
-           labels come from here, never from the model
---plan     where the server saves the last check_plan input it accepted, for the loop to rebuild
-           and validate once Claude Code is done
+--request  the AgentRequest (or in chat mode the ChatRequest), written by the loop: the student's
+           record, overrides and semester labels come from here, never from the model
+--plan     where the server saves the last check_plan input it accepted (in chat mode, the working
+           plan and accepted exceptions after every accepted edit), for the loop to rebuild and
+           validate once Claude Code is done
+--mode     plan (the default) or chat
 
 Only stderr is used for logging: stdout carries the MCP messages.
 """
@@ -31,6 +34,8 @@ from mcp.server.lowlevel import Server
 from mcp.server.stdio import stdio_server
 
 from degree_planner_backend.agent import tools
+from degree_planner_backend.agent.chat_models import ChatRequest
+from degree_planner_backend.agent.chat_tools import CHAT_EDIT_TOOLS, ChatSession
 from degree_planner_backend.agent.request_models import AgentRequest
 
 logger = logging.getLogger(__name__)
@@ -45,6 +50,11 @@ TOOL_DEFINITIONS = [
     tools.GET_FORMS_TOOL,
     tools.CHECK_PLAN_TOOL,
 ]
+LOOKUP_TOOL_DEFINITIONS = TOOL_DEFINITIONS[:4]
+# Chat mode: the catalog lookups and the edit tools, but not check_plan, so a small request cannot
+# turn into a whole new plan.
+CHAT_TOOL_DEFINITIONS = LOOKUP_TOOL_DEFINITIONS + CHAT_EDIT_TOOLS
+_CHAT_EDIT_NAMES = frozenset(tool["name"] for tool in CHAT_EDIT_TOOLS)
 _LOOKUP_HANDLERS: dict[str, Callable[[sqlite3.Connection, dict[str, Any]], tools.ToolResult]] = {
     "search_catalog": tools.search_catalog,
     "get_prerequisites": tools.get_prerequisites,
@@ -62,6 +72,8 @@ def context_for(request: AgentRequest) -> tools.StudentContext:
 
 class PlannerTools:
     """Runs one tool call for one request. Plain Python, so it can be tested without MCP."""
+
+    tool_definitions = TOOL_DEFINITIONS
 
     def __init__(self, connection: sqlite3.Connection, request: AgentRequest, plan_path: Path) -> None:
         self.connection = connection
@@ -98,12 +110,34 @@ class PlannerTools:
         os.replace(partial, self.plan_path)
 
 
-def build_server(planner: PlannerTools) -> Server:
+class ChatTools:
+    """Runs one tool call for one chat request: the catalog lookups as the planner has them, and
+    the edit tools on the request's working plan (ChatSession)."""
+
+    tool_definitions = CHAT_TOOL_DEFINITIONS
+
+    def __init__(self, connection: sqlite3.Connection, request: ChatRequest, state_path: Path) -> None:
+        self.connection = connection
+        self.session = ChatSession(connection, request, state_path)
+
+    def call(self, name: str, tool_input: Any) -> tools.ToolResult:
+        if name in _CHAT_EDIT_NAMES:
+            return self.session.call(name, tool_input)
+        handler = _LOOKUP_HANDLERS.get(name)
+        if handler is None:
+            names = ", ".join(tool["name"] for tool in CHAT_TOOL_DEFINITIONS)
+            return {"error": f"there is no tool named {name!r}; the tools are {names}."}
+        return handler(self.connection, tool_input)
+
+
+def build_server(planner: PlannerTools | ChatTools) -> Server:
+    definitions = planner.tool_definitions
+
     async def list_tools(_context: Any, _params: Any) -> types.ListToolsResult:
         return types.ListToolsResult(
             tools=[
                 types.Tool(name=tool["name"], description=tool["description"], inputSchema=tool["input_schema"])
-                for tool in TOOL_DEFINITIONS
+                for tool in definitions
             ]
         )
 
@@ -127,13 +161,18 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--db", required=True, type=Path)
     parser.add_argument("--request", required=True, type=Path)
     parser.add_argument("--plan", required=True, type=Path)
+    parser.add_argument("--mode", choices=["plan", "chat"], default="plan")
     args = parser.parse_args(argv)
 
     logging.basicConfig(level=logging.INFO, stream=sys.stderr)
-    request = AgentRequest.model_validate_json(args.request.read_text())
     # Read-only: no tool writes to the catalog, and a bug must not be able to change it.
     connection = sqlite3.connect(f"{args.db.resolve().as_uri()}?mode=ro", uri=True)
-    asyncio.run(_serve(build_server(PlannerTools(connection, request, args.plan))))
+    planner: PlannerTools | ChatTools
+    if args.mode == "chat":
+        planner = ChatTools(connection, ChatRequest.model_validate_json(args.request.read_text()), args.plan)
+    else:
+        planner = PlannerTools(connection, AgentRequest.model_validate_json(args.request.read_text()), args.plan)
+    asyncio.run(_serve(build_server(planner)))
 
 
 if __name__ == "__main__":
