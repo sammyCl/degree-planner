@@ -539,3 +539,46 @@ def test_tool_descriptions_explain_refused_edits_and_completed_rows() -> None:
     for tool in CHAT_EDIT_TOOLS:
         assert "completed_on_board" in tool["description"]
         assert "refused returns only an error" in tool["description"]
+
+
+# --- each course's credits (so the model never guesses a course's credits) ----------------------
+
+
+def test_results_list_each_courses_credits(session: ChatSession) -> None:
+    result = session.call("get_current_plan", {})
+
+    assert [s["course_credits"] for s in result["semesters"]] == [
+        [{"code": "TEST101", "credits": 3.0}], [{"code": "TEST102", "credits": 3.0}], [{"code": "TEST301", "credits": 3.0}],
+    ]
+
+
+def test_course_credits_follow_an_edit_and_add_up(session: ChatSession) -> None:
+    result = session.call("move_course", {"code": "TEST301", "to_label": "Spring 2027"})
+
+    spring = result["semesters"][1]
+    assert [c["code"] for c in spring["course_credits"]] == spring["courses"] == ["TEST102", "TEST301"]
+    for semester in result["semesters"]:
+        assert sum(c["credits"] for c in semester["course_credits"]) == semester["credits"]
+
+
+def test_course_credits_use_the_catalog_not_the_board(db_path: Path, state_path: Path) -> None:
+    # The board says 3.0 for TEST050; the catalog says 0 (a seminar).
+    board = {"Fall 2026": ["TEST101", "TEST050"], "Spring 2027": ["TEST102"], "Fall 2027": ["TEST301"]}
+    session = ChatSession(sqlite3.connect(db_path), make_request(board), state_path)
+    fall = session.call("get_current_plan", {})["semesters"][0]
+
+    assert fall["course_credits"] == [{"code": "TEST101", "credits": 3.0}, {"code": "TEST050", "credits": 0.0}]
+    assert fall["credits"] == 3.0 and fall["room"] == 15.0
+
+
+def test_course_credits_leave_out_courses_check_plan_drops(db_path: Path, state_path: Path) -> None:
+    board = {"Fall 2026": ["TEST101", "TEST999"], "Spring 2027": ["TEST102"], "Fall 2027": ["TEST301"]}
+    session = ChatSession(sqlite3.connect(db_path), make_request(board), state_path)
+
+    assert session.call("get_current_plan", {})["semesters"][0]["course_credits"] == [{"code": "TEST101", "credits": 3.0}]
+
+
+def test_tool_descriptions_mention_course_credits() -> None:
+    from degree_planner_backend.agent.chat_tools import CHAT_EDIT_TOOLS
+
+    assert all("course_credits" in tool["description"] for tool in CHAT_EDIT_TOOLS)

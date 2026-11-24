@@ -155,6 +155,7 @@ _FIELD_WORDS = {
     "total_credits": "the total credits",
     "semesters_over_credit_limit": "the semesters over their credit limit",
     "completed_on_board": "courses already completed",
+    "course_credits": "course credits",
     "credit_limit": "credit limit",
     "open_exceptions": "exceptions still to decide",
     "still_open": "open problems",

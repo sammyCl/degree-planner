@@ -578,6 +578,7 @@ def test_reply_gets_both_safety_nets(connection: sqlite3.Connection) -> None:
         ("Look at the semesters_over_credit_limit list.", "Look at the semesters over their credit limit list."),
         ("Some tools (e.g. check_plan) ran.", "Some tools (e.g. the plan check) ran."),
         ("Fall 2027: total_credits is 18.", "Fall 2027: the total credits is 18."),
+        ("Per course_credits, LIFL113 is 3 credits.", "Per course credits, LIFL113 is 3 credits."),
         # F8: tables, strikethrough, HTML, closing #s, setext headings, quotes, rules, _italic_.
         ("| Semester | Credits |\n|---|---|\n| Fall 2026 | 15 |", "Semester, Credits\nFall 2026, 15"),
         ("~~old~~ new <b>bold</b> and _italic_ text", "old new bold and italic text"),

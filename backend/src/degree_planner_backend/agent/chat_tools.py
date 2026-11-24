@@ -20,6 +20,7 @@ import unicodedata
 from pathlib import Path
 from typing import Any
 
+from degree_planner_backend import lookups
 from degree_planner_backend.agent import tools
 from degree_planner_backend.agent.chat_models import ChatRequest
 from degree_planner_backend.agent.tools import (
@@ -55,8 +56,8 @@ def credit_limit(degree_level: str) -> int:
 _RESULT_NOTE = (
     "Returns the same result as check_plan for the whole plan after the change: requirements_met, "
     "total_credits, total_credits_required, semesters, errors, warnings, unknown_courses and open_exceptions. "
-    "Each semester also has credit_limit (the most credits it may hold) and room (credits left under the "
-    "limit, negative when over) and completed_on_board (courses the board shows as already completed: not in "
+    "Each semester also has course_credits (each planned course's code and catalog credits), credit_limit (the "
+    "most credits it may hold) and room (credits left under the limit, negative when over) and completed_on_board (courses the board shows as already completed: not in "
     "the plan and not counted in room), and semesters_over_credit_limit lists the semesters over their limit: "
     "use these numbers instead of adding credits yourself. A course fits in a semester only if its credits are "
     "at most that semester's room. An edit that is refused returns only an error and changes nothing; call "
@@ -187,6 +188,7 @@ class ChatSession:
             for semester in request.plan.semesters
         ]
         self.overrides: set[tuple[str, str]] = {(o.type, o.code) for o in request.overrides}
+        self._credits: dict[str, float | None] = {}  # catalog credits by code, looked up once per run
         self.accepted: list[str] = []
         self.state_path = state_path
 
@@ -309,14 +311,15 @@ class ChatSession:
         return self._with_credit_room(result)
 
     def _with_credit_room(self, result: ToolResult) -> ToolResult:
-        """Adds each semester's credit_limit, room and completed_on_board, and the semesters over
-        their limit."""
+        """Adds each semester's course_credits, credit_limit, room and completed_on_board, and the
+        semesters over their limit."""
         if "error" in result:
             return result
         limit = credit_limit(self.student.degree_level)
         over = []
         for semester, completed in zip(result["semesters"], self.completed_on_board):
             credits = semester["credits"]
+            semester["course_credits"] = [{"code": code, "credits": self._course_credits(code)} for code in semester["courses"]]
             semester["credit_limit"] = limit
             semester["room"] = round(limit - credits, 2)
             semester["completed_on_board"] = completed
@@ -365,6 +368,16 @@ class ChatSession:
     def _reason(self, result: ToolResult, code: str, index: int) -> str:
         reasons = [issue["message"] for issue in result["errors"] + result["warnings"] if issue.get("course") == code]
         return reasons[0] if reasons else f"{code} could not be planned in {self.labels[index]}."
+
+    def _course_credits(self, code: str) -> float | None:
+        """A kept course's catalog credits (the same number check_plan counts); None if the catalog
+        no longer has it, which cannot happen for a course check_plan kept."""
+        if code not in self._credits:
+            try:
+                self._credits[code] = lookups.get_course(self.connection, code, self.student.catalog_year).credits
+            except lookups.NotFoundError:
+                self._credits[code] = None
+        return self._credits[code]
 
     def state(self) -> dict[str, Any]:
         return self._tool_input(self.semesters) | {
