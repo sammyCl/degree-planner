@@ -39,9 +39,26 @@ logger = logging.getLogger(__name__)
 EXCEPTION_TYPE = "exception_claimed"
 assert EXCEPTION_TYPE in OVERRIDABLE_FLAG_TYPES
 
+# Most credits in one semester without extra approval: 18 undergraduate, 15 graduate (2026-2027
+# Graduate Catalog). The validator does not check this, so the chat tools report it, worked out
+# in code, and the model never adds credits itself. A combined BS+MS plan uses the undergraduate
+# limit here; chat.md tells the model about its graduate semesters.
+CREDIT_LIMIT_UNDERGRADUATE = 18
+CREDIT_LIMIT_GRADUATE = 15
+_GRADUATE_LEVELS = {"master", "phd"}
+
+
+def credit_limit(degree_level: str) -> int:
+    return CREDIT_LIMIT_GRADUATE if degree_level in _GRADUATE_LEVELS else CREDIT_LIMIT_UNDERGRADUATE
+
+
 _RESULT_NOTE = (
     "Returns the same result as check_plan for the whole plan after the change: requirements_met, "
-    "total_credits, total_credits_required, semesters, errors, warnings, unknown_courses and open_exceptions."
+    "total_credits, total_credits_required, semesters, errors, warnings, unknown_courses and open_exceptions. "
+    "Each semester also has credit_limit (the most credits it may hold) and room (credits left under the "
+    "limit, negative when over), and semesters_over_credit_limit lists the semesters over their limit: use "
+    "these numbers instead of adding credits yourself. A course fits in a semester only if its credits are at "
+    "most that semester's room."
 )
 _CODE = {"type": "string", "description": "Course code such as 'CSCI400'."}
 _LABEL = {"type": "string", "description": "A semester label from the plan, such as 'Fall 2027'."}
@@ -280,7 +297,23 @@ class ChatSession:
         return {"semesters": [{"label": label, "courses": codes} for label, codes in zip(self.labels, semesters)]}
 
     def _check(self, semesters: list[list[str]] | None = None) -> ToolResult:
-        return tools.check_plan(self.connection, self._tool_input(self.semesters if semesters is None else semesters), self._context())
+        result = tools.check_plan(self.connection, self._tool_input(self.semesters if semesters is None else semesters), self._context())
+        return self._with_credit_room(result)
+
+    def _with_credit_room(self, result: ToolResult) -> ToolResult:
+        """Adds each semester's credit_limit and room, and the semesters over their limit."""
+        if "error" in result:
+            return result
+        limit = credit_limit(self.student.degree_level)
+        over = []
+        for semester in result["semesters"]:
+            credits = semester["credits"]
+            semester["credit_limit"] = limit
+            semester["room"] = round(limit - credits, 2)
+            if credits > limit:
+                over.append(semester["label"])
+        result["semesters_over_credit_limit"] = over
+        return result
 
     def _apply(
         self,

@@ -453,3 +453,67 @@ def test_no_trace_without_a_path(db_path: Path, state_path: Path, tmp_path: Path
     chat.call("get_current_plan", {})
 
     assert not list(tmp_path.glob("*.jsonl"))
+
+
+# --- credit limit and room (so the model never adds credits itself) ----------------------------
+
+
+def test_results_carry_credit_limit_and_room(session: ChatSession) -> None:
+    result = session.call("get_current_plan", {})
+
+    assert [(s["label"], s["credits"], s["credit_limit"], s["room"]) for s in result["semesters"]] == [
+        ("Fall 2026", 3.0, 18, 15.0), ("Spring 2027", 3.0, 18, 15.0), ("Fall 2027", 3.0, 18, 15.0),
+    ]
+    assert result["semesters_over_credit_limit"] == []
+
+
+def test_every_edit_result_carries_the_room(session: ChatSession) -> None:
+    result = session.call("move_course", {"code": "TEST301", "to_label": "Spring 2027"})
+
+    assert [s["room"] for s in result["semesters"]] == [15.0, 12.0, 18.0]
+
+
+def test_exactly_at_the_limit_has_no_room_and_is_not_over(db_path: Path, state_path: Path) -> None:
+    # Five 3-credit courses: 15 credits, the limit for a master's student.
+    board = {"Fall 2026": ["TEST101", "TEST201", "TEST301", "TEST302"], "Spring 2027": ["TEST102"], "Fall 2027": []}
+    request = make_request(board)
+    plan = request.plan.model_dump(by_alias=True)
+    plan["student"]["degree_level"] = "master"
+    session = ChatSession(sqlite3.connect(db_path), make_request(plan=plan), state_path)
+
+    result = session.call("move_course", {"code": "TEST102", "to_label": "Fall 2026"})
+    assert result["semesters"][0]["credits"] == 15.0 and result["semesters"][0]["room"] == 0.0
+    assert result["semesters_over_credit_limit"] == []
+
+
+def test_over_the_limit_is_listed(session: ChatSession) -> None:
+    # The catalog in these tests cannot reach 18 credits, so the check runs on a result directly.
+    result = {"semesters": [{"label": "Fall 2026", "credits": 21.0, "courses": []},
+                            {"label": "Spring 2027", "credits": 18.0, "courses": []}]}
+    session._with_credit_room(result)
+
+    assert [s["room"] for s in result["semesters"]] == [-3.0, 0.0]
+    assert result["semesters_over_credit_limit"] == ["Fall 2026"]
+
+
+def test_error_results_are_left_alone(session: ChatSession) -> None:
+    assert session._with_credit_room({"error": "x"}) == {"error": "x"}
+
+
+def test_graduate_limit_is_15(db_path: Path, state_path: Path) -> None:
+    from degree_planner_backend.agent.chat_tools import credit_limit
+
+    assert credit_limit("master") == 15 and credit_limit("phd") == 15
+    assert credit_limit("bachelor") == 18 and credit_limit("combined") == 18
+    request = make_request()
+    plan = request.plan.model_dump(by_alias=True)
+    plan["student"]["degree_level"] = "master"
+    session = ChatSession(sqlite3.connect(db_path), make_request(plan=plan), state_path)
+
+    assert session.call("get_current_plan", {})["semesters"][0]["credit_limit"] == 15
+
+
+def test_tool_descriptions_tell_the_model_to_use_room() -> None:
+    from degree_planner_backend.agent.chat_tools import CHAT_EDIT_TOOLS
+
+    assert all("room" in tool["description"] for tool in CHAT_EDIT_TOOLS)

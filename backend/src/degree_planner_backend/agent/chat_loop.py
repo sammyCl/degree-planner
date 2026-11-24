@@ -98,7 +98,7 @@ def run_chat(connection: sqlite3.Connection, request: ChatRequest, runner: Runne
         return _stopped(STOPPED_PROBLEM, usage)
 
     final_text = result.get("result", "") if isinstance(result.get("result"), str) else ""
-    final_text = plain_text(final_text).strip()
+    final_text = plain_words(plain_text(final_text)).strip()
     reply = final_text[:MESSAGE_MAX] if _has_visible_text(final_text) else EMPTY_REPLY
     return _build_response(connection, request, state_text, reply, usage)
 
@@ -119,6 +119,66 @@ def plain_text(text: str) -> str:
     text = _MD_HEADING.sub("", text)
     text = _MD_STAR_BULLET.sub(r"\1- ", text)
     return _MD_ITALIC.sub(r"\1", text)
+
+
+# Tool and field names the student should never see, with the plain words used instead. Phrases
+# about requirements_met come first, so "requirements_met is false" reads as a sentence.
+_FIELD_PHRASES = [
+    (re.compile(r"\brequirements_met\s*(?:is|was|=|:)?\s*true\b", re.IGNORECASE), "the plan meets its requirements"),
+    (re.compile(r"\brequirements_met\s*(?:is|was|=|:)?\s*false\b", re.IGNORECASE), "the plan does not meet its requirements"),
+]
+_FIELD_WORDS = {
+    "requirements_met": "whether the plan meets its requirements",
+    "total_credits_required": "the credits required",
+    "total_credits": "the total credits",
+    "semesters_over_credit_limit": "the semesters over their credit limit",
+    "credit_limit": "credit limit",
+    "open_exceptions": "exceptions still to decide",
+    "still_open": "open problems",
+    "accepted_overrides": "accepted exceptions",
+    "unknown_courses": "courses not in the catalog",
+    "exception_claimed": "exception",
+    "broken_prerequisite": "broken prerequisite",
+    "requirement_unmet": "unmet requirement",
+    "credit_shortfall": "credit shortfall",
+    "double_count_exceeded": "too many shared credits",
+    "program_not_loaded": "program not loaded",
+    "already_completed": "already completed",
+    "duplicate_course": "repeated course",
+    "check_plan": "the plan check",
+    "get_current_plan": "your current plan",
+    "get_prerequisites": "the prerequisite lookup",
+    "get_program_requirements": "the program requirements",
+    "search_catalog": "the catalog search",
+    "get_forms": "the forms list",
+    "move_course": "a move",
+    "replace_course": "a swap",
+    "add_course": "adding a course",
+    "remove_course": "removing a course",
+    "accept_exception": "accepting the exception",
+}
+# Longest name first, so total_credits_required is not read as total_credits; mcp__planner__ too.
+_FIELD_NAME = re.compile(
+    r"(?<![\w])(?:mcp__planner__)?(" + "|".join(sorted(map(re.escape, _FIELD_WORDS), key=len, reverse=True)) + r")(?![\w])"
+)
+
+
+def plain_words(text: str) -> str:
+    """The reply with the tools' field and tool names put in plain words. chat.md already asks for
+    plain words; this is the safety net. Course codes have no underscore, so they are never touched."""
+    for pattern, words in _FIELD_PHRASES:
+        text = pattern.sub(lambda m, words=words: _in_sentence(m, words), text)
+    return _FIELD_NAME.sub(lambda m: _in_sentence(m, _FIELD_WORDS[m.group(1)]), text)
+
+
+_SENTENCE_START = re.compile(r"(?:^|[.!?:]\s+|\n)[ \t]*(?:- )?$")
+
+
+def _in_sentence(match: re.Match[str], words: str) -> str:
+    """words, capitalized when the name it replaces starts a sentence or a list line."""
+    if _SENTENCE_START.search(match.string[: match.start()]):
+        return words[:1].upper() + words[1:]
+    return words
 
 
 def _read_trace(path: Path) -> list[dict[str, Any]]:

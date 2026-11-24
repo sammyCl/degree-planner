@@ -514,3 +514,43 @@ def test_markdown_only_reply_gets_the_fallback(connection: sqlite3.Connection) -
 )
 def test_plain_text_leaves_plain_text_alone(text: str) -> None:
     assert chat_loop.plain_text(text) == text
+
+
+# --- plain words: no tool or field names in the reply --------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("text", "plain"),
+    [
+        ("The validator says requirements_met is false.", "The validator says the plan does not meet its requirements."),
+        ("requirements_met is true, with 128 credits.", "The plan meets its requirements, with 128 credits."),
+        ("It shows requirements_met: True.", "It shows the plan meets its requirements."),
+        ("open_exceptions lists CSCI478.", "Exceptions still to decide lists CSCI478."),
+        ("I ran get_prerequisites and mcp__planner__check_plan.", "I ran the prerequisite lookup and the plan check."),
+        ("Its credit_limit is 18; total_credits_required is 128.", "Its credit limit is 18; the credits required is 128."),
+        ("- still_open: one error", "- Open problems: one error"),
+        ("That is a broken_prerequisite.", "That is a broken prerequisite."),
+    ],
+)
+def test_field_names_become_plain_words(text: str, plain: str) -> None:
+    assert chat_loop.plain_words(text) == plain
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Your plan meets its requirements, and Fall 2029 has room for 1 more credit.",
+        "CSCI400, EENG500A and MATH111 stay as they are.",
+        "snake_case_words and requirements_metx are not field names.",
+        "The room is booked; the credit limit is 18.",
+    ],
+)
+def test_plain_words_leaves_plain_text_alone(text: str) -> None:
+    assert chat_loop.plain_words(text) == text
+
+
+def test_reply_gets_both_safety_nets(connection: sqlite3.Connection) -> None:
+    text = "**requirements_met is false** because open_exceptions has `TEST201`."
+    response = run_chat(connection, make_request(), runner=FakeClaude(result=claude_result(text)))
+
+    assert response.reply == "The plan does not meet its requirements because exceptions still to decide has TEST201."
