@@ -1063,3 +1063,26 @@ BUG-048  get_forms has no course substitution form, so the chatbot cannot
              petition form and add it to forms-policies.json in the data
              format; if Mines has none, note that, and the chatbot will keep
              saying to ask the advisor
+
+BUG-049  The validator does not check corequisites
+  Status:    Open
+  Owner:     Midhat Sajad (validator)
+  Where:     backend/src/degree_planner_backend/validator.py (corequisites is
+             defined in models.py and filled in the course data, but never
+             read by the validator)
+  Found:     2026-11-24 by the chatbot's third adversarial review (a real
+             chat refused to move HASS202 because of its corequisite while
+             the validator said the plan was fine), checked by Samantha with
+             Claude
+  Steps:     get_prerequisites {"code": "HASS202"} returns corequisites
+             {"type": "course", "code": "HASS215"}; plan cs-bs-general-track
+             with HASS202 in Fall 2027 and HASS215 in Spring 2028, then call
+             check_plan
+  Actual:    errors [] and requirements_met true: HASS202 is planned a
+             semester before its corequisite and nothing is flagged
+  Expected:  an error (or at least a warning) when a corequisite is not in
+             the same semester or earlier, like broken_prerequisite
+  Fix idea:  in the validator's per-course loop, resolve corequisites
+             against the courses completed before the semester plus the
+             semester's own courses. Until then, chat.md tells the chatbot
+             to check corequisites itself and say when one is unmet
