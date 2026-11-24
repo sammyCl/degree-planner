@@ -1,17 +1,20 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { PROGRAMS } from '../setup/validate.ts'
+import { LEVELS, PROGRAMS } from '../setup/validate.ts'
 import type { Flag, Plan } from '../types.ts'
 import { Arrows } from './Arrows.tsx'
 import { CourseCard, type CardState } from './CourseCard.tsx'
 import { CoursePopover } from './CoursePopover.tsx'
+import { AssistantNote } from './AssistantNote.tsx'
 import { chainOf, creditLevel, flagsByCourse, formatCredits, indexPlan, isOpen } from './graph.ts'
 import { SummaryBar } from './SummaryBar.tsx'
 import './PlannerPage.css'
 
 interface Props {
   plan: Plan
-  /** shown above the board, for example to say the plan is a sample */
-  notice?: string
+  /** what the planning assistant says about the plan */
+  explanation?: string
+  /** why it could not finish a valid plan, if it could not */
+  problems?: string[]
   onBack: () => void
 }
 
@@ -20,7 +23,7 @@ const programName = (plan: Plan): string => {
   return PROGRAMS.find((p) => p.id === id)?.name ?? id ?? 'Your plan'
 }
 
-export function PlannerPage({ plan, notice, onBack }: Props) {
+export function PlannerPage({ plan, explanation, problems, onBack }: Props) {
   const index = useMemo(() => indexPlan(plan), [plan])
   const byCourse = useMemo(() => flagsByCourse(plan.flags), [plan.flags])
   const brokenTargets = useMemo(
@@ -71,11 +74,15 @@ export function PlannerPage({ plan, notice, onBack }: Props) {
     <div className="planner">
       <SummaryBar plan={plan} programName={programName(plan)} onSelectFlag={selectFlag} />
       <div className="planner-notice">
-        <span>{notice}</span>
+        <span>
+          {LEVELS.find((l) => l.value === plan.student.degree_level)?.label ?? plan.student.degree_level} plan,{' '}
+          {plan.semesters.length} semesters, starting {plan.semesters[0]?.label}
+        </span>
         <button type="button" className="link" onClick={onBack}>
           Edit setup
         </button>
       </div>
+      <AssistantNote explanation={explanation} problems={problems} />
       <div className="board">
         <div className="board-inner">
           <div className={`cols${chain ? ' chain-mode' : ''}`} ref={setCols} data-testid="board">

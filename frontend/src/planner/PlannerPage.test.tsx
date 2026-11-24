@@ -3,8 +3,8 @@ import { describe, expect, it, vi } from 'vitest'
 import { samplePlan } from '../samplePlan.ts'
 import { PlannerPage } from './PlannerPage.tsx'
 
-function setup(onBack = vi.fn()) {
-  render(<PlannerPage plan={samplePlan} notice="Sample plan notice" onBack={onBack} />)
+function setup(onBack = vi.fn(), extra: { explanation?: string; problems?: string[] } = {}) {
+  render(<PlannerPage plan={samplePlan} explanation="Plain explanation of the plan." onBack={onBack} {...extra} />)
   return onBack
 }
 
@@ -24,7 +24,8 @@ describe('PlannerPage', () => {
     setup()
     expect(screen.getByText('Bachelor of Science in Computer Science (General Track)')).toBeInTheDocument()
     expect(screen.getByText('Catalog 2026-2027')).toBeInTheDocument()
-    expect(screen.getByText('Sample plan notice')).toBeInTheDocument()
+    expect(screen.getByText('Plain explanation of the plan.')).toBeInTheDocument()
+    expect(screen.getByText(/Bachelor's plan, 8 semesters, starting Fall 2026/)).toBeInTheDocument()
     // the number counts up over about a second
     await waitFor(() => expect(screen.getByTestId('credit-total')).toHaveTextContent('114 / 130'), { timeout: 4000 })
   })
@@ -105,6 +106,37 @@ describe('PlannerPage', () => {
     const last = screen.getByRole('region', { name: 'Spring 2030' })
     expect(last.querySelector('.meter')).toHaveClass('low')
     expect(screen.getByRole('region', { name: 'Fall 2026' }).querySelector('.meter')).toHaveClass('ok')
+  })
+
+  it('lists the problems when the assistant could not finish a valid plan', () => {
+    setup(vi.fn(), { problems: ['CSCI400 cannot be placed after CSCI306.', 'Not enough credits.'] })
+    const alert = screen.getByRole('alert')
+    expect(alert).toHaveTextContent('could not finish a valid plan')
+    expect(within(alert).getAllByRole('listitem')).toHaveLength(2)
+  })
+
+  it('collapses a long explanation without cutting its text, and expands it on request', () => {
+    const long = 'word '.repeat(200).trim()
+    setup(vi.fn(), { explanation: long })
+    const text = screen.getByText(long) // the whole text is there; CSS clamps how much shows
+    expect(text.closest('.note-text')).toHaveClass('clamped')
+    fireEvent.click(screen.getByRole('button', { name: 'Show more' }))
+    expect(text.closest('.note-text')).not.toHaveClass('clamped')
+    fireEvent.click(screen.getByRole('button', { name: 'Show less' }))
+    expect(screen.getByRole('button', { name: 'Show more' })).toBeInTheDocument()
+  })
+
+  it('shows the assistant\'s markdown as formatting, not as symbols', () => {
+    setup(vi.fn(), { explanation: 'It has **130 of 130 credits**.\n- **MATH111** needs a note' })
+    expect(screen.getByText('130 of 130 credits').tagName).toBe('STRONG')
+    expect(screen.queryByText(/\*\*/)).not.toBeInTheDocument()
+  })
+
+  it('draws a warning in amber and an error in red', () => {
+    const warned = { ...samplePlan, flags: [{ ...samplePlan.flags[0], severity: 'warning' as const, type: 'exception_claimed' as const }] }
+    render(<PlannerPage plan={warned} onBack={vi.fn()} />)
+    expect(card('CSCI400')).toHaveClass('warned')
+    expect(card('CSCI400')).not.toHaveClass('flagged')
   })
 
   it('goes back to setup', () => {

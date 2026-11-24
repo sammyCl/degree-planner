@@ -20,11 +20,12 @@ interface Props {
 
 export function CourseCard({ course, flag, state, col, row, setRef, onEnter, onLeave, onOpen, pulse }: Props) {
   const open = flag && !flag.overridden
+  const warning = open && flag.severity === 'warning'
   const aria =
     `${course.code} ${course.title}, ${formatCredits(course.credits)} credits` +
     (course.status === 'completed' ? ', completed' : '') +
     (flag ? `. Problem: ${flag.message}` : '')
-  const classes = ['card', open ? 'flagged' : '', course.status === 'completed' ? 'completed' : '', state, pulse ? 'pulse' : '']
+  const classes = ['card', open && !warning ? 'flagged' : '', warning ? 'warned' : '', course.status === 'completed' ? 'completed' : '', state, pulse ? 'pulse' : '']
     .filter(Boolean)
     .join(' ')
   return (
@@ -60,7 +61,7 @@ export function CourseCard({ course, flag, state, col, row, setRef, onEnter, onL
             <path d="M12 3l10 18H2z" />
             <path d="M12 10v4m0 3h.01" />
           </svg>
-          {flag.type === 'broken_prerequisite' ? 'Prerequisite out of order' : 'Needs attention'}
+          {flag.type === 'broken_prerequisite' ? 'Prerequisite out of order' : warning ? 'Check this' : 'Needs attention'}
         </div>
       )}
     </div>

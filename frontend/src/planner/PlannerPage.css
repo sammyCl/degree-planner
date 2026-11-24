@@ -503,6 +503,10 @@
   color: var(--err);
 }
 
+.card.warned .card-warn {
+  color: var(--warn);
+}
+
 .card.flagged {
   border-color: color-mix(in srgb, var(--err) 55%, transparent);
   background: linear-gradient(var(--err-bg), var(--err-bg)), var(--raised);
@@ -517,6 +521,23 @@
   width: 3px;
   border-radius: 0 3px 3px 0;
   background: var(--err);
+}
+
+/* a warning (for example an exception the student can accept) is amber, an error is red */
+.card.warned {
+  border-color: color-mix(in srgb, var(--warn) 55%, transparent);
+  background: linear-gradient(var(--warn-bg), var(--warn-bg)), var(--raised);
+}
+
+.card.warned::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--warn);
 }
 
 .card.completed {
@@ -655,4 +676,73 @@
   .chain-mode .edge.hot {
     stroke-dasharray: none;
   }
+}
+
+/* ---------- Assistant note ---------- */
+.assistant-note {
+  padding: 0 20px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.assistant-note:empty {
+  display: none;
+}
+
+.note-explanation,
+.note-problems {
+  margin: 10px 0;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.note-text {
+  margin: 4px 0 2px;
+  color: var(--mut);
+}
+
+.note-text p,
+.note-text ul {
+  margin: 0 0 8px;
+}
+
+.note-text ul {
+  padding-left: 20px;
+}
+
+.note-text strong {
+  color: var(--text);
+}
+
+.note-text code {
+  font: 500 12px 'JetBrains Mono', ui-monospace, monospace;
+  padding: 1px 5px;
+  border-radius: 5px;
+  background: var(--col);
+  color: var(--text);
+}
+
+/* collapsed: about three lines, fading out, instead of cutting the text off mid-word */
+.note-text.clamped {
+  max-height: 4.9em;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(#000 55%, transparent);
+  mask-image: linear-gradient(#000 55%, transparent);
+}
+
+.note-problems {
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+
+.note-problems ul {
+  margin: 6px 0 0;
+  padding-left: 20px;
+  color: var(--text);
+}
+
+.planner-notice .link {
+  flex: none;
 }

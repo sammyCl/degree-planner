@@ -20,27 +20,33 @@ import {
 import './SetupPage.css'
 
 interface Props {
-  onSubmit: (request: AgentRequest) => void
+  /** Called with the request to send and the form it came from, so the page can restore it on the way back. */
+  onSubmit: (request: AgentRequest, form: SetupForm) => void
+  /** The student's earlier choices, when they come back from the planner or an error. */
+  initial?: SetupForm
   /** Injectable for tests; the current date is used otherwise. */
   today?: Date
 }
 
-export function SetupPage({ onSubmit, today }: Props) {
+export function SetupPage({ onSubmit, initial, today }: Props) {
   const [now] = useState(() => today ?? new Date())
   const ids = { major: useId(), semesters: useId() }
   const start = useMemo(() => defaultStart(now), [now])
   const thisYear = now.getFullYear()
   const years = Array.from({ length: 6 }, (_, i) => thisYear + i)
 
-  const [form, setForm] = useState<SetupForm>({
-    level: 'bachelor',
-    programId: '',
-    addOnIds: [],
-    season: start.season,
-    year: start.year,
-    semesters: SEMESTER_LIMITS.bachelor.default,
-    includeSummers: false,
-  })
+  const [form, setForm] = useState<SetupForm>(
+    () =>
+      initial ?? {
+        level: 'bachelor',
+        programId: '',
+        addOnIds: [],
+        season: start.season,
+        year: start.year,
+        semesters: SEMESTER_LIMITS.bachelor.default,
+        includeSummers: false,
+      },
+  )
   const [submitted, setSubmitted] = useState(false)
   const errors = validateSetup(form)
   const shown = submitted ? errors : {}
@@ -72,7 +78,7 @@ export function SetupPage({ onSubmit, today }: Props) {
       ;(errors.programId ? majorRef : semestersRef).current?.focus()
       return
     }
-    onSubmit(buildRequest(form))
+    onSubmit(buildRequest(form), form)
   }
 
   const stepSemesters = (delta: number) => {

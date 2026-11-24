@@ -75,3 +75,21 @@ export interface AgentRequest {
   include_summers: boolean
   overrides: Override[]
 }
+
+// What POST /plans/submit-setup returns (docs/agent-request-format.md).
+export interface Usage {
+  input_tokens: number
+  output_tokens: number
+  steps: number
+}
+
+export interface AgentResponse {
+  status: 'ok' | 'cannot_work'
+  /** null only when the agent never proposed a plan */
+  plan: Plan | null
+  /** what the plan does and any choices the agent made, written for the student */
+  explanation: string
+  /** why the agent could not finish a valid plan; empty when status is "ok" */
+  problems: string[]
+  usage: Usage
+}
