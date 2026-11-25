@@ -1,6 +1,18 @@
 import { describe, expect, it } from 'vitest'
 import { defaultStart, semesterLabels } from './terms.ts'
-import { allowsAddOns, buildRequest, majorsFor, PROGRAMS, SEMESTER_LIMITS, validateSetup, type SetupForm } from './validate.ts'
+import {
+  addOnsOfKind,
+  allowsAddOns,
+  buildRequest,
+  CATALOG_YEAR,
+  majorsFor,
+  PROGRAMS,
+  SEMESTER_LIMITS,
+  staleAddOns,
+  validateSetup,
+  type ProgramOption,
+  type SetupForm,
+} from './validate.ts'
 
 const form = (over: Partial<SetupForm> = {}): SetupForm => ({
   level: 'bachelor',
@@ -42,8 +54,17 @@ describe('program options', () => {
     expect(PROGRAMS.some((p) => p.level === 'minor')).toBe(true)
   })
 
-  it('offers no ASI until the ASIs are stored for the 2026-2027 catalog (they would fail in the backend)', () => {
-    expect(PROGRAMS.some((p) => p.level === 'asi')).toBe(false)
+  it('offers the newest ASI data stored, even from an older catalog year, and says which year it is', () => {
+    const asis = addOnsOfKind('asi')
+    expect(asis.length).toBeGreaterThan(0)
+    expect(asis.every((a) => /^\d{4}-\d{4}$/.test(a.catalog_year))).toBe(true)
+  })
+  it('reports the kinds of add-on whose data is not from the catalog year, with the year shown', () => {
+    const opt = (level: ProgramOption['level'], catalog_year: string): ProgramOption => ({ id: `${level}-${catalog_year}`, name: level, level, catalog_year })
+    expect(staleAddOns([opt('minor', CATALOG_YEAR), opt('asi', '2025-2026'), opt('asi', '2024-2025')])).toEqual([
+      { kind: 'asi', years: ['2024-2025', '2025-2026'] },
+    ])
+    expect(staleAddOns([opt('minor', CATALOG_YEAR)])).toEqual([])
   })
   it('has unique ids', () => {
     expect(new Set(PROGRAMS.map((p) => p.id)).size).toBe(PROGRAMS.length)

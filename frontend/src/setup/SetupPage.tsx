@@ -5,8 +5,12 @@ import { Dropdown } from './Dropdown.tsx'
 import { SegmentedControl } from './SegmentedControl.tsx'
 import { defaultStart, semesterLabels, SEASONS, type Season } from './terms.ts'
 import {
+  ADD_ON_NAMES,
   addOns,
+  addOnsOfKind,
   allowsAddOns,
+  staleAddOns,
+  type AddOnKind,
   buildRequest,
   CATALOG_YEAR,
   LEVELS,
@@ -69,9 +73,14 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
     : []
   const major = majors.find((m) => m.id === form.programId)
   const allAddOns = useMemo(() => addOns(), [])
-  // ASIs are only offered once they are stored for the student's catalog year (data/tools/build_frontend_options.py)
-  const addOnNoun = allAddOns.some((a) => a.level === 'asi') ? 'minors and ASIs' : 'minors'
   const byId = new Map(allAddOns.map((a) => [a.id, a]))
+  // minors, ASIs and certifications each get their own picker (a kind with no data stored is not shown)
+  const kinds = (['minor', 'asi', 'certificate'] as const).filter((k) => addOnsOfKind(k).length > 0)
+  const chosenOfKind = (kind: AddOnKind) => form.addOnIds.filter((id) => byId.get(id)?.level === kind)
+  const setKind = (kind: AddOnKind, ids: string[]) =>
+    patch({ addOnIds: [...form.addOnIds.filter((id) => byId.get(id)?.level !== kind), ...ids] })
+  // add-on data older than the catalog the plan uses is still offered, with a warning at the top
+  const stale = useMemo(() => staleAddOns(allAddOns), [allAddOns])
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -91,6 +100,13 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
   return (
     <main className="setup-wrap">
       <div>
+        {stale.length > 0 && (
+          <div className="stale-warning" role="note">
+            <b>Minor, ASI and certification data may not be up to date.</b>{' '}
+            {stale.map((s) => `The ${ADD_ON_NAMES[s.kind].many} shown come from the ${s.years.join(' and ')} catalog`).join('; ')}
+            , not {CATALOG_YEAR}. Check each one against the current Mines catalog before you rely on it.
+          </div>
+        )}
         <div className="hero">
           <h2>
             Plan your path to <span className="grad">graduation</span>.
@@ -126,14 +142,20 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
             )}
           </div>
 
-          {allowsAddOns(form.level) && (
-            <div className="field">
-              <div className="lbl">
-                {addOnNoun === 'minors' ? 'Minors' : 'Minors and ASIs'} <span className="opt">optional, add as many as you like</span>
+          {allowsAddOns(form.level) &&
+            kinds.map((kind) => (
+              <div className="field" key={kind}>
+                <div className="lbl">
+                  {ADD_ON_NAMES[kind].many} <span className="opt">optional, add as many as you like</span>
+                </div>
+                <AddOnPicker
+                  options={addOnsOfKind(kind)}
+                  noun={ADD_ON_NAMES[kind].plural}
+                  selected={chosenOfKind(kind)}
+                  onChange={(ids) => setKind(kind, ids)}
+                />
               </div>
-              <AddOnPicker options={allAddOns} noun={addOnNoun} selected={form.addOnIds} onChange={(addOnIds) => patch({ addOnIds })} />
-            </div>
-          )}
+            ))}
 
           <div className="field">
             <div className="lbl">Starting term</div>

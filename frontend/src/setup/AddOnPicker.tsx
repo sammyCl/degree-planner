@@ -1,16 +1,16 @@
 import { useId, useMemo, useState } from 'react'
-import { shortName, type ProgramOption } from './validate.ts'
+import { CATALOG_YEAR, shortName, type ProgramOption } from './validate.ts'
 
 interface Props {
   options: ProgramOption[]
   selected: string[]
   onChange: (ids: string[]) => void
-  /** what the options are called, "minors" or "minors and ASIs" */
+  /** what the options are called, such as "minors", "ASIs" or "certifications" (names the search box) */
   noun?: string
 }
 
-/** Search box with chips: pick any number of minors and ASIs. */
-export function AddOnPicker({ options, selected, onChange, noun = 'minors and ASIs' }: Props) {
+/** Search box with chips: pick any number of one kind of add-on (minors, ASIs or certifications). */
+export function AddOnPicker({ options, selected, onChange, noun = 'minors' }: Props) {
   const listId = useId()
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
@@ -103,7 +103,7 @@ export function AddOnPicker({ options, selected, onChange, noun = 'minors and AS
               onMouseEnter={() => setHighlight(i)}
             >
               {shortName(o.name)}
-              <span className="menu-kind">{o.level === 'asi' ? 'ASI' : 'minor'}</span>
+              {o.catalog_year !== CATALOG_YEAR && <span className="menu-kind old">{o.catalog_year}</span>}
             </div>
           ))}
         </div>

@@ -936,6 +936,22 @@
   font: 600 15px/1.2 'Inter Tight', Inter, sans-serif;
 }
 
+.about-body.peek {
+  position: relative;
+  max-height: 128px;
+  overflow: hidden;
+}
+
+/* fades the cut-off text into the page so it reads as "there is more" */
+.about-body.peek::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 64px;
+  background: linear-gradient(to bottom, transparent, var(--surface));
+  pointer-events: none;
+}
+
 .about-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));

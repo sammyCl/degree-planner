@@ -40,8 +40,10 @@ export function CoursePopover({ plan, index, courseId, anchor, flags, onMove, on
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
     const onDown = (e: MouseEvent) => {
-      const t = e.target as Node
-      if (!ref.current?.contains(t) && !anchor.contains(t)) onClose()
+      // composedPath is fixed when the click starts. A menu option that React removes while handling the
+      // same click (choosing a semester) is no longer in the page, so contains() would call it "outside".
+      const path = e.composedPath()
+      if (!path.includes(ref.current as EventTarget) && !path.includes(anchor)) onClose()
     }
     document.addEventListener('keydown', onKey)
     document.addEventListener('mousedown', onDown)

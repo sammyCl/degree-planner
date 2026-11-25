@@ -297,6 +297,11 @@
   from { opacity: 0; transform: translateY(-4px) scale(0.98); }
 }
 
+.menu.up {
+  top: auto;
+  bottom: calc(100% + 6px);
+}
+
 .menu-item {
   display: flex;
   align-items: center;
@@ -535,4 +540,20 @@
   .hero h2 {
     font-size: 24px;
   }
+}
+
+/* Warning that add-on data comes from an older catalog */
+.stale-warning {
+  margin-bottom: 18px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--warn) 35%, transparent);
+  background: var(--warn-bg);
+  color: var(--warn);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.menu-kind.old {
+  color: var(--warn);
 }

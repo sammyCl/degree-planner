@@ -157,16 +157,19 @@ describe('PlannerPage', () => {
     expect(screen.queryByRole('heading', { name: 'Choices I made' })).not.toBeInTheDocument()
   })
 
-  it('puts the About panel under the board, closed until the student opens it', () => {
+  it('puts the About panel under the board, showing only a peek until the student opens it', () => {
     setup()
     const board = screen.getByTestId('board')
     const about = screen.getByRole('region', { name: 'About this plan' })
     expect(board.compareDocumentPosition(about) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy() // the board comes first
-    expect(screen.queryByRole('heading', { name: 'Degree requirements' })).not.toBeInTheDocument()
+    const body = about.querySelector('.about-body') as HTMLElement
+    expect(body).toHaveClass('peek') // the first lines are in the page but cut off, and cannot be tabbed into
+    expect(body).toHaveAttribute('inert')
     fireEvent.click(screen.getByRole('button', { name: 'Show' }))
-    expect(screen.getByRole('heading', { name: 'Degree requirements' })).toBeInTheDocument()
+    expect(body).not.toHaveClass('peek')
+    expect(body).not.toHaveAttribute('inert')
     fireEvent.click(screen.getByRole('button', { name: 'Hide' }))
-    expect(screen.queryByRole('heading', { name: 'Degree requirements' })).not.toBeInTheDocument()
+    expect(body).toHaveClass('peek')
   })
 
   it('keeps the "could not finish" alert above the board, where it is seen first', () => {

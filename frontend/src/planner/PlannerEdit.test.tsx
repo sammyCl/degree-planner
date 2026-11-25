@@ -123,6 +123,20 @@ describe('moving a course', () => {
     await waitFor(() => expect(sent).toHaveLength(1))
   })
 
+  it('stays open when the clicked menu option is removed from the page while the click is handled', () => {
+    // in a browser React drops the chosen option before the popover's outside-click check runs
+    render(<PlannerPage plan={samplePlan} onBack={vi.fn()} />)
+    fireEvent.click(card('CSM101'))
+    const dialog = screen.getByRole('dialog', { name: 'CSM101 details' })
+    const option = document.createElement('div')
+    dialog.appendChild(option)
+    dialog.addEventListener('mousedown', () => option.remove())
+    act(() => {
+      option.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+    })
+    expect(screen.getByRole('dialog', { name: 'CSM101 details' })).toBeInTheDocument()
+  })
+
   it('offers no Move-to for a completed course', () => {
     const plan: Plan = {
       ...samplePlan,

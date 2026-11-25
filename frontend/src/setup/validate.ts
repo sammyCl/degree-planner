@@ -13,8 +13,12 @@ export const LEVELS: { value: Level; label: string }[] = [
 export interface ProgramOption {
   id: string
   name: string
-  level: 'bachelor' | 'master' | 'combined' | 'minor' | 'asi'
+  level: 'bachelor' | 'master' | 'combined' | 'minor' | 'asi' | 'certificate'
+  /** the catalog the program was collected from; add-ons may be older than CATALOG_YEAR */
+  catalog_year: string
 }
+
+export type AddOnKind = 'minor' | 'asi' | 'certificate'
 
 export const CATALOG_YEAR: string = options.catalog_year
 export const PROGRAMS = options.programs as ProgramOption[]
@@ -71,10 +75,25 @@ export function buildRequest(form: SetupForm): AgentRequest {
 
 /** "Minor in Computer Science" becomes "Computer Science"; the kind is shown next to it. */
 export const shortName = (name: string): string =>
-  name.replace(/^Minor in /, '').replace(/^Area of Special Interest in /, '')
+  name.replace(/^Minor in /, '').replace(/^Area of Special Interest in /, '').replace(/^(Online )?Graduate Certificate in /, '')
 
-/** Minors and ASIs together, alphabetical by the name shown in the picker. */
-export const addOns = (): ProgramOption[] =>
-  PROGRAMS.filter((p) => p.level === 'minor' || p.level === 'asi').sort((a, b) =>
-    shortName(a.name).localeCompare(shortName(b.name)),
-  )
+/** The minors, ASIs or certificates, alphabetical by the name shown in the picker. */
+export const addOnsOfKind = (kind: AddOnKind): ProgramOption[] =>
+  PROGRAMS.filter((p) => p.level === kind).sort((a, b) => shortName(a.name).localeCompare(shortName(b.name)))
+
+/** Every minor, ASI and certificate. */
+export const addOns = (): ProgramOption[] => (['minor', 'asi', 'certificate'] as const).flatMap(addOnsOfKind)
+
+/** The kinds of add-on whose data is not from the student's catalog year, with the year(s) actually shown. */
+export function staleAddOns(options: ProgramOption[] = addOns()): { kind: AddOnKind; years: string[] }[] {
+  return (['minor', 'asi', 'certificate'] as const).flatMap((kind) => {
+    const years = [...new Set(options.filter((o) => o.level === kind && o.catalog_year !== CATALOG_YEAR).map((o) => o.catalog_year))].sort()
+    return years.length ? [{ kind, years }] : []
+  })
+}
+
+export const ADD_ON_NAMES: Record<AddOnKind, { one: string; many: string; plural: string }> = {
+  minor: { one: 'minor', many: 'Minors', plural: 'minors' },
+  asi: { one: 'ASI', many: 'ASIs', plural: 'ASIs' },
+  certificate: { one: 'certification', many: 'Certifications', plural: 'certifications' },
+}

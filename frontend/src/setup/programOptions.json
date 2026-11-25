@@ -4,637 +4,872 @@
   {
    "id": "ams-bs-cam",
    "name": "Bachelor of Science in Applied Mathematics and Statistics (Computational and Applied Mathematics)",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "ams-bs-ds",
    "name": "Bachelor of Science in Applied Mathematics and Statistics (Data Science)",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "ams-bs-stats",
    "name": "Bachelor of Science in Applied Mathematics and Statistics (Statistics)",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "biochemistry-bs",
    "name": "Bachelor of Science in Biochemistry",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "bems-bs",
    "name": "Bachelor of Science in Business Engineering and Management Science",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "bems-bs-actuarial-science",
    "name": "Bachelor of Science in Business Engineering and Management Science (Actuarial Science Track)",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "bems-bs-computing",
    "name": "Bachelor of Science in Business Engineering and Management Science (Computing Track)",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "bems-bs-corporate-management",
    "name": "Bachelor of Science in Business Engineering and Management Science (Corporate Management Track)",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "bems-bs-energy-natural-resources",
    "name": "Bachelor of Science in Business Engineering and Management Science (Energy and Natural Resources Management Track)",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "bems-bs-engineering",
    "name": "Bachelor of Science in Business Engineering and Management Science (Engineering Track)",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "bems-bs-financial-economics",
    "name": "Bachelor of Science in Business Engineering and Management Science (Financial Economics Track)",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "bems-bs-operations-research",
    "name": "Bachelor of Science in Business Engineering and Management Science (Operations Research Track)",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "ceramic-engineering-bs",
    "name": "Bachelor of Science in Ceramic Engineering",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "chemical-engineering-bs",
    "name": "Bachelor of Science in Chemical Engineering",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "chemical-engineering-bs-biological",
    "name": "Bachelor of Science in Chemical Engineering (Biological Engineering Track)",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "chemical-engineering-bs-honors-research",
    "name": "Bachelor of Science in Chemical Engineering (Honors Research Track)",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "chemical-engineering-bs-process",
    "name": "Bachelor of Science in Chemical Engineering (Process Engineering Track)",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "chemistry-bs-biochemistry",
    "name": "Bachelor of Science in Chemistry (Biochemistry Track)",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "chemistry-bs-chemistry",
    "name": "Bachelor of Science in Chemistry (Chemistry Track)",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "chemistry-bs-environmental",
    "name": "Bachelor of Science in Chemistry (Environmental Chemistry Track)",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "civil-engineering-bs",
    "name": "Bachelor of Science in Civil Engineering",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "cs-bs-business",
    "name": "Bachelor of Science in Computer Science (CS + Business)",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "cs-bs-computer-engineering",
    "name": "Bachelor of Science in Computer Science (CS + Computer Engineering)",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "cs-bs-data-science",
    "name": "Bachelor of Science in Computer Science (CS + Data Science)",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "cs-bs-entrepreneurship",
    "name": "Bachelor of Science in Computer Science (CS + Entrepreneurship and Innovation)",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "cs-bs-robotics",
    "name": "Bachelor of Science in Computer Science (CS + Robotics and Intelligent Systems)",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "cs-bs-space",
    "name": "Bachelor of Science in Computer Science (CS + Space)",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "cs-bs-general-track",
    "name": "Bachelor of Science in Computer Science (General Track)",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "construction-engineering-bs",
    "name": "Bachelor of Science in Construction Engineering",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "design-engineering-bs",
    "name": "Bachelor of Science in Design Engineering",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "ee-bs",
    "name": "Bachelor of Science in Electrical Engineering",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "engineering-physics-bs",
    "name": "Bachelor of Science in Engineering Physics",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "environmental-engineering-bs",
    "name": "Bachelor of Science in Environmental Engineering",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "geological-engineering-bs-engineering-geology",
    "name": "Bachelor of Science in Geological Engineering (Engineering Geology and Geotechnics Track)",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "geological-engineering-bs-environmental-geosciences",
    "name": "Bachelor of Science in Geological Engineering (Environmental Geosciences Track)",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "geological-engineering-bs-mineral-energy",
    "name": "Bachelor of Science in Geological Engineering (Mineral and Energy Resources Exploration Track)",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "geophysical-engineering-bs",
    "name": "Bachelor of Science in Geophysical Engineering",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "mechanical-engineering-bs",
    "name": "Bachelor of Science in Mechanical Engineering",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "mme-bs",
    "name": "Bachelor of Science in Metallurgical and Materials Engineering",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "mining-bs",
    "name": "Bachelor of Science in Mining Engineering",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "petroleum-engineering-bs",
    "name": "Bachelor of Science in Petroleum Engineering",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "qbe-bs-general",
    "name": "Bachelor of Science in Quantitative Biosciences and Engineering (General Track)",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "qbe-bs-honors",
    "name": "Bachelor of Science in Quantitative Biosciences and Engineering (Honors Track)",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "quantum-systems-engineering-bs",
    "name": "Bachelor of Science in Quantum Systems Engineering",
-   "level": "bachelor"
+   "level": "bachelor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "additive-manufacturing-ms",
    "name": "Additive Manufacturing, M.S. (Non-Thesis)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "advanced-energy-systems-ms",
    "name": "Advanced Energy Systems, M.S. (Non-Thesis)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "applied-mathematics-statistics-ms",
    "name": "Applied Mathematics and Statistics, M.S. (Non-Thesis)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "physics-ms",
    "name": "Applied Physics, M.S. (Non-Thesis)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "ccus-ms",
    "name": "Carbon Capture, Utilization and Storage, M.S. (Non-Thesis)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "chemical-engineering-ms",
    "name": "Chemical Engineering, M.S. (Non-Thesis)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "chemistry-ms",
    "name": "Chemistry, M.S. (Non-Thesis)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "civil-engineering-ms",
    "name": "Civil Engineering, M.S. (Non-Thesis)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "cs-ms-non-thesis-project-track",
    "name": "Computer Science, M.S. (Non-Thesis, Project Track)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "data-science-ms",
    "name": "Data Science, M.S. (Non-Thesis)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "ee-ms",
    "name": "Electrical Engineering, M.S. (Non-Thesis)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "engineering-technology-management-ms",
    "name": "Engineering and Technology Management, M.S. (Non-Thesis)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "enrep-ms",
    "name": "Environment, Resources & Energy Policy, M.S. (Non-Thesis)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "environmental-engineering-ms",
    "name": "Environmental Engineering and Science, M.S. (Non-Thesis)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "geochemistry-ms",
    "name": "Geochemistry, M.S. (Geochemistry Track)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "geological-engineering-ms",
    "name": "Geological Engineering, M.S. (Engineering Geology/Geotechnics Specialization)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "geology-ms",
    "name": "Geology, M.S.",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "geophysics-ms",
    "name": "Geophysics or Geophysical Engineering, M.S. (Non-Thesis)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "gis-geoinformatics-ms",
    "name": "GIS & GeoInformatics, M.S. (Non-Thesis)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "humanitarian-engineering-ms",
    "name": "Humanitarian Engineering and Science, M.S. (Non-Thesis)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "hydrologic-science-and-engineering-ms",
    "name": "Hydrologic Science and Engineering, M.S. (Non-Thesis)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "materials-science-ms",
    "name": "Materials Science, M.S. (Non-Thesis, with Case Study/Design)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "mechanical-engineering-ms",
    "name": "Mechanical Engineering, M.S. (Non-Thesis)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "metallurgical-and-materials-engineering-ms",
    "name": "Metallurgical and Materials Engineering, Master of Engineering",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "mineral-energy-economics-ms",
    "name": "Mineral and Energy Economics, M.S. (Non-Thesis)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "mining-ms",
    "name": "Mining Engineering, M.S.",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "nuclear-engineering-me",
    "name": "Nuclear Engineering, M.E. (Master of Engineering, Non-Thesis)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "operations-research-engineering-ms",
    "name": "Operations Research with Engineering, M.S. (Non-Thesis)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "petroleum-engineering-me",
    "name": "Petroleum Engineering, M.E. (Master of Engineering, Non-Thesis)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "quantitative-biosciences-engineering-ms",
    "name": "Quantitative Biosciences and Engineering, M.S. (Non-Thesis)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "quantum-engineering-ms",
    "name": "Quantum Engineering, M.S. (Non-Thesis)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "robotics-ms",
    "name": "Robotics, M.S. (Non-Thesis)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "space-resources-ms",
    "name": "Space Resources, M.S. (Non-Thesis, Online)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "stem-teaching-ms",
    "name": "STEM Teaching, M.S. in STEM Education (Non-Thesis)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "ucte-ms-non-thesis",
    "name": "Underground Construction and Tunnel Engineering, M.S. (Non-Thesis)",
-   "level": "master"
+   "level": "master",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "cs-bs-ms-combined",
    "name": "Computer Science, Combined B.S./M.S. (Non-Thesis, Project Track)",
-   "level": "combined"
+   "level": "combined",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "mining-bs-ms-combined",
    "name": "Mining Engineering, Combined B.S./M.S.",
-   "level": "combined"
+   "level": "combined",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "individualized-minor-in-humanities-arts-and-social-sciences",
    "name": "Individualized Minor in Humanities, Arts, and Social Sciences",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "aerospace-engineering-minor",
    "name": "Minor in Aerospace Engineering",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "applied-mathematics-and-statistics-ams-minor",
    "name": "Minor in Applied Mathematics and Statistics (AMS)",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "biology-minor",
    "name": "Minor in Biology",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "biomechanical-engineering-minor",
    "name": "Minor in Biomechanical Engineering",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "biomedical-engineering-bme-minor",
    "name": "Minor in Biomedical Engineering (BME)",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "business-minor",
    "name": "Minor in Business",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "chemistry-minor",
    "name": "Minor in Chemistry",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "computer-engineering-minor",
    "name": "Minor in Computer Engineering",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "computer-science-minor",
    "name": "Minor in Computer Science",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "culture-creativity-and-communication-minor",
    "name": "Minor in Culture, Creativity, and Communication",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "data-science-minor-option-1",
    "name": "Minor in Data Science (option 1)",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "data-science-minor-option-2",
    "name": "Minor in Data Science (option 2)",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "economics-minor",
    "name": "Minor in Economics",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "electrical-engineering-minor-general-track",
    "name": "Minor in Electrical Engineering (General Electrical Engineering track)",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "electrical-engineering-minor-iss-track",
    "name": "Minor in Electrical Engineering (Information Systems and Science (ISS) track)",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "electrical-engineering-minor-ice-track",
    "name": "Minor in Electrical Engineering (Integrated Circuits and Electronics (ICE) track)",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "electrical-engineering-minor-pes-track",
    "name": "Minor in Electrical Engineering (Power and Energy Systems (PES) track)",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "energy-minor",
    "name": "Minor in Energy",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "engineering-physics-minor",
    "name": "Minor in Engineering Physics",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "environment-and-sustainability-studies-minor",
    "name": "Minor in Environment and Sustainability Studies",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "explosive-engineering-minor",
    "name": "Minor in Explosive Engineering",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "geological-engineering-minor",
    "name": "Minor in Geological Engineering",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "geophysics-geophysical-engineering-minor",
    "name": "Minor in Geophysics/Geophysical Engineering",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "global-politics-and-society-minor",
    "name": "Minor in Global Politics and Society",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "guy-t-mcbride-jr-honors-program-in-public-affairs-minor",
    "name": "Minor in Guy T. McBride, Jr. Honors Program in Public Affairs",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "humanitarian-engineering-minor",
    "name": "Minor in Humanitarian Engineering",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "mechanical-engineering-minor-robotics-automation-design-track",
    "name": "Minor in Mechanical Engineering (Robotics, Automation and Design track)",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "mechanical-engineering-minor-solid-materials-track",
    "name": "Minor in Mechanical Engineering (Solid Materials track)",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "mechanical-engineering-minor-thermal-fluids-track",
    "name": "Minor in Mechanical Engineering (Thermal-Fluids track)",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "metallurgical-and-materials-engineering-minor",
    "name": "Minor in Metallurgical and Materials Engineering",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "mineral-processing-extractive-metallurgy-mpem-minor",
    "name": "Minor in Mineral Processing & Extractive Metallurgy (MPEM)",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "mining-engineering-minor",
    "name": "Minor in Mining Engineering",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "music-audio-engineering-and-the-recording-arts-minor",
    "name": "Minor in Music, Audio Engineering, and the Recording Arts",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "operations-research-minor",
    "name": "Minor in Operations Research",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "petroleum-data-analytics-minor",
    "name": "Minor in Petroleum Data Analytics",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "petroleum-engineering-minor",
    "name": "Minor in Petroleum Engineering",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "physics-minor",
    "name": "Minor in Physics",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "quantum-engineering-minor",
    "name": "Minor in Quantum Engineering",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "robotics-and-intelligent-systems-minor",
    "name": "Minor in Robotics and Intelligent Systems",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "space-mining-minor",
    "name": "Minor in Space Mining",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "structural-engineering-minor",
    "name": "Minor in Structural Engineering",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "teaching-minor",
    "name": "Minor in Teaching",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "teaching-minor-with-licensure",
    "name": "Minor in Teaching with Licensure",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "underground-construction-and-tunneling-minor",
    "name": "Minor in Underground Construction and Tunneling",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
   },
   {
    "id": "water-sustainability-minor",
    "name": "Minor in Water Sustainability",
-   "level": "minor"
+   "level": "minor",
+   "catalog_year": "2026-2027"
+  },
+  {
+   "id": "additive-manufacturing-asi",
+   "name": "Area of Special Interest in Additive Manufacturing",
+   "level": "asi",
+   "catalog_year": "2025-2026"
+  },
+  {
+   "id": "aerospace-engineering-asi",
+   "name": "Area of Special Interest in Aerospace Engineering",
+   "level": "asi",
+   "catalog_year": "2025-2026"
+  },
+  {
+   "id": "biochemistry-asi",
+   "name": "Area of Special Interest in Biochemistry",
+   "level": "asi",
+   "catalog_year": "2025-2026"
+  },
+  {
+   "id": "chemistry-asi",
+   "name": "Area of Special Interest in Chemistry",
+   "level": "asi",
+   "catalog_year": "2025-2026"
+  },
+  {
+   "id": "civil-engineering-asi",
+   "name": "Area of Special Interest in Civil Engineering",
+   "level": "asi",
+   "catalog_year": "2025-2026"
+  },
+  {
+   "id": "economics-asi",
+   "name": "Area of Special Interest in Economics",
+   "level": "asi",
+   "catalog_year": "2025-2026"
+  },
+  {
+   "id": "electrical-engineering-asi",
+   "name": "Area of Special Interest in Electrical Engineering",
+   "level": "asi",
+   "catalog_year": "2025-2026"
+  },
+  {
+   "id": "energy-asi",
+   "name": "Area of Special Interest in Energy",
+   "level": "asi",
+   "catalog_year": "2025-2026"
+  },
+  {
+   "id": "entrepreneurship-asi",
+   "name": "Area of Special Interest in Entrepreneurship",
+   "level": "asi",
+   "catalog_year": "2025-2026"
+  },
+  {
+   "id": "environmental-chemistry-asi",
+   "name": "Area of Special Interest in Environmental Chemistry",
+   "level": "asi",
+   "catalog_year": "2025-2026"
+  },
+  {
+   "id": "environmental-engineering-asi",
+   "name": "Area of Special Interest in Environmental Engineering",
+   "level": "asi",
+   "catalog_year": "2025-2026"
+  },
+  {
+   "id": "geological-engineering-asi",
+   "name": "Area of Special Interest in Geological Engineering",
+   "level": "asi",
+   "catalog_year": "2025-2026"
+  },
+  {
+   "id": "humanitarian-engineering-asi",
+   "name": "Area of Special Interest in Humanitarian Engineering",
+   "level": "asi",
+   "catalog_year": "2025-2026"
+  },
+  {
+   "id": "mechanical-engineering-asi",
+   "name": "Area of Special Interest in Mechanical Engineering",
+   "level": "asi",
+   "catalog_year": "2025-2026"
+  },
+  {
+   "id": "music-technology-asi",
+   "name": "Area of Special Interest in Music Technology",
+   "level": "asi",
+   "catalog_year": "2025-2026"
+  },
+  {
+   "id": "polymer-chemistry-asi",
+   "name": "Area of Special Interest in Polymer Chemistry",
+   "level": "asi",
+   "catalog_year": "2025-2026"
+  },
+  {
+   "id": "space-and-planetary-science-and-engineering-asi",
+   "name": "Area of Special Interest in Space and Planetary Science and Engineering",
+   "level": "asi",
+   "catalog_year": "2025-2026"
+  },
+  {
+   "id": "underground-construction-and-tunneling-asi",
+   "name": "Area of Special Interest in Underground Construction and Tunneling",
+   "level": "asi",
+   "catalog_year": "2025-2026"
   }
  ]
 }
