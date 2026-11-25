@@ -62,8 +62,9 @@ def test_check_plan_endpoint_flags_broken_prerequisite(client_with_catalog: Test
     body = response.json()
     assert body["summary"]["requirements_met"] is False
     broken = [flag for flag in body["flags"] if flag["type"] == "broken_prerequisite"]
-    assert len(broken) == 1
-    assert broken[0]["course_id"] == "sem-2-csci400"
+    # BUG-049: CSCI400's unmet corequisite is now flagged too, alongside its unmet prerequisite.
+    assert len(broken) == 2
+    assert all(flag["course_id"] == "sem-2-csci400" for flag in broken)
     assert {"from": "sem-1-csci200", "to": "sem-2-csci306"} in body["prerequisite_edges"]
 
 
@@ -190,3 +191,45 @@ def test_submit_setup_endpoint_returns_503_when_claude_code_is_unavailable(
 def test_submit_setup_endpoint_rejects_a_malformed_request(client_with_catalog: TestClient) -> None:
     response = client_with_catalog.post("/plans/submit-setup", json={**SETUP_REQUEST, "semesters": 0})
     assert response.status_code == 422
+
+
+def test_a_lone_surrogate_in_the_body_gets_422_not_500(client_with_empty_db: TestClient) -> None:
+    # BUG-046: \ud800 is a lone surrogate, valid JSON but not valid text; FastAPI's default 422
+    # handler used to echo it back and crash trying to encode the response as UTF-8.
+    body = {
+        "student": {"degree_level": "bachelor", "programs": ["x\ud800"], "catalog_year": "2026-2027"},
+        "semesters": 5,
+    }
+
+    response = client_with_empty_db.post(
+        "/plans/submit-setup", content=json.dumps(body).encode("utf-8"),
+        headers={"content-type": "application/json"},
+    )
+
+    assert response.status_code == 422
+    assert "detail" in response.json()
+
+
+def test_an_unexpected_error_is_a_clean_500_not_a_bare_crash(
+    client_with_catalog: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Trial-ready API: a genuine bug or server problem we didn't anticipate (not an HTTPException
+    # or a validation error, both handled elsewhere) should still reach the student as a normal,
+    # readable response, with the real exception only in the server log.
+    def fake_check_plan(connection, plan):
+        raise RuntimeError("the database is locked")
+
+    monkeypatch.setattr(main, "check_plan", fake_check_plan)
+
+    # client_with_catalog's dependency override is on the shared `app`, so it still applies; a
+    # plain TestClient(app) re-raises an unhandled exception instead of returning our 500 (so a
+    # real bug stays loud in tests by default) — raise_server_exceptions=False shows what the
+    # student's browser would actually get.
+    client = TestClient(app, raise_server_exceptions=False)
+    response = client.post("/plans/check", json=json.loads(
+        (REPO_ROOT / "docs" / "plan-format.sample.json").read_text()
+    ))
+
+    assert response.status_code == 500
+    assert "locked" not in response.text
+    assert response.json() == {"detail": "Something went wrong on our end. Please try again in a moment."}

@@ -70,7 +70,7 @@ BUG-002  search_catalog crashed on database errors and bad stored rows
              test_malformed_course_row_returns_error
 
 BUG-003  The real course catalog is not loaded: search finds 0 courses
-  Status:    Open
+  Status:    Fixed
   Owner:     Samantha Clapp (bachelor's data: mines-courses.csv) and
              Midhat Sajad (graduate data: mines-graduate-courses.csv; data format)
   Where:     data/Academic Catalog/*.csv, backend data_loader.py
@@ -88,9 +88,15 @@ BUG-003  The real course catalog is not loaded: search finds 0 courses
   Fix idea:  convert each CSV into data-format JSON (docs/data-format.md).
              Until then the agent tool cannot tell "empty catalog" from
              "no match" and tells the model to keep trying other queries.
+  Fixed in:  not marked earlier; found already resolved, 2026-11-24
+             (Midhat). Stale by the time it was checked: data/tools/
+             build_courses_json.py (Abdallah) converts both CSVs into
+             data/json/courses.json, which loads 2137 courses cleanly
+             (`uv run load-data`). No code change; a side effect of the
+             course-catalog conversion task landing, just never ticked here.
 
 BUG-004  The two catalog CSVs overlap and would silently overwrite each other
-  Status:    Open
+  Status:    Fixed
   Owner:     Midhat Sajad (graduate data, data format), with Samantha Clapp
              (bachelor's data)
   Where:     data/Academic Catalog/mines-courses.csv,
@@ -107,6 +113,16 @@ BUG-004  The two catalog CSVs overlap and would silently overwrite each other
   Fix idea:  decide which file wins for shared codes (or merge them) before
              converting; have the loader report duplicates instead of
              replacing quietly.
+  Fixed in:  not marked earlier; found already resolved, 2026-11-24 (Midhat).
+             data/CONFLICT-LOG.md ("Same code in both CSVs") documents the
+             decision: one entry per code, undergraduate row wins, empty
+             fields filled from the other, a shorter description replaced by
+             a longer one, and real disagreements (title/credits/
+             prerequisites) kept at the undergraduate value and logged in
+             the review file. Verified the math: 2131 undergrad rows + 953
+             distinct grad codes - 947 overlapping = 2137, exactly
+             courses.json's count. No code change; a side effect of the
+             course-catalog conversion task landing, just never ticked here.
 
 BUG-005  search_catalog crashed on a lone surrogate character in the input
   Status:    Fixed
@@ -209,7 +225,7 @@ BUG-009  Deeply nested prerequisites load fine but can never be read back
              since both hit the same round-trip check).
 
 BUG-010  Empty AND/OR groups are allowed in the data format
-  Status:    Open
+  Status:    Fixed
   Owner:     Midhat Sajad (data format)
   Where:     backend/src/degree_planner_backend/models.py (AndRequirement.of,
              OrRequirement.of), docs/data-format.md
@@ -225,15 +241,17 @@ BUG-010  Empty AND/OR groups are allowed in the data format
   Expected:  the loader rejects empty groups
   Fix idea:  of: list[Requirement] = Field(min_length=1) on both models, and
              say so in docs/data-format.md.
-  Note:      2026-11-24: tried the fix idea (backend: Midhat), then held it
-             back. summarize_requirement's "(empty OR group)" rendering, quoted
-             in the "Actual" text above, is exactly what
-             test_summary_empty_group_is_not_none and two sibling tests in
-             test_agent_tools.py build and check today; Field(min_length=1)
-             stops that group from being constructed at all, so those tests
-             can no longer set up their input. Needs Samantha's call: drop the
-             tool-side rendering and reject at load instead, or keep tolerating
-             it there and leave this one open.
+  Fixed in:  2026-11-25 (backend: Midhat), exactly the fix idea:
+             of: list[Requirement] = Field(min_length=1) on AndRequirement and
+             OrRequirement. Held back on 2026-11-24 because
+             summarize_requirement's "(empty OR group)" rendering could no
+             longer be constructed; raised to Samantha, who agreed on
+             2026-11-25 that an empty AND/OR is always bad data. Renamed
+             test_summary_empty_group_is_not_none to
+             test_empty_requirement_group_is_rejected_at_load in
+             test_agent_tools.py and changed it to assert
+             pytest.raises(ValidationError) instead of checking the now-
+             unreachable rendering.
 
 BUG-011  Course codes are not checked or normalized when data is loaded
   Status:    Open
@@ -314,7 +332,7 @@ BUG-013  A catalog year that is not loaded looks like "no match" in search_catal
              test_catalog_years_and_program_ids in test_data_hardening.py.
 
 BUG-014  Exception labels are not checked when data is loaded
-  Status:    Open
+  Status:    Fixed
   Owner:     Midhat Sajad (data format, data loader)
   Where:     backend/src/degree_planner_backend/models.py
              (ExceptionRequirement.label), data_loader.py
@@ -331,20 +349,22 @@ BUG-014  Exception labels are not checked when data is loaded
              character labels, so every consumer gets the same clean text
   Fix idea:  label: str = Field(min_length=1, max_length=200) plus a validator
              that strips Unicode categories Cc/Cf; say so in docs/data-format.md.
-  Note:      2026-11-24: tried the fix idea (backend: Midhat), then held it
-             back. The "Actual" text above already says agent/tools.py cleans
-             labels at its own layer today (same drop-invisible/join-lines/
-             cut-at-200 rules); test_summary_quotes_exception_labels and
-             test_summary_and_tree_use_cleaned_labels in test_agent_tools.py
-             store a raw, uncleaned label and check the tool's own clean_label()
-             output against it. Cleaning at the model too means the tool
-             re-cleans already-clean text, which doesn't always agree with its
-             own cut (a 500-character label truncated at 200 by the model,
-             then by the tool again, isn't the same string in every case).
-             Also found CEEN590/EDNS491/MATH552/MEGN572/SPRS501's real
-             corequisite text already runs past 200 characters, so a straight
-             Field(max_length=200) would drop 5 real courses rather than just
-             clean the label. Needs Samantha's call on which layer cleans.
+  Fixed in:  2026-11-25 (backend: Midhat). Held back on 2026-11-24 over which
+             layer should clean; raised to Samantha, who agreed on 2026-11-25.
+             Chose cleaning (not a length reject) at the model, matching the
+             fix idea's reasoning about CEEN590/EDNS491/MATH552/MEGN572/
+             SPRS501's real corequisite text already running past 200
+             characters: ExceptionRequirement.label is cleaned by a
+             field_validator (_clean_label in models.py) that exactly
+             replicates agent/tools.py's clean_text/clean_label algorithm
+             (drop Cf, Cc to space, collapse whitespace, cut at 200 with a
+             combining-mark-aware "..." suffix) rather than importing it, to
+             avoid models.py depending on agent/tools.py. Field(min_length=1,
+             max_length=200) still rejects a label that is empty (or empty
+             once cleaned). test_summary_quotes_exception_labels and
+             test_summary_and_tree_use_cleaned_labels needed no change: the
+             model and the tool now produce identical output, so the tool's
+             re-clean of already-clean text is a no-op.
 
 BUG-015  Design note: tool errors carry no machine-readable kind
   Status:    Open (decide when building the agent loop)
@@ -363,7 +383,7 @@ BUG-015  Design note: tool errors carry no machine-readable kind
              error in both tools, at the same time as the loop that uses it.
 
 BUG-016  No bachelor's or graduate programs are loaded, only minors and ASIs
-  Status:    Open
+  Status:    Fixed
   Owner:     Samantha Clapp (bachelor's data) and Midhat Sajad (graduate and
              combined data)
   Where:     data/json/ (has minors.json, asis.json, forms-policies.json only)
@@ -380,9 +400,17 @@ BUG-016  No bachelor's or graduate programs are loaded, only minors and ASIs
   Expected:  the programs for the five examples are in data/json
   Fix idea:  part of the Bachelor's data and Graduate data tasks; see also
              BUG-003 (course catalog not loaded).
+  Fixed in:  not marked earlier; found already resolved, 2026-11-24 (Midhat).
+             Stale by the time it was checked: data/json/bachelors.json (44
+             programs, Samantha/Abdallah) and data/json/graduate-programs.json
+             (120 programs, Midhat) both exist and load; `uv run load-data
+             ../data` now reports 164 programs total, including every -bs,
+             -ms and combined program the five examples need. No code change;
+             this was a side effect of the Bachelor's data and Graduate data
+             tasks both landing, just never ticked here.
 
 BUG-017  Form fields are not checked when data is loaded
-  Status:    Open
+  Status:    Fixed
   Owner:     Midhat Sajad (data format, data loader); tell Abdallah Salhi
              (forms data) what the rules become
   Where:     backend/src/degree_planner_backend/models.py (Form),
@@ -404,18 +432,27 @@ BUG-017  Form fields are not checked when data is loaded
   Fix idea:  form_id and applies_to entries as lowercase slugs (lowercase and
              strip first), applies_to min_length=1, max_credits finite and > 0
              (allow_inf_nan=False, gt=0), url must start with https://.
-  Note:      2026-11-24: tried the fix idea in full (backend: Midhat), then
-             held it back. The "Actual" text above already says agent/tools.py
-             does this same cleaning and https-only filtering at its own
-             layer, on forms the loader stores as-is; a dozen-plus tests in
-             test_agent_tools.py (the url, id-cleaning, and duplicate-id-
-             numbering ones) depend on messy/duplicate-looking raw form_ids
-             and urls reaching the tool so it can clean and de-duplicate them
-             itself. Doing the same normalization at the model collapses
-             distinct raw values (e.g. "x-dup" and "x-dup\n" both become
-             "x-dup") before the tool ever sees them, which broke those tests'
-             premise rather than just their expected numbers. Needs
-             Samantha's call on which layer owns cleaning, same as BUG-014.
+  Fixed in:  2026-11-25 (backend: Midhat). Held back on 2026-11-24 over which
+             layer owns cleaning, same as BUG-014; raised to Samantha, who
+             agreed on 2026-11-25. form_id and applies_to entries get a cheap
+             strip().lower() field_validator in models.py (not the tool's full
+             invisible-character cleaning, so a raw value with e.g. a
+             zero-width space still reaches the tool distinct from its clean
+             form, which test_forms_duplicate_cleaned_ids_are_numbered and
+             test_forms_id_and_applies_to_are_cleaned still rely on);
+             applies_to keeps Field(min_length=1). max_credits keeps
+             Field(gt=0, allow_inf_nan=False) (BUG-007/BUG-013 already added
+             this). url's field_validator cleans rather than rejects: a
+             value that is not an https:// url (case-insensitive) becomes
+             None instead of failing the whole form, the same shape as a form
+             that never had a url, since agent/tools.py already does its own
+             stricter https+domain check on top. test_forms_duplicate_cleaned_
+             ids_are_numbered's fixture changed its third duplicate variant
+             from a trailing "\n" (which strip() now collapses into the first
+             variant before the tool ever sees it) to a trailing U+202E
+             (right-to-left override, category Cf, which strip() does not
+             touch); the test's intent (three ids that look the same once
+             fully cleaned) is unchanged.
 
 BUG-018  Duplicate form_ids replace each other silently, and one bad form row
          blocks every form
@@ -497,7 +534,7 @@ BUG-020  No way to list program ids, so a mistyped id cannot be corrected
              test_catalog_years_and_program_ids in test_data_hardening.py.
 
 BUG-021  Program rules that the data format cannot hold never reach the agent
-  Status:    Open
+  Status:    Open (data-format half fixed)
   Owner:     Midhat Sajad (data format); Abdallah Salhi (minors and ASIs data,
              data/tools/build_minors_json.py); then Samantha Clapp (agent tools)
   Where:     backend/src/degree_planner_backend/models.py (Program),
@@ -517,9 +554,26 @@ BUG-021  Program rules that the data format cannot hold never reach the agent
              have build_minors_json.py fill it from the same text it writes to
              REVIEW.md; then the agent tool returns the notes (cleaned and
              capped) with each program.
+  Fixed in:  not yet committed (backend: Midhat), the schema half only:
+             Program.notes: list[str] = [] (models.py, docs/data-format.md).
+             Did not wire up build_minors_json.py: its x.notes list mixes
+             real degree-policy text (e.g. "Not open to QBE majors") with
+             internal data-conversion documentation (e.g. how CAS electives
+             were modeled), and only Abdallah can tell which of his own
+             notes are which — guessing risks showing a student internal
+             conversion commentary as if it were degree policy, which would
+             be worse than the field staying empty. Also did not touch
+             agent/tools.py's get_program_requirements to return it:
+             test_program_result_fields in test_agent_tools.py asserts an
+             exact output key set that doesn't include "notes" yet, and
+             that tool builds its own output dict rather than dumping the
+             model, so this schema addition doesn't affect it either way —
+             adding "notes" to what it returns is Samantha's call and her
+             test to update. Covered by test_program_notes_default_to_empty
+             and test_program_notes_can_be_set in test_models.py.
 
 BUG-022  Program credit fields accept NaN, infinity, zero, and negative values
-  Status:    Open
+  Status:    Fixed
   Owner:     Midhat Sajad (data format)
   Where:     backend/src/degree_planner_backend/models.py (Program.
              total_credits_required, RequirementGroup.credits_required,
@@ -539,22 +593,38 @@ BUG-022  Program credit fields accept NaN, infinity, zero, and negative values
              LoadReport.errors
   Fix idea:  Field(gt=0, allow_inf_nan=False) on all three fields (credits on
              kind "all" groups may stay None).
-  Note:      2026-11-24: tried the fix idea (backend: Midhat), then held it
-             back. The "Actual" text above already says the agent tool adds a
-             data_warning for a zero/negative value rather than failing;
-             test_program_impossible_values_are_warned and
-             test_infinite_stored_credits_never_raise in test_agent_tools.py
-             build exactly these programs (including a credits_required
-             corrupted to Infinity after loading, to simulate already-bad
-             stored data) and expect get_program_requirements to still return
-             a result with that warning, not reject the program outright.
-             Rejecting at load is the more correct fix long-term, but it's
-             Samantha's call whether the tool's data_warning path goes away
-             or this stays caught only at read time (same shape as BUG-008).
+  Fixed in:  2026-11-25 (backend: Midhat), exactly the fix idea:
+             Field(gt=0, allow_inf_nan=False) on Program.total_credits_
+             required, RequirementGroup.credits_required, and DoubleCount.
+             shared_credit_limit. Held back on 2026-11-24 because
+             test_program_impossible_values_are_warned's zero/negative cases
+             depended on the tool's data_warning path; raised to Samantha,
+             who agreed on 2026-11-25 these are always bad data, never
+             legitimate. Split that test: the four zero/negative/NaN-shaped
+             cases moved to a new test_program_bad_numbers_are_rejected_at_
+             load_not_warned (asserts the program no longer loads at all), the
+             remaining four non-numeric-validity cases (duplicate group id,
+             self-referencing combines, "all" group that also gives
+             credits_required, shared_credit_limit larger than the program's
+             total) stay in the original test unchanged.
+             test_infinite_stored_credits_never_raise is a different case:
+             it tampers with an already-stored row directly (bypassing the
+             loader) to simulate corruption from some other path, which is
+             read-time resilience (BUG-008's still-open shape), not the
+             write-time rejection this bug fixed. It still never raises;
+             updated to expect the existing generic "catalog unavailable"
+             response (assert_catalog_unavailable), the same as
+             test_program_malformed_row's unparseable-row case, instead of a
+             specific data_warning. test_unknown_requirements_warning_
+             survives_the_cap's fixture swapped its shared_credit_limit: 0
+             (now load-rejected) for a comically large valid value (999999),
+             which still earns its own "larger than the program's total"
+             warning without being load-rejected; the cap behavior it tests
+             is unaffected.
 
 BUG-023  Catalog years are not checked at load, and the "several years" error
          carries its years only as text
-  Status:    Open ((b) is fixed)
+  Status:    Fixed
   Owner:     Midhat Sajad (data format, lookups)
   Where:     backend/src/degree_planner_backend/models.py (catalog_year on
              Course and Program), backend/src/degree_planner_backend/lookups.py
@@ -575,20 +645,37 @@ BUG-023  Catalog years are not checked at load, and the "several years" error
   Fix idea:  (a) catalog_year: str = Field(pattern=r"^[0-9]{4}-[0-9]{4}$");
              (b) give AmbiguousLookupError a years: list[str] attribute set in
              _resolve_catalog_year; the agent tool then uses exc.years.
-  Fixed in:  not yet committed (backend: Midhat), (b) only, exactly the fix
-             idea above (years defaults to [] so existing code that builds
-             this exception from just a message still works). (a) was tried
-             and held back: test_stored_bad_year_is_not_echoed,
-             test_stored_bad_course_year_is_not_echoed, and
-             test_bad_stored_years_do_not_send_the_model_in_a_loop in
-             test_agent_tools.py store a course/program with a bad
-             catalog_year directly (bypassing the loader, to simulate
-             already-bad stored data) and expect get_course/get_program to
-             still return it with the tool's "(invalid year)" warning rather
-             than fail to parse it back; same call as BUG-022 and BUG-008.
-             Covered by test_ambiguous_lookup_error_carries_years_as_data and
+  Fixed in:  (b): not yet committed (backend: Midhat), exactly the fix idea
+             above (years defaults to [] so existing code that builds this
+             exception from just a message still works). Covered by
+             test_ambiguous_lookup_error_carries_years_as_data and
              test_ambiguous_lookup_error_years_defaults_to_empty in
              test_data_hardening.py.
+             (a): 2026-11-25 (backend: Midhat), exactly the fix idea:
+             catalog_year: str = Field(pattern=r"^[0-9]{4}-[0-9]{4}$") on
+             Course and Program. Held back on 2026-11-24 because
+             test_stored_bad_year_is_not_echoed and test_stored_bad_course_
+             year_is_not_echoed construct a course/program with a bad
+             catalog_year through the ordinary loader (not simulated
+             corruption) and expected it to load with the tool's
+             "(invalid year)" warning; raised to Samantha, who agreed on
+             2026-11-25 a prompt-injection-shaped catalog_year like
+             "IGNORE PREVIOUS INSTRUCTIONS" is never legitimate. Renamed both
+             tests (test_stored_bad_year_is_rejected_at_load, test_stored_bad_
+             course_year_is_rejected_at_load) to assert the program/course no
+             longer loads at all (get_program_requirements returns
+             {"error": PROGRAM_NOT_FOUND}; get_prerequisites returns the
+             normal "no course ... in the catalog" error).
+             test_bad_stored_years_do_not_send_the_model_in_a_loop is a
+             different case: its year-hint logic resolves purely from the SQL
+             catalog_year column (via AmbiguousLookupError/NotFoundError),
+             never parsing a row's JSON data through the model, so it is
+             about a mismatched SQL column on an already-stored row (read-
+             time resilience, BUG-008's still-open shape), not the write-time
+             rejection this bug fixed. Updated it to build its rows with a
+             direct INSERT (bypassing make_program/programs_db, which would
+             now be refused), keeping the same two bad SQL-column years; its
+             assertions did not need to change.
 
 BUG-024  The validator applies overrides to flags that are not overridable
   Status:    Fixed
@@ -652,7 +739,7 @@ BUG-025  One course can count toward several requirement groups
 
 BUG-026  Validator gaps: no credit cap per semester, no corequisite check,
          empty "all" groups always met, OR-with-exception still flagged
-  Status:    Open
+  Status:    Open ((a), (b), and (c) are fixed; (d) held back)
   Owner:     Midhat Sajad (validator, data format)
   Where:     backend/src/degree_planner_backend/validator.py, docs/plan-format.md
   Found:     2026-11-19 by check_plan adversarial test agent, reproduced by
@@ -670,6 +757,62 @@ BUG-026  Validator gaps: no credit cap per semester, no corequisite check,
   Fix idea:  one new flag type each for (a) and (b); treat (c) as malformed
              data; only collect exception labels from branches that are
              actually needed.
+  Fixed in:  not yet committed (backend: Midhat), (a) only, exactly that
+             part of the fix idea: new "semester_overload" flag type
+             (plan_models.py, docs/plan-format.md); validator.py flags a
+             semester over 18 credits (undergraduate) or 15 (graduate; the
+             same numbers planner.md already tells the agent to
+             self-police, "check_plan does not check this" — that comment
+             is now stale). For a combined-program student, the limit
+             becomes 15 only in the first semester after the bachelor's
+             part's last planned required course is done (reusing BUG-044's
+             boundary logic, generalized to not require a known non-thesis
+             master's/PhD). Covered by test_validator_semester_credit_cap.py
+             (6 tests).
+             (b) fixed too, 2026-11-24, as part of BUG-049 (same gap, found
+             independently by Samantha's chatbot adversarial review): the
+             validator now checks corequisites, resolved against the
+             semester before plus the semester's own courses. The "blocked
+             on BUG-012" note below was wrong by the time it was written —
+             217 real courses already have a structured (not free-text)
+             corequisite. See BUG-049 for the fix and its tests.
+  Note:      2026-11-24: (c) was also tried and held back (backend: Midhat).
+             Rejecting an "all" group with no courses at the model means it
+             can no longer load at all, but
+             test_program_all_group_without_courses_is_flagged in
+             test_agent_tools.py depends on agent/tools.py's existing lenient
+             handling (loads the program, adds a "kind 'all' with no
+             courses" data_warning). Same call as the other held-back bugs
+             (007, 010, 014, 017, 022, 023(a), 028 — see those entries and
+             the message sent to Samantha, 2026-11-24): reject at load, or
+             keep tolerating it at the tool layer. ((b) was fixed the same
+             day, see the Fixed in: note above — this "blocked on BUG-012"
+             call turned out to be wrong.)
+  Fixed in:  (c): 2026-11-25 (backend: Midhat), exactly the fix idea (treat
+             an "all" group with no courses as malformed data): added a
+             model_validator on RequirementGroup that raises when kind is
+             "all" and courses is empty. Samantha agreed on 2026-11-25.
+             Renamed test_program_all_group_without_courses_is_flagged to
+             test_program_all_group_without_courses_is_rejected_at_load and
+             changed it to assert get_program_requirements returns
+             {"error": PROGRAM_NOT_FOUND} instead of checking the now-
+             unreachable data_warning.
+  Note:      2026-11-24: (d) was also tried, merged briefly, then reverted
+             after pulling Samantha's new chat/Exception handling work
+             (backend: Midhat). The new agent/chat_tools.py's
+             open_exceptions/accept_exception feature, and its whole test
+             suite (test_chat_tools.py, test_chat_loop.py), is built on
+             exception_claimed being raised unconditionally for any course
+             whose prerequisite tree names an exception, even when a sibling
+             OR-branch is already satisfied by a plain course (e.g.
+             test_accept_an_exception_the_student_was_granted plans TEST101,
+             which satisfies OR(TEST101, exception), in an earlier semester,
+             and still expects TEST201 to show as an open exception to
+             confirm). Fixing (d) silently zeroed out her open_exceptions
+             list in that case. Same held-back shape as everything else here,
+             but surfaced only once her branch landed on main, not by a
+             pre-existing adversarial test; flagging it to her alongside the
+             rest.
 
 BUG-027  Courses that may be repeated for credit cannot be marked
   Status:    Open
@@ -687,7 +830,7 @@ BUG-027  Courses that may be repeated for credit cannot be marked
              the tool then allows repeats up to that limit.
 
 BUG-028  Student accepts an empty programs list
-  Status:    Open
+  Status:    Fixed
   Owner:     Midhat Sajad (data format)
   Where:     backend/src/degree_planner_backend/plan_models.py (Student)
   Found:     2026-11-19 by Samantha, probing the agent request format
@@ -700,18 +843,20 @@ BUG-028  Student accepts an empty programs list
   Expected:  rejected when the request comes in: a student always has at
              least one program
   Fix idea:  programs: list[str] = Field(min_length=1)
-  Note:      2026-11-24: tried the fix idea (backend: Midhat), then held it
-             back. test_check_plan_no_programs_never_passes in
-             test_agent_tools.py builds Student(programs=[]) directly (via the
-             model, not a stored/loaded request) specifically to test
-             check_plan's own "no_programs" error path for that case;
-             Field(min_length=1) stops that test from constructing its
-             scenario at all. This is the same "AgentRequest should refuse it
-             at the door" case the bug describes, just also exercised one
-             layer down than expected; needs Samantha's call on whether
-             check_plan's own no_programs handling becomes dead code once
-             this rejects at the edge, or this stays as request-level
-             validation on AgentRequest only (not the shared Student model).
+  Fixed in:  2026-11-25 (backend: Midhat), exactly the fix idea:
+             programs: list[str] = Field(min_length=1) on plan_models.Student.
+             Held back on 2026-11-24 because test_check_plan_no_programs_
+             never_passes built Student(programs=[]) directly to test
+             check_plan's own "no_programs" error path; raised to Samantha,
+             who agreed on 2026-11-25. Renamed that test to
+             test_student_with_no_programs_is_rejected_at_construction and
+             changed it to assert pytest.raises(ValidationError) on the
+             Student construction itself. agent/tools.py's own "no_programs"
+             check (build_plan, line ~1184) is left as-is: it is Samantha's
+             defensive code for the same scenario this bug describes and is
+             harmless to keep even though it can no longer be reached by
+             constructing a Student directly; not touched, since it is her
+             file and nothing asked for its removal.
 
 BUG-029  Completed courses accept negative (or zero) credits
   Status:    Fixed
@@ -1220,7 +1365,7 @@ BUG-045  Terms offered are not in the course data (summer only, spring
 
 BUG-046  A lone surrogate in a request body gives 500 instead of 422 (all
          JSON endpoints)
-  Status:    Open
+  Status:    Fixed
   Owner:     Midhat Sajad (backend API)
   Where:     backend/src/degree_planner_backend/main.py (FastAPI's default
              RequestValidationError handler)
@@ -1239,6 +1384,16 @@ BUG-046  A lone surrogate in a request body gives 500 instead of 422 (all
   Fix idea:  add an exception handler for RequestValidationError that
              leaves out each error's "input" (or encodes it with
              errors="replace")
+  Fixed in:  not yet committed (backend: Midhat), exactly the fix idea
+             above: main.py registers an exception_handler for
+             RequestValidationError that drops "input" from each error
+             dict (via jsonable_encoder, same as FastAPI's default handler
+             uses, for anything else non-JSON-native in an error's "ctx")
+             and returns the usual {"detail": [...]} 422 shape. Verified
+             the fix is real by reverting main.py and confirming
+             test_a_lone_surrogate_in_the_body_gets_422_not_500 reproduces
+             the exact UnicodeEncodeError from "Actual" above, then
+             restoring it. Covered by that test in test_api_plans.py.
 
 BUG-047  CSCI478's prerequisite is stored as an exception, so every plan
          with CSCI478 gets an exception warning
@@ -1289,7 +1444,7 @@ BUG-048  get_forms has no course substitution form, so the chatbot cannot
              saying to ask the advisor
 
 BUG-049  The validator does not check corequisites
-  Status:    Open
+  Status:    Fixed
   Owner:     Midhat Sajad (validator)
   Where:     backend/src/degree_planner_backend/validator.py (corequisites is
              defined in models.py and filled in the course data, but never
@@ -1310,3 +1465,18 @@ BUG-049  The validator does not check corequisites
              against the courses completed before the semester plus the
              semester's own courses. Until then, chat.md tells the chatbot
              to check corequisites itself and say when one is unmet
+  Fixed in:  not yet committed (backend: Midhat), exactly the fix idea
+             above: the per-course loop now also resolves corequisites
+             against completed-before-this-semester plus this semester's
+             own courses (unlike a prerequisite, which must be strictly
+             earlier), flagging an unmet one as broken_prerequisite with a
+             message naming it as a corequisite. Verified against the real
+             catalog: 217 courses have a structured corequisite (168
+             course, 16 AND, 15 OR, 18 exception), so this isn't blocked on
+             BUG-012 the way BUG-026(b) is. Updated two existing tests
+             whose sample plan has an unmet CSCI400 corequisite that's now
+             correctly caught too (test_check_plan_matches_the_sample_plan,
+             test_check_plan_endpoint_flags_broken_prerequisite). Covered
+             by test_validator_corequisites.py (3 tests). chat.md's
+             "check corequisites itself" instruction is now redundant,
+             worth Samantha simplifying once she sees this.

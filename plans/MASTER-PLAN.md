@@ -61,7 +61,7 @@ Today is Thu Nov 12. Dates marked "target" are our own; the others come from the
 | Catalog sources | Choose catalog sources (Mines online catalog pages, department pages, forms) and decide scrape vs. export vs. giving the agent pages directly | P0 | Nov 13 | | [x] |
 | User conversation | Write up the real-user conversation (who, role, what it costs them today, their words) and confirm Nov 20 and Nov 24 dates with the user | P0 | Nov 16 | | [ ] |
 | Presentation day | Confirm which presentation day (Dec 3 or Dec 8) | P1 | Nov 16 | | [ ] |
-| Integration day | Integration day: run the whole path on Example 1, fix seams | P0 | Nov 20 | Lookups, API endpoints, Agent loop, Connect setup to backend | [ ] |
+| Integration day | Integration day: run the whole path on Example 1, fix seams | P0 | Nov 20 | Lookups, API endpoints, Agent loop, Connect setup to backend | [x] |
 | User trial | User trial, take notes, turn feedback into tasks in the three plans | P0 | Nov 24 | Integration day | [ ] |
 | Measured claim | Pick the one measured claim and baseline for EVAL.md (taught later in the course; team judgment) | P0 | Nov 25 | Eval runner | [ ] |
 | Threat model | Threat model: which lethal-trifecta parts we have (private data, untrusted content, external communication) and mitigations. Draft after lecture 26 | P0 | Dec 2 | | [ ] |
@@ -119,3 +119,4 @@ The proposal text lists different cut orders (one major and one minor only; then
 - 2026-11-12: Plans created from the proposal and README. No tasks started in these plans yet.
 - 2026-11-13: Stack decision done (Midhat): Python 3.12, `uv`, FastAPI, SQLite. Recorded in DECISIONS.md and CLAUDE.md (PR #7).
 - 2026-11-23: Catalog sources done (Midhat, team agreed): one-time export and hand-reviewed conversion, not a live or scheduled scraper, and not giving the agent raw catalog pages directly; matches what all three data slices were already built as. Unblocks Catalog scraper in BACKEND-PLAN.md (the existing one-time `load-data` loader already satisfies it). Decision write-up given to the team to copy into DECISIONS.md.
+- 2026-11-25: Integration day done (Midhat ran it): Example 1 through the real backend, real agent loop, and real validator (no mocks), via `POST /plans/submit-setup` against the full real catalog. HTTP 200, `status: "ok"`, requirements met, 129/128 credits, 8 semesters, no flags. See BACKEND-PLAN.md's status log for the full run and two data issues it surfaced (MATH225's `CSC128` prerequisite typo, MATH334's AND of two corequisite versions) that still need a bugs.txt entry and an owner.

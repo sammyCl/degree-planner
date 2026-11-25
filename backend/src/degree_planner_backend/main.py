@@ -1,8 +1,12 @@
+import logging
 import sqlite3
 import tempfile
 from pathlib import Path
 
-from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
+from fastapi import Depends, FastAPI, File, HTTPException, Request, UploadFile
+from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 
 from degree_planner_backend.agent.chat_loop import run_chat
 from degree_planner_backend.agent.chat_models import ChatRequest, ChatResponse
@@ -18,7 +22,33 @@ from degree_planner_backend.transcript_parser import (
 )
 from degree_planner_backend.validator import check_plan
 
+logger = logging.getLogger(__name__)
+
 app = FastAPI(title="Degree Planner API")
+
+
+@app.exception_handler(RequestValidationError)
+async def _on_request_validation_error(request: Request, exc: RequestValidationError) -> JSONResponse:
+    """FastAPI's default handler echoes each error's "input" back in the response; a lone
+    surrogate in the request body (valid JSON, not valid text, e.g. "\\ud800") can't then be
+    encoded as UTF-8, turning an ordinary 422 into a 500 (BUG-046). Drop "input" instead."""
+    errors = [{key: value for key, value in error.items() if key != "input"} for error in exc.errors()]
+    return JSONResponse(status_code=422, content=jsonable_encoder({"detail": errors}))
+
+
+@app.exception_handler(Exception)
+async def _on_unexpected_error(request: Request, exc: Exception) -> JSONResponse:
+    """Trial-ready API: an HTTPException or RequestValidationError is handled above or by FastAPI
+    itself and never reaches this; this is only for a genuine bug or server problem we did not
+    anticipate (e.g. a locked database). The real exception and traceback go to the server log
+    (same principle as BUG-006: internals are never a student's problem or an attacker's map of
+    this server); the response stays a plain, fixed message so the frontend has something to show
+    and retry, instead of the connection just failing."""
+    logger.exception("unhandled error on %s %s", request.method, request.url.path)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Something went wrong on our end. Please try again in a moment."},
+    )
 
 
 @app.get("/health")
