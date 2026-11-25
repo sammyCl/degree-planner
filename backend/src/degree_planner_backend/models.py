@@ -2,12 +2,34 @@
 
 from __future__ import annotations
 
+import unicodedata
 from typing import Annotated, Literal, Union
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 # BUG-019: a default catalog year for forms that don't carry their own.
 _CATALOG_YEAR = r"^[0-9]{4}-[0-9]{4}$"
+# BUG-014: an exception label is cleaned once here so every consumer (validator, frontend, agent)
+# sees the same text, instead of each layer cleaning it again its own way. Matches
+# agent/tools.py's clean_text exactly (format characters dropped, control characters become a
+# space, whitespace runs collapse, "..." if still over the limit) so the two layers never disagree.
+_LABEL_MAX = 200
+
+
+def _clean_label(value: str) -> str:
+    kept = []
+    for char in value:
+        category = unicodedata.category(char)
+        if category == "Cf":
+            continue
+        kept.append(" " if category == "Cc" else char)
+    cleaned = " ".join("".join(kept).split())
+    if len(cleaned) <= _LABEL_MAX:
+        return cleaned
+    cut = _LABEL_MAX - 3
+    while cut > 0 and unicodedata.combining(cleaned[cut]):
+        cut -= 1
+    return cleaned[:cut] + "..."
 
 
 class CourseRequirement(BaseModel):
@@ -18,25 +40,27 @@ class CourseRequirement(BaseModel):
 
 class ExceptionRequirement(BaseModel):
     type: Literal["exception"]
-    # BUG-014 (held back): agent/tools.py already cleans a label (drops invisible characters,
-    # joins lines, cuts at 200 characters) at its own layer with its own exact rules; cleaning it
-    # again here as well double-processes it and can disagree with the tool's own cut. Leave this
-    # to Samantha to fold into the data format once the two layers are reconciled.
-    label: str
+    # BUG-014: cleaned and truncated, not rejected for length — real scraped prerequisite text can
+    # run past 200 characters (e.g. CEEN590's corequisite); emptied-out (all invisible characters)
+    # is still rejected, since an exception with no real label is malformed data.
+    label: str = Field(min_length=1, max_length=_LABEL_MAX)
+
+    @field_validator("label", mode="before")
+    @classmethod
+    def _clean(cls, value: object) -> object:
+        return _clean_label(value) if isinstance(value, str) else value
 
 
 class AndRequirement(BaseModel):
     type: Literal["AND"]
-    # BUG-010 (held back): rejecting an empty "of" here means an already-loaded empty group (which
-    # agent/tools.py's summarize_requirement already renders as "(empty OR group)") can no longer
-    # be constructed directly either, which several of its tests rely on. Needs the same
-    # reconciliation as BUG-014 before this can enforce min_length=1.
-    of: list[Requirement]
+    # BUG-010: an AND or OR of nothing is malformed data (an empty OR can never be true, an empty
+    # AND is trivially true, and the data author almost certainly meant neither).
+    of: list[Requirement] = Field(min_length=1)
 
 
 class OrRequirement(BaseModel):
     type: Literal["OR"]
-    of: list[Requirement]
+    of: list[Requirement] = Field(min_length=1)
 
 
 Requirement = Annotated[
@@ -68,7 +92,8 @@ class Course(BaseModel):
     description: str
     prerequisites: Requirement | None = None
     corequisites: Requirement | None = None
-    catalog_year: str
+    # BUG-023(a): a catalog year is always a "2026-2027"-shaped range, never free text.
+    catalog_year: str = Field(pattern=_CATALOG_YEAR)
     source: Source | None = None
 
     @field_validator("code", mode="before")
@@ -91,14 +116,12 @@ class RequirementGroup(BaseModel):
     # checks only.
     kind: Literal["all", "choose_credits", "requirement"]
     courses: list[str] | None = None
-    # BUG-022 (held back): several of agent/tools.py's existing adversarial tests deliberately
-    # store a program with credits_required/total_credits_required missing, zero or negative and
-    # expect it to load with a data_warning, not be rejected by the loader. Needs Samantha to fold
-    # this into that handling before it can reject at load.
+    # BUG-022: 0, negative, NaN or infinite credits_required would make a group impossible to fail
+    # or let any amount of credits satisfy it.
     # Also used for a "requirement" group's nominal credit count (bookkeeping only, e.g. for a
     # printed total to add up); the validator decides whether the group is met from `requirement`
     # alone, never from this number.
-    credits_required: float | None = None
+    credits_required: float | None = Field(default=None, gt=0, allow_inf_nan=False)
     # Only meaningful for an "all" group (BUG-042): its courses must be planned in every fall and
     # spring semester of the plan, not just once anywhere (e.g. a 0-credit graduate seminar).
     every_semester: bool = False
@@ -111,28 +134,25 @@ class RequirementGroup(BaseModel):
             raise ValueError(f"credits_required is required when kind is {self.kind!r}")
         if self.kind == "requirement" and self.requirement is None:
             raise ValueError("requirement is required when kind is 'requirement'")
-        # BUG-026(c) (held back): rejecting an "all" group with no courses here means it can no
-        # longer load at all, but agent/tools.py already handles this leniently today — it loads
-        # the program and adds a "kind 'all' with no courses" data_warning, which
-        # test_program_all_group_without_courses_is_flagged depends on. Same call as the other
-        # held-back bugs (see bugs.txt): reject at load, or keep tolerating it at the tool layer.
+        # BUG-026(c): an "all" group with no courses listed is malformed data, not a requirement
+        # that is trivially met; a group with nothing to require shouldn't exist at all.
+        if self.kind == "all" and not self.courses:
+            raise ValueError("courses must be non-empty when kind is 'all'")
         return self
 
 
 class DoubleCount(BaseModel):
     program_id: str
     shared_courses: list[str]
-    shared_credit_limit: float
+    shared_credit_limit: float = Field(gt=0, allow_inf_nan=False)
 
 
 class Program(BaseModel):
     program_id: str
     name: str
     degree_level: Literal["bachelor", "master", "phd", "combined", "minor", "asi"]
-    catalog_year: str
-    # BUG-023(a) (held back): same reconciliation as BUG-022, applies to catalog_year too (an
-    # existing test stores a program with an invalid catalog_year string on purpose).
-    total_credits_required: float
+    catalog_year: str = Field(pattern=_CATALOG_YEAR)
+    total_credits_required: float = Field(gt=0, allow_inf_nan=False)
     requirement_groups: list[RequirementGroup]
     combines: list[str] = Field(default_factory=list)
     double_counts_with: list[DoubleCount] = Field(default_factory=list)
@@ -147,14 +167,11 @@ class Program(BaseModel):
 
 
 class Form(BaseModel):
-    # BUG-017 (held back in full): agent/tools.py already normalizes form_id/applies_to, caps
-    # max_credits, and allows only https URLs at its own layer, with tests built against forms the
-    # loader stores as-is and the tool then cleans. Doing the same checks here too collapses
-    # distinct raw ids/text the tool's own de-duplication and cleaning tests depend on seeing.
     form_id: str
     name: str
-    applies_to: list[str]
-    max_credits: float | None = None
+    # BUG-017: min_length=1 so a form applies to at least something; entries are normalized below.
+    applies_to: list[str] = Field(min_length=1)
+    max_credits: float | None = Field(default=None, gt=0, allow_inf_nan=False)
     requires: str | None = None
     url: str | None = None
     notes: str | None = None
@@ -163,6 +180,30 @@ class Form(BaseModel):
     # required, so a form built without one (e.g. an existing test fixture) still loads; None just
     # means "year not known."
     catalog_year: str | None = Field(default=None, pattern=_CATALOG_YEAR)
+
+    @field_validator("form_id", mode="before")
+    @classmethod
+    def _normalize_form_id(cls, value: object) -> object:
+        return value.strip().lower() if isinstance(value, str) else value
+
+    @field_validator("applies_to", mode="before")
+    @classmethod
+    def _normalize_applies_to(cls, value: object) -> object:
+        if isinstance(value, list):
+            return [item.strip().lower() if isinstance(item, str) else item for item in value]
+        return value
+
+    @field_validator("url", mode="before")
+    @classmethod
+    def _only_https(cls, value: object) -> object:
+        # BUG-017: a non-https url (or plain text that isn't a url at all) becomes None rather
+        # than rejecting the whole form — url is already optional, so this is the same shape as a
+        # form that never had one, not data loss the way dropping the form would be. agent/tools.py
+        # does a stricter check on top (the real Mines domain, not just the scheme); this is only
+        # the cheap, load-time half.
+        if isinstance(value, str) and not value.lower().startswith("https://"):
+            return None
+        return value
 
 
 class DataFile(BaseModel):
