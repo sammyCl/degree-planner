@@ -660,7 +660,7 @@ BUG-025  One course can count toward several requirement groups
 
 BUG-026  Validator gaps: no credit cap per semester, no corequisite check,
          empty "all" groups always met, OR-with-exception still flagged
-  Status:    Open ((a) is fixed)
+  Status:    Open ((a) and (b) are fixed)
   Owner:     Midhat Sajad (validator, data format)
   Where:     backend/src/degree_planner_backend/validator.py, docs/plan-format.md
   Found:     2026-11-19 by check_plan adversarial test agent, reproduced by
@@ -690,6 +690,13 @@ BUG-026  Validator gaps: no credit cap per semester, no corequisite check,
              boundary logic, generalized to not require a known non-thesis
              master's/PhD). Covered by test_validator_semester_credit_cap.py
              (6 tests).
+             (b) fixed too, 2026-11-24, as part of BUG-049 (same gap, found
+             independently by Samantha's chatbot adversarial review): the
+             validator now checks corequisites, resolved against the
+             semester before plus the semester's own courses. The "blocked
+             on BUG-012" note below was wrong by the time it was written —
+             217 real courses already have a structured (not free-text)
+             corequisite. See BUG-049 for the fix and its tests.
   Note:      2026-11-24: (c) was also tried and held back (backend: Midhat).
              Rejecting an "all" group with no courses at the model means it
              can no longer load at all, but
@@ -699,9 +706,9 @@ BUG-026  Validator gaps: no credit cap per semester, no corequisite check,
              courses" data_warning). Same call as the other held-back bugs
              (007, 010, 014, 017, 022, 023(a), 028 — see those entries and
              the message sent to Samantha, 2026-11-24): reject at load, or
-             keep tolerating it at the tool layer. (b) is still blocked on
-             BUG-012 (corequisites are still free text, not structured
-             codes); not attempted.
+             keep tolerating it at the tool layer. ((b) was fixed the same
+             day, see the Fixed in: note above — this "blocked on BUG-012"
+             call turned out to be wrong.)
   Note:      2026-11-24: (d) was also tried, merged briefly, then reverted
              after pulling Samantha's new chat/Exception handling work
              (backend: Midhat). The new agent/chat_tools.py's
