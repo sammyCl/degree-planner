@@ -33,31 +33,50 @@ INDEPENDENT_STUDY_CREDITS = 3.0
 EQUIVALENT = re.compile(r"^\s*Equivalent with ((?:[A-Z]{3,4}\s?\d{3}[A-Z]{0,2}\s*,\s*)*[A-Z]{3,4}\s?\d{3}[A-Z]{0,2})\b")
 
 SMALL = {"and", "or", "of", "the", "in", "for", "to", "a", "an", "on", "at", "by", "with", "from", "as"}
+ROMAN = {"I", "II", "III", "IV", "V", "VI"}
+# Words the catalog prints in capitals that must stay capitals (or a fixed mix) in a title.
 ACRONYMS = {
     "CAD", "CAM", "CNC", "GIS", "GPS", "FEA", "CFD", "MEMS", "VLSI", "RF", "DC", "AC", "IC", "IT", "AI", "ML", "LED",
     "PLC", "HVAC", "NMR", "XRD", "SEM", "TEM", "ISS", "ICE", "PES", "STEM", "HASS", "EBGN", "MATLAB", "SQL", "CS",
     "EE", "ME", "BME", "CPR", "UAS", "UAV", "3D", "2D", "LNG", "CO2", "CCUS", "PV", "FPGA", "ASIC", "SC1", "SC2", "SC3",
-    "II", "III", "IV", "VI", "VII", "VIII", "IX", "XI", "XII", "I", "TCP", "IP", "OS", "VR", "AR", "R&D", "PhD", "MS",
+    "TCP", "IP", "OS", "VR", "AR", "R&D", "PhD", "MS",
+    # found by scanning every title against the catalog (2026-11-24)
+    "CSM", "QBE", "MCAT", "CPU", "CPT", "REU", "HVDC", "SWIR", "ICP", "AAPG", "SRC", "MME", "MN", "CASA", "LA", "IoT",
+    # product and proper names written with an inner capital
+    "AutoCAD", "SolidWorks", "McBride",
 }
+FORMS = {a.upper(): a for a in ACRONYMS} | {r: r for r in ROMAN}
+# Misspellings in the catalog itself, fixed in the title (the CSV is not changed). FUNDAMENTA is cut off (its sibling
+# AFGN202 reads "Fundamentals II"); REPORTMASTER is "Report" and "Master" run together (MNGN700, the Master of
+# Engineering report), written here as "Report - Master", the best reading of the description.
+TYPOS = {"TOPCS": "Topics", "FUNDAMENTA": "Fundamentals", "RAQUETBALL": "Racquetball", "REPORTMASTER": "Report - Master"}
+TOKEN = re.compile(r"[A-Za-z0-9&]+")
 
 
 def title_case(s: str) -> str:
+    """ALL CAPS catalog titles become Title Case, word by word so a Roman numeral or acronym joined to a hyphen,
+    slash or parenthesis ("PHYSICS II-ELECTROMAGNETISM", "(HVDC)") is still recognised."""
     s = " ".join(s.split())
+    s = re.sub(r"^csm\b", "CSM", s)  # LIMU211 is printed "csm CONCERT CHOIR - SOPHOMORE"
     if any(ch.islower() for ch in s):
         return s  # already mixed case in the catalog
 
-    def word(w: str, first: bool) -> str:
-        core = re.sub(r"[^\w&]", "", w)
-        if core in ACRONYMS or re.search(r"\d", core):
-            return w
-        low = w.lower()
-        if not first and low in SMALL:
-            return low
-        # capitalize each hyphen/slash/paren-separated piece
-        return re.sub(r"(^|[-/(])([a-z])", lambda m: m.group(1) + m.group(2).upper(), low)
+    def fix(m: re.Match) -> str:
+        w = m.group(0)
+        up = w.upper()
+        if up in TYPOS:
+            return TYPOS[up]
+        if up in FORMS:
+            return FORMS[up]
+        if re.search(r"\d", w):
+            return up  # SC1, 4XX, ...
+        if up == "S" and m.start() > 0 and s[m.start() - 1] == "'":
+            return "s"  # WOMEN'S, CPU'S
+        if m.start() > 0 and up.lower() in SMALL:
+            return up.lower()
+        return up.capitalize()
 
-    words = s.split(" ")
-    return " ".join(word(w, i == 0) for i, w in enumerate(words))
+    return TOKEN.sub(fix, s)
 
 
 def norm(s: str) -> str:
@@ -172,6 +191,9 @@ def build() -> tuple[list[dict], dict[str, list[str]], Counter]:
         if pre.grade_dropped:
             stats["prerequisites with a grade minimum (grade dropped)"] += 1
             dropped.append({"code": code, "kind": "grade minimum", "detail": "; ".join(pre.grade_texts), "original_prerequisites": original})
+        if pre.placement_dropped:
+            stats["placement-level prerequisites left out (not a course)"] += 1
+            dropped.append({"code": code, "kind": "placement assumption", "detail": pre.placement_dropped, "original_prerequisites": original})
         if pre.notes_dropped:
             stats["credit/repeat notes dropped from prerequisites"] += 1
             dropped.append({"code": code, "kind": "credit/repeat note", "detail": " | ".join(pre.notes_dropped), "original_prerequisites": original})
@@ -247,6 +269,7 @@ def write_review(notes: dict[str, list[str]], stats: Counter) -> None:
     for kind, title in [
         ("grade minimum", "Grade minimums dropped from prerequisites (the data format has no grade field)"),
         ("credit/repeat note", "Credit/repeat notes dropped from prerequisites (not course requirements)"),
+        ("placement assumption", "Placement-level prerequisites left out (a level of preparation, not a course)"),
     ]:
         items = [d for d in dropped if d["kind"] == kind]
         out.append(f"\n## {title} ({len(items)})\n")

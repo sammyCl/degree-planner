@@ -1,5 +1,5 @@
 import type { Flag, PlannedCourse } from '../types.ts'
-import { formatCredits, subjectColor } from './graph.ts'
+import { flagKind, formatCredits, subjectColor } from './graph.ts'
 
 export type CardState = 'idle' | 'in-chain' | 'focus' | 'dim'
 
@@ -20,12 +20,12 @@ interface Props {
 
 export function CourseCard({ course, flag, state, col, row, setRef, onEnter, onLeave, onOpen, pulse }: Props) {
   const open = flag && !flag.overridden
-  const warning = open && flag.severity === 'warning'
+  const kind = open ? flagKind(flag) : null
   const aria =
     `${course.code} ${course.title}, ${formatCredits(course.credits)} credits` +
     (course.status === 'completed' ? ', completed' : '') +
     (flag ? `. Problem: ${flag.message}` : '')
-  const classes = ['card', open && !warning ? 'flagged' : '', warning ? 'warned' : '', course.status === 'completed' ? 'completed' : '', state, pulse ? 'pulse' : '']
+  const classes = ['card', kind === 'error' ? 'flagged' : '', kind === 'warning' ? 'warned' : '', kind === 'confirm' ? 'confirm' : '', course.status === 'completed' ? 'completed' : '', state, pulse ? 'pulse' : '']
     .filter(Boolean)
     .join(' ')
   return (
@@ -61,7 +61,7 @@ export function CourseCard({ course, flag, state, col, row, setRef, onEnter, onL
             <path d="M12 3l10 18H2z" />
             <path d="M12 10v4m0 3h.01" />
           </svg>
-          {flag.type === 'broken_prerequisite' ? 'Prerequisite out of order' : warning ? 'Check this' : 'Needs attention'}
+          {flag.type === 'broken_prerequisite' ? 'Prerequisite out of order' : kind === 'confirm' ? 'To confirm' : kind === 'warning' ? 'Check this' : 'Needs attention'}
         </div>
       )}
     </div>

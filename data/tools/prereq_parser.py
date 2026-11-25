@@ -32,6 +32,10 @@ EXCEPTIONS = [
     (re.compile(r"equivalents?(?:\s+(?:courses?|project\s+classes?|knowledge|experience))?", re.I), "equivalent course"),
 ]
 NOISE_SENTENCE = re.compile(r"^(?:variable credit|repeatable|offered|may be repeated|this course)", re.I)
+# A prerequisite that is a level of preparation, not a course, and that every student who reaches the course already has
+# (MATH111's whole prerequisite is the word "precalculus"). It is not an exception to confirm, so it is left out and
+# recorded in the dropped-info file.
+PLACEMENT_ONLY = re.compile(r"^pre-?\s?calculus\.?$", re.I)
 NONE = re.compile(r"^(?:none|n/a|na|no prerequisites?)\.?$", re.I)
 
 
@@ -42,6 +46,7 @@ class ParseResult:
     grade_dropped: bool = False
     grade_texts: list[str] = field(default_factory=list)  # the grade-minimum wording that was dropped
     notes_dropped: list[str] = field(default_factory=list)
+    placement_dropped: str = ""  # a placement-level expectation (not a course) that was left out
 
 
 def _course(code: str) -> dict:
@@ -180,6 +185,8 @@ def parse_prerequisites(text: str) -> ParseResult:
     original = " ".join((text or "").replace("“", '"').replace("”", '"').replace("’", "'").split())
     if not original or NONE.match(original):
         return ParseResult(None)
+    if PLACEMENT_ONLY.match(original):
+        return ParseResult(None, placement_dropped=original)
 
     # Keep the prerequisite sentence(s); drop notes about credit or repetition.
     sentences = [s.strip() for s in re.split(r"(?<=[a-z0-9)])\.\s+(?=[A-Z\"])", original) if s.strip()]

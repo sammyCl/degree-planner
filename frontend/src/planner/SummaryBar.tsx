@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { Flag, Plan } from '../types.ts'
-import { flagCounts } from './graph.ts'
+import { flagCounts, flagKind } from './graph.ts'
 import { useCountUp } from './useCountUp.ts'
 
 const R = 19
@@ -32,7 +32,7 @@ interface Props {
 
 export function SummaryBar({ plan, programName, onSelectFlag }: Props) {
   const { total_credits: total, total_credits_required: required } = plan.summary
-  const { errors, warnings } = flagCounts(plan.flags)
+  const { errors, warnings, confirm } = flagCounts(plan.flags)
   const shown = useCountUp(total)
   const [ready, setReady] = useState(false)
   const [menu, setMenu] = useState(false)
@@ -101,6 +101,12 @@ export function SummaryBar({ plan, programName, onSelectFlag }: Props) {
             {warnings} warning{warnings === 1 ? '' : 's'}
           </button>
         )}
+        {confirm > 0 && (
+          <button type="button" className="badge c" aria-expanded={menu} aria-haspopup="true" onClick={() => setMenu((m) => !m)}>
+            <InfoIcon />
+            {confirm} to confirm
+          </button>
+        )}
         {menu && (
           <div className="flags-menu" role="menu">
             {plan.flags.length === 0 && <div className="flags-none">Everything checks out.</div>}
@@ -109,13 +115,13 @@ export function SummaryBar({ plan, programName, onSelectFlag }: Props) {
                 key={f.flag_id}
                 type="button"
                 role="menuitem"
-                className={`flag ${f.severity === 'error' ? 'e' : 'w'}${f.overridden ? ' done' : ''}`}
+                className={`flag ${{ error: 'e', warning: 'w', confirm: 'c' }[flagKind(f)]}${f.overridden ? ' done' : ''}`}
                 onClick={() => {
                   setMenu(false)
                   onSelectFlag(f)
                 }}
               >
-                <span className="flag-ic">{f.severity === 'error' ? <WarnIcon /> : <InfoIcon />}</span>
+                <span className="flag-ic">{flagKind(f) === 'error' ? <WarnIcon /> : <InfoIcon />}</span>
                 <span>
                   <b>{flagTitle(f)}</b>
                   <span>{f.message}</span>
@@ -143,6 +149,6 @@ const TITLES: Record<string, string> = {
   credit_shortfall: 'Credit load',
   requirement_unmet: 'Requirement not met',
   double_count_exceeded: 'Too many shared courses',
-  exception_claimed: 'Exception claimed',
+  exception_claimed: 'To confirm',
 }
 const flagTitle = (f: Flag): string => TITLES[f.type] ?? 'Needs attention'

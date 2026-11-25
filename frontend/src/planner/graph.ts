@@ -58,11 +58,24 @@ export function chainOf(plan: Plan, index: PlanIndex, id: string): { ids: Set<st
 /** An overridden flag no longer counts against the plan (the student chose to accept it). */
 export const isOpen = (flag: Flag): boolean => !flag.overridden
 
-export function flagCounts(flags: Flag[]): { errors: number; warnings: number } {
-  const open = flags.filter(isOpen)
+/**
+ * How a flag is shown. An error is red and a warning is amber: those mean something is wrong or at risk. A claimed
+ * exception (instructor consent, "or equivalent", class standing) is not a problem, only something for the student to
+ * confirm, so it gets its own calm "confirm" style.
+ */
+export type FlagKind = 'error' | 'warning' | 'confirm'
+
+export function flagKind(flag: Flag): FlagKind {
+  if (flag.severity === 'error') return 'error'
+  return flag.type === 'exception_claimed' ? 'confirm' : 'warning'
+}
+
+export function flagCounts(flags: Flag[]): { errors: number; warnings: number; confirm: number } {
+  const kinds = flags.filter(isOpen).map(flagKind)
   return {
-    errors: open.filter((f) => f.severity === 'error').length,
-    warnings: open.filter((f) => f.severity === 'warning').length,
+    errors: kinds.filter((k) => k === 'error').length,
+    warnings: kinds.filter((k) => k === 'warning').length,
+    confirm: kinds.filter((k) => k === 'confirm').length,
   }
 }
 

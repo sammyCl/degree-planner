@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { samplePlan } from '../samplePlan.ts'
-import { chainOf, creditLevel, flagCounts, flagsByCourse, indexPlan, subjectColor } from './graph.ts'
+import { chainOf, creditLevel, flagCounts, flagKind, flagsByCourse, indexPlan, subjectColor } from './graph.ts'
 
 describe('indexPlan', () => {
   const index = indexPlan(samplePlan)
@@ -45,9 +45,19 @@ describe('chainOf', () => {
 
 describe('flags', () => {
   it('counts open errors and warnings, ignoring overridden ones', () => {
-    expect(flagCounts(samplePlan.flags)).toEqual({ errors: 2, warnings: 1 })
+    expect(flagCounts(samplePlan.flags)).toEqual({ errors: 2, warnings: 1, confirm: 0 })
     const overridden = samplePlan.flags.map((f) => ({ ...f, overridden: true }))
-    expect(flagCounts(overridden)).toEqual({ errors: 0, warnings: 0 })
+    expect(flagCounts(overridden)).toEqual({ errors: 0, warnings: 0, confirm: 0 })
+  })
+
+  it('tells a claimed exception, which only needs confirming, from a real warning', () => {
+    const base = samplePlan.flags[0]
+    const confirm = { ...base, type: 'exception_claimed' as const, severity: 'warning' as const }
+    const warning = { ...base, type: 'credit_shortfall' as const, severity: 'warning' as const }
+    expect(flagKind(base)).toBe('error')
+    expect(flagKind(warning)).toBe('warning')
+    expect(flagKind(confirm)).toBe('confirm')
+    expect(flagCounts([confirm, warning, base])).toEqual({ errors: 1, warnings: 1, confirm: 1 })
   })
 
   it('groups course flags and leaves out plan-wide ones', () => {

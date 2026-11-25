@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import type { Flag, Plan } from '../types.ts'
-import { formatCredits, type PlanIndex } from './graph.ts'
+import { flagKind, formatCredits, type PlanIndex } from './graph.ts'
 
 interface Props {
   plan: Plan
@@ -70,7 +70,7 @@ export function CoursePopover({ plan, index, courseId, anchor, flags, onClose }:
         {course.status === 'completed' ? ' (completed)' : ''}
       </div>
       {flags.map((f) => (
-        <div key={f.flag_id} className={`pop-msg ${f.severity}`}>
+        <div key={f.flag_id} className={`pop-msg ${flagKind(f)}`}>
           {f.message}
         </div>
       ))}

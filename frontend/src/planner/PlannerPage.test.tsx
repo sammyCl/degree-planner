@@ -132,11 +132,24 @@ describe('PlannerPage', () => {
     expect(screen.queryByText(/\*\*/)).not.toBeInTheDocument()
   })
 
-  it('draws a warning in amber and an error in red', () => {
-    const warned = { ...samplePlan, flags: [{ ...samplePlan.flags[0], severity: 'warning' as const, type: 'exception_claimed' as const }] }
-    render(<PlannerPage plan={warned} onBack={vi.fn()} />)
-    expect(card('CSCI400')).toHaveClass('warned')
+  it('draws an error in red, a warning in amber, and a claimed exception as a calm "to confirm"', () => {
+    const withFlag = (type: 'exception_claimed' | 'credit_shortfall', severity: 'warning' | 'error') =>
+      ({ ...samplePlan, flags: [{ ...samplePlan.flags[0], type, severity }] })
+    const { unmount } = render(<PlannerPage plan={withFlag('exception_claimed', 'warning')} onBack={vi.fn()} />)
+    expect(card('CSCI400')).toHaveClass('confirm')
+    expect(card('CSCI400')).not.toHaveClass('warned')
     expect(card('CSCI400')).not.toHaveClass('flagged')
+    expect(screen.getByRole('button', { name: '1 to confirm' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /warning/ })).not.toBeInTheDocument()
+    unmount()
+
+    const second = render(<PlannerPage plan={withFlag('credit_shortfall', 'warning')} onBack={vi.fn()} />)
+    expect(card('CSCI400')).toHaveClass('warned')
+    expect(screen.getByRole('button', { name: '1 warning' })).toBeInTheDocument()
+    second.unmount()
+
+    render(<PlannerPage plan={withFlag('credit_shortfall', 'error')} onBack={vi.fn()} />)
+    expect(card('CSCI400')).toHaveClass('flagged')
   })
 
   it('goes back to setup', () => {
