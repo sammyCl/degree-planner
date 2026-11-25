@@ -34,6 +34,12 @@ OVERRIDE_CODE_MAX = 20
 EXPLANATION_MAX = 4000
 PROBLEMS_MAX = FLAGS_SHOWN_MAX  # 30
 PROBLEM_MAX = FLAG_MESSAGE_MAX  # 600
+# The agent's choices and the things to check with an advisor, as separate lists so the planner
+# page does not have to sort them out of the explanation's text (submit_summary in mcp_server.py).
+# Named as the planner page names them: AssistantNotes.choices and .checks in
+# frontend/src/planner/summary.ts, shown as 'Choices I made' and 'Things to check'.
+SUMMARY_ITEMS_MAX = 12
+SUMMARY_ITEM_MAX = 500
 
 
 def _has_visible_text(value: str) -> bool:
@@ -179,6 +185,11 @@ class AgentResponse(BaseModel):
     plan: Plan | None
     explanation: str = Field(max_length=EXPLANATION_MAX)
     problems: tuple[str, ...] = Field(default=(), max_length=PROBLEMS_MAX)
+    # What the agent chose where the requirements left it open (which elective fills a group), and
+    # what the student should confirm with an advisor; both written for the student. Empty when
+    # the agent did not call submit_summary after its last check_plan, or the run did not finish.
+    choices: tuple[str, ...] = Field(default=(), max_length=SUMMARY_ITEMS_MAX)
+    checks: tuple[str, ...] = Field(default=(), max_length=SUMMARY_ITEMS_MAX)
     usage: Usage
 
     @field_validator("explanation")
@@ -196,6 +207,16 @@ class AgentResponse(BaseModel):
                 raise ValueError("each problem must say something")
             if len(problem) > PROBLEM_MAX:
                 raise ValueError(f"each problem must be at most {PROBLEM_MAX} characters")
+        return value
+
+    @field_validator("choices", "checks")
+    @classmethod
+    def _check_summary_items(cls, value: tuple[str, ...]) -> tuple[str, ...]:
+        for item in value:
+            if not _has_visible_text(item):
+                raise ValueError("each choice and check must say something")
+            if len(item) > SUMMARY_ITEM_MAX:
+                raise ValueError(f"each choice and check must be at most {SUMMARY_ITEM_MAX} characters")
         return value
 
     @model_validator(mode="after")

@@ -23,6 +23,7 @@ from typing import Any
 from degree_planner_backend import lookups
 from degree_planner_backend.agent import tools
 from degree_planner_backend.agent.chat_models import ChatRequest
+from degree_planner_backend.plan_models import Student
 from degree_planner_backend.agent.tools import (
     CATALOG_UNAVAILABLE,
     COURSES_PER_SEMESTER_MAX,
@@ -41,16 +42,93 @@ EXCEPTION_TYPE = "exception_claimed"
 assert EXCEPTION_TYPE in OVERRIDABLE_FLAG_TYPES
 
 # Most credits in one semester without extra approval: 18 undergraduate, 15 graduate (2026-2027
-# Graduate Catalog). The validator does not check this, so the chat tools report it, worked out
-# in code, and the model never adds credits itself. A combined BS+MS plan uses the undergraduate
-# limit here; chat.md tells the model about its graduate semesters.
+# Graduate Catalog). The validator flags a semester over its limit (BUG-026a); the chat tools also
+# report each semester's limit and room, worked out in code, so the model never adds credits itself.
+#
+# KEEP IN SYNC: semester_credit_limits below is a copy of the validator's rule in check_plan
+# (validator.py: combined_boundary_semester and the "per-term credit limit" loop). If either one
+# changes (the limits, who counts as graduate, or where a combined plan's graduate semesters
+# start), change the other too, or the room shown to the model will disagree with the validator's
+# semester_overload errors. test_chat_limits_match_the_validator in test_chat_tools.py checks
+# that they agree.
 CREDIT_LIMIT_UNDERGRADUATE = 18
 CREDIT_LIMIT_GRADUATE = 15
 _GRADUATE_LEVELS = {"master", "phd"}
 
 
 def credit_limit(degree_level: str) -> int:
+    """The limit for a whole plan by degree level alone; a combined plan's graduate semesters need
+    semester_credit_limits."""
     return CREDIT_LIMIT_GRADUATE if degree_level in _GRADUATE_LEVELS else CREDIT_LIMIT_UNDERGRADUATE
+
+
+def _combined_boundary_semester(
+    connection: sqlite3.Connection, student: Student, semester_codes: list[list[str]]
+) -> int | None:
+    """The last semester holding a course from a combined program's bachelor's part (the
+    validator's combined_boundary_semester): later semesters are graduate. None when the student
+    has no combined program or none of its bachelor's courses are planned. Copied from
+    validator.check_plan; see KEEP IN SYNC above."""
+    year = student.catalog_year
+
+    def equivalents(code: str) -> list[str]:
+        try:
+            return list(lookups.get_course(connection, code, year).equivalent_with)
+        except lookups.NotFoundError:
+            return []
+
+    # Of equivalent courses only the first taken (completed, then by semester) counts (BUG-041),
+    # as in the validator's plan_codes.
+    taken_in_order = [c.code for c in student.completed_courses] + [code for codes in semester_codes for code in codes]
+    counted: set[str] = set()
+    for code in dict.fromkeys(taken_in_order):
+        if not any(other in counted for other in equivalents(code)):
+            counted.add(code)
+
+    boundary: int | None = None
+    for program_id in student.programs:
+        try:
+            program = lookups.get_program(connection, program_id, year)
+        except lookups.NotFoundError:
+            # The validator's fallback to another catalog year is only for minors, ASIs and
+            # certificates, which never combine programs, so skipping is the same here.
+            continue
+        if not program.combines:
+            continue
+        components = []
+        for component_id in program.combines:
+            try:
+                components.append(lookups.get_program(connection, component_id, year))
+            except lookups.NotFoundError:
+                continue
+        bachelor = next((p for p in components if p.degree_level == "bachelor"), None)
+        if bachelor is None:
+            continue
+        bachelor_codes = {c for g in bachelor.requirement_groups for c in (g.courses or [])}
+        found = [
+            index
+            for index, codes in enumerate(semester_codes)
+            for code in codes
+            if code in bachelor_codes and code in counted
+        ]
+        if found:
+            boundary = max(found)
+    return boundary
+
+
+def semester_credit_limits(
+    connection: sqlite3.Connection, student: Student, semester_codes: list[list[str]]
+) -> list[int]:
+    """Each semester's credit limit, the same as the validator's (see KEEP IN SYNC above):
+    graduate throughout for a master's/PhD student, graduate after the bachelor's part is done in a
+    combined program, undergraduate otherwise."""
+    if student.degree_level in _GRADUATE_LEVELS:
+        return [CREDIT_LIMIT_GRADUATE] * len(semester_codes)
+    boundary = _combined_boundary_semester(connection, student, semester_codes)
+    return [
+        CREDIT_LIMIT_GRADUATE if boundary is not None and index > boundary else CREDIT_LIMIT_UNDERGRADUATE
+        for index in range(len(semester_codes))
+    ]
 
 
 _RESULT_NOTE = (
@@ -315,9 +393,11 @@ class ChatSession:
         semesters over their limit."""
         if "error" in result:
             return result
-        limit = credit_limit(self.student.degree_level)
+        limits = semester_credit_limits(
+            self.connection, self.student, [list(semester.get("courses", [])) for semester in result["semesters"]]
+        )
         over = []
-        for semester, completed in zip(result["semesters"], self.completed_on_board):
+        for semester, completed, limit in zip(result["semesters"], self.completed_on_board, limits):
             credits = semester["credits"]
             semester["course_credits"] = [{"code": code, "credits": self._course_credits(code)} for code in semester["courses"]]
             semester["credit_limit"] = limit

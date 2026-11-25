@@ -9632,8 +9632,21 @@
    "credits": 3.0,
    "description": "Bioinformatics is the theory, application and development of computing tools to solve problems and create hypotheses in all areas of biological sciences, which has contributed to advances in biology by providing tools that handle datasets too large and/or complex for manual analysis. This course focuses on an introduction to computational analysis of genetic variation and computational interdisciplinary research in genetics. The topics of this course include introduction to genetics, identification of genes involved in disease, inferring human population history, technologies for obtaining genetic information, and genetic sequencing, with an emphasis on formulating interdisciplinary problems as computational problems and then solving those problems using computational techniques from statistics and computer science.",
    "prerequisites": {
-    "type": "exception",
-    "label": "CSCI101 or CSCI102 CSCI128"
+    "type": "OR",
+    "of": [
+     {
+      "type": "course",
+      "code": "CSCI101"
+     },
+     {
+      "type": "course",
+      "code": "CSCI102"
+     },
+     {
+      "type": "course",
+      "code": "CSCI128"
+     }
+    ]
    },
    "corequisites": null,
    "catalog_year": "2026-2027",

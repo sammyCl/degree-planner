@@ -404,6 +404,9 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
     # The first semester after a combined program's bachelor's part is done (BUG-026a: that's also
     # when the per-semester credit limit switches from undergraduate to graduate), or None if the
     # student isn't in a combined program or hasn't planned any of the bachelor's required courses.
+    # KEEP IN SYNC: agent/chat_tools.py (_combined_boundary_semester, semester_credit_limits)
+    # copies this rule to show the chatbot each semester's limit and room. If you change how this
+    # boundary is found, change it there too (test_chat_limits_match_the_validator checks it).
     combined_boundary_semester: int | None = None
     for program in loaded:
         if not (has_degree and program.degree_level in _ADD_ON_LEVELS):
@@ -590,6 +593,8 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
     # No semester over the Mines per-term credit limit (BUG-026a): graduate throughout for a
     # master's/PhD student, graduate only after the bachelor's part is done for a combined student,
     # undergraduate otherwise.
+    # KEEP IN SYNC: agent/chat_tools.py (semester_credit_limits, CREDIT_LIMIT_UNDERGRADUATE/GRADUATE)
+    # copies these limits and this rule. If you change them, change it there too.
     for index, semester in enumerate(semesters):
         if student.degree_level in _GRADUATE_LEVELS or (
             combined_boundary_semester is not None and index > combined_boundary_semester

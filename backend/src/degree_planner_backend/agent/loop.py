@@ -1,8 +1,8 @@
 """Agent loop: plan, check, revise (plans/AGENT-PLAN.md, task "Agent loop").
 
 Claude Code is the loop: run_agent starts `claude -p` (headless Claude Code) on the machine's
-Claude Code login, with every built-in tool turned off and the planner's five tools served by
-mcp_server.py. Claude Code calls the tools until it is done or reaches the step limit; then
+Claude Code login, with every built-in tool turned off and the planner's tools (the five in tools.py and
+submit_summary) served by mcp_server.py. Claude Code calls the tools until it is done or reaches the step limit; then
 run_agent rebuilds and validates the last plan check_plan accepted and returns an AgentResponse:
 status "ok" with a validated plan, or "cannot_work" with the problems.
 The format both ways is docs/agent-request-format.md.
@@ -24,10 +24,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable
 
+from pydantic import ValidationError
+
 from degree_planner_backend import validator
 from degree_planner_backend.agent import tools
 from degree_planner_backend.agent.agent_file import AgentSpec, load_agent
-from degree_planner_backend.agent.mcp_server import SERVER_NAME, context_for
+from degree_planner_backend.agent.mcp_server import SERVER_NAME, context_for, summary_path_for
 from degree_planner_backend.agent.request_models import (
     EXPLANATION_MAX,
     PROBLEM_MAX,
@@ -139,6 +141,8 @@ def run_agent(connection: sqlite3.Connection, request: AgentRequest, runner: Run
 
         run = runner(claude_command(config_path), _first_message(request), work)
         plan_input = json.loads(plan_path.read_text()) if plan_path.exists() else None
+        summary_path = summary_path_for(plan_path)
+        summary = json.loads(summary_path.read_text()) if summary_path.exists() else None
 
     stop_problem: str | None = None
     if run.timed_out:
@@ -155,7 +159,30 @@ def run_agent(connection: sqlite3.Connection, request: AgentRequest, runner: Run
             final_text = ""  # on an error the result text is Claude Code's message, not the agent's
     if stop_problem:
         record_failure(request, stop_problem, run)
-    return _build_response(connection, context_for(request), plan_input, final_text.strip(), stop_problem, usage)
+        summary = None  # the agent did not finish, so what it sent may not describe its last plan
+    response = _build_response(connection, context_for(request), plan_input, final_text.strip(), stop_problem, usage)
+    return _with_summary(response, summary)
+
+
+def _with_summary(response: AgentResponse, summary: Any) -> AgentResponse:
+    """The choices and checks from submit_summary, which mcp_server.py already checked and cleaned;
+    checked again here, so a summary file that is somehow off leaves both lists empty instead of
+    failing the request."""
+    if response.plan is None or not isinstance(summary, dict):
+        return response
+    choices, checks = summary.get("choices", []), summary.get("checks", [])
+    if not isinstance(choices, list) or not isinstance(checks, list):
+        logger.warning("agent summary file was not usable; choices and checks left empty")
+        return response
+    try:
+        return AgentResponse(
+            status=response.status, plan=response.plan, explanation=response.explanation,
+            problems=response.problems, usage=response.usage,
+            choices=tuple(choices), checks=tuple(checks),
+        )
+    except ValidationError:
+        logger.warning("agent summary file was not usable; choices and checks left empty")
+        return response
 
 
 def claude_command(config_path: Path, agent: AgentSpec | None = None) -> list[str]:

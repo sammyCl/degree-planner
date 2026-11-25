@@ -308,7 +308,7 @@ BUG-012  The catalog CSVs hold placeholder codes and free-text corequisites
              Midhat how the format should carry "X or Y" corequisites.
 
 BUG-013  A catalog year that is not loaded looks like "no match" in search_catalog
-  Status:    Open (Midhat's half fixed)
+  Status:    Fixed
   Owner:     Midhat Sajad (lookups), then Samantha Clapp (agent tools)
   Where:     backend/src/degree_planner_backend/lookups.py,
              backend/src/degree_planner_backend/agent/tools.py
@@ -330,6 +330,20 @@ BUG-013  A catalog year that is not loaded looks like "no match" in search_catal
              added, exactly as the fix idea names it. Samantha's half (calling
              it from search_catalog) is still hers to do. Covered by
              test_catalog_years_and_program_ids in test_data_hardening.py.
+             Samantha's half: 2026-11-25, branch agent/bug-013-020-lookup-
+             helpers (agent: Samantha). search_catalog with a catalog_year
+             that has no courses loaded returns {"error": "no courses are
+             loaded for catalog year 2019-2020; loaded catalog years:
+             2026-2027. Call again with one of them ..."}; a loaded year
+             with no match is still an empty list. Extended to
+             get_prerequisites: when the code is in no year and the year
+             has nothing loaded, the error also lists the loaded years.
+             Only '2026-2027'-shaped stored years are shown, and a failed
+             year lookup falls back to the old behavior (logged). Tool
+             descriptions updated. Covered by the search_catalog and
+             get_prerequisites tests in test_agent_tools_lookup_hints.py;
+             test_catalog_year_filter in test_agent_tools.py became
+             test_catalog_year_filter_unloaded_year_is_an_error.
 
 BUG-014  Exception labels are not checked when data is loaded
   Status:    Fixed
@@ -511,7 +525,7 @@ BUG-019  Forms have no catalog year; the file's catalog_year is dropped
              test_data_hardening.py.
 
 BUG-020  No way to list program ids, so a mistyped id cannot be corrected
-  Status:    Open (Midhat's half fixed)
+  Status:    Fixed
   Owner:     Midhat Sajad (lookups), then Samantha Clapp (agent tools)
   Where:     backend/src/degree_planner_backend/lookups.py,
              backend/src/degree_planner_backend/agent/tools.py (get_forms)
@@ -532,6 +546,19 @@ BUG-020  No way to list program ids, so a mistyped id cannot be corrected
              added, exactly as the fix idea names it. Samantha's half (calling
              it from get_forms) is still hers to do. Covered by
              test_catalog_years_and_program_ids in test_data_hardening.py.
+             Samantha's half: 2026-11-25, branch agent/bug-013-020-lookup-
+             helpers (agent: Samantha). get_forms adds did_you_mean (up to
+             3 loaded ids from difflib.get_close_matches, cutoff 0.8) when
+             program_found is false, e.g. ["computer-science-minor"] for
+             the Steps above; the field is left out when nothing is close.
+             Extended to get_program_requirements' "no program with this
+             id" error. Stored slug-shaped ids only, never the input. A
+             close id can be a different real program (chemistry-bs, not
+             loaded, suggests chemistry-ms, biochemistry-bs, chemistry-asi),
+             so both tool descriptions tell the model to use a suggestion
+             only if it is the program the student chose. Covered by the
+             get_forms and get_program_requirements tests in
+             test_agent_tools_lookup_hints.py.
 
 BUG-021  Program rules that the data format cannot hold never reach the agent
   Status:    Open (data-format half fixed)
@@ -1397,7 +1424,7 @@ BUG-046  A lone surrogate in a request body gives 500 instead of 422 (all
 
 BUG-047  CSCI478's prerequisite is stored as an exception, so every plan
          with CSCI478 gets an exception warning
-  Status:    Open
+  Status:    Fixed
   Owner:     Samantha Clapp (bachelor's data: course entries); Abdallah
              Salhi (prerequisite parser)
   Where:     data/Academic Catalog/mines-courses.csv (CSCI478 row);
@@ -1421,6 +1448,16 @@ BUG-047  CSCI478's prerequisite is stored as an exception, so every plan
   Fix idea:  confirm the wording on catalog.mines.edu, then correct the
              CSCI478 entry (a fix in the slice, or a known-fix rule in the
              parser), and rebuild courses.json
+  Fixed in:  2026-11-25, branch data/fix-bug-047-csci478 (bachelor's data:
+             Samantha). The catalog page reads "CSCI101 or CSCI102 or
+             CSCI128"; corrected the CSCI478 row in mines-courses.csv to
+             match (a fix in the slice, not a parser rule) and rebuilt
+             courses.json, so prerequisites is now an OR of the three
+             courses. Only CSCI478 changed (a rebuild before the edit gave
+             no diff); courses.REVIEW.md's free-text count went 225 -> 224.
+             Covered by test_bug_047_csci478_prerequisite_is_one_of_three_
+             courses in data/tools/test_course_data_fixes.py. A re-scrape
+             that brings back the old text fails that test.
 
 BUG-048  get_forms has no course substitution form, so the chatbot cannot
          point a student to one
@@ -1747,3 +1784,31 @@ BUG-055  Equivalent courses the catalog states and ones the team only
              equivalent_with) plus the model_validator's own coverage.
              Touches data/tools/build_courses_json.py, Abdallah's
              converter; flag to him.
+
+BUG-056  courses.REVIEW.md's free-text prerequisite list shows the previous
+         course's prerequisite text, not the course's own
+  Status:    Open
+  Owner:     Abdallah Salhi (course data converter: data/tools/
+             build_courses_json.py)
+  Where:     data/tools/build_courses_json.py, build(), lines 313-314;
+             data/json/courses.REVIEW.md ("Prerequisites that are free
+             text, whole or in part")
+  Found:     2026-11-25 by Samantha with Claude, while fixing BUG-047
+  Steps:     on main before BUG-047's fix, run python3 data/tools/
+             build_courses_json.py and look for CSCI478 in
+             data/json/courses.REVIEW.md
+  Actual:    "- CSCI478: CSCI220 or CSCI262". That is CSCI477's
+             prerequisite; CSCI478's own text was "CSCI101 or CSCI102
+             CSCI128". Line 313 appends the note using the variable
+             original, which line 314 only assigns afterwards, so each
+             entry carries the text of the course processed before it (and
+             the first one would raise NameError if it came first). The
+             "full text" in this list is wrong for most of its 232 entries.
+             courses.json is not affected: line 309 parses each course's
+             own r["prerequisites"]. The dropped-info entries (lines
+             317-323) are also fine, since they run after line 314
+  Expected:  each entry shows that course's own prerequisite text
+  Fix idea:  move line 314 (original = " ".join(r["prerequisites"].split()))
+             above the "if pre.fallback:" block, rebuild, and add a test
+             that a free-text note's text matches its own course's row
+  Fixed in:
