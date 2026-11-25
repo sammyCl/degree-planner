@@ -5,10 +5,12 @@ interface Props {
   options: ProgramOption[]
   selected: string[]
   onChange: (ids: string[]) => void
+  /** what the options are called, "minors" or "minors and ASIs" */
+  noun?: string
 }
 
 /** Search box with chips: pick any number of minors and ASIs. */
-export function AddOnPicker({ options, selected, onChange }: Props) {
+export function AddOnPicker({ options, selected, onChange, noun = 'minors and ASIs' }: Props) {
   const listId = useId()
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
@@ -66,12 +68,12 @@ export function AddOnPicker({ options, selected, onChange }: Props) {
         })}
         <input
           role="combobox"
-          aria-label="Search minors and ASIs"
+          aria-label={`Search ${noun}`}
           aria-expanded={open}
           aria-controls={listId}
           aria-autocomplete="list"
           aria-activedescendant={open && hits[active] ? `${listId}-${hits[active].id}` : undefined}
-          placeholder={selected.length ? '' : 'Search minors and ASIs...'}
+          placeholder={selected.length ? '' : `Search ${noun}...`}
           autoComplete="off"
           value={query}
           onChange={(e) => {
@@ -85,8 +87,8 @@ export function AddOnPicker({ options, selected, onChange }: Props) {
         />
       </div>
       {open && (
-        <div className="menu" id={listId} role="listbox" aria-label="Minors and ASIs">
-          {hits.length === 0 && <div className="menu-empty">No matching minor or ASI</div>}
+        <div className="menu" id={listId} role="listbox" aria-label={noun}>
+          {hits.length === 0 && <div className="menu-empty">No match</div>}
           {hits.map((o, i) => (
             <div
               key={o.id}

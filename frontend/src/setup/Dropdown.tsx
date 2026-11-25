@@ -1,4 +1,4 @@
-import { useId, useMemo, useState } from 'react'
+import { useId, useMemo, useRef, useState } from 'react'
 
 export interface DropdownOption {
   value: string
@@ -26,6 +26,13 @@ export function Dropdown({ options, value, onChange, label, id, placeholder, sea
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [highlight, setHighlight] = useState(0)
+  const input = useRef<HTMLInputElement | null>(null)
+  // the field is ours and the caller's (for focusing it on an error), so both refs get it
+  const setInput = (el: HTMLInputElement | null) => {
+    input.current = el
+    if (typeof ref === 'function') ref(el)
+    else if (ref) (ref as React.MutableRefObject<HTMLInputElement | null>).current = el
+  }
 
   const selected = options.find((o) => o.value === value)
   const shown = useMemo(() => {
@@ -79,9 +86,19 @@ export function Dropdown({ options, value, onChange, label, id, placeholder, sea
 
   return (
     <div className="dd">
-      <div className={invalid ? 'dd-box invalid' : 'dd-box'}>
+      <div
+        className={invalid ? 'dd-box invalid' : 'dd-box'}
+        onMouseDown={(e) => {
+          // a press on the arrow or the padding (not the text field itself) opens and closes it too
+          if (e.target === input.current) return
+          e.preventDefault()
+          input.current?.focus()
+          if (open) close()
+          else openMenu()
+        }}
+      >
         <input
-          ref={ref}
+          ref={setInput}
           id={id}
           role="combobox"
           aria-label={label}

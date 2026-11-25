@@ -497,5 +497,317 @@
     "total_credits": 114.0,
     "total_credits_required": 130,
     "requirements_met": false
-  }
+  },
+  "counts_toward": {
+    "sem-1-csci128": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "required",
+        "label": "Required core and Computer Science courses"
+      }
+    ],
+    "sem-1-math112": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "required",
+        "label": "Required core and Computer Science courses"
+      }
+    ],
+    "sem-1-chgn121": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "required",
+        "label": "Required core and Computer Science courses"
+      }
+    ],
+    "sem-1-edns151": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "first-year-core",
+        "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)"
+      }
+    ],
+    "sem-1-csm101": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "required",
+        "label": "Required core and Computer Science courses"
+      }
+    ],
+    "sem-2-csci200": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "required",
+        "label": "Required core and Computer Science courses"
+      }
+    ],
+    "sem-2-math213": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "required",
+        "label": "Required core and Computer Science courses"
+      }
+    ],
+    "sem-2-phgn100": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "required",
+        "label": "Required core and Computer Science courses"
+      }
+    ],
+    "sem-2-hass100": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "first-year-core",
+        "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)"
+      }
+    ],
+    "sem-3-csci210": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "required",
+        "label": "Required core and Computer Science courses"
+      }
+    ],
+    "sem-3-csci358": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "required",
+        "label": "Required core and Computer Science courses"
+      }
+    ],
+    "sem-3-phgn200": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "required",
+        "label": "Required core and Computer Science courses"
+      }
+    ],
+    "sem-3-math201": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "free-electives",
+        "label": "Free Electives"
+      }
+    ],
+    "sem-3-cben110": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "free-electives",
+        "label": "Free Electives"
+      }
+    ],
+    "sem-4-csci220": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "required",
+        "label": "Required core and Computer Science courses"
+      }
+    ],
+    "sem-4-csci341": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "required",
+        "label": "Required core and Computer Science courses"
+      }
+    ],
+    "sem-4-math332": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "required",
+        "label": "Required core and Computer Science courses"
+      }
+    ],
+    "sem-4-math334": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "required",
+        "label": "Required core and Computer Science courses"
+      }
+    ],
+    "sem-4-ebgn201": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "free-electives",
+        "label": "Free Electives"
+      }
+    ],
+    "sem-5-csci306": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "required",
+        "label": "Required core and Computer Science courses"
+      }
+    ],
+    "sem-5-csci400": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "required",
+        "label": "Required core and Computer Science courses"
+      }
+    ],
+    "sem-5-csci406": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "required",
+        "label": "Required core and Computer Science courses"
+      }
+    ],
+    "sem-5-csci442": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "required",
+        "label": "Required core and Computer Science courses"
+      }
+    ],
+    "sem-5-csci403": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "cs-electives",
+        "label": "Computer Science Electives (6 courses)"
+      }
+    ],
+    "sem-6-csci370": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "required",
+        "label": "Required core and Computer Science courses"
+      }
+    ],
+    "sem-6-csci445": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "cs-electives",
+        "label": "Computer Science Electives (6 courses)"
+      }
+    ],
+    "sem-6-csci404": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "cs-electives",
+        "label": "Computer Science Electives (6 courses)"
+      }
+    ],
+    "sem-6-chgn122": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "free-electives",
+        "label": "Free Electives"
+      }
+    ],
+    "sem-7-csci475": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "cs-electives",
+        "label": "Computer Science Electives (6 courses)"
+      }
+    ],
+    "sem-7-csci250": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "free-electives",
+        "label": "Free Electives"
+      }
+    ],
+    "sem-7-csci303": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "free-electives",
+        "label": "Free Electives"
+      }
+    ],
+    "sem-7-math225": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "required",
+        "label": "Required core and Computer Science courses"
+      }
+    ],
+    "sem-8-csci437": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "cs-electives",
+        "label": "Computer Science Electives (6 courses)"
+      }
+    ],
+    "sem-8-csci410": [
+      {
+        "program_id": "cs-bs-general-track",
+        "group_id": "cs-electives",
+        "label": "Computer Science Electives (6 courses)"
+      }
+    ]
+  },
+  "requirement_status": [
+    {
+      "program_id": "cs-bs-general-track",
+      "group_id": "required",
+      "label": "Required core and Computer Science courses",
+      "kind": "all",
+      "met": false,
+      "credits_required": null,
+      "credits_earned": 69.0,
+      "missing_count": 3
+    },
+    {
+      "program_id": "cs-bs-general-track",
+      "group_id": "first-year-core",
+      "label": "HASS100 and EDNS151, or HNRS105 and HNRS115 (Thorson First-Year Honors)",
+      "kind": "requirement",
+      "met": true,
+      "credits_required": 6.0,
+      "credits_earned": null,
+      "missing_count": 0
+    },
+    {
+      "program_id": "cs-bs-general-track",
+      "group_id": "success-wellness",
+      "label": "Success and Wellness (S&W) elective",
+      "kind": "choose_credits",
+      "met": false,
+      "credits_required": 1.0,
+      "credits_earned": 0.0,
+      "missing_count": 0
+    },
+    {
+      "program_id": "cs-bs-general-track",
+      "group_id": "cas-mid",
+      "label": "Culture and Society (CAS) Mid-Level Restricted Electives",
+      "kind": "choose_credits",
+      "met": false,
+      "credits_required": 6.0,
+      "credits_earned": 0.0,
+      "missing_count": 0
+    },
+    {
+      "program_id": "cs-bs-general-track",
+      "group_id": "cas-400",
+      "label": "Culture and Society (CAS) 400-Level Restricted Elective",
+      "kind": "choose_credits",
+      "met": false,
+      "credits_required": 3.0,
+      "credits_earned": 0.0,
+      "missing_count": 0
+    },
+    {
+      "program_id": "cs-bs-general-track",
+      "group_id": "cs-electives",
+      "label": "Computer Science Electives (6 courses)",
+      "kind": "choose_credits",
+      "met": true,
+      "credits_required": 18.0,
+      "credits_earned": 18.0,
+      "missing_count": 0
+    },
+    {
+      "program_id": "cs-bs-general-track",
+      "group_id": "free-electives",
+      "label": "Free Electives",
+      "kind": "choose_credits",
+      "met": true,
+      "credits_required": 18.0,
+      "credits_earned": 20.0,
+      "missing_count": 0
+    }
+  ]
 }

@@ -487,3 +487,110 @@ def test_check_plan_ignores_a_combined_program_s_unloaded_component(tmp_path: Pa
     # The loaded component (component-ms) is still checked; the missing one is skipped, not a crash.
     assert result.summary.total_credits_required == 10.0
     assert not [flag for flag in result.flags if flag.type == "requirement_unmet"]
+
+
+def test_check_plan_reports_which_requirement_group_each_course_fills(connection: sqlite3.Connection) -> None:
+    """Plan.counts_toward lets the planner page label a course Core, Free elective, and so on."""
+
+    def course(code: str, credits: float = 3.0) -> dict:
+        return {"course_id": f"sem-1-{code.lower()}", "code": code, "title": code, "credits": credits, "status": "planned"}
+
+    plan = Plan.model_validate(
+        {
+            "plan_id": None,
+            "student": {"degree_level": "bachelor", "programs": ["cs-bs-general-track"], "catalog_year": "2026-2027", "completed_courses": []},
+            "semesters": [
+                {
+                    "semester_id": "sem-1",
+                    "label": "Fall 2026",
+                    "courses": [course("CSCI200"), course("MATH201"), course("MNGN598")],
+                    "total_credits": 9.0,
+                }
+            ],
+            "summary": {"total_credits": 0, "total_credits_required": 0, "requirements_met": False},
+        }
+    )
+
+    result = check_plan(connection, plan)
+
+    def groups(course_id: str) -> list[tuple[str, str]]:
+        return [(entry.program_id, entry.group_id) for entry in result.counts_toward.get(course_id, [])]
+
+    assert groups("sem-1-csci200") == [("cs-bs-general-track", "core")]  # a fixed required course
+    assert groups("sem-1-math201") == [("cs-bs-general-track", "math_science")]  # chosen from a list
+    assert groups("sem-1-mngn598") == [("cs-bs-general-track", "free_electives")]  # takes what is left
+    assert result.counts_toward["sem-1-csci200"][0].label  # the group's own label comes with it
+
+
+def test_check_plan_ignores_counts_toward_sent_by_the_client(connection: sqlite3.Connection) -> None:
+    plan = Plan.model_validate(json.loads((REPO_ROOT / "docs" / "plan-format.sample.json").read_text()))
+    forged = plan.model_copy(
+        update={"counts_toward": {"sem-1-csci200": [{"program_id": "mining-bs", "group_id": "core", "label": "forged"}]}}
+    )
+
+    result = check_plan(connection, forged)
+
+    assert [entry.program_id for entry in result.counts_toward["sem-1-csci200"]] == ["cs-bs-general-track"]
+
+
+def test_a_course_in_no_group_is_missing_from_counts_toward(connection: sqlite3.Connection) -> None:
+    plan = Plan.model_validate(json.loads((REPO_ROOT / "docs" / "plan-format.sample.json").read_text()))
+    result = check_plan(connection, plan.model_copy(update={"student": plan.student.model_copy(update={"programs": []})}))
+    assert result.counts_toward == {}
+
+
+def _plan_with(codes: list[str], programs: list[str] | None = None) -> Plan:
+    courses = [
+        {"course_id": f"sem-1-{code.lower()}", "code": code, "title": code, "credits": 3.0, "status": "planned"} for code in codes
+    ]
+    return Plan.model_validate(
+        {
+            "plan_id": None,
+            "student": {
+                "degree_level": "bachelor",
+                "programs": programs or ["cs-bs-general-track"],
+                "catalog_year": "2026-2027",
+                "completed_courses": [],
+            },
+            "semesters": [{"semester_id": "sem-1", "label": "Fall 2026", "courses": courses, "total_credits": 3.0 * len(courses)}],
+            "summary": {"total_credits": 0, "total_credits_required": 0, "requirements_met": False},
+        }
+    )
+
+
+def test_requirement_status_reports_every_group_met_or_not(connection: sqlite3.Connection) -> None:
+    result = check_plan(connection, _plan_with(["CSCI200", "MATH201"]))
+    by_group = {status.group_id: status for status in result.requirement_status}
+
+    assert list(by_group) == ["core", "math_science", "free_electives"]  # the program's own order
+    assert by_group["core"].met is False and by_group["core"].missing_count == 2  # CSCI306 and CSCI400 are missing
+    assert by_group["core"].kind == "all"
+    assert by_group["math_science"].met is False
+    assert (by_group["math_science"].credits_earned, by_group["math_science"].credits_required) == (3.0, 6.0)
+    assert by_group["free_electives"].met is False
+    assert by_group["core"].label and by_group["core"].program_id == "cs-bs-general-track"
+
+
+def test_requirement_status_marks_a_group_met_once_the_plan_fills_it(connection: sqlite3.Connection) -> None:
+    result = check_plan(
+        connection, _plan_with(["CSCI200", "CSCI306", "CSCI400", "MATH201", "MATH223", "MNGN501", "MNGN502", "MNGN598"])
+    )
+    by_group = {status.group_id: status for status in result.requirement_status}
+
+    assert by_group["core"].met is True and by_group["core"].missing_count == 0
+    assert by_group["math_science"].met is True
+    assert (by_group["math_science"].credits_earned, by_group["math_science"].credits_required) == (6.0, 6.0)
+    assert by_group["free_electives"].met is True  # takes what the other groups left: 9 credits
+
+
+def test_requirement_status_covers_every_program_the_student_is_in(connection: sqlite3.Connection) -> None:
+    result = check_plan(connection, _plan_with(["CSCI200"], programs=["cs-bs-general-track", "mining-bs"]))
+    assert {status.program_id for status in result.requirement_status} == {"cs-bs-general-track", "mining-bs"}
+
+
+def test_requirement_status_is_not_taken_from_the_client(connection: sqlite3.Connection) -> None:
+    forged = _plan_with(["CSCI200"]).model_copy(
+        update={"requirement_status": [{"program_id": "x", "group_id": "core", "label": "forged", "kind": "all", "met": True}]}
+    )
+    result = check_plan(connection, forged)
+    assert all(status.label != "forged" for status in result.requirement_status)

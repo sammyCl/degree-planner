@@ -250,6 +250,10 @@ def _build_response(
             prerequisite_edges=checked.prerequisite_edges,
             flags=checked.flags,
             summary=checked.summary,
+            # the validator's labels and requirement checklist for the planner page (Plan.counts_toward and
+            # Plan.requirement_status); without these the page shows no course labels until the first edit
+            counts_toward=checked.counts_toward,
+            requirement_status=checked.requirement_status,
         )
         problems += [issue["message"] for issue in built.errors]
         problems += [

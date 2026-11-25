@@ -3,8 +3,8 @@ import { describe, expect, it, vi } from 'vitest'
 import { samplePlan } from '../samplePlan.ts'
 import { PlannerPage } from './PlannerPage.tsx'
 
-function setup(onBack = vi.fn()) {
-  render(<PlannerPage plan={samplePlan} notice="Sample plan notice" onBack={onBack} />)
+function setup(onBack = vi.fn(), extra: { explanation?: string; problems?: string[] } = {}) {
+  render(<PlannerPage plan={samplePlan} explanation="Plain explanation of the plan." onBack={onBack} {...extra} />)
   return onBack
 }
 
@@ -15,16 +15,18 @@ describe('PlannerPage', () => {
     setup()
     for (const s of samplePlan.semesters) {
       const column = screen.getByRole('region', { name: s.label })
-      expect(within(column).getAllByRole('button')).toHaveLength(s.courses.length)
+      expect(within(column).getAllByRole('button', { name: /credits/ })).toHaveLength(s.courses.length)
     }
     expect(screen.getByText('Principles of Programming Languages')).toBeInTheDocument()
   })
 
   it('shows the program, catalog year, notice and credit total', async () => {
     setup()
-    expect(screen.getByText('Bachelor of Science in Computer Science (General Track)')).toBeInTheDocument()
+    expect(within(document.querySelector('.bar') as HTMLElement).getByText('Bachelor of Science in Computer Science (General Track)')).toBeInTheDocument()
     expect(screen.getByText('Catalog 2026-2027')).toBeInTheDocument()
-    expect(screen.getByText('Sample plan notice')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Show' }))
+    expect(screen.getByText('Plain explanation of the plan.')).toBeInTheDocument()
+    expect(screen.getByText(/Bachelor's plan, 8 semesters, starting Fall 2026/)).toBeInTheDocument()
     // the number counts up over about a second
     await waitFor(() => expect(screen.getByTestId('credit-total')).toHaveTextContent('114 / 130'), { timeout: 4000 })
   })
@@ -105,6 +107,113 @@ describe('PlannerPage', () => {
     const last = screen.getByRole('region', { name: 'Spring 2030' })
     expect(last.querySelector('.meter')).toHaveClass('low')
     expect(screen.getByRole('region', { name: 'Fall 2026' }).querySelector('.meter')).toHaveClass('ok')
+  })
+
+  it('lists the problems when the assistant could not finish a valid plan', () => {
+    setup(vi.fn(), { problems: ['CSCI400 cannot be placed after CSCI306.', 'Not enough credits.'] })
+    const alert = screen.getByRole('alert')
+    expect(alert).toHaveTextContent('could not finish a valid plan')
+    expect(within(alert).getAllByRole('listitem')).toHaveLength(2)
+  })
+
+  it('shows what is met as a short checklist, with check marks and no course numbers', () => {
+    setup()
+    fireEvent.click(screen.getByRole('button', { name: 'Show' }))
+    const panel = screen.getByRole('region', { name: 'About this plan' })
+    const req = within(panel).getByRole('heading', { name: 'Degree requirements' }).closest('.about-card') as HTMLElement
+    const row = (name: string) => within(req).getByText(name).closest('li') as HTMLElement
+    expect(row('CS electives')).toHaveClass('met')
+    expect(row('CS electives')).toHaveTextContent('18/18 credits')
+    expect(row('Core courses')).toHaveClass('unmet')
+    expect(row('Core courses')).toHaveTextContent('3 courses missing')
+    expect(row('Free electives')).toHaveClass('met')
+    expect(within(req).getByText('Prerequisites in order').closest('li')).toHaveClass('unmet')
+    expect(req.textContent).not.toMatch(/[A-Z]{3,4}\d{3}/)
+  })
+
+  it('lists what to check by course title, and says so when there is nothing', () => {
+    const flag = { flag_id: 'x', type: 'exception_claimed' as const, severity: 'warning' as const, course_id: 'sem-1-csci128', message: 'CSCI128 relies on a claimed exception (instructor consent); confirm it still applies.', overridable: true, overridden: false }
+    const { unmount } = render(<PlannerPage plan={{ ...samplePlan, flags: [flag] }} onBack={vi.fn()} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Show' }))
+    const card = screen.getByRole('heading', { name: 'Things to check' }).closest('.about-card') as HTMLElement
+    expect(card).toHaveTextContent('Computer Science for STEM needs instructor consent; confirm it still applies')
+    expect(card.textContent).not.toMatch(/CSCI128/)
+    unmount()
+    render(<PlannerPage plan={{ ...samplePlan, flags: [] }} onBack={vi.fn()} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Show' }))
+    expect(screen.getByText('Nothing needs your attention.')).toBeInTheDocument()
+  })
+
+  it('shows the assistant\'s choices without its talk about tools, and hides the section when there are none', () => {
+    const text = 'The plan meets every requirement. `check_plan` reports `requirements_met: true`.\n\n**Exceptions you need to decide.** Decide.\n- **MATH111** needs a note\n\nI put the electives in year two.'
+    const { unmount } = render(<PlannerPage plan={samplePlan} explanation={text} onBack={vi.fn()} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Show' }))
+    const card = screen.getByRole('heading', { name: 'Choices I made' }).closest('.about-card') as HTMLElement
+    expect(card).toHaveTextContent('I put the electives in year two.')
+    expect(card.textContent).not.toMatch(/check_plan|requirements_met|MATH111|Exceptions/)
+    unmount()
+    render(<PlannerPage plan={samplePlan} explanation="The plan meets every requirement." onBack={vi.fn()} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Show' }))
+    expect(screen.queryByRole('heading', { name: 'Choices I made' })).not.toBeInTheDocument()
+  })
+
+  it('puts the About panel under the board, closed until the student opens it', () => {
+    setup()
+    const board = screen.getByTestId('board')
+    const about = screen.getByRole('region', { name: 'About this plan' })
+    expect(board.compareDocumentPosition(about) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy() // the board comes first
+    expect(screen.queryByRole('heading', { name: 'Degree requirements' })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Show' }))
+    expect(screen.getByRole('heading', { name: 'Degree requirements' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Hide' }))
+    expect(screen.queryByRole('heading', { name: 'Degree requirements' })).not.toBeInTheDocument()
+  })
+
+  it('keeps the "could not finish" alert above the board, where it is seen first', () => {
+    setup(vi.fn(), { problems: ['Not enough credits.'] })
+    const alert = screen.getByRole('alert')
+    expect(alert.compareDocumentPosition(screen.getByTestId('board')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it('shows the assistant\'s markdown as formatting, not as symbols', () => {
+    setup(vi.fn(), { explanation: 'It has **130 of 130 credits**.\n- **MATH111** needs a note' })
+    fireEvent.click(screen.getByRole('button', { name: 'Show' }))
+    expect(screen.getByText('130 of 130 credits').tagName).toBe('STRONG')
+    expect(screen.queryByText(/\*\*/)).not.toBeInTheDocument()
+  })
+
+  it('draws an error in red, a warning in amber, and a claimed exception as a calm "to confirm"', () => {
+    const withFlag = (type: 'exception_claimed' | 'credit_shortfall', severity: 'warning' | 'error') =>
+      ({ ...samplePlan, flags: [{ ...samplePlan.flags[0], type, severity }] })
+    const { unmount } = render(<PlannerPage plan={withFlag('exception_claimed', 'warning')} onBack={vi.fn()} />)
+    expect(card('CSCI400')).toHaveClass('confirm')
+    expect(card('CSCI400')).not.toHaveClass('warned')
+    expect(card('CSCI400')).not.toHaveClass('flagged')
+    expect(screen.getByRole('button', { name: '1 to confirm' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /warning/ })).not.toBeInTheDocument()
+    unmount()
+
+    const second = render(<PlannerPage plan={withFlag('credit_shortfall', 'warning')} onBack={vi.fn()} />)
+    expect(card('CSCI400')).toHaveClass('warned')
+    expect(screen.getByRole('button', { name: '1 warning' })).toBeInTheDocument()
+    second.unmount()
+
+    render(<PlannerPage plan={withFlag('credit_shortfall', 'error')} onBack={vi.fn()} />)
+    expect(card('CSCI400')).toHaveClass('flagged')
+  })
+
+  it('labels each course with what it counts as, and says Extra when it fills no group', () => {
+    setup()
+    const labelOf = (code: string) => card(code).querySelector('.card-tag')?.textContent
+    expect(labelOf('CSCI200')).toBe('Core')
+    expect(labelOf('PAGN101')).toBe('Extra')
+    expect(screen.getAllByText('Free elective').length).toBeGreaterThan(0)
+    expect(card('CSCI200')).toHaveAccessibleName(/, Core/)
+  })
+
+  it('shows no labels when the plan has no assignments', () => {
+    render(<PlannerPage plan={{ ...samplePlan, counts_toward: undefined }} onBack={vi.fn()} />)
+    expect(document.querySelector('.card-tag')).toBeNull()
   })
 
   it('goes back to setup', () => {

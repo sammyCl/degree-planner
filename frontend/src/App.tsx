@@ -1,12 +1,20 @@
-import { useEffect, useState } from 'react'
-import { getHealth } from './api.ts'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { ApiError, getHealth, submitSetup } from './api.ts'
+import { BuildingScreen } from './building/BuildingScreen.tsx'
+import { ProblemScreen } from './building/ProblemScreen.tsx'
 import { PlannerPage } from './planner/PlannerPage.tsx'
-import { samplePlan } from './samplePlan.ts'
 import { SetupPage } from './setup/SetupPage.tsx'
-import type { AgentRequest } from './types.ts'
+import type { SetupForm } from './setup/validate.ts'
+import type { AgentRequest, AgentResponse } from './types.ts'
 import './App.css'
 
 type BackendStatus = 'checking' | 'up' | 'down'
+
+type Screen =
+  | { name: 'setup' }
+  | { name: 'building'; request: AgentRequest }
+  | { name: 'planner'; response: AgentResponse }
+  | { name: 'problem'; request: AgentRequest; title: string; message: string; problems: string[]; canRetry: boolean }
 
 function toggleTheme() {
   const root = document.documentElement
@@ -26,10 +34,35 @@ try {
   // Storage is not available; keep the system theme.
 }
 
+/** The words shown to the student for each way the call can fail. */
+function describeError(error: unknown): { title: string; message: string; canRetry: boolean } {
+  if (error instanceof ApiError) {
+    switch (error.kind) {
+      case 'network':
+        return { title: 'Cannot reach the backend', message: error.message, canRetry: true }
+      case 'agent_unavailable':
+        return {
+          title: 'The planning assistant is not available',
+          message: `The backend could not start the assistant, so no plan was built. ${error.message}`,
+          canRetry: true,
+        }
+      case 'invalid_request':
+        return { title: 'The backend did not accept this setup', message: error.message, canRetry: false }
+      default:
+        return { title: 'Something went wrong on the backend', message: error.message, canRetry: true }
+    }
+  }
+  return { title: 'Something went wrong', message: 'An unexpected error stopped the plan from being built.', canRetry: true }
+}
+
 function App() {
   const [backend, setBackend] = useState<BackendStatus>('checking')
-  // A submitted setup shows the planner. Until "Connect setup to backend", it shows the sample plan, not the student's.
-  const [request, setRequest] = useState<AgentRequest | null>(null)
+  const [screen, setScreen] = useState<Screen>({ name: 'setup' })
+  // What the student chose, kept so that coming back from the planner or an error does not lose it.
+  const [form, setForm] = useState<SetupForm | undefined>()
+  // Each submit gets a number; a late answer to an older submit is ignored.
+  const run = useRef(0)
+  const controller = useRef<AbortController | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -40,6 +73,40 @@ function App() {
       cancelled = true
     }
   }, [])
+
+  const build = useCallback((request: AgentRequest) => {
+    const mine = ++run.current
+    controller.current?.abort()
+    const abort = new AbortController()
+    controller.current = abort
+    setScreen({ name: 'building', request })
+    submitSetup(request, abort.signal)
+      .then((response) => {
+        if (run.current !== mine) return
+        if (response.plan === null) {
+          setScreen({
+            name: 'problem',
+            request,
+            title: 'The assistant could not build a plan',
+            message: response.explanation,
+            problems: response.problems,
+            canRetry: true,
+          })
+        } else {
+          setScreen({ name: 'planner', response })
+        }
+      })
+      .catch((error) => {
+        if (run.current !== mine || (error instanceof ApiError && error.kind === 'aborted')) return
+        setScreen({ name: 'problem', request, problems: [], ...describeError(error) })
+      })
+  }, [])
+
+  const cancel = () => {
+    run.current++ // anything still in flight is now stale
+    controller.current?.abort()
+    setScreen({ name: 'setup' })
+  }
 
   return (
     <>
@@ -65,14 +132,32 @@ function App() {
         </button>
       </header>
 
-      {request ? (
-        <PlannerPage
-          plan={samplePlan}
-          notice="This is a sample plan: the setup form is not yet connected to the backend, so it does not change what is shown here."
-          onBack={() => setRequest(null)}
+      {screen.name === 'setup' && (
+        <SetupPage
+          initial={form}
+          onSubmit={(request, submitted) => {
+            setForm(submitted)
+            build(request)
+          }}
         />
-      ) : (
-        <SetupPage onSubmit={setRequest} />
+      )}
+      {screen.name === 'building' && <BuildingScreen request={screen.request} onCancel={cancel} />}
+      {screen.name === 'planner' && (
+        <PlannerPage
+          plan={screen.response.plan!}
+          explanation={screen.response.explanation}
+          problems={screen.response.status === 'cannot_work' ? screen.response.problems : []}
+          onBack={() => setScreen({ name: 'setup' })}
+        />
+      )}
+      {screen.name === 'problem' && (
+        <ProblemScreen
+          title={screen.title}
+          message={screen.message}
+          problems={screen.problems}
+          onRetry={screen.canRetry ? () => build(screen.request) : undefined}
+          onBack={() => setScreen({ name: 'setup' })}
+        />
       )}
     </>
   )

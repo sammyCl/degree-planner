@@ -38,6 +38,7 @@ Slice: minors, ASIs, forms, policies (Abdallah). Add a row here whenever a new c
 
 - The ASI list in `data/json/asis.json` comes from the **2025-2026** catalog (extracted pages: `data/Minors and ASIs/ASIs (2025-2026 catalog, extracted pages).pdf`; general rules: `data/Policies/Minor and ASI Rules (2025-2026 catalog, pp. 23-25).pdf`).
 - The catalog site was unreachable when this was collected, so the 2026-2027 pages could not be read. The 2026-2027 minors list has no ASIs and no longer lists some 2025-2026 programs (Additive Manufacturing, and the Business minor is now "Business" not "Business and Entrepreneurship"). **ASIs may have been dropped or moved in 2026-2027. Confirm in the live catalog before showing them to students.**
+- 2026-11-24: the setup page offered the ASIs anyway, and every plan with one failed ("aerospace-engineering-asi is not in the loaded 2026-2027 program data"): the backend looks a program up by the student's exact catalog year. The setup page now offers only programs stored for 2026-2027 (`tools/build_frontend_options.py`), so the ASIs are hidden until they are confirmed and stored for 2026-2027.
 - Several 2025-2026 codes are not in the 2026-2027 CSV (for example CEEN360 appears to be CEEN320 "Introduction to Construction Engineering" in 2026-2027; AMFG401, AMFG421, AMFG498, EDNS480 are absent). They are kept as printed and listed in `minors.REVIEW.md`.
 - 18 ASIs: Civil, Environmental, Economics, Entrepreneurship, Humanitarian Engineering, Electrical, Aerospace, Mechanical, Additive Manufacturing, Energy, Space and Planetary Science and Engineering, Underground Construction and Tunneling, Geological Engineering, Chemistry, Polymer Chemistry, Environmental Chemistry, Biochemistry, Music Technology.
 
@@ -68,7 +69,19 @@ Built from the two course CSVs by `tools/build_courses_json.py`. Counts and ever
 - **Corequisites** are a plain list in the format, so an OR ("PHGN300 or PHGN310") or free text cannot be expressed and is left empty and reported. Resolved (Midhat, PR #20): `corequisites` changed from a plain list to a `Requirement` (the same AND/OR/course/exception tree `prerequisites` already uses). `tools/prereq_parser.py`'s `parse_corequisites` and `courses.json` were updated to match: the 15 OR corequisites that used to be dropped are now expressed as a tree, and the 18 genuine free-text ones are kept as an `exception` instead of emptied.
 - **Codes the catalog does not have:** prerequisite codes that match no course (typos like `CSC128`, retired courses) are kept as written and listed in the review file, not corrected.
 - **Placeholder and special codes** (`CHGN1XX`, `HASS2XX`, `CEEN599AB`, lab sections such as `MTGN348L`) are real catalog entries and are kept.
-- **Titles** are in capitals in the catalog and are converted to title case (small words lower, Roman numerals and common acronyms kept); a few unusual acronyms may be off. Titles that already have lower-case letters are untouched.
+- **Titles** are in capitals in the catalog and are converted to title case word by word, so a Roman numeral or acronym
+  joined to a hyphen, slash or bracket is still recognised (the bug that printed "Physics Ii-Electromagnetism" is fixed;
+  `tools/test_title_case.py` keeps it fixed). Small words stay lower case, Roman numerals and acronyms stay capitals
+  (CSM, GIS, MME, HVDC, STEM, ...), and product names keep their mix (AutoCAD, SolidWorks, McBride, IoT, PhD). Titles that
+  already have lower-case letters are untouched. On 2026-11-24 a scan of every title fixed 48 of them. Misspellings in the
+  catalog itself are fixed in the title only (the CSV is not changed): `Topcs` to Topics (EDNS198), `Raquetball` to
+  Racquetball (PAGN242), `Fundamenta` to Fundamentals (AFGN201, cut off; AFGN202 reads "Fundamentals II"), and
+  `Reportmaster` to "Report - Master" (MNGN700, two words run together; the best reading of its description).
+- **Placement-level prerequisites are not exceptions.** MATH111's whole catalog prerequisite is the word "precalculus".
+  That is a level of preparation, not a course, and every student who starts at Mines has it, so turning it into an
+  "exception" made every plan with MATH111 show a warning to confirm. It is now left out (no prerequisite) and recorded as
+  kind `placement assumption` in `json/courses.dropped-info.csv` and the review file. It affects only MATH111; the other
+  exception-type prerequisites (instructor consent, "or equivalent", class standing) are unchanged.
 - **Source:** undergraduate rows carry their catalog URL. The graduate CSV has a PDF page number and no URL, so the six courses only it has carry no `source`.
 - **Catalog year:** 2026-2027 for all courses, matching the minors.
 - **Programs that reference codes missing from the catalog:** `CSCI481`, `EENG432`, `SPRS401` (Quantum Engineering, Space Mining minors) and `CEEN360`, `EDNS480`, `AMFG401`, `AMFG421`, `AMFG498` (ASIs). The program PDFs list them, so the programs keep them; Samantha is checking the CSV.

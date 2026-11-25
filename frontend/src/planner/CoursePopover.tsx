@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { Dropdown } from '../setup/Dropdown.tsx'
 import type { Flag, Plan } from '../types.ts'
-import { formatCredits, type PlanIndex } from './graph.ts'
+import { flagKind, formatCredits, type PlanIndex } from './graph.ts'
 
 interface Props {
   plan: Plan
@@ -8,14 +9,17 @@ interface Props {
   courseId: string
   anchor: HTMLElement
   flags: Flag[]
+  /** move the course to another semester (the keyboard-friendly way); left out for a completed course */
+  onMove?: (toIndex: number) => void
   onClose: () => void
 }
 
 /** Details for one course: its flags, what it needs and what it unlocks. Placed beside the card that was clicked. */
-export function CoursePopover({ plan, index, courseId, anchor, flags, onClose }: Props) {
+export function CoursePopover({ plan, index, courseId, anchor, flags, onMove, onClose }: Props) {
   const ref = useRef<HTMLDivElement>(null)
   const course = index.courses.get(courseId)!
   const here = index.semesterOf.get(courseId) ?? 0
+  const [target, setTarget] = useState(String(here))
 
   // Place next to the card, on whichever side has room.
   useEffect(() => {
@@ -70,7 +74,7 @@ export function CoursePopover({ plan, index, courseId, anchor, flags, onClose }:
         {course.status === 'completed' ? ' (completed)' : ''}
       </div>
       {flags.map((f) => (
-        <div key={f.flag_id} className={`pop-msg ${f.severity}`}>
+        <div key={f.flag_id} className={`pop-msg ${flagKind(f)}`}>
           {f.message}
         </div>
       ))}
@@ -82,6 +86,22 @@ export function CoursePopover({ plan, index, courseId, anchor, flags, onClose }:
       <div className="pop-list">
         {unlocks.length ? unlocks.map((id) => tag(id, (index.semesterOf.get(id) ?? 0) <= here)) : <span className="tag">Nothing in this plan</span>}
       </div>
+      {onMove && (
+        <>
+          <div className="pop-sec">Move to</div>
+          <div className="pop-move">
+            <Dropdown
+              label="Move to semester"
+              options={plan.semesters.map((s, i) => ({ value: String(i), label: s.label }))}
+              value={target}
+              onChange={setTarget}
+            />
+            <button type="button" className="btn primary" disabled={Number(target) === here} onClick={() => onMove(Number(target))}>
+              Move
+            </button>
+          </div>
+        </>
+      )}
     </div>
   )
 }

@@ -12,8 +12,18 @@ import re
 import sqlite3
 
 from degree_planner_backend.lookups import NotFoundError, get_course, get_program
-from degree_planner_backend.models import Program, Requirement
-from degree_planner_backend.plan_models import Edge, Flag, FlagSeverity, FlagType, Plan, Semester, Summary
+from degree_planner_backend.models import Program, Requirement, RequirementGroup
+from degree_planner_backend.plan_models import (
+    CountsToward,
+    Edge,
+    Flag,
+    FlagSeverity,
+    FlagType,
+    Plan,
+    RequirementStatus,
+    Semester,
+    Summary,
+)
 
 _GRADUATE_LEVELS = ("master", "phd")
 
@@ -183,6 +193,30 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
             )
         )
 
+    # Which requirement groups each planned course fills (code -> groups), for Plan.counts_toward.
+    counts: dict[str, list[CountsToward]] = {}
+
+    # Whether each requirement group is met, in the programs' own order, for Plan.requirement_status.
+    statuses: list[tuple[int, int, RequirementStatus]] = []
+    program_rank = 0
+
+    def report(group: RequirementGroup, program: Program, met: bool, **fields: float | int | None) -> None:
+        order = [g.group_id for g in program.requirement_groups]
+        statuses.append(
+            (
+                program_rank,
+                order.index(group.group_id),
+                RequirementStatus(
+                    program_id=program.program_id, group_id=group.group_id, label=group.label, kind=group.kind, met=met, **fields
+                ),
+            )
+        )
+
+    def record(code: str, program: Program, group: RequirementGroup) -> None:
+        entry = CountsToward(program_id=program.program_id, group_id=group.group_id, label=group.label)
+        if entry not in counts.setdefault(code, []):
+            counts[code].append(entry)
+
     equivalent: dict[str, list[str]] = {}
 
     def with_equivalents(codes: set[str]) -> set[str]:
@@ -327,6 +361,7 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                                 )
 
         for req_program in requirement_programs:
+            program_rank += 1
             for double_count in req_program.double_counts_with:
                 shared_used = sum(
                     code_credits.get(code, 0.0) for code in double_count.shared_courses if code in plan_codes
@@ -365,6 +400,13 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                         f"{req_program.name}: {group.label} is missing {', '.join(missing)}.",
                         False,
                     )
+                report(
+                    group,
+                    req_program,
+                    not missing,
+                    credits_earned=sum(code_credits.get(code, 0.0) for code in listed if code in plan_codes),
+                    missing_count=len(missing),
+                )
                 if group.every_semester:
                     # BUG-042: a 0-credit graduate seminar required every fall and spring
                     # semester isn't met by appearing once anywhere, unlike a normal "all" group.
@@ -382,12 +424,17 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                                 f"in every fall and spring semester; missing in {semester.label}.",
                                 False,
                             )
+                for code in listed:
+                    actual = code if code in plan_codes else stand_in.get(code, "")
+                    if actual in plan_codes:
+                        record(actual, req_program, group)
                 available -= set(listed) | {stand_in[code] for code in listed if code in stand_in}
 
             for group in requirement_groups_kind:
                 assert group.requirement is not None  # enforced by the model
                 satisfied_codes = plan_codes | set(stand_in.keys())
                 branch = _satisfied_branch(group.requirement, satisfied_codes)
+                report(group, req_program, branch is not None, credits_required=group.credits_required)
                 if branch is None:
                     add_flag(
                         "requirement_unmet",
@@ -397,6 +444,10 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                         False,
                     )
                 else:
+                    for code in branch:
+                        actual = code if code in plan_codes else stand_in.get(code, "")
+                        if actual in plan_codes:
+                            record(actual, req_program, group)
                     available -= set(branch) | {stand_in[code] for code in branch if code in stand_in}
 
             for group in choose_with_list + choose_without_list:
@@ -419,6 +470,7 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                         break
                     earned += code_credits.get(code, 0.0)
                     claimed.add(code)
+                report(group, req_program, earned >= credits_required, credits_required=credits_required, credits_earned=earned)
                 if earned < credits_required:
                     add_flag(
                         "credit_shortfall",
@@ -428,6 +480,8 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                         f"only {earned} completed or planned.",
                         False,
                     )
+                for code in claimed:
+                    record(code, req_program, group)
                 available -= claimed
 
     # Every minor and ASI: at least 9 of its credits not used for any other part of the degree
@@ -483,4 +537,11 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
             total_credits_required=total_credits_required,
             requirements_met=requirements_met,
         ),
+        requirement_status=[status for _, _, status in sorted(statuses, key=lambda s: (s[0], s[1]))],
+        counts_toward={
+            course.course_id: counts[course.code]
+            for semester in semesters
+            for course in semester.courses
+            if course.code in counts
+        },
     )

@@ -1,4 +1,12 @@
 :root {
+  /* one colour per kind of requirement, used by the card labels, the checklist and the About panel */
+  --cat-core: #1d4ed8;
+  --cat-elective: #7c3aed;
+  --cat-free: #12795a;
+  --cat-cas: #0e7490;
+  --cat-minor: #be185d;
+  --cat-extra: #9a5b00;
+  --cat-other: #5b6472;
   --arrow: #9aa4b2;
   --warn-bg: #fff8e6;
   --dot: #d3d9e2;
@@ -12,6 +20,13 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
+    --cat-core: #7ea6f2;
+    --cat-elective: #b79bff;
+    --cat-free: #4ade9a;
+    --cat-cas: #5eead4;
+    --cat-minor: #f472b6;
+    --cat-extra: #f5b54a;
+    --cat-other: #93a0b4;
     --arrow: #4a5872;
     --warn-bg: rgba(245, 181, 74, 0.12);
     --dot: rgba(255, 255, 255, 0.07);
@@ -25,6 +40,13 @@
 }
 
 :root[data-theme='dark'] {
+  --cat-core: #7ea6f2;
+  --cat-elective: #b79bff;
+  --cat-free: #4ade9a;
+  --cat-cas: #5eead4;
+  --cat-minor: #f472b6;
+  --cat-extra: #f5b54a;
+  --cat-other: #93a0b4;
   --arrow: #4a5872;
   --warn-bg: rgba(245, 181, 74, 0.12);
   --dot: rgba(255, 255, 255, 0.07);
@@ -161,6 +183,12 @@
   border-color: color-mix(in srgb, var(--warn) 25%, transparent);
 }
 
+.badge.c {
+  background: var(--acc-tint);
+  color: var(--acc);
+  border-color: color-mix(in srgb, var(--acc) 25%, transparent);
+}
+
 .badge.ok {
   background: var(--ok-bg);
   color: var(--ok);
@@ -222,6 +250,11 @@
 .flag.w .flag-ic {
   background: var(--warn-bg);
   color: var(--warn);
+}
+
+.flag.c .flag-ic {
+  background: var(--acc-tint);
+  color: var(--acc);
 }
 
 .flag b {
@@ -356,7 +389,7 @@
 .sem {
   position: relative;
   z-index: 1;
-  width: 206px;
+  width: 224px;
   padding: 10px;
   border-radius: 14px;
   background: color-mix(in srgb, var(--col) 88%, transparent);
@@ -372,9 +405,13 @@
 
 .sem-h {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
   padding: 2px 4px 8px;
+}
+
+.sem-h b {
+  margin-right: auto;
 }
 
 .sem-h b {
@@ -460,6 +497,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  min-width: 0;
 }
 
 .card-code {
@@ -477,13 +515,10 @@
 }
 
 .card-cr {
-  margin-left: auto;
   font-size: 11.5px;
   color: var(--mut);
   font-weight: 500;
-  padding: 1px 6px;
-  border-radius: 6px;
-  background: var(--col);
+  white-space: nowrap;
 }
 
 .card-title {
@@ -503,6 +538,10 @@
   color: var(--err);
 }
 
+.card.warned .card-warn {
+  color: var(--warn);
+}
+
 .card.flagged {
   border-color: color-mix(in srgb, var(--err) 55%, transparent);
   background: linear-gradient(var(--err-bg), var(--err-bg)), var(--raised);
@@ -517,6 +556,39 @@
   width: 3px;
   border-radius: 0 3px 3px 0;
   background: var(--err);
+}
+
+/* a warning (for example an exception the student can accept) is amber, an error is red */
+.card.warned {
+  border-color: color-mix(in srgb, var(--warn) 55%, transparent);
+  background: linear-gradient(var(--warn-bg), var(--warn-bg)), var(--raised);
+}
+
+.card.warned::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--warn);
+}
+
+/* a claimed exception: not a problem, just something to confirm; a calm blue marker, no tinted card */
+.card.confirm::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--acc-bright);
+}
+
+.card.confirm .card-warn {
+  color: var(--acc);
 }
 
 .card.completed {
@@ -618,6 +690,11 @@
   color: var(--warn);
 }
 
+.pop-msg.confirm {
+  background: var(--acc-tint);
+  color: var(--acc);
+}
+
 .pop-close {
   position: absolute;
   top: 10px;
@@ -655,4 +732,373 @@
   .chain-mode .edge.hot {
     stroke-dasharray: none;
   }
+}
+
+/* ---------- Moving courses and adding semesters ---------- */
+.card[draggable='true'] {
+  cursor: grab;
+}
+
+.card.dragging {
+  opacity: 0.4;
+  border-style: dashed;
+  box-shadow: none;
+}
+
+.sem.drop-target {
+  background: color-mix(in srgb, var(--acc) 9%, var(--col));
+  border-color: color-mix(in srgb, var(--acc) 45%, transparent);
+  box-shadow: 0 0 0 3px var(--acc-tint);
+}
+
+.sem-empty {
+  padding: 22px 8px;
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--mut);
+  border: 1.5px dashed var(--border-strong);
+  border-radius: 10px;
+}
+
+.sem-remove {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  margin-right: -4px;
+  border-radius: 6px;
+  border: 0;
+  background: none;
+  color: var(--mut);
+  font-size: 16px;
+  line-height: 1;
+  transition: background 120ms, color 120ms;
+}
+
+.sem-remove:hover,
+.sem-remove:focus-visible {
+  background: var(--err-bg);
+  color: var(--err);
+}
+
+/* "+ Summer": a round button in the gap after a Spring column */
+.add-between {
+  position: absolute;
+  z-index: 5;
+  right: -42px;
+  top: 14px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1.5px dashed var(--border-strong);
+  background: var(--surface);
+  color: var(--acc);
+  font-size: 18px;
+  line-height: 1;
+  transition: transform 200ms var(--spring), border-color 120ms, background 120ms;
+}
+
+.add-between:hover,
+.add-between:focus-visible {
+  transform: scale(1.12);
+  border-style: solid;
+  border-color: var(--acc-bright);
+  background: var(--acc-tint);
+}
+
+.sem.add-end {
+  display: grid;
+  place-items: start center;
+  padding: 18px 10px;
+  background: transparent;
+  border-style: dashed;
+}
+
+.checking {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--mut);
+}
+
+.checking i {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--border-strong);
+  border-top-color: var(--acc-bright);
+  animation: spin 800ms linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.planner-toast {
+  position: fixed;
+  z-index: 60;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: min(560px, calc(100vw - 32px));
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #0f1a2e;
+  color: #e6eaf2;
+  box-shadow: var(--sh-3);
+  font-size: 13.5px;
+  animation: rise 300ms var(--ease-out);
+}
+
+.planner-toast .link {
+  color: #7ea6f2;
+  flex: none;
+}
+
+.pop-move {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.pop-move .dd {
+  flex: 1;
+  min-width: 0;
+}
+
+.pop-move .btn {
+  flex: none;
+}
+
+.pop-move .btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .checking i {
+    animation: none;
+  }
+}
+
+/* ---------- Category colours: card labels, checklist dots ---------- */
+.cat-core { --c: var(--cat-core); }
+.cat-elective { --c: var(--cat-elective); }
+.cat-free { --c: var(--cat-free); }
+.cat-cas { --c: var(--cat-cas); }
+.cat-minor { --c: var(--cat-minor); }
+.cat-extra { --c: var(--cat-extra); }
+.cat-other { --c: var(--cat-other); }
+
+/* the label sits at the right end of the top row of a card */
+.card-tag {
+  margin-left: auto;
+  flex: none;
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--c) 35%, transparent);
+  background: color-mix(in srgb, var(--c) 11%, transparent);
+  color: var(--c);
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.card-also {
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--c);
+}
+
+/* ---------- About this plan ---------- */
+.about {
+  padding: 4px 20px 14px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+.about-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0 4px;
+}
+
+.about-head h2 {
+  margin: 0;
+  font: 600 15px/1.2 'Inter Tight', Inter, sans-serif;
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.about-card {
+  padding: 12px 14px 14px;
+  border-radius: 12px;
+  background: var(--col);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--accent);
+  animation: rise 360ms var(--ease-out) backwards;
+}
+
+.about-card h3 {
+  margin: 0 0 8px;
+  font: 600 12px/1 Inter, sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.about-card.c-req { --accent: var(--cat-core); }
+.about-card.c-check { --accent: var(--warn); }
+.about-card.c-choice { --accent: var(--cat-elective); }
+
+.req-section + .req-section {
+  margin-top: 10px;
+}
+
+.req-title {
+  margin-bottom: 3px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mut);
+}
+
+.req-list,
+.check-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.req-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 13px;
+}
+
+.req-icon {
+  flex: none;
+}
+
+.req-icon.ok {
+  color: var(--ok);
+}
+
+.req-icon.bad {
+  color: var(--err);
+}
+
+.req-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--c);
+}
+
+.req-name {
+  font-weight: 500;
+}
+
+.req-row.unmet .req-name {
+  color: var(--err);
+}
+
+.req-detail {
+  margin-left: auto;
+  color: var(--mut);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.about-none {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 13px;
+  color: var(--mut);
+}
+
+.check-item {
+  padding: 6px 0 6px 10px;
+  border-left: 3px solid var(--warn);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.check-item + .check-item {
+  margin-top: 6px;
+}
+
+.check-item.confirm {
+  border-left-color: var(--acc-bright);
+}
+
+/* something the assistant says to confirm with an advisor */
+.check-item.note {
+  border-left-color: var(--cat-other);
+}
+
+.choice-text {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--mut);
+}
+
+.choice-text p,
+.choice-text ul {
+  margin: 0 0 8px;
+}
+
+.choice-text ul {
+  padding-left: 18px;
+}
+
+.choice-text strong {
+  color: var(--text);
+}
+
+.choice-text code {
+  font: 500 12px 'JetBrains Mono', ui-monospace, monospace;
+  padding: 1px 5px;
+  border-radius: 5px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.note-problems {
+  margin: 8px 0 4px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--warn-bg);
+  color: var(--warn);
+  font-size: 13px;
+}
+
+.planner-problems {
+  margin: 0;
+  border-radius: 0;
+  padding: 10px 20px;
+}
+
+.note-problems ul {
+  margin: 6px 0 0;
+  padding-left: 20px;
+  color: var(--text);
 }

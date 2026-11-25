@@ -1,0 +1,237 @@
+.building {
+  display: grid;
+  place-items: center;
+  min-height: calc(100vh - 58px);
+  padding: 24px 16px;
+}
+
+.building-card {
+  width: min(480px, 100%);
+  padding: 32px 28px;
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--sh-2);
+  animation: rise 420ms var(--ease-out) backwards;
+}
+
+.building-card h2 {
+  margin: 18px 0 6px;
+  font: 700 22px/1.2 'Inter Tight', Inter, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.building-sub {
+  margin: 0 0 20px;
+  color: var(--mut);
+}
+
+.building-for {
+  margin: 0 0 18px;
+  font-size: 12.5px;
+  color: var(--mut);
+}
+
+/* a small plan assembling itself */
+.plan-anim {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 10px;
+  height: 78px;
+}
+
+.pa-col {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 30px;
+  padding: 5px;
+  border-radius: 8px;
+  background: var(--col);
+  border: 1px solid var(--border);
+}
+
+.pa-col i {
+  display: block;
+  height: 9px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--acc), var(--acc-bright));
+  opacity: 0;
+  transform: translateY(-6px) scale(0.9);
+  animation: place 4.8s var(--ease-out) infinite;
+  animation-delay: calc(var(--c) * 260ms + var(--b) * 150ms);
+}
+
+@keyframes place {
+  0%, 4% { opacity: 0; transform: translateY(-6px) scale(0.9); }
+  14%, 78% { opacity: 1; transform: none; }
+  92%, 100% { opacity: 0; transform: none; }
+}
+
+/* facts that slide sideways: scroll or swipe the row, or use the arrows and dots */
+.facts {
+  margin: 0 0 20px;
+  padding: 14px 8px 10px;
+  text-align: left;
+  background: var(--col);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.facts-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.facts-track {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  border-radius: 8px;
+}
+
+.facts-track::-webkit-scrollbar {
+  display: none;
+}
+
+.fact-slide {
+  flex: 0 0 100%;
+  margin: 0;
+  padding: 2px 8px;
+  scroll-snap-align: start;
+  opacity: 0.35;
+  transition: opacity 600ms ease;
+}
+
+.fact-slide.on {
+  opacity: 1;
+}
+
+.fact-slide figcaption {
+  margin-bottom: 4px;
+  font: 600 11.5px/1.2 Inter, sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--acc);
+}
+
+.fact-slide p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+.facts-arrow {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--mut);
+  font-size: 18px;
+  line-height: 1;
+  transition: color 120ms, border-color 120ms, transform 80ms;
+}
+
+.facts-arrow:hover {
+  color: var(--acc);
+  border-color: var(--acc-bright);
+}
+
+.facts-arrow:active {
+  transform: scale(0.92);
+}
+
+.facts-dots {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 10px;
+}
+
+.facts-dots button {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  background: none;
+  display: grid;
+  place-items: center;
+}
+
+.facts-dots button::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--border-strong);
+  transition: background 300ms, transform 300ms;
+}
+
+.facts-dots button.on::before {
+  background: var(--acc-bright);
+  transform: scale(1.35);
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pa-col i {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.problem-icon {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: var(--err-bg);
+  color: var(--err);
+}
+
+.problem-list {
+  margin: 0 0 20px;
+  padding: 12px 16px 12px 32px;
+  text-align: left;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--err-bg);
+  border-radius: 12px;
+}
+
+.problem-list li + li {
+  margin-top: 6px;
+}
+
+.problem-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn.primary {
+  background: var(--fill);
+  color: #fff;
+  border-color: transparent;
+}
+
+.btn.primary:hover {
+  background: var(--fill-hover);
+}

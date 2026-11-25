@@ -14,12 +14,13 @@ Regenerated every run; do not edit by hand. Rules: `data/CONFLICT-LOG.md`, secti
 - csv rows: 3168
 - graduate-only courses without a source URL: 6
 - independent study (set to 3 credits): 160
-- prerequisites kept as one exception (free text): 226
+- placement-level prerequisites left out (not a course): 1
+- prerequisites kept as one exception (free text): 225
 - prerequisites partly free text (mixed): 8
 - prerequisites with a grade minimum (grade dropped): 67
 - references to codes not in the catalog: 76
 
-## Prerequisites that are free text, whole or in part (free text becomes an exception the student can override) (234)
+## Prerequisites that are free text, whole or in part (free text becomes an exception the student can override) (233)
 
 - AMFG581: AMFG 501, AMFG 521, AMFG 531
 - CBEN198: CBEN 120 or equivalent
@@ -170,7 +171,6 @@ Regenerated every run; do not edit by hand. Rules: `data/CONFLICT-LOG.md`, secti
 - MAED465: Completed/concurrent 3 credits of SCED 262; completed/concurrent with MAED 405 or MAED 425
 - MAED564: 
 - MAED565: Completed/concurrent 3 credits of SCED 562; completed/concurrent with MAED 505 or MAED 525
-- MATH111: 
 - MATH470: MATH213 and MATH225
 - MATH552: MATH332, MATH 307
 - MATH559: MATH332 or MATH342 and MATH455
@@ -477,8 +477,9 @@ Regenerated every run; do not edit by hand. Rules: `data/CONFLICT-LOG.md`, secti
 - SYGN598 course_name: kept `special topics`; other: `carbon reduction: capture & utilization`
 - SYGN598 credits: kept `0-6`; other: `3.0`
 
-## Prerequisite text that produced no requirement (0)
+## Prerequisite text that produced no requirement (1)
 
+- MATH111: precalculus
 
 ## Variable-credit courses (upper bound used) (311)
 
@@ -1368,3 +1369,7 @@ Regenerated every run; do not edit by hand. Rules: `data/CONFLICT-LOG.md`, secti
 - PHGN599: `Independent Study form must be completed and submitted to the Registrar` (full text: Independent Study form must be completed and submitted to the Registrar)
 - PHGN698: `Variable credit: 0 to 6 credit hours | Repeatable for credit under different titles` (full text: none. Variable credit: 0 to 6 credit hours. Repeatable for credit under different titles.)
 - PHGN699: `Independent Study form must be completed and submitted to the Registrar` (full text: Independent Study form must be completed and submitted to the Registrar)
+
+## Placement-level prerequisites left out (a level of preparation, not a course) (1)
+
+- MATH111: `precalculus` (full text: precalculus)
