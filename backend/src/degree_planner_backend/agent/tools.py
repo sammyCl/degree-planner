@@ -695,6 +695,9 @@ GET_PROGRAM_REQUIREMENTS_TOOL: dict[str, Any] = {
         "Get what one Colorado School of Mines program (bachelor's, master's, combined BS+MS, minor, or ASI) "
         "requires: name, degree_level, catalog_year, total_credits_required, requirement_groups, combines, "
         "double_counts_with, and data_warnings. "
+        "A minor, ASI or certificate that is not in the catalog_year asked for returns its requirements "
+        "from the newest older year stored, with catalog_year set to that year and a catalog_year_note: "
+        "plan with them, and tell the student which catalog year they come from. "
         "Each requirement group has kind 'all' (take every listed course) or 'choose_credits' (take enough "
         "of the listed courses to reach credits_required), and a one-line summary. "
         "courses null means the data has no course list for that group: read the label to see what counts. "
@@ -726,6 +729,24 @@ GET_PROGRAM_REQUIREMENTS_TOOL: dict[str, Any] = {
         "required": ["program_id"],
     },
 }
+
+# BUG-053: a minor, ASI or certificate not re-collected for the requested year. The validator checks
+# a plan against the same older year and warns (stale_program_year), so planning with it is fine.
+ADD_ON_OLDER_YEAR_NOTE = (
+    "This program is not in the {requested} catalog data, so these are its requirements from the "
+    "{used} catalog, the newest year stored. Plan with them, and tell the student they come from "
+    "the {used} catalog and to confirm them with their advisor."
+)
+
+def _add_on_fallback(connection: sqlite3.Connection, program_id: str, catalog_year: str) -> tuple[Any, str] | None:
+    """validator._add_on_with_fallback (called, not copied, so the agent and the validator use one
+    rule), but never to a stored year that is not '2026-2027'-shaped: the loader refuses those
+    (BUG-023a), so one can only come from a hand-edited row, and its year must not reach the model."""
+    fallback = validator._add_on_with_fallback(connection, program_id, catalog_year)
+    if fallback is None or not _CATALOG_YEAR.fullmatch(fallback[1]):
+        return None
+    return fallback
+
 
 PROGRAM_NOT_FOUND = (
     "no program with this id in the loaded program data. The id may be mistyped, or the program's data "
@@ -970,8 +991,19 @@ def get_program_requirements(connection: sqlite3.Connection, tool_input: dict[st
             "error": f"this program is in catalog years {', '.join(years)}. Call again with one of them as catalog_year."
         }
     except lookups.NotFoundError:
+        if catalog_year is not None:
+            # BUG-053 on the agent side: the same fallback check_plan uses (the validator's rule).
+            fallback = _add_on_fallback(connection, program_id, catalog_year)
+            if fallback is not None:
+                older, older_year = fallback
+                result = _program_to_dict(connection, older)
+                if "error" not in result:
+                    result["catalog_year_note"] = ADD_ON_OLDER_YEAR_NOTE.format(
+                        requested=catalog_year, used=_shown_year(older_year)
+                    )
+                return result
         if catalog_year is None:
-            result: ToolResult = {"error": PROGRAM_NOT_FOUND}
+            result = {"error": PROGRAM_NOT_FOUND}
         else:
             result = {
                 "error": _not_in_year_message(
@@ -1287,6 +1319,14 @@ def build_plan(connection: sqlite3.Connection, context: StudentContext, semester
         try:
             program = lookups.get_program(connection, program_id, year)
         except lookups.NotFoundError:
+            # BUG-053 on the agent side: a minor, ASI or certificate stored only for an older year is
+            # checked against that year, using the validator's own fallback rule (called, not copied,
+            # so the two cannot drift). The validator repeats the fallback and adds a
+            # stale_program_year warning naming the year used. The student's own degree never falls
+            # back, so it is still program_not_loaded.
+            if _add_on_fallback(connection, program_id, year) is not None:
+                checkable_programs.append(program_id)
+                continue
             missing_part = shown
         else:
             for component in program.combines:

@@ -44,11 +44,11 @@ def course(code: str, catalog_year: str = "2026-2027", title: str = "Test Course
     }
 
 
-def program(program_id: str, catalog_year: str = "2026-2027") -> dict:
+def program(program_id: str, catalog_year: str = "2026-2027", degree_level: str = "minor") -> dict:
     return {
         "program_id": program_id,
         "name": f"{program_id} program",
-        "degree_level": "minor",
+        "degree_level": degree_level,
         "catalog_year": catalog_year,
         "total_credits_required": 18,
         "requirement_groups": [{"group_id": "core", "label": "Core", "kind": "all", "courses": ["CSCI200"]}],
@@ -257,8 +257,9 @@ def test_program_typo_with_year_gets_did_you_mean(real_data_connection: sqlite3.
 
 def test_program_in_another_year_has_no_did_you_mean(tmp_path: Path) -> None:
     # The error already names the year the program is in; suggesting the same id would be noise.
-    conn = load(tmp_path, programs=[program("test-minor", "2025-2026")])
-    result = get_program_requirements(conn, {"program_id": "test-minor", "catalog_year": "2026-2027"})
+    # A bachelor's program, since a minor in an older year now falls back to it (BUG-053).
+    conn = load(tmp_path, programs=[program("test-bs", "2025-2026", "bachelor")])
+    result = get_program_requirements(conn, {"program_id": "test-bs", "catalog_year": "2026-2027"})
     assert_bad_input(result)
     assert "exists only in catalog year 2025-2026" in result["error"]
 
