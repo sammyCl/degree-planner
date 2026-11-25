@@ -54,7 +54,8 @@ describe('building a plan', () => {
     chooseProgramAndBuild()
 
     expect(screen.getByRole('heading', { name: 'Building your plan' })).toBeInTheDocument()
-    expect(screen.getByRole('timer')).toHaveTextContent('0:00')
+    expect(screen.getByRole('status')).toHaveTextContent(/choosing your courses/)
+    expect(document.querySelectorAll('.fact.on')).toHaveLength(1)
     expect(calls).toHaveLength(1)
     expect(JSON.parse(calls[0].body as string)).toMatchObject({
       student: { degree_level: 'bachelor', programs: ['cs-bs-general-track'] },
