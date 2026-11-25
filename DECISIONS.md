@@ -15,6 +15,14 @@ Add an entry whenever the team picks between real options; copy the template bel
 
 ## Entries
 
+### Validation strictness: reject or clean malformed data at load, don't just warn about it later
+
+- Date: 2026-11-25
+- Owner: Midhat Sajad (backend, data format), agreed with Samantha Clapp (agent tools)
+- Decision: Genuinely malformed data (NaN/infinite/negative numbers, an empty required list, a prompt-injection-shaped catalog year, a prerequisite/corequisite referencing a course code that doesn't exist and has no safe alternative) is rejected at load, or cleaned to a safe value, instead of loading successfully with a tool-side `data_warning`. A value kept as literal, uncorrected text stays that way only when correcting it would mean guessing (a catalog typo like `CSC128` with no single obvious fix); a dead reference with no safe fallback becomes an overridable `exception` instead, so it's visible and actionable rather than a silent permanent failure.
+- Options considered: Keep the agent tool's existing leniency (load anything, add a warning the agent reads) vs. move the check to the data format itself, so every consumer (validator, frontend, future tools, not just today's agent tool) gets the same guarantee.
+- Why: The stricter checks were first tried back when models.py/plan_models.py were built, then held back after they collided with the agent tool's existing lenient behavior and its tests (bugs.txt BUG-010, 014, 017, 022, 023(a), 026(c), 028). Raised to Samantha directly rather than guessed at; she agreed none of these are legitimate cases, only broken ones, so rejecting or cleaning them at load is strictly better than relying on every future consumer to re-implement the same tool-side warning. The same principle later caught BUG-050 (most "code not in the catalog" prerequisite references were a dead end, not an overridable exception), but was applied carefully there: the 21 cases with a working OR fallback are left untouched, since converting those too would make the validator always flag them (BUG-026(d)) even though nothing is actually wrong with the plan.
+
 ### Stack: Python 3.12, uv, FastAPI, SQLite
 
 - Date: 2026-11-13
@@ -22,6 +30,14 @@ Add an entry whenever the team picks between real options; copy the template bel
 - Decision: Python 3.12, `uv` for env and dependency management, FastAPI for the API, SQLite for storage.
 - Options considered: Package manager: `uv` vs Poetry vs pip+venv. Framework: FastAPI vs Flask vs Django. Database: SQLite vs Postgres vs flat JSON files.
 - Why:  We picked uv for one fast tool covering env, deps, and the lockfile across three people's machines. We picked FastAPI because Pydantic models let us define the course/program schema once and reuse it for API validation and the Data format doc, instead of three separate definitions; its auto-generated docs also help since the team build against our API before it's finished. We picked SQLite because the data loader rebuilds the catalog from scratch each run, and a single file is trivial to wipe and reload, with no server or secrets to manage at this scale.
+
+### Data format: structured AND/OR requirement trees, not free text
+
+- Date: 2026-11-13
+- Owner: Midhat Sajad (backend)
+- Decision: Prerequisites and corequisites are a typed `Requirement` tree (`course`, `AND`, `OR`, `exception`), not the plain-text strings the raw catalog CSVs store (e.g. `"MATH301, MATH332."`).
+- Options considered: Keep prerequisites as free text and have the agent or validator parse/interpret it at plan-check time, vs. parse it once into structured AND/OR logic at load time.
+- Why: The validator needs a deterministic, repeatable answer to "is this prerequisite satisfied," the same requirement the team picked rules code over an LLM for; parsing free text at check time would reintroduce exactly the ambiguity that was being avoided. Parsing once, at load, means the validator, the agent's tools, and the frontend all read the same structure instead of three independent text-parsers potentially disagreeing. An `exception` type (for instructor consent, placement, or a catalog reference that can't be resolved) keeps anything the parser can't turn into real logic from being silently dropped or guessed at — it surfaces as a warning the student can override, rather than either a hallucinated interpretation or a dead, permanently-failing requirement (see bugs.txt BUG-050).
 
 The first entries are the decisions recorded in our proposal (submitted Fri Nov 6, 2026).
 
