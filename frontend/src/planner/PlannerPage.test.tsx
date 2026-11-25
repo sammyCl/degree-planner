@@ -134,7 +134,7 @@ describe('PlannerPage', () => {
     const key = screen.getByRole('dialog', { name: 'Colour and label key' })
     expect(key).toHaveTextContent('Required for your degree')
     expect(key).toHaveTextContent('Minor core')
-    expect(key).toHaveTextContent('over 19 credits')
+    expect(key).toHaveTextContent('over the limit, 18 credits')
     fireEvent.keyDown(document, { key: 'Escape' })
     expect(screen.queryByRole('dialog', { name: 'Colour and label key' })).not.toBeInTheDocument()
   })

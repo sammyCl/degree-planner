@@ -89,13 +89,25 @@ export function flagsByCourse(flags: Flag[]): Map<string, Flag[]> {
   return map
 }
 
+/** The labels of semesters the validator says are over the credit limit (18 undergraduate, 15 graduate). */
+export function overloadedSemesters(flags: Flag[]): Set<string> {
+  const labels = new Set<string>()
+  for (const f of flags) {
+    if (f.type !== 'semester_overload' || !isOpen(f)) continue
+    const label = /^((?:Fall|Spring|Summer) \d{4}) has /.exec(f.message)?.[1]
+    if (label) labels.add(label)
+  }
+  return labels
+}
+
 /**
- * Full time is 12 or more credits; more than 19 is an overload. Only used to colour the semester's credit bar.
- * A Summer is a short, optional term, so a light one is normal and is never marked as under full time.
+ * How to colour a semester's credit bar. Over the limit is the validator's call (`overloaded`), not the page's.
+ * Full time is 12 credits (9 for a master's student); less is marked low. A Summer is a short, optional term, so a
+ * light one is normal and is never marked as under full time.
  */
-export function creditLevel(credits: number, label = ''): 'low' | 'ok' | 'high' {
-  if (credits > 19) return 'high'
-  if (credits > 0 && credits < 12 && !label.startsWith('Summer')) return 'low'
+export function creditLevel(credits: number, label = '', overloaded = false, fullTime = 12): 'low' | 'ok' | 'high' {
+  if (overloaded) return 'high'
+  if (credits > 0 && credits < fullTime && !label.startsWith('Summer')) return 'low'
   return 'ok'
 }
 

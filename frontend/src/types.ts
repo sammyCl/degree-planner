@@ -33,6 +33,8 @@ export type FlagType =
   | 'requirement_unmet'
   | 'double_count_exceeded'
   | 'exception_claimed'
+  | 'ineligible_course'
+  | 'semester_overload'
 
 export interface Flag {
   flag_id: string
