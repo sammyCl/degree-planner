@@ -18,6 +18,7 @@ Field names use `snake_case`. Credits are numbers (not strings), since `0.5`/`1.
 | `credits_min` | number \| null | no | set together with `credits_max` when the catalog gives a range (e.g. "1-6 credits"); omit for a fixed-credit course |
 | `credits_max` | number \| null | no | equal to `credits` when set; see `credits_min` |
 | `equivalent_with` | array of course codes | no | courses the catalog calls equivalent ("Equivalent with ..." in the description), listed on both courses; one satisfies a prerequisite on the other, and only one counts toward a degree. Default `[]` |
+| `equivalent_with_inferred` | array of course codes | no | a subset of `equivalent_with`: the codes in it the catalog text never actually states are equivalent, only inferred by the team's rule (same title/description/credits, named together elsewhere as alternatives). Must be a subset of `equivalent_with`. A student should be asked to confirm one of these standing in for a requirement; a plain `equivalent_with` entry is catalog fact, not an assumption. Default `[]` |
 | `description` | string | yes | catalog text, may be empty string |
 | `prerequisites` | Requirement \| null | no | see **Requirement expressions** below; `null` means no prerequisites |
 | `corequisites` | Requirement \| null | no | same shape as `prerequisites` (a flat `AND` of courses covers the common case); `null` means no corequisites |
@@ -52,7 +53,7 @@ A bachelor's, master's, PhD, minor, or ASI. A combined BS+MS is its own program 
 |---|---|---|---|
 | `program_id` | string | yes | stable slug, e.g. `"cs-bs-general-track"` |
 | `name` | string | yes | |
-| `degree_level` | string | yes | one of `bachelor`, `master`, `phd`, `combined`, `minor`, `asi` |
+| `degree_level` | string | yes | one of `bachelor`, `master`, `phd`, `combined`, `minor`, `asi`, `certificate` |
 | `catalog_year` | string | yes | |
 | `total_credits_required` | number | yes | |
 | `requirement_groups` | array of RequirementGroup | yes | see below |

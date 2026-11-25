@@ -106,6 +106,7 @@ def _request(level: str, count: int) -> dict:
         ("combined", SEMESTERS_MAX_BACHELOR),
         ("minor", SEMESTERS_MAX_BACHELOR),
         ("asi", SEMESTERS_MAX_BACHELOR),
+        ("certificate", SEMESTERS_MAX_BACHELOR),
         ("master", SEMESTERS_MAX_GRADUATE),
         ("phd", SEMESTERS_MAX_GRADUATE),
     ],

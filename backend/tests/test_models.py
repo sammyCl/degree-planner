@@ -26,6 +26,12 @@ def test_program_notes_default_to_empty() -> None:
     assert program.notes == []
 
 
+def test_program_accepts_certificate_degree_level() -> None:
+    program = Program.model_validate({**BASE_PROGRAM, "degree_level": "certificate"})
+
+    assert program.degree_level == "certificate"
+
+
 def test_program_notes_can_be_set() -> None:
     program = Program.model_validate({**BASE_PROGRAM, "notes": ["Not open to QBE majors."]})
 

@@ -22,7 +22,7 @@ This is a different thing from the [data format](data-format.md): the data forma
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| `degree_level` | string | yes | `bachelor`, `master`, `phd`, `combined`, `minor`, `asi` |
+| `degree_level` | string | yes | `bachelor`, `master`, `phd`, `combined`, `minor`, `asi`, `certificate` |
 | `programs` | array of program_id | yes | from the data format; more than one for a combined degree or a major+minor |
 | `catalog_year` | string | yes | |
 | `completed_courses` | array of CompletedCourse | yes | `[]` if none. `{"code": string, "credits": number, "term": "transfer" \| "aplcredit" \| a semester label, "transfer_from": string \| null}` |
@@ -47,6 +47,8 @@ A course placed in a specific semester. It has its own id, separate from the cat
 | `title` | string | yes | denormalized from the catalog so the frontend does not need a second lookup to render a box |
 | `credits` | number | yes | |
 | `status` | string | yes | `planned` or `completed` |
+| `description` | string | no | denormalized from the catalog, same reason as `title`. Defaults to `""` |
+| `corequisites` | Requirement \| null | no | same shape as a course's `corequisites` in the data format (see **Requirement expressions** in docs/data-format.md). `null` means no corequisites, or the course was not found in the catalog. Defaults to `null` |
 
 ## Prerequisite edge
 
@@ -66,7 +68,7 @@ What the validator found wrong, attached to a specific course placement so the f
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | `flag_id` | string | yes | |
-| `type` | string | yes | `broken_prerequisite`, `credit_shortfall`, `requirement_unmet`, `double_count_exceeded`, `exception_claimed`, `ineligible_course`, `semester_overload` |
+| `type` | string | yes | `broken_prerequisite`, `credit_shortfall`, `requirement_unmet`, `double_count_exceeded`, `exception_claimed`, `ineligible_course`, `semester_overload`, `stale_program_year`, `assumed_equivalent` |
 | `severity` | string | yes | `error` (the plan is invalid) or `warning` (needs the student's attention but is not by itself invalid, e.g. a claimed exception) |
 | `course_id` | course_id \| null | yes | `null` for a plan-wide flag like `requirement_unmet` |
 | `message` | string | yes | shown to the student as-is |

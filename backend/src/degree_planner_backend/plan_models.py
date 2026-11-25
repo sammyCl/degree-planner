@@ -6,6 +6,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from degree_planner_backend.models import Requirement
+
 
 class CompletedCourse(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -21,7 +23,7 @@ class CompletedCourse(BaseModel):
 class Student(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    degree_level: Literal["bachelor", "master", "phd", "combined", "minor", "asi"]
+    degree_level: Literal["bachelor", "master", "phd", "combined", "minor", "asi", "certificate"]
     # BUG-028: a student always has at least one program; an empty list only used to fail later,
     # inside build_plan.
     programs: list[str] = Field(min_length=1)
@@ -37,6 +39,11 @@ class PlannedCourse(BaseModel):
     title: str
     credits: float
     status: Literal["planned", "completed"]
+    # Denormalized from the catalog, same reason as title: the frontend's About panel can show a
+    # course's description and corequisites without a second lookup. Optional/defaulted so an
+    # older plan (or one built before a course was found in the catalog) still validates.
+    description: str = ""
+    corequisites: Requirement | None = None
 
 
 class Semester(BaseModel):
@@ -65,6 +72,8 @@ FlagType = Literal[
     "exception_claimed",
     "ineligible_course",
     "semester_overload",
+    "stale_program_year",
+    "assumed_equivalent",
 ]
 FlagSeverity = Literal["error", "warning"]
 

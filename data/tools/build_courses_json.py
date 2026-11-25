@@ -163,6 +163,11 @@ def infer_equivalents(courses: list[dict], notes: dict[str, list[str]], stats: C
         for a, b in new:
             by_code[a].setdefault("equivalent_with", []).append(b)
             by_code[b].setdefault("equivalent_with", []).append(a)
+            # BUG-055: this pair is not in the catalog text (checked above), so it's an assumption,
+            # not a fact; equivalent_with_inferred marks it as such for anything downstream (e.g.
+            # the validator) that treats the two kinds differently.
+            by_code[a].setdefault("equivalent_with_inferred", []).append(b)
+            by_code[b].setdefault("equivalent_with_inferred", []).append(a)
         found.append({"codes": codes, "reason": reason})
 
     linked_subjects: set[frozenset[str]] = set()
@@ -195,6 +200,8 @@ def infer_equivalents(courses: list[dict], notes: dict[str, list[str]], stats: C
     for c in courses:
         if "equivalent_with" in c:
             c["equivalent_with"] = sorted(set(c["equivalent_with"]))
+        if "equivalent_with_inferred" in c:
+            c["equivalent_with_inferred"] = sorted(set(c["equivalent_with_inferred"]))
     stats["equivalent groups inferred (not in the catalog text)"] = len(found)
     return found
 
