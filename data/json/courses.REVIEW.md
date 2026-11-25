@@ -20,6 +20,7 @@ Regenerated every run; do not edit by hand. Rules: `data/CONFLICT-LOG.md`, secti
 - prerequisites partly free text (mixed): 8
 - prerequisites with a grade minimum (grade dropped): 67
 - references to codes not in the catalog: 76
+- unknown references turned into an overridable exception: 20
 
 ## Prerequisites that are free text, whole or in part (free text becomes an exception the student can override) (233)
 
