@@ -1784,3 +1784,31 @@ BUG-055  Equivalent courses the catalog states and ones the team only
              equivalent_with) plus the model_validator's own coverage.
              Touches data/tools/build_courses_json.py, Abdallah's
              converter; flag to him.
+
+BUG-056  courses.REVIEW.md's free-text prerequisite list shows the previous
+         course's prerequisite text, not the course's own
+  Status:    Open
+  Owner:     Abdallah Salhi (course data converter: data/tools/
+             build_courses_json.py)
+  Where:     data/tools/build_courses_json.py, build(), lines 313-314;
+             data/json/courses.REVIEW.md ("Prerequisites that are free
+             text, whole or in part")
+  Found:     2026-11-25 by Samantha with Claude, while fixing BUG-047
+  Steps:     on main before BUG-047's fix, run python3 data/tools/
+             build_courses_json.py and look for CSCI478 in
+             data/json/courses.REVIEW.md
+  Actual:    "- CSCI478: CSCI220 or CSCI262". That is CSCI477's
+             prerequisite; CSCI478's own text was "CSCI101 or CSCI102
+             CSCI128". Line 313 appends the note using the variable
+             original, which line 314 only assigns afterwards, so each
+             entry carries the text of the course processed before it (and
+             the first one would raise NameError if it came first). The
+             "full text" in this list is wrong for most of its 232 entries.
+             courses.json is not affected: line 309 parses each course's
+             own r["prerequisites"]. The dropped-info entries (lines
+             317-323) are also fine, since they run after line 314
+  Expected:  each entry shows that course's own prerequisite text
+  Fix idea:  move line 314 (original = " ".join(r["prerequisites"].split()))
+             above the "if pre.fallback:" block, rebuild, and add a test
+             that a free-text note's text matches its own course's row
+  Fixed in:
