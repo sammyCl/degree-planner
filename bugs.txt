@@ -1480,3 +1480,68 @@ BUG-049  The validator does not check corequisites
              by test_validator_corequisites.py (3 tests). chat.md's
              "check corequisites itself" instruction is now redundant,
              worth Samantha simplifying once she sees this.
+
+BUG-050  Most prerequisite/corequisite codes not in the catalog are a dead
+         end, not an overridable exception
+  Status:    Fixed
+  Owner:     Midhat Sajad (data format); Abdallah Salhi (course converter,
+             prereq_parser.py)
+  Where:     data/tools/build_courses_json.py, data/tools/prereq_parser.py,
+             data/json/courses.json
+  Found:     2026-11-25 while running Integration day on Example 1: the
+             agent flagged that MATH225's corequisite data names "CSC128",
+             which does not exist (almost certainly a typo for CSCI128),
+             and worked around it. Checking the other 75 cases already
+             listed in courses.REVIEW.md's "codes not in the catalog"
+             section found most are worse than MATH225's: 55 of the 76
+             (mostly MLGN/MNGN/MTGN/GEGN/GEOL graduate courses) have no OR
+             fallback at all
+  Steps:     before the fix: get_prerequisites {"code": "MNGN531"} (or any
+             of the 55 listed in the Fixed in note); its corequisite names
+             MTGN351, which is not a course in the catalog, with no
+             alternative branch
+  Actual:    the broken code was stored as a literal {"type": "course",
+             "code": "..."}; a plan including one of the 55 courses can
+             never satisfy that requirement, and the validator would flag
+             it forever with no way for the student or advisor to resolve
+             it (unlike an actual exception, which the student can accept).
+             None of the 55 are in mining-ms's or mining-bs-ms-combined's
+             own requirement groups, so Example 3 was not directly hit, but
+             a plan choosing one of these courses as a free elective would
+             be
+  Expected:  a prerequisite/corequisite code that matches no real course
+             becomes an overridable exception instead of a dead end, the
+             same as instructor consent or other free text already is,
+             without guessing at what the typo meant
+  Fix idea:  in build_courses_json.py, after parsing, replace a course
+             reference to an unknown code with {"type": "exception",
+             "label": ...} naming the code, so the student/advisor can
+             confirm it, instead of leaving a code that can never resolve
+  Fixed in:  2026-11-25 (backend: Midhat; told Abdallah, since this changes
+             his converter's output). Team decision (2026-11-25): go ahead.
+             Not a blanket replace-every-unknown-code, which would have
+             regressed MATH225 itself: 21 of the 76 (including CSC128) sit
+             inside an OR with a real course as a working fallback, and
+             are harmless as literal dead branches; converting those to an
+             exception too would make the validator always raise
+             exception_claimed on them (BUG-026(d), held back: an
+             exception's label is surfaced regardless of whether another
+             OR branch is already satisfied), a regression on an otherwise
+             clean plan. build_courses_json.py's new _resolve_unknown_refs
+             walks each prerequisites/corequisites tree and converts a
+             bare unknown-code reference only when it has no safe OR
+             fallback: an AND branch with no fallback, or an OR whose every
+             branch is itself unknown. CSC128 (the 21 safe cases) is left
+             exactly as it was; 20 courses' trees changed (the 55 unsafe
+             references collapse to 20 distinct courses, several of which
+             have more than one). courses.REVIEW.md's "codes not in the
+             catalog" count and list are unchanged (computed before the
+             rewrite, for the same transparency as before); only
+             courses.json's stored trees changed. Re-ran Integration day's
+             Example 1 afterward to confirm no regression: still zero
+             flags, requirements_met true, 128/128 credits. Covered by the
+             new data/tools/test_build_courses_json.py (7 tests). Does not
+             touch the other 21 safe cases or attempt to guess corrections
+             for any of the 76 codes (that remains CSC128's documented
+             policy in CONFLICT-LOG.md, unchanged); see the Course catalog
+             section there for the full writeup.

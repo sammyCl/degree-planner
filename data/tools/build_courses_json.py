@@ -240,6 +240,42 @@ def merge(rows: list[dict], notes: dict[str, list[str]]) -> list[dict]:
     return merged
 
 
+def _resolve_unknown_refs(req: dict | None, known: set[str]) -> tuple[dict | None, bool]:
+    """A course reference to a code not in the catalog (typo or retired course) is a dead
+    requirement that can never be satisfied. Left alone, it is either harmless (an OR with another,
+    real branch already covers it) or a trap (an AND, or an OR where every branch is unknown, that
+    the validator will flag forever with no way for the student to move past it).
+
+    Returns the rewritten requirement and whether it has at least one real, satisfiable path.
+    A course node is valid when its code is known; exception and None are always valid (the
+    validator already lets the student override those). An AND is valid only once every branch is;
+    any bare unknown-code branch it still has becomes an exception, so the AND can still be met by
+    override instead of being permanently broken. An OR is valid as soon as one branch is: when
+    another branch already works, its unknown-code siblings are left exactly as they are (a dead
+    but harmless branch) rather than turned into exceptions too, because the validator surfaces
+    every exception label regardless of whether another OR branch is satisfied (BUG-026(d), held
+    back); turning a harmless branch into an exception would raise a false exception_claimed on an
+    otherwise-clean plan. Only once no OR branch is real does it fall back to the AND treatment.
+    """
+    if req is None:
+        return None, True
+    if req["type"] == "course":
+        return req, req["code"] in known
+    if req["type"] == "exception":
+        return req, True
+    children = [_resolve_unknown_refs(sub, known) for sub in req["of"]]
+    if req["type"] == "OR" and any(valid for _, valid in children):
+        return {"type": "OR", "of": [child for child, _ in children]}, True
+    # AND, or an OR with no real branch at all: every still-bare unknown-code child becomes an
+    # exception (a child that is itself an AND/OR already resolved itself by this point).
+    fixed = [
+        child if child["type"] != "course" or valid else
+        {"type": "exception", "label": f'the catalog names "{child["code"]}" here, which is not a course in our data; confirm with your advisor'}
+        for child, valid in children
+    ]
+    return {"type": req["type"], "of": fixed}, True
+
+
 def build() -> tuple[list[dict], dict[str, list[str]], Counter]:
     notes: dict[str, list[str]] = defaultdict(list)
     stats: Counter = Counter()
@@ -321,6 +357,15 @@ def build() -> tuple[list[dict], dict[str, list[str]], Counter]:
             if ref not in known:
                 stats["references to codes not in the catalog"] += 1
                 notes["unknown references"].append(f"{code} -> {ref}")
+
+        # Rewrite only the branches that would otherwise be a dead end (see
+        # _resolve_unknown_refs): a harmless unknown-code sibling in an already-satisfiable OR is
+        # left exactly as it was, so this does not touch the review file's counts above.
+        for field in ("prerequisites", "corequisites"):
+            resolved, _ = _resolve_unknown_refs(course[field], known)
+            if resolved != course[field]:
+                stats["unknown references turned into an overridable exception"] += 1
+            course[field] = resolved
     link_equivalents(courses, notes, stats)
     inferred = infer_equivalents(courses, notes, stats)
     INFERRED_JSON.write_text(json.dumps(inferred, indent=1) + "\n", encoding="utf-8")
