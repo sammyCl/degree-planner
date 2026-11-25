@@ -9,7 +9,9 @@ import {
   indexPlan,
   insertSemester,
   isRemovable,
+  attachedLabs,
   movePlanned,
+  togetherWith,
   nextRegularTerm,
   removeSemester,
   subjectColor,
@@ -154,5 +156,45 @@ describe('terms', () => {
     expect(summerSlots(samplePlan).map((s) => s.label)).toEqual(['Summer 2027', 'Summer 2028', 'Summer 2029', 'Summer 2030'])
     const withSummer = insertSemester(samplePlan, 2, 'Summer 2027')
     expect(summerSlots(withSummer).map((s) => s.label)).not.toContain('Summer 2027')
+  })
+})
+
+describe('labs that go with a lecture', () => {
+  const course = (code: string, status: 'planned' | 'completed' = 'planned') => ({
+    course_id: `c-${code}`,
+    code,
+    title: code,
+    credits: 1,
+    status,
+  })
+  const withLab = (labStatus: 'planned' | 'completed' = 'planned') => ({
+    ...samplePlan,
+    semesters: samplePlan.semesters.map((sem, i) =>
+      i === 0 ? { ...sem, courses: [...sem.courses, course('CHGN221'), course('CHGN223', labStatus)] } : sem,
+    ),
+  })
+
+  it('draws a lab under its lecture and finds the pair from either one', () => {
+    const plan = withLab()
+    expect(attachedLabs(plan).get('c-CHGN223')).toBe('c-CHGN221')
+    expect(togetherWith(plan, 'c-CHGN221').sort()).toEqual(['c-CHGN221', 'c-CHGN223'])
+    expect(togetherWith(plan, 'c-CHGN223').sort()).toEqual(['c-CHGN221', 'c-CHGN223'])
+    expect(togetherWith(plan, 'sem-1-csm101')).toEqual(['sem-1-csm101'])
+  })
+
+  it('moves the lecture and its lab as one, whichever is moved', () => {
+    for (const moved of ['c-CHGN221', 'c-CHGN223']) {
+      const plan = movePlanned(withLab(), moved, 1)
+      const codes = (i: number) => plan.semesters[i].courses.map((c) => c.code)
+      expect(codes(1)).toEqual(expect.arrayContaining(['CHGN221', 'CHGN223']))
+      expect(codes(0)).not.toContain('CHGN221')
+      expect(codes(0)).not.toContain('CHGN223')
+    }
+  })
+
+  it('leaves a completed lab where it is', () => {
+    const plan = movePlanned(withLab('completed'), 'c-CHGN221', 1)
+    expect(plan.semesters[0].courses.map((c) => c.code)).toContain('CHGN223')
+    expect(plan.semesters[1].courses.map((c) => c.code)).toContain('CHGN221')
   })
 })

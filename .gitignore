@@ -18,5 +18,8 @@ Group 9_Project 4_Proposal.pdf
 backend/eval/examples/private/
 backend/eval/results/
 
+# Local record of failed agent runs (agent-failures.jsonl): the reason Claude Code gave, never committed
+backend/logs/
+
 # Claude Code per-person settings (may hold local permissions)
 .claude/settings.local.json

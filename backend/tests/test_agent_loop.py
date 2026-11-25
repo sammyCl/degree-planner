@@ -299,6 +299,30 @@ def test_error_result_is_cannot_work_without_its_text(connection: sqlite3.Connec
     assert response.explanation == EMPTY_EXPLANATION  # Claude Code's message is not shown to the student
 
 
+def test_error_result_is_kept_in_the_failure_log_but_not_the_students_completed_courses(connection: sqlite3.Connection) -> None:
+    import json
+    import os
+    from pathlib import Path
+
+    result = claude_result("API Error: 529 overloaded", subtype="error_during_execution")
+    run_agent(connection, make_request(), runner=FakeClaude([("check_plan", GOOD_PLAN)], result))
+
+    lines = (Path(os.environ["DEGREE_PLANNER_LOG_DIR"]) / "agent-failures.jsonl").read_text().splitlines()
+    entry = json.loads(lines[-1])
+    assert entry["problem"] == STOPPED_PROBLEM
+    assert "529 overloaded" in entry["claude_result"]  # the real reason, which the student never sees
+    assert "completed_courses" not in entry["request"]
+    assert entry["request"]["programs"]
+
+
+def test_a_run_that_finishes_writes_no_failure_log(connection: sqlite3.Connection) -> None:
+    import os
+    from pathlib import Path
+
+    run_agent(connection, make_request(), runner=FakeClaude([("check_plan", GOOD_PLAN)], claude_result("Done.")))
+    assert not (Path(os.environ["DEGREE_PLANNER_LOG_DIR"]) / "agent-failures.jsonl").exists()
+
+
 def test_timeout_is_cannot_work_with_the_plan_so_far(connection: sqlite3.Connection) -> None:
     response = run_agent(connection, make_request(), runner=FakeClaude([("check_plan", HALF_PLAN)], timed_out=True))
 

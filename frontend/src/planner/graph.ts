@@ -1,5 +1,6 @@
 // Read-only helpers over a plan. The frontend never computes flags or prerequisite edges itself: the backend's
 // validator does (docs/plan-format.md). These functions only index what the plan already says, for drawing.
+import labPairs from './labPairs.json'
 import type { Flag, Plan, PlannedCourse } from '../types.ts'
 
 export interface PlanIndex {
@@ -118,14 +119,43 @@ export function subjectColor(code: string): string {
 
 const sumCredits = (courses: PlannedCourse[]): number => courses.reduce((sum, c) => sum + c.credits, 0)
 
-/** The plan with one planned course moved to the end of another semester. */
+const LAB_OF: Record<string, string> = labPairs
+
+/**
+ * The planned courses that travel together with this one: a lecture and its lab(s) taken in the same semester.
+ * Always includes the course itself; a completed course, or one with no partner in its semester, is alone.
+ */
+export function togetherWith(plan: Plan, courseId: string): string[] {
+  const semester = plan.semesters.find((s) => s.courses.some((c) => c.course_id === courseId))
+  const me = semester?.courses.find((c) => c.course_id === courseId)
+  if (!semester || !me || me.status !== 'planned') return [courseId]
+  const lectureCode = LAB_OF[me.code] ?? me.code // a lab's lecture, or the course itself when it is the lecture
+  return semester.courses
+    .filter((c) => c.status === 'planned' && (c.code === lectureCode || LAB_OF[c.code] === lectureCode))
+    .map((c) => c.course_id)
+}
+
+/** For each lab shown attached to a lecture in the same semester: the lab's course_id to the lecture's. */
+export function attachedLabs(plan: Plan): Map<string, string> {
+  const result = new Map<string, string>()
+  for (const s of plan.semesters) {
+    for (const lab of s.courses) {
+      const lecture = LAB_OF[lab.code] && s.courses.find((c) => c.code === LAB_OF[lab.code])
+      if (lecture) result.set(lab.course_id, lecture.course_id)
+    }
+  }
+  return result
+}
+
+/** The plan with one planned course (and the lab or lecture that goes with it) moved to the end of another semester. */
 export function movePlanned(plan: Plan, courseId: string, toIndex: number): Plan {
   const fromIndex = plan.semesters.findIndex((s) => s.courses.some((c) => c.course_id === courseId))
   if (fromIndex < 0 || toIndex < 0 || toIndex >= plan.semesters.length || fromIndex === toIndex) return plan
-  const course = plan.semesters[fromIndex].courses.find((c) => c.course_id === courseId)!
+  const ids = new Set(togetherWith(plan, courseId))
+  const moving = plan.semesters[fromIndex].courses.filter((c) => ids.has(c.course_id))
   const semesters = plan.semesters.map((s, i) => {
     if (i !== fromIndex && i !== toIndex) return s
-    const courses = i === fromIndex ? s.courses.filter((c) => c.course_id !== courseId) : [...s.courses, course]
+    const courses = i === fromIndex ? s.courses.filter((c) => !ids.has(c.course_id)) : [...s.courses, ...moving]
     return { ...s, courses, total_credits: sumCredits(courses) }
   })
   return { ...plan, semesters }

@@ -17,7 +17,7 @@ const Tick = ({ ok }: { ok: boolean }) => (
 
 /** A short summary of the plan under the board: what is met, what to look at, and what the assistant chose. */
 export function PlanSummary({ plan, explanation }: Props) {
-  // starts closed under the board, so the flowchart is what the student sees first
+  // starts closed under the board so the flowchart comes first, but the top few lines stay visible as a peek
   const [open, setOpen] = useState(false)
   const checklist = useMemo(() => buildChecklist(plan), [plan])
   const checks = useMemo(() => buildChecks(plan), [plan])
@@ -32,7 +32,7 @@ export function PlanSummary({ plan, explanation }: Props) {
           {open ? 'Hide' : 'Show'}
         </button>
       </div>
-      {open && (
+      <div className={open ? 'about-body' : 'about-body peek'} inert={!open}>
         <div className="about-grid">
           <div className="about-card c-req">
             <h3>Degree requirements</h3>
@@ -84,7 +84,7 @@ export function PlanSummary({ plan, explanation }: Props) {
             </div>
           )}
         </div>
-      )}
+      </div>
     </section>
   )
 }

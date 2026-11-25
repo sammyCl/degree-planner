@@ -14,10 +14,12 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import sqlite3
 import subprocess
 import sys
 import tempfile
+from datetime import datetime, timezone
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable
@@ -67,6 +69,45 @@ STOPPED_PROBLEM = "The agent stopped with an error before it finished."
 EMPTY_EXPLANATION = "The agent finished without writing an explanation."
 
 
+# Where failed runs are written, one JSON line each: backend/logs/agent-failures.jsonl (git-ignored, local only).
+# DEGREE_PLANNER_LOG_DIR moves it; the tests point it at a temporary folder.
+LOG_DIR_ENV = "DEGREE_PLANNER_LOG_DIR"
+FAILURE_LOG = "agent-failures.jsonl"
+
+
+def _log_dir() -> Path:
+    return Path(os.environ.get(LOG_DIR_ENV) or Path(__file__).resolve().parents[3] / "logs")
+
+
+def record_failure(request: AgentRequest, problem: str, run: ClaudeRun) -> None:
+    """Keep why a run did not finish: Claude Code's own message and stderr, which the student never sees.
+    The request is kept as a summary only (programs, term, semester count), never the completed courses."""
+    result = run.result or {}
+    detail = {k: v for k, v in result.items() if k not in ("usage", "modelUsage")}
+    entry = {
+        "time": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "problem": problem,
+        "timed_out": run.timed_out,
+        "claude_result": json.dumps(detail, default=str)[:4000],
+        "stderr": run.stderr.strip()[-2000:],
+        "request": {
+            "degree_level": request.student.degree_level,
+            "programs": request.student.programs,
+            "catalog_year": request.student.catalog_year,
+            "semesters": request.semesters,
+            "start_term": request.start_term,
+        },
+    }
+    logger.warning("agent run failed: %s | claude said: %s", problem, entry["claude_result"][:500])
+    try:
+        directory = _log_dir()
+        directory.mkdir(parents=True, exist_ok=True)
+        with open(directory / FAILURE_LOG, "a", encoding="utf-8") as f:
+            f.write(json.dumps(entry) + "\n")
+    except OSError:
+        logger.exception("could not write the agent failure log")
+
+
 class ClaudeCodeError(RuntimeError):
     """Claude Code could not run at all (not installed, not signed in, unreadable output).
     A server problem, not something about the student's plan, so it is raised, not "cannot_work"."""
@@ -78,6 +119,7 @@ class ClaudeRun:
 
     result: dict[str, Any] | None
     timed_out: bool = False
+    stderr: str = ""  # what claude wrote to stderr, kept for the failure log
 
 
 # (command, first message, working directory) -> ClaudeRun. Replaced in tests.
@@ -109,9 +151,10 @@ def run_agent(connection: sqlite3.Connection, request: AgentRequest, runner: Run
         if result.get("subtype") == "error_max_turns":
             stop_problem = STEP_LIMIT_PROBLEM
         elif result.get("is_error") or result.get("subtype") != "success":
-            logger.warning("claude -p stopped with %r", result.get("subtype"))
             stop_problem = STOPPED_PROBLEM
             final_text = ""  # on an error the result text is Claude Code's message, not the agent's
+    if stop_problem:
+        record_failure(request, stop_problem, run)
     return _build_response(connection, context_for(request), plan_input, final_text.strip(), stop_problem, usage)
 
 
@@ -156,7 +199,7 @@ def run_claude(command: list[str], first_message: str, cwd: Path, timeout: float
         raise ClaudeCodeError(f"claude -p exited {completed.returncode} without a JSON result") from exc
     if not isinstance(result, dict):
         raise ClaudeCodeError("claude -p returned JSON that is not an object")
-    return ClaudeRun(result=result)
+    return ClaudeRun(result=result, stderr=completed.stderr or "")
 
 
 def _mcp_config(db_path: Path, request_path: Path, plan_path: Path, mode: str = "plan",

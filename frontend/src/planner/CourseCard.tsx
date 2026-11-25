@@ -22,19 +22,22 @@ interface Props {
   dragging?: boolean
   onDragStart?: (id: string) => void
   onDragEnd?: () => void
+  /** set for a lab drawn under its lecture: the lecture's code */
+  attachedTo?: string
   /** set briefly after a flag is clicked in the flags list, to draw the eye */
   pulse?: boolean
 }
 
-export function CourseCard({ course, flag, label, state, col, row, setRef, onEnter, onLeave, onOpen, canDrag, dragging, onDragStart, onDragEnd, pulse }: Props) {
+export function CourseCard({ course, flag, label, state, col, row, setRef, onEnter, onLeave, onOpen, canDrag, dragging, onDragStart, onDragEnd, pulse, attachedTo }: Props) {
   const open = flag && !flag.overridden
   const kind = open ? flagKind(flag) : null
   const aria =
     `${course.code} ${course.title}, ${formatCredits(course.credits)} credits` +
     (label ? `, ${label.primary}${label.also ? ` and ${label.also}` : ''}` : '') +
     (course.status === 'completed' ? ', completed' : '') +
+    (attachedTo ? `, lab taken together with ${attachedTo}` : '') +
     (flag ? `. Problem: ${flag.message}` : '')
-  const classes = ['card', kind === 'error' ? 'flagged' : '', kind === 'warning' ? 'warned' : '', kind === 'confirm' ? 'confirm' : '', course.status === 'completed' ? 'completed' : '', state, pulse ? 'pulse' : '', dragging ? 'dragging' : '']
+  const classes = ['card', kind === 'error' ? 'flagged' : '', kind === 'warning' ? 'warned' : '', kind === 'confirm' ? 'confirm' : '', course.status === 'completed' ? 'completed' : '', state, pulse ? 'pulse' : '', dragging ? 'dragging' : '', attachedTo ? 'attached' : '']
     .filter(Boolean)
     .join(' ')
   return (
@@ -72,6 +75,7 @@ export function CourseCard({ course, flag, label, state, col, row, setRef, onEnt
         {label && <span className={`card-tag cat-${categoryOf(label.primary)}`}>{label.primary}</span>}
       </div>
       <div className="card-title">{course.title}</div>
+      {attachedTo && <div className="card-lab">Lab: taken with {attachedTo}</div>}
       {open && (
         <div className="card-warn" aria-hidden="true">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">

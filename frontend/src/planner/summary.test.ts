@@ -67,11 +67,17 @@ describe('buildChecklist', () => {
   })
 })
 
+/** the sample plan has CSCI303, which the data treats as the same course as DSCI403; these tests are about other notes */
+const withoutAssumedEquivalents = (plan: Plan): Plan => ({
+  ...plan,
+  semesters: plan.semesters.map((s) => ({ ...s, courses: s.courses.filter((c) => c.code !== 'CSCI303') })),
+})
+
 describe('buildChecks', () => {
   const flag = (over: object) => ({ flag_id: 'f', type: 'exception_claimed', severity: 'warning', course_id: 'sem-1-csci128', message: 'CSCI128 relies on a claimed exception (instructor consent); confirm it still applies.', overridable: true, overridden: false, ...over })
 
   it('names the course by title and says what to confirm, without the number', () => {
-    const plan = { ...samplePlan, flags: [flag({})] } as Plan
+    const plan = { ...withoutAssumedEquivalents(samplePlan), flags: [flag({})] } as Plan
     expect(buildChecks(plan)).toEqual([
       { title: 'Computer Science for STEM', text: 'needs instructor consent; confirm it still applies', kind: 'confirm' },
     ])
@@ -79,7 +85,7 @@ describe('buildChecks', () => {
 
   it('includes warnings, leaves out errors and overridden flags', () => {
     const plan = {
-      ...samplePlan,
+      ...withoutAssumedEquivalents(samplePlan),
       flags: [
         flag({ flag_id: 'w', type: 'credit_shortfall', course_id: null, message: 'Spring 2030 is light.' }),
         flag({ flag_id: 'e', type: 'broken_prerequisite', severity: 'error' }),
@@ -88,6 +94,36 @@ describe('buildChecks', () => {
     } as Plan
     const checks = buildChecks(plan)
     expect(checks).toEqual([{ title: '', text: 'Spring 2030 is light.', kind: 'warning' }])
+  })
+})
+
+describe('buildChecks: assumed equivalents and the minor credit note', () => {
+  const course = (code: string, title: string) => ({ course_id: `c-${code}`, code, title, credits: 3, status: 'planned' as const })
+  const withCourses = (codes: [string, string][], programs: string[], total = 142): Plan => ({
+    ...samplePlan,
+    flags: [],
+    student: { ...samplePlan.student, programs },
+    summary: { ...samplePlan.summary, total_credits: total, total_credits_required: 131 },
+    semesters: [{ ...samplePlan.semesters[0], courses: codes.map(([c, t]) => course(c, t)) }],
+  })
+
+  it('asks the student to confirm a course the data treats as the same as another', () => {
+    const checks = buildChecks(withCourses([['MNGN310', 'Earth Materials']], ['mining-bs']))
+    const item = checks.find((c) => c.title === 'Earth Materials')!
+    expect(item.kind).toBe('confirm')
+    expect(item.text).toContain('GEOL310')
+    expect(item.text).toContain('Confirm with your advisor')
+    expect(buildChecks(withCourses([['MATH111', 'Calculus']], ['mining-bs'])).some((c) => c.kind === 'confirm')).toBe(false)
+  })
+
+  it('says a minor adds about 9 credits beyond the degree, with this plan\'s numbers', () => {
+    const checks = buildChecks(withCourses([['MATH111', 'Calculus']], ['mining-bs', 'biology-minor']))
+    const note = checks.find((c) => c.title === 'Credits')!
+    expect(note.kind).toBe('info')
+    expect(note.text).toContain('A minor adds about 9 credits beyond your degree')
+    expect(note.text).toContain('142 credits')
+    expect(note.text).toContain('131')
+    expect(buildChecks(withCourses([['MATH111', 'Calculus']], ['mining-bs'])).some((c) => c.title === 'Credits')).toBe(false)
   })
 })
 

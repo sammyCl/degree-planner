@@ -1,0 +1,37 @@
+[
+ {
+  "codes": [
+   "CSCI303",
+   "DSCI403"
+  ],
+  "reason": "same title and description, and EBGN280 names both as prerequisites"
+ },
+ {
+  "codes": [
+   "ENGY475",
+   "MEGN475"
+  ],
+  "reason": "same title and description, and NUGN510 names both as prerequisites"
+ },
+ {
+  "codes": [
+   "GEOL310",
+   "MNGN310"
+  ],
+  "reason": "same title and description, and GEOL311 names both as prerequisites"
+ },
+ {
+  "codes": [
+   "MLGN502",
+   "PHGN440"
+  ],
+  "reason": "same title and description, and MLGN607 names both as prerequisites"
+ },
+ {
+  "codes": [
+   "GEOL311",
+   "MNGN311"
+  ],
+  "reason": "same title, description, number and prerequisites as an equivalent pair of the same two subjects"
+ }
+]

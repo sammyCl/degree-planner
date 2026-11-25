@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
+import { PROGRAMS } from '../setup/validate.ts'
 import { samplePlan } from '../samplePlan.ts'
 import { PlannerPage } from './PlannerPage.tsx'
 
@@ -92,14 +93,50 @@ describe('PlannerPage', () => {
     expect(screen.getByRole('dialog', { name: 'MATH213 details' })).toBeInTheDocument()
   })
 
-  it('lists every flag and goes to the course when one is chosen', () => {
+  it('lists only the errors when Errors is clicked, and goes to the course when one is chosen', () => {
     setup()
     fireEvent.click(screen.getByRole('button', { name: '2 errors' }))
     const items = screen.getAllByRole('menuitem')
-    expect(items).toHaveLength(samplePlan.flags.length)
+    expect(items).toHaveLength(samplePlan.flags.filter((f) => f.severity === 'error').length)
+    expect(items.some((i) => /credit/i.test(i.textContent ?? '') && /warning|short/i.test(i.textContent ?? ''))).toBe(false)
     fireEvent.click(items.find((i) => /out of order/i.test(i.textContent ?? ''))!)
     expect(screen.queryByRole('menu')).not.toBeInTheDocument()
     expect(card('CSCI400')).toHaveClass('pulse')
+  })
+
+  it('lists only the warnings, or only the to-confirm items, for the badge that was clicked', () => {
+    const confirm = {
+      flag_id: 'c1',
+      type: 'exception_claimed' as const,
+      severity: 'warning' as const,
+      course_id: 'sem-2-csci200',
+      message: 'CSCI200 relies on a claimed exception; confirm it still applies.',
+      overridable: true,
+      overridden: false,
+    }
+    render(<PlannerPage plan={{ ...samplePlan, flags: [...samplePlan.flags, confirm] }} onBack={vi.fn()} />)
+    fireEvent.click(screen.getByRole('button', { name: '1 to confirm' }))
+    expect(screen.getByRole('menu', { name: 'To confirm' })).toBeInTheDocument()
+    expect(screen.getAllByRole('menuitem')).toHaveLength(1)
+    expect(screen.getByRole('menuitem')).toHaveTextContent('claimed exception')
+    fireEvent.click(screen.getByRole('button', { name: '1 warning' }))
+    expect(screen.getByRole('menu', { name: 'Warnings' })).toBeInTheDocument()
+    expect(screen.getAllByRole('menuitem')).toHaveLength(1)
+    expect(screen.getByRole('menuitem')).not.toHaveTextContent('claimed exception')
+    fireEvent.click(screen.getByRole('button', { name: '2 errors' }))
+    expect(screen.getAllByRole('menuitem')).toHaveLength(2)
+  })
+
+  it('keeps the colour and label key closed until the Key button is pressed, and closes it with Escape', () => {
+    setup()
+    expect(screen.queryByRole('dialog', { name: 'Colour and label key' })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Key' }))
+    const key = screen.getByRole('dialog', { name: 'Colour and label key' })
+    expect(key).toHaveTextContent('Required for your degree')
+    expect(key).toHaveTextContent('Minor core')
+    expect(key).toHaveTextContent('over 19 credits')
+    fireEvent.keyDown(document, { key: 'Escape' })
+    expect(screen.queryByRole('dialog', { name: 'Colour and label key' })).not.toBeInTheDocument()
   })
 
   it('marks an under-full-time semester', () => {
@@ -112,7 +149,7 @@ describe('PlannerPage', () => {
   it('lists the problems when the assistant could not finish a valid plan', () => {
     setup(vi.fn(), { problems: ['CSCI400 cannot be placed after CSCI306.', 'Not enough credits.'] })
     const alert = screen.getByRole('alert')
-    expect(alert).toHaveTextContent('could not finish a valid plan')
+    expect(alert).toHaveTextContent('could not build a plan that passes every rule')
     expect(within(alert).getAllByRole('listitem')).toHaveLength(2)
   })
 
@@ -133,13 +170,15 @@ describe('PlannerPage', () => {
 
   it('lists what to check by course title, and says so when there is nothing', () => {
     const flag = { flag_id: 'x', type: 'exception_claimed' as const, severity: 'warning' as const, course_id: 'sem-1-csci128', message: 'CSCI128 relies on a claimed exception (instructor consent); confirm it still applies.', overridable: true, overridden: false }
-    const { unmount } = render(<PlannerPage plan={{ ...samplePlan, flags: [flag] }} onBack={vi.fn()} />)
+    // CSCI303 is treated as the same course as DSCI403, which adds its own note; leave it out here
+    const plain = { ...samplePlan, semesters: samplePlan.semesters.map((s) => ({ ...s, courses: s.courses.filter((c) => c.code !== 'CSCI303') })) }
+    const { unmount } = render(<PlannerPage plan={{ ...plain, flags: [flag] }} onBack={vi.fn()} />)
     fireEvent.click(screen.getByRole('button', { name: 'Show' }))
     const card = screen.getByRole('heading', { name: 'Things to check' }).closest('.about-card') as HTMLElement
     expect(card).toHaveTextContent('Computer Science for STEM needs instructor consent; confirm it still applies')
     expect(card.textContent).not.toMatch(/CSCI128/)
     unmount()
-    render(<PlannerPage plan={{ ...samplePlan, flags: [] }} onBack={vi.fn()} />)
+    render(<PlannerPage plan={{ ...plain, flags: [] }} onBack={vi.fn()} />)
     fireEvent.click(screen.getByRole('button', { name: 'Show' }))
     expect(screen.getByText('Nothing needs your attention.')).toBeInTheDocument()
   })
@@ -157,16 +196,30 @@ describe('PlannerPage', () => {
     expect(screen.queryByRole('heading', { name: 'Choices I made' })).not.toBeInTheDocument()
   })
 
-  it('puts the About panel under the board, closed until the student opens it', () => {
+  it('puts the About panel under the board, showing only a peek until the student opens it', () => {
     setup()
     const board = screen.getByTestId('board')
     const about = screen.getByRole('region', { name: 'About this plan' })
     expect(board.compareDocumentPosition(about) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy() // the board comes first
-    expect(screen.queryByRole('heading', { name: 'Degree requirements' })).not.toBeInTheDocument()
+    const body = about.querySelector('.about-body') as HTMLElement
+    expect(body).toHaveClass('peek') // the first lines are in the page but cut off, and cannot be tabbed into
+    expect(body).toHaveAttribute('inert')
     fireEvent.click(screen.getByRole('button', { name: 'Show' }))
-    expect(screen.getByRole('heading', { name: 'Degree requirements' })).toBeInTheDocument()
+    expect(body).not.toHaveClass('peek')
+    expect(body).not.toHaveAttribute('inert')
     fireEvent.click(screen.getByRole('button', { name: 'Hide' }))
-    expect(screen.queryByRole('heading', { name: 'Degree requirements' })).not.toBeInTheDocument()
+    expect(body).toHaveClass('peek')
+  })
+
+  it('warns at the top when the plan uses an ASI from an older catalog, and says nothing otherwise', () => {
+    const { unmount } = render(<PlannerPage plan={samplePlan} onBack={vi.fn()} />)
+    expect(screen.queryByRole('note')).not.toBeInTheDocument()
+    unmount()
+    const asi = PROGRAMS.find((p) => p.level === 'asi')!
+    render(<PlannerPage plan={{ ...samplePlan, student: { ...samplePlan.student, programs: [...samplePlan.student.programs, asi.id] } }} onBack={vi.fn()} />)
+    const note = screen.getByRole('note')
+    expect(note).toHaveTextContent('may not be up to date')
+    expect(note).toHaveTextContent(`from the ${asi.catalog_year} catalog, not 2026-2027`)
   })
 
   it('keeps the "could not finish" alert above the board, where it is seen first', () => {

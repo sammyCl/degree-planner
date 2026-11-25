@@ -118,6 +118,87 @@ def link_equivalents(courses: list[dict], notes: dict[str, list[str]], stats: Co
             stats["courses with an equivalent"] += 1
 
 
+SKIP_INFERENCE = re.compile(r"special topics|independent study|research|thesis|seminar", re.I)
+INFERRED_JSON = ROOT / "frontend" / "src" / "planner" / "inferredEquivalents.json"
+
+
+def _norm(text: str) -> str:
+    return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9 ]", " ", text.lower())).strip()
+
+
+def _codes_in(req: dict | None) -> set[str]:
+    if req is None:
+        return set()
+    if req["type"] == "course":
+        return {req["code"]}
+    if req["type"] in ("AND", "OR"):
+        return set().union(*[_codes_in(x) for x in req["of"]]) if req["of"] else set()
+    return set()
+
+
+def infer_equivalents(courses: list[dict], notes: dict[str, list[str]], stats: Counter) -> list[dict]:
+    """Treat courses as equivalent when the catalog never says so but the data strongly suggests it (the team's rule).
+
+    Only courses with the same title, the same description and the same credits are considered. Then:
+      1. Both are named in the prerequisites or corequisites of the same other course (for example MNGN311 asks
+         for "GEOL310 or MNGN310"): the catalog treats them as interchangeable.
+      2. Same number, different subject, the same prerequisites once rule 1's equivalents are treated as one, and
+         the same two subjects as a pair rule 1 already found (GEOL and MNGN): the twin of a pair found by rule 1.
+    Courses that only differ by level (a 400 and a 500 version of the same text) are never matched.
+    The planner shows each of these as something to confirm. Returns [{"codes": [...], "reason": "..."}].
+    """
+    by_code = {c["code"]: c for c in courses}
+    groups: dict[tuple, list[str]] = defaultdict(list)
+    for c in courses:
+        if SKIP_INFERENCE.search(c["title"]) or "XX" in c["code"]:
+            continue
+        groups[(_norm(c["title"]), _norm(c["description"]), c["credits"])].append(c["code"])
+    identical = [sorted(v) for v in groups.values() if len(v) > 1]
+    found: list[dict] = []
+
+    def link(codes: list[str], reason: str) -> None:
+        new = [(a, b) for i, a in enumerate(codes) for b in codes[i + 1 :] if b not in by_code[a].get("equivalent_with", [])]
+        if not new:
+            return  # the catalog already says so
+        for a, b in new:
+            by_code[a].setdefault("equivalent_with", []).append(b)
+            by_code[b].setdefault("equivalent_with", []).append(a)
+        found.append({"codes": codes, "reason": reason})
+
+    linked_subjects: set[frozenset[str]] = set()
+    for group in identical:  # rule 1
+        for c in courses:
+            named = (_codes_in(c.get("prerequisites")) | _codes_in(c.get("corequisites"))) & set(group)
+            if len(named) >= 2:
+                link(sorted(named), f"same title and description, and {c['code']} names both as prerequisites")
+                linked_subjects.add(frozenset(by_code[x]["subject"] for x in named))
+    canon = {}
+    for entry in found:
+        for code in entry["codes"]:
+            canon[code] = entry["codes"][0]
+
+    def shape(req):
+        if isinstance(req, dict):
+            return {k: (canon.get(v, v) if k == "code" else shape(v)) for k, v in req.items()}
+        if isinstance(req, list):
+            return sorted((shape(v) for v in req), key=json.dumps)
+        return req
+
+    for group in identical:  # rule 2
+        numbers = {by_code[x]["number"] for x in group}
+        subjects = frozenset(by_code[x]["subject"] for x in group)
+        same_prereqs = len({json.dumps(shape(by_code[x].get("prerequisites")), sort_keys=True) for x in group}) == 1
+        if len(numbers) == 1 and subjects in linked_subjects and same_prereqs:
+            link(group, "same title, description, number and prerequisites as an equivalent pair of the same two subjects")
+    for entry in found:
+        notes["inferred equivalents"].append(f"{', '.join(entry['codes'])}: {entry['reason']}")
+    for c in courses:
+        if "equivalent_with" in c:
+            c["equivalent_with"] = sorted(set(c["equivalent_with"]))
+    stats["equivalent groups inferred (not in the catalog text)"] = len(found)
+    return found
+
+
 def load_rows() -> list[dict]:
     rows = []
     for name, grad in [("mines-courses.csv", False), ("mines-graduate-courses.csv", True)]:
@@ -241,6 +322,8 @@ def build() -> tuple[list[dict], dict[str, list[str]], Counter]:
                 stats["references to codes not in the catalog"] += 1
                 notes["unknown references"].append(f"{code} -> {ref}")
     link_equivalents(courses, notes, stats)
+    inferred = infer_equivalents(courses, notes, stats)
+    INFERRED_JSON.write_text(json.dumps(inferred, indent=1) + "\n", encoding="utf-8")
     stats["courses written"] = len(courses)
     stats["codes in both CSVs (merged)"] = sum(1 for r in merged if r["_in_both"])
     return courses, notes, stats
@@ -259,6 +342,7 @@ def write_review(notes: dict[str, list[str]], stats: Counter) -> None:
         "empty prerequisites": "Prerequisite text that produced no requirement",
         "credit ranges": "Variable-credit courses (upper bound used)",
         "independent study": "Independent Study courses (set to 3 credits, not the upper bound)",
+        "inferred equivalents": "Equivalent courses the catalog does not state, inferred by the team's rule (shown to students as to confirm)",
         "equivalent not in catalog": "Equivalent courses named in a description but not in the catalog CSVs (left out)",
     }
     for key, title in caps.items():

@@ -297,6 +297,11 @@
   from { opacity: 0; transform: translateY(-4px) scale(0.98); }
 }
 
+.menu.up {
+  top: auto;
+  bottom: calc(100% + 6px);
+}
+
 .menu-item {
   display: flex;
   align-items: center;
@@ -535,4 +540,8 @@
   .hero h2 {
     font-size: 24px;
   }
+}
+
+.menu-kind.old {
+  color: var(--warn);
 }

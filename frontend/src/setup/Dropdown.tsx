@@ -20,12 +20,18 @@ interface Props {
   ref?: React.Ref<HTMLInputElement>
 }
 
+const MENU_MAX = 260 // keep in step with .menu max-height in SetupPage.css
+const MENU_GAP = 6
+const MENU_EDGE = 12 // keep this far from the window edge
+
 /** A custom dropdown with the same look as the minors/ASIs picker: boxed field, solid menu, keyboard support. */
 export function Dropdown({ options, value, onChange, label, id, placeholder, searchable, invalid, describedBy, ref }: Props) {
   const listId = useId()
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [highlight, setHighlight] = useState(0)
+  // where the menu goes: below the field, or above it (with a smaller height) when the page has no room below
+  const [place, setPlace] = useState<{ up: boolean; maxHeight: number }>({ up: false, maxHeight: MENU_MAX })
   const input = useRef<HTMLInputElement | null>(null)
   // the field is ours and the caller's (for focusing it on an error), so both refs get it
   const setInput = (el: HTMLInputElement | null) => {
@@ -42,6 +48,15 @@ export function Dropdown({ options, value, onChange, label, id, placeholder, sea
   const active = Math.min(highlight, Math.max(0, shown.length - 1))
 
   const openMenu = () => {
+    if (!open) {
+      const box = input.current?.closest('.dd')?.getBoundingClientRect()
+      if (box) {
+        const below = window.innerHeight - box.bottom - MENU_GAP - MENU_EDGE
+        const above = box.top - MENU_GAP - MENU_EDGE
+        const up = below < MENU_MAX && above > below
+        setPlace({ up, maxHeight: Math.max(120, Math.min(MENU_MAX, up ? above : below)) })
+      }
+    }
     if (!open) setHighlight(Math.max(0, shown.findIndex((o) => o.value === value)))
     setOpen(true)
   }
@@ -124,7 +139,13 @@ export function Dropdown({ options, value, onChange, label, id, placeholder, sea
         <span className="dd-chevron" aria-hidden="true" />
       </div>
       {open && (
-        <div className="menu" id={listId} role="listbox" aria-label={label}>
+        <div
+          className={place.up ? 'menu up' : 'menu'}
+          style={{ maxHeight: place.maxHeight }}
+          id={listId}
+          role="listbox"
+          aria-label={label}
+        >
           {shown.length === 0 && <div className="menu-empty">No matches</div>}
           {shown.map((o, i) => (
             <div

@@ -308,6 +308,41 @@
   background: var(--surface);
 }
 
+.planner-notice {
+  min-height: 52px;
+}
+
+/* the way back to the setup page: a real button, not a text link */
+.edit-setup {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--acc);
+  color: #fff;
+  font: 600 14.5px/1 Inter, sans-serif;
+  box-shadow: var(--sh-2);
+  cursor: pointer;
+  transition: background 120ms, transform 80ms, box-shadow 200ms;
+}
+
+.edit-setup:hover {
+  background: var(--acc-bright);
+  box-shadow: var(--sh-3);
+}
+
+.edit-setup:active {
+  transform: scale(0.97);
+}
+
+.edit-setup:focus-visible {
+  outline: 3px solid var(--acc-tint);
+  outline-offset: 2px;
+}
+
 .link {
   border: 0;
   background: none;
@@ -936,6 +971,22 @@
   font: 600 15px/1.2 'Inter Tight', Inter, sans-serif;
 }
 
+.about-body.peek {
+  position: relative;
+  max-height: 128px;
+  overflow: hidden;
+}
+
+/* fades the cut-off text into the page so it reads as "there is more" */
+.about-body.peek::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 64px;
+  background: linear-gradient(to bottom, transparent, var(--surface));
+  pointer-events: none;
+}
+
 .about-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
@@ -1050,6 +1101,11 @@
   border-left-color: var(--acc-bright);
 }
 
+/* a plain explanation, nothing to fix */
+.check-item.info {
+  border-left-color: var(--cat-minor);
+}
+
 /* something the assistant says to confirm with an advisor */
 .check-item.note {
   border-left-color: var(--cat-other);
@@ -1101,4 +1157,206 @@
   margin: 6px 0 0;
   padding-left: 20px;
   color: var(--text);
+}
+
+/* ---------- A lab drawn under its lecture ---------- */
+.card-group {
+  margin-bottom: 8px;
+}
+
+.card-group .card {
+  margin-bottom: 0;
+}
+
+.card-group .card:not(.attached) {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.card-group .card.attached {
+  margin-top: -1px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-top-style: dashed;
+  background: color-mix(in srgb, var(--acc-tint) 55%, var(--raised));
+}
+
+.card-group .card:hover {
+  transform: none;
+}
+
+.card-lab {
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--acc);
+}
+
+.pop-note {
+  margin-top: 10px;
+  padding: 9px 10px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  background: var(--acc-tint);
+  color: var(--acc);
+}
+
+/* ---------- Undo and redo ---------- */
+/* under the flowchart, bottom left; sticky so it stays in view while the board scrolls sideways */
+.board-tools {
+  position: sticky;
+  left: 20px;
+  z-index: 3;
+  display: flex;
+  gap: 8px;
+  width: max-content;
+  margin-top: 6px;
+}
+
+.tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--raised);
+  box-shadow: var(--sh-1);
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.tool:hover:not(:disabled) {
+  border-color: var(--border-strong);
+  box-shadow: var(--sh-2);
+}
+
+.tool:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* in dark mode the accent is light, so the button text goes dark */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .edit-setup {
+    color: #0b1a33;
+  }
+}
+
+:root[data-theme='dark'] .edit-setup {
+  color: #0b1a33;
+}
+
+/* ---------- Key: colours and labels ---------- */
+.key-wrap {
+  position: relative;
+}
+
+.key-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--raised);
+  color: var(--mut);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.key-btn:hover,
+.key-btn[aria-expanded='true'] {
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.key-pop {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 330px;
+  max-width: calc(100vw - 32px);
+  padding: 8px 14px 12px;
+  border-radius: 14px;
+  background: var(--raised);
+  border: 1px solid var(--border);
+  box-shadow: var(--sh-3);
+  font-size: 12.5px;
+  animation: menuIn 160ms var(--ease-out);
+}
+
+.key-sec {
+  margin: 10px 0 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--mut);
+}
+
+.key-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 3px 0;
+  line-height: 1.35;
+}
+
+.key-row .card-tag {
+  margin-left: 0;
+  min-width: 78px;
+  text-align: center;
+}
+
+.key-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+}
+
+.key-dots i {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 3px;
+  border-radius: 50%;
+}
+
+.key-swatch {
+  flex: none;
+  width: 78px;
+  height: 14px;
+  border-radius: 5px;
+  border: 1.5px solid var(--border-strong);
+  background: var(--raised);
+}
+
+.key-swatch.err {
+  border-color: var(--err);
+  background: var(--err-bg);
+}
+
+.key-swatch.warn {
+  border-color: var(--warn);
+  background: var(--warn-bg);
+}
+
+.key-swatch.dashed {
+  border-style: dashed;
+  background: color-mix(in srgb, var(--acc-tint) 55%, var(--raised));
+}
+
+.key-swatch.low {
+  height: 6px;
+  border: 0;
+  background: var(--warn);
+}
+
+.key-swatch.high {
+  height: 6px;
+  border: 0;
+  background: var(--err);
 }

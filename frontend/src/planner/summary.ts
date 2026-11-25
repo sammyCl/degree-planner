@@ -2,6 +2,7 @@
 // should look at, and the choices the planning assistant made. The checklist comes from the backend's own checks
 // (Plan.requirement_status); nothing here decides whether a requirement is met.
 import { PROGRAMS } from '../setup/validate.ts'
+import inferredEquivalents from './inferredEquivalents.json'
 import type { Plan, RequirementStatus } from '../types.ts'
 import { categoryOf, groupCategory, type Category } from './courseLabel.ts'
 import { flagKind, formatCredits, indexPlan, isOpen } from './graph.ts'
@@ -43,7 +44,7 @@ const programTitle = (programId: string): string => PROGRAMS.find((p) => p.id ==
 function rowsFor(statuses: RequirementStatus[]): ChecklistRow[] {
   const merged = new Map<string, RequirementStatus[]>()
   for (const s of statuses) {
-    const category = groupCategory(s.group_id)
+    const category = groupCategory(s.group_id, s.label)
     const key = category === 'Requirement' ? `label:${plainLabel(s.label)}` : category
     merged.set(key, [...(merged.get(key) ?? []), s])
   }
@@ -100,7 +101,7 @@ export interface CheckItem {
   /** the course's title (not its number), or empty for a plan-wide note */
   title: string
   text: string
-  kind: 'confirm' | 'warning'
+  kind: 'confirm' | 'warning' | 'info'
 }
 
 /** What the student should look at: claimed exceptions to confirm, and warnings. Errors are shown on the board itself. */
@@ -118,7 +119,40 @@ export function buildChecks(plan: Plan): CheckItem[] {
       kind,
     })
   }
+  items.push(...inferredEquivalentChecks(plan), ...addOnCreditNote(plan))
   return items
+}
+
+/** Courses the data treats as the same course although the catalog does not say so: the student confirms them. */
+function inferredEquivalentChecks(plan: Plan): CheckItem[] {
+  const inPlan = new Map(plan.semesters.flatMap((s) => s.courses.map((c) => [c.code, c] as const)))
+  const items: CheckItem[] = []
+  for (const group of inferredEquivalents as { codes: string[] }[]) {
+    const mine = group.codes.find((code) => inPlan.has(code))
+    if (!mine) continue
+    const others = group.codes.filter((code) => code !== mine)
+    items.push({
+      title: inPlan.get(mine)!.title,
+      text: `(${mine}) is treated as the same course as ${others.join(' and ')}. The catalog does not say so; the data assumes it because the catalog names both as prerequisites of other courses. Confirm with your advisor.`,
+      kind: 'confirm',
+    })
+  }
+  return items
+}
+
+/** A minor or ASI adds credits to the plan: at least 9 of its credits cannot also count toward the degree. */
+function addOnCreditNote(plan: Plan): CheckItem[] {
+  const levels = plan.student.programs.map((id) => PROGRAMS.find((p) => p.id === id)?.level)
+  const addOn = levels.includes('minor') ? 'minor' : levels.includes('asi') ? 'ASI' : null
+  if (!addOn || !levels.some((l) => l === 'bachelor' || l === 'combined')) return []
+  const { total_credits: total, total_credits_required: required } = plan.summary
+  return [
+    {
+      title: 'Credits',
+      text: `A ${addOn} adds about 9 credits beyond your degree: at least 9 of its credits cannot also count toward the degree, and only free electives can overlap. This plan has ${formatCredits(total)} credits and the degree needs ${formatCredits(required)}.`,
+      kind: 'info',
+    },
+  ]
 }
 
 // ---------- What the assistant wrote ----------

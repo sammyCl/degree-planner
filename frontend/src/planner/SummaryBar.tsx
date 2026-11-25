@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { Flag, Plan } from '../types.ts'
 import { flagCounts, flagKind } from './graph.ts'
+import { Legend } from './Legend.tsx'
 import { useCountUp } from './useCountUp.ts'
 
 const R = 19
@@ -24,6 +25,9 @@ const CheckIcon = () => (
   </svg>
 )
 
+const MENU_NAMES = { error: 'Errors', warning: 'Warnings', confirm: 'To confirm' } as const
+type FlagKind = keyof typeof MENU_NAMES
+
 interface Props {
   plan: Plan
   programName: string
@@ -37,7 +41,8 @@ export function SummaryBar({ plan, programName, onSelectFlag, checking }: Props)
   const { errors, warnings, confirm } = flagCounts(plan.flags)
   const shown = useCountUp(total)
   const [ready, setReady] = useState(false)
-  const [menu, setMenu] = useState(false)
+  // which list is open: only the flags of the badge that was clicked
+  const [menu, setMenu] = useState<FlagKind | null>(null)
   const menuRef = useRef<HTMLDivElement>(null)
 
   // Start the ring empty, then let CSS animate it to the real value.
@@ -48,8 +53,8 @@ export function SummaryBar({ plan, programName, onSelectFlag, checking }: Props)
 
   useEffect(() => {
     if (!menu) return
-    const onDown = (e: MouseEvent) => !menuRef.current?.contains(e.target as Node) && setMenu(false)
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setMenu(false)
+    const onDown = (e: MouseEvent) => !menuRef.current?.contains(e.target as Node) && setMenu(null)
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setMenu(null)
     document.addEventListener('mousedown', onDown)
     document.addEventListener('keydown', onKey)
     return () => {
@@ -58,6 +63,8 @@ export function SummaryBar({ plan, programName, onSelectFlag, checking }: Props)
     }
   }, [menu])
 
+  const toggle = (kind: FlagKind) => setMenu((m) => (m === kind ? null : kind))
+  const listed = menu ? plan.flags.filter((f) => flagKind(f) === menu) : []
   const progress = required > 0 ? Math.min(1, total / required) : 0
   return (
     <div className="bar">
@@ -90,36 +97,36 @@ export function SummaryBar({ plan, programName, onSelectFlag, checking }: Props)
         <button
           type="button"
           className={errors ? 'badge e' : 'badge ok'}
-          aria-expanded={menu}
+          aria-expanded={menu === 'error'}
           aria-haspopup="true"
-          onClick={() => setMenu((m) => !m)}
+          onClick={() => toggle('error')}
         >
           {errors ? <WarnIcon /> : <CheckIcon />}
           {errors ? `${errors} error${errors === 1 ? '' : 's'}` : 'No errors'}
         </button>
         {warnings > 0 && (
-          <button type="button" className="badge w" aria-expanded={menu} aria-haspopup="true" onClick={() => setMenu((m) => !m)}>
+          <button type="button" className="badge w" aria-expanded={menu === 'warning'} aria-haspopup="true" onClick={() => toggle('warning')}>
             <InfoIcon />
             {warnings} warning{warnings === 1 ? '' : 's'}
           </button>
         )}
         {confirm > 0 && (
-          <button type="button" className="badge c" aria-expanded={menu} aria-haspopup="true" onClick={() => setMenu((m) => !m)}>
+          <button type="button" className="badge c" aria-expanded={menu === 'confirm'} aria-haspopup="true" onClick={() => toggle('confirm')}>
             <InfoIcon />
             {confirm} to confirm
           </button>
         )}
         {menu && (
-          <div className="flags-menu" role="menu">
-            {plan.flags.length === 0 && <div className="flags-none">Everything checks out.</div>}
-            {plan.flags.map((f) => (
+          <div className="flags-menu" role="menu" aria-label={MENU_NAMES[menu]}>
+            {listed.length === 0 && <div className="flags-none">{menu === 'error' ? 'No errors.' : 'Nothing here.'}</div>}
+            {listed.map((f) => (
               <button
                 key={f.flag_id}
                 type="button"
                 role="menuitem"
                 className={`flag ${{ error: 'e', warning: 'w', confirm: 'c' }[flagKind(f)]}${f.overridden ? ' done' : ''}`}
                 onClick={() => {
-                  setMenu(false)
+                  setMenu(null)
                   onSelectFlag(f)
                 }}
               >
@@ -148,6 +155,7 @@ export function SummaryBar({ plan, programName, onSelectFlag, checking }: Props)
           <i className="bad" /> out of order
         </span>
       </div>
+      <Legend />
     </div>
   )
 }

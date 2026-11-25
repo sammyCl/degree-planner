@@ -8430,7 +8430,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/compsci/"
-   }
+   },
+   "equivalent_with": [
+    "DSCI403"
+   ]
   },
   {
    "code": "CSCI306",
@@ -11092,7 +11095,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/datascience/"
-   }
+   },
+   "equivalent_with": [
+    "CSCI303"
+   ]
   },
   {
    "code": "DSCI470",
@@ -16185,7 +16191,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/energy/"
-   }
+   },
+   "equivalent_with": [
+    "MEGN475"
+   ]
   },
   {
    "code": "ENGY497",
@@ -18417,7 +18426,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/geology/"
-   }
+   },
+   "equivalent_with": [
+    "MNGN310"
+   ]
   },
   {
    "code": "GEOL311",
@@ -18452,7 +18464,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/geology/"
-   }
+   },
+   "equivalent_with": [
+    "MNGN311"
+   ]
   },
   {
    "code": "GEOL314",
@@ -27994,7 +28009,8 @@
     "url": "https://catalog.mines.edu/coursesaz/mecheng/"
    },
    "equivalent_with": [
-    "EENG475"
+    "EENG475",
+    "ENGY475"
    ]
   },
   {
@@ -29070,7 +29086,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/materialsci/"
-   }
+   },
+   "equivalent_with": [
+    "PHGN440"
+   ]
   },
   {
    "code": "MLGN505",
@@ -29941,7 +29960,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/miningeng/"
-   }
+   },
+   "equivalent_with": [
+    "GEOL310"
+   ]
   },
   {
    "code": "MNGN311",
@@ -29976,7 +29998,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/miningeng/"
-   }
+   },
+   "equivalent_with": [
+    "GEOL311"
+   ]
   },
   {
    "code": "MNGN312",
@@ -38962,7 +38987,10 @@
    "catalog_year": "2026-2027",
    "source": {
     "url": "https://catalog.mines.edu/coursesaz/physics/"
-   }
+   },
+   "equivalent_with": [
+    "MLGN502"
+   ]
   },
   {
    "code": "PHGN441",

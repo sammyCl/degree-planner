@@ -118,6 +118,22 @@ describe('SetupPage', () => {
     expect(screen.queryByRole('button', { name: /^Remove Computer Science/ })).not.toBeInTheDocument()
   })
 
+  it('keeps ASIs in their own picker, apart from minors, with each one marked with its older catalog year', () => {
+    setup()
+    expect(screen.queryByRole('note')).not.toBeInTheDocument() // the catalog warning is on the planner page
+    const box = screen.getByRole('combobox', { name: 'Search ASIs' })
+    fireEvent.focus(box)
+    const options = screen.getAllByRole('option')
+    expect(options.every((o) => o.textContent?.includes('2025-2026'))).toBe(true) // each shows its year
+    fireEvent.mouseDown(options[0])
+    expect(screen.getAllByRole('button', { name: /^Remove / })).toHaveLength(1)
+    // the minors box does not list ASIs
+    fireEvent.blur(box)
+    const minors = screen.getByRole('combobox', { name: 'Search minors' })
+    fireEvent.focus(minors)
+    expect(screen.getAllByRole('option').some((o) => o.textContent?.includes('2025-2026'))).toBe(false)
+  })
+
   it('shows summer terms in the projected graduation when summers are included', () => {
     setup()
     fireEvent.change(semesters(), { target: { value: '3' } })
