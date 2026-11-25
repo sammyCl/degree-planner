@@ -55,7 +55,7 @@ describe('building a plan', () => {
 
     expect(screen.getByRole('heading', { name: 'Building your plan' })).toBeInTheDocument()
     expect(screen.getByRole('status')).toHaveTextContent(/choosing your courses/)
-    expect(document.querySelectorAll('.fact.on')).toHaveLength(1)
+    expect(document.querySelectorAll('.fact-slide.on')).toHaveLength(1)
     expect(calls).toHaveLength(1)
     expect(JSON.parse(calls[0].body as string)).toMatchObject({
       student: { degree_level: 'bachelor', programs: ['cs-bs-general-track'] },
@@ -64,6 +64,7 @@ describe('building a plan', () => {
 
     await act(async () => finish(ok(goodResponse)))
     expect(screen.getByRole('region', { name: 'Fall 2026' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Show' })) // the About panel starts closed, under the board
     expect(screen.getByText('I placed CSCI courses early.')).toBeInTheDocument()
     expect(screen.queryByText(/could not finish a valid plan/)).not.toBeInTheDocument()
   })

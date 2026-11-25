@@ -921,7 +921,7 @@
 .about {
   padding: 4px 20px 14px;
   background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  border-top: 1px solid var(--border);
 }
 
 .about-head {
@@ -1050,6 +1050,11 @@
   border-left-color: var(--acc-bright);
 }
 
+/* something the assistant says to confirm with an advisor */
+.check-item.note {
+  border-left-color: var(--cat-other);
+}
+
 .choice-text {
   font-size: 13px;
   line-height: 1.55;
@@ -1084,6 +1089,12 @@
   background: var(--warn-bg);
   color: var(--warn);
   font-size: 13px;
+}
+
+.planner-problems {
+  margin: 0;
+  border-radius: 0;
+  padding: 10px 20px;
 }
 
 .note-problems ul {

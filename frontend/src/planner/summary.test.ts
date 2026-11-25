@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { samplePlan } from '../samplePlan.ts'
 import type { Plan, RequirementStatus } from '../types.ts'
-import { buildChecklist, buildChecks, extractChoices } from './summary.ts'
+import { buildChecklist, buildChecks, readExplanation } from './summary.ts'
 
 const status = (over: Partial<RequirementStatus>): RequirementStatus => ({
   program_id: 'cs-bs-general-track',
@@ -91,38 +91,56 @@ describe('buildChecks', () => {
   })
 })
 
-describe('extractChoices', () => {
-  // what the assistant really wrote in a real run
+describe('readExplanation', () => {
+  // what the assistant really wrote in a real run (CS General Track, 2026-11-24), shortened
   const real = [
-    'The plan meets every requirement. `check_plan` reports `requirements_met: true` with 130 of 130 credits, and every semester is at or under 18 credits.',
+    'It totals 128 of the 128 required credits across all 8 semesters, with no errors, warnings or open exceptions. No semester goes over 18 credits.',
     '',
-    "**Exceptions you need to decide.** The plan isn't final until you answer each one.",
-    '- **MATH111** relies on a precalculus exception.',
-    '- **CSCI478** relies on a prerequisite exception.',
+    '**Order of courses**',
+    '- **Spring 2027 to Spring 2028:** the first-year core (MATH111, CSCI128), then CSCI200 and CSCI210.',
+    '- **Fall 2028:** CSCI220 and CSCI341.',
     '',
-    '**Choices I made.** I put the biology electives in the second year, and chose CBEN320 for the cell biology slot.',
+    '**Choices I made** (you can change any of these)',
+    '- **Computer Science electives (18 credits):** CSCI403 and CSCI445. I first tried CSCI422, but it needs CSCI262, so I swapped it.',
+    '- **First-year requirement:** I used HASS100 and EDNS151 rather than the honors pair.',
     '',
-    'I kept the summer free.',
+    '**Things to check with your advisor**',
+    "- The catalog lists MATH334's corequisite oddly; I planned only MATH213, and the checker accepted it.",
+    '- The data does not include rules such as requiring one elective at the 400 level, so confirm the final plan with your advisor.',
   ].join('\n')
 
-  it('keeps the choices and drops the tool talk and the exception list', () => {
-    const blocks = extractChoices(real)
-    const text = JSON.stringify(blocks)
-    expect(text).toContain('I put the biology electives in the second year')
-    expect(text).toContain('I kept the summer free.')
-    expect(text).not.toMatch(/check_plan|requirements_met|Exceptions you need|MATH111/)
-    expect(text).not.toContain('**Choices I made.**') // the panel already has that heading
+  it('keeps the choices, in plain words, with course titles instead of numbers where the course is in the plan', () => {
+    const { choices } = readExplanation(real, samplePlan)
+    const text = JSON.stringify(choices)
+    expect(text).toContain('Data Base Management and Web Programming') // CSCI403 and CSCI445
+    expect(text).toContain('Nature and Human Values and Cornerstone - Design I') // HASS100 and EDNS151
+    expect(text).toContain('CSCI422') // not in the plan: kept as written
+    expect(text).not.toMatch(/It totals|no errors|goes over/)
+    expect(text).not.toContain('you can change any of these')
   })
 
-  it('shows nothing when the message only repeats the validation', () => {
-    expect(extractChoices('The plan meets every requirement. `check_plan` says `requirements_met: true`.')).toEqual([])
+  it('drops the semester-by-semester rundown, which the board already shows', () => {
+    const text = JSON.stringify(readExplanation(real, samplePlan))
+    expect(text).not.toContain('Spring 2027 to Spring 2028')
+    expect(text).not.toContain('Order of courses')
   })
 
-  it('passes plain text through', () => {
-    expect(extractChoices('Plain explanation of the plan.')).toEqual([{ type: 'p', text: 'Plain explanation of the plan.' }])
+  it('moves the advisor notes to the things to check, and drops a note that is only about the tools', () => {
+    const { checks } = readExplanation(real, samplePlan)
+    expect(checks).toHaveLength(1) // the MATH334 note is about what "the checker" accepted, not advice for a student
+    expect(checks[0]).toContain('confirm the final plan with your advisor')
+    expect(checks.join(' ')).not.toContain('corequisite') // not even half of the dropped note
   })
 
-  it('keeps ordinary bullet lists', () => {
-    expect(extractChoices('- first choice\n- second choice')).toEqual([{ type: 'ul', items: ['first choice', 'second choice'] }])
+  it('drops the exception list (the flags show it) and the sentences about the tools', () => {
+    const text = 'The plan meets every requirement. `check_plan` reports `requirements_met: true`.\n\n**Exceptions you need to decide.** Decide.\n- **MATH111** needs a note\n\nI put the electives in year two.'
+    const { choices, checks } = readExplanation(text, samplePlan)
+    expect(choices).toEqual([{ type: 'p', text: 'I put the electives in year two.' }])
+    expect(checks).toEqual([])
+  })
+
+  it('passes plain text and ordinary lists through', () => {
+    expect(readExplanation('Plain explanation of the plan.', samplePlan).choices).toEqual([{ type: 'p', text: 'Plain explanation of the plan.' }])
+    expect(readExplanation('- first choice\n- second choice', samplePlan).choices).toEqual([{ type: 'ul', items: ['first choice', 'second choice'] }])
   })
 })

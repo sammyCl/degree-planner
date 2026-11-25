@@ -70,36 +70,51 @@
   92%, 100% { opacity: 0; transform: none; }
 }
 
-/* facts that cross-fade; all of them share one grid cell so the box keeps its height */
+/* facts that slide sideways: scroll or swipe the row, or use the arrows and dots */
 .facts {
   margin: 0 0 20px;
-  padding: 16px 18px 12px;
+  padding: 14px 8px 10px;
   text-align: left;
   background: var(--col);
   border: 1px solid var(--border);
   border-radius: 12px;
 }
 
-.facts-stage {
-  display: grid;
+.facts-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
-.fact {
-  grid-area: 1 / 1;
+.facts-track {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  border-radius: 8px;
+}
+
+.facts-track::-webkit-scrollbar {
+  display: none;
+}
+
+.fact-slide {
+  flex: 0 0 100%;
   margin: 0;
-  opacity: 0;
-  transform: translateY(10px);
-  /* a long, even ease in and out so one fact melts into the next instead of snapping */
-  transition: opacity 1800ms cubic-bezier(0.45, 0, 0.25, 1), transform 1800ms cubic-bezier(0.45, 0, 0.25, 1);
-  pointer-events: none;
+  padding: 2px 8px;
+  scroll-snap-align: start;
+  opacity: 0.35;
+  transition: opacity 600ms ease;
 }
 
-.fact.on {
+.fact-slide.on {
   opacity: 1;
-  transform: none;
 }
 
-.fact figcaption {
+.fact-slide figcaption {
   margin-bottom: 4px;
   font: 600 11.5px/1.2 Inter, sans-serif;
   letter-spacing: 0.06em;
@@ -107,28 +122,61 @@
   color: var(--acc);
 }
 
-.fact p {
+.fact-slide p {
   margin: 0;
   font-size: 13.5px;
   line-height: 1.55;
 }
 
+.facts-arrow {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--mut);
+  font-size: 18px;
+  line-height: 1;
+  transition: color 120ms, border-color 120ms, transform 80ms;
+}
+
+.facts-arrow:hover {
+  color: var(--acc);
+  border-color: var(--acc-bright);
+}
+
+.facts-arrow:active {
+  transform: scale(0.92);
+}
+
 .facts-dots {
   display: flex;
   justify-content: center;
-  gap: 6px;
-  margin-top: 12px;
+  gap: 4px;
+  margin-top: 10px;
 }
 
-.facts-dots i {
+.facts-dots button {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  background: none;
+  display: grid;
+  place-items: center;
+}
+
+.facts-dots button::before {
+  content: '';
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background: var(--border-strong);
-  transition: background 900ms ease-in-out, transform 900ms ease-in-out;
+  transition: background 300ms, transform 300ms;
 }
 
-.facts-dots i.on {
+.facts-dots button.on::before {
   background: var(--acc-bright);
   transform: scale(1.35);
 }

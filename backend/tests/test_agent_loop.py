@@ -394,3 +394,13 @@ def test_run_claude_timeout(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> 
     run = run_claude(command, "", tmp_path)
 
     assert run == ClaudeRun(result=None, timed_out=True)
+
+
+def test_the_returned_plan_keeps_the_validators_labels_and_checklist(connection: sqlite3.Connection) -> None:
+    """Regression: run_agent rebuilt the Plan field by field and dropped counts_toward and requirement_status,
+    so the planner page showed no course labels and no requirement checklist until the first edit."""
+    response = run_agent(connection, make_request(), runner=FakeClaude([("check_plan", HALF_PLAN)]))
+
+    assert response.plan is not None
+    assert response.plan.requirement_status, "the requirement checklist was dropped"
+    assert response.plan.counts_toward, "the course labels were dropped"

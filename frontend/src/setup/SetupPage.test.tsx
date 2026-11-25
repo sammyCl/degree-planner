@@ -52,7 +52,7 @@ describe('SetupPage', () => {
     expect(screen.getAllByRole('option').length).toBeGreaterThan(10)
     expect(semesters()).toHaveValue(4)
     // minors and ASIs are not offered to master's students
-    expect(screen.queryByRole('combobox', { name: 'Search minors and ASIs' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('combobox', { name: 'Search minors' })).not.toBeInTheDocument()
   })
 
   it('rejects a semester count outside the level\'s limit', () => {
@@ -85,6 +85,16 @@ describe('SetupPage', () => {
     expect(screen.getByText('Spring 2032')).toBeInTheDocument() // 8 semesters from Fall 2028
   })
 
+  it('opens a dropdown from its arrow, not only from its text', () => {
+    setup()
+    const season = screen.getByRole('combobox', { name: 'Starting season' })
+    const arrow = season.parentElement!.querySelector('.dd-chevron')!
+    fireEvent.mouseDown(arrow)
+    expect(screen.getByRole('listbox', { name: 'Starting season' })).toBeInTheDocument()
+    fireEvent.mouseDown(arrow)
+    expect(screen.queryByRole('listbox', { name: 'Starting season' })).not.toBeInTheDocument()
+  })
+
   it('keeps the stepper inside the limits', () => {
     setup()
     fireEvent.change(semesters(), { target: { value: '18' } })
@@ -97,7 +107,7 @@ describe('SetupPage', () => {
 
   it('adds and removes a minor with the search box', () => {
     setup()
-    const box = screen.getByRole('combobox', { name: 'Search minors and ASIs' })
+    const box = screen.getByRole('combobox', { name: 'Search minors' })
     fireEvent.focus(box)
     fireEvent.change(box, { target: { value: 'Computer Science' } })
     const option = screen.getAllByRole('option').find((o) => o.textContent?.startsWith('Computer Science'))!

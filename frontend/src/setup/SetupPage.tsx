@@ -69,6 +69,8 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
     : []
   const major = majors.find((m) => m.id === form.programId)
   const allAddOns = useMemo(() => addOns(), [])
+  // ASIs are only offered once they are stored for the student's catalog year (data/tools/build_frontend_options.py)
+  const addOnNoun = allAddOns.some((a) => a.level === 'asi') ? 'minors and ASIs' : 'minors'
   const byId = new Map(allAddOns.map((a) => [a.id, a]))
 
   const submit = (e: React.FormEvent) => {
@@ -127,9 +129,9 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
           {allowsAddOns(form.level) && (
             <div className="field">
               <div className="lbl">
-                Minors and ASIs <span className="opt">optional, add as many as you like</span>
+                {addOnNoun === 'minors' ? 'Minors' : 'Minors and ASIs'} <span className="opt">optional, add as many as you like</span>
               </div>
-              <AddOnPicker options={allAddOns} selected={form.addOnIds} onChange={(addOnIds) => patch({ addOnIds })} />
+              <AddOnPicker options={allAddOns} noun={addOnNoun} selected={form.addOnIds} onChange={(addOnIds) => patch({ addOnIds })} />
             </div>
           )}
 

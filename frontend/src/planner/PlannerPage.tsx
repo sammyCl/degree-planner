@@ -140,7 +140,16 @@ export function PlannerPage({ plan: initialPlan, explanation, problems, onBack }
           Edit setup
         </button>
       </div>
-      <PlanSummary plan={plan} explanation={explanation} problems={problems} />
+      {problems && problems.length > 0 && (
+        <div className="note-problems planner-problems" role="alert">
+          <b>The assistant could not finish a valid plan.</b> This is its last attempt; check the flagged courses.
+          <ul>
+            {problems.map((p, i) => (
+              <li key={i}>{p}</li>
+            ))}
+          </ul>
+        </div>
+      )}
       <div className="board">
         <div className="board-inner">
           <div className={`cols${chain ? ' chain-mode' : ''}${dragId ? ' dragging-any' : ''}`} ref={setCols} data-testid="board">
@@ -246,6 +255,7 @@ export function PlannerPage({ plan: initialPlan, explanation, problems, onBack }
           </div>
         </div>
       </div>
+      <PlanSummary plan={plan} explanation={explanation} />
       {notice && (
         <div className="planner-toast" role="alert">
           <span>{notice}</span>

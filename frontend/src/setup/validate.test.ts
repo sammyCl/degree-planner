@@ -35,12 +35,15 @@ describe('defaultStart', () => {
 })
 
 describe('program options', () => {
-  it('has real bachelor, master and combined majors, and minors and ASIs', () => {
+  it('has real bachelor, master and combined majors, and minors', () => {
     expect(majorsFor('bachelor').length).toBeGreaterThan(0)
     expect(majorsFor('master').length).toBeGreaterThan(0)
     expect(majorsFor('combined').length).toBeGreaterThan(0)
     expect(PROGRAMS.some((p) => p.level === 'minor')).toBe(true)
-    expect(PROGRAMS.some((p) => p.level === 'asi')).toBe(true)
+  })
+
+  it('offers no ASI until the ASIs are stored for the 2026-2027 catalog (they would fail in the backend)', () => {
+    expect(PROGRAMS.some((p) => p.level === 'asi')).toBe(false)
   })
   it('has unique ids', () => {
     expect(new Set(PROGRAMS.map((p) => p.id)).size).toBe(PROGRAMS.length)

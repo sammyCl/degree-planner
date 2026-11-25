@@ -8,7 +8,10 @@ export interface CourseLabel {
   also?: string
 }
 
-const levelOf = (programId: string) => PROGRAMS.find((p) => p.id === programId)?.level
+/** A program's level, from the options list, or from its id for one the setup page does not offer (the ASIs today). */
+const levelOf = (programId: string) =>
+  PROGRAMS.find((p) => p.id === programId)?.level ??
+  (programId.endsWith('-asi') ? 'asi' : programId.endsWith('-minor') ? 'minor' : undefined)
 
 /** A short name for a requirement group, from its id (the backend sends ids like "free-electives" or "cas-mid"). */
 export function groupCategory(groupId: string): string {

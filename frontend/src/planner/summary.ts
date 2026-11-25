@@ -121,36 +121,89 @@ export function buildChecks(plan: Plan): CheckItem[] {
   return items
 }
 
-const JARGON = /`|check_plan|requirements_met/i
-const RESTATES = /^the plan (meets|satisfies|fulfills) every requirement\b/i
+// ---------- What the assistant wrote ----------
+// The assistant writes free text with its own headings ("Order of courses", "Choices I made", "Things to check with your
+// advisor", ...). These rules sort it so the panel stays short and in plain words. The lasting fix is for the agent to
+// return its choices and notes as separate fields (Samantha's part); until then the page reads the text.
+
+/** Sentences about the tools, or that only repeat what the checklist already shows. */
+const NOT_FOR_STUDENTS =
+  /`|check_plan|requirements_met|\bthe checker\b|\b(totals?|adds up to) \d+ of (the )?\d+|\bno errors\b|\bgoes over \d+ credits|\bat or under \d+ credits|^the plan (meets|satisfies|fulfills) every requirement/i
 const sentences = (text: string): string[] => text.match(/[^.!?]+[.!?]*/g)?.map((s) => s.trim()).filter(Boolean) ?? []
 
-/**
- * The assistant's own words about the choices it made. It writes free text, so this keeps what a student cares about:
- * it drops the exception list (shown as "Things to check" instead), sentences that talk about the tools, and a plain
- * "the plan meets every requirement" (the checklist says that better).
- */
-export function extractChoices(explanation: string): Block[] {
-  const out: Block[] = []
-  const blocks = parseBlocks(explanation)
-  for (let i = 0; i < blocks.length; i++) {
-    const block = blocks[i]
+type Destination = 'choices' | 'checks' | 'drop'
+
+/** Where a heading's section goes: a semester rundown repeats the board; exceptions are listed from the flags. */
+function destinationOf(heading: string): Destination {
+  if (/order|semester by semester|schedule|timeline|by year/i.test(heading)) return 'drop'
+  if (/exception|decide/i.test(heading)) return 'drop'
+  if (/check|advisor|confirm|note|caveat|limit/i.test(heading)) return 'checks'
+  return 'choices'
+}
+
+export interface AssistantNotes {
+  /** what the assistant chose, in its own words */
+  choices: Block[]
+  /** things it says to confirm with an advisor */
+  checks: string[]
+}
+
+/** Course numbers become course titles, for every course in the plan; anything else stays as written. */
+function withTitles(text: string, titles: Map<string, string>): string {
+  return text.replace(/\b([A-Z]{3,4})(\d{3}[A-Z]?)\b/g, (code) => titles.get(code) ?? code)
+}
+
+function clean(text: string, titles: Map<string, string>): string {
+  return withTitles(
+    sentences(text)
+      .filter((s) => !NOT_FOR_STUDENTS.test(s))
+      .join(' '),
+    titles,
+  ).trim()
+}
+
+/** Sorts the assistant's message into its choices and its notes to check, in plain words with no course numbers. */
+export function readExplanation(explanation: string, plan: Plan): AssistantNotes {
+  const titles = new Map(plan.semesters.flatMap((s) => s.courses.map((c) => [c.code, c.title] as const)))
+  const notes: AssistantNotes = { choices: [], checks: [] }
+  let where: Destination = 'choices'
+  // A heading on its own line ("**Order of courses**") covers everything up to the next heading. A heading that starts a
+  // paragraph ("**Exceptions.** Decide each one.") covers that paragraph and the list right after it, then text goes
+  // back to the choices.
+  let untilNextHeading = true
+  let listMayFollow = false
+  for (const block of parseBlocks(explanation)) {
     if (block.type === 'p') {
-      const lead = /^\*\*([^*]+)\*\*/.exec(block.text)?.[1] ?? ''
-      if (/exception|decide/i.test(lead)) {
-        if (blocks[i + 1]?.type === 'ul') i++ // the list that belongs to it
-        continue
-      }
+      const lead = /^\*\*([^*]+)\*\*[.:]?\s*/.exec(block.text)
       let text = block.text
-      if (/choice|decision|picked|selected/i.test(lead)) text = text.replace(/^\*\*[^*]+\*\*\s*/, '')
-      text = sentences(text)
-        .filter((s) => !JARGON.test(s) && !RESTATES.test(s))
-        .join(' ')
-      if (text) out.push({ type: 'p', text })
+      if (lead) {
+        where = destinationOf(lead[1])
+        text = text.slice(lead[0].length) // the panel has its own headings
+        untilNextHeading = text.trim() === ''
+        listMayFollow = !untilNextHeading
+      } else if (!untilNextHeading) {
+        where = 'choices'
+        listMayFollow = false
+      }
+      if (where === 'drop') continue
+      text = clean(text, titles)
+      if (!text || /^\(.*\)$/.test(text)) continue // nothing left, or only an aside like "(you can change any of these)"
+      if (where === 'checks') notes.checks.push(text)
+      else notes.choices.push({ type: 'p', text })
     } else {
-      const items = block.items.filter((it) => !JARGON.test(it))
-      if (items.length) out.push({ type: 'ul', items })
+      const section = untilNextHeading || listMayFollow ? where : 'choices'
+      listMayFollow = false
+      if (!untilNextHeading) where = 'choices'
+      if (section === 'drop') continue
+      // a bullet is one thought: if any of it is about the tools, leave the whole bullet out rather than half of it
+      const items = block.items
+        .filter((item) => !sentences(item).some((s) => NOT_FOR_STUDENTS.test(s)))
+        .map((item) => withTitles(item, titles).trim())
+        .filter(Boolean)
+      if (!items.length) continue
+      if (section === 'checks') notes.checks.push(...items.map((i) => i.replace(/\*\*/g, '')))
+      else notes.choices.push({ type: 'ul', items })
     }
   }
-  return out
+  return notes
 }

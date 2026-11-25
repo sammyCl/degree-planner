@@ -24,6 +24,7 @@ describe('PlannerPage', () => {
     setup()
     expect(within(document.querySelector('.bar') as HTMLElement).getByText('Bachelor of Science in Computer Science (General Track)')).toBeInTheDocument()
     expect(screen.getByText('Catalog 2026-2027')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Show' }))
     expect(screen.getByText('Plain explanation of the plan.')).toBeInTheDocument()
     expect(screen.getByText(/Bachelor's plan, 8 semesters, starting Fall 2026/)).toBeInTheDocument()
     // the number counts up over about a second
@@ -117,6 +118,7 @@ describe('PlannerPage', () => {
 
   it('shows what is met as a short checklist, with check marks and no course numbers', () => {
     setup()
+    fireEvent.click(screen.getByRole('button', { name: 'Show' }))
     const panel = screen.getByRole('region', { name: 'About this plan' })
     const req = within(panel).getByRole('heading', { name: 'Degree requirements' }).closest('.about-card') as HTMLElement
     const row = (name: string) => within(req).getByText(name).closest('li') as HTMLElement
@@ -132,36 +134,50 @@ describe('PlannerPage', () => {
   it('lists what to check by course title, and says so when there is nothing', () => {
     const flag = { flag_id: 'x', type: 'exception_claimed' as const, severity: 'warning' as const, course_id: 'sem-1-csci128', message: 'CSCI128 relies on a claimed exception (instructor consent); confirm it still applies.', overridable: true, overridden: false }
     const { unmount } = render(<PlannerPage plan={{ ...samplePlan, flags: [flag] }} onBack={vi.fn()} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Show' }))
     const card = screen.getByRole('heading', { name: 'Things to check' }).closest('.about-card') as HTMLElement
     expect(card).toHaveTextContent('Computer Science for STEM needs instructor consent; confirm it still applies')
     expect(card.textContent).not.toMatch(/CSCI128/)
     unmount()
     render(<PlannerPage plan={{ ...samplePlan, flags: [] }} onBack={vi.fn()} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Show' }))
     expect(screen.getByText('Nothing needs your attention.')).toBeInTheDocument()
   })
 
   it('shows the assistant\'s choices without its talk about tools, and hides the section when there are none', () => {
     const text = 'The plan meets every requirement. `check_plan` reports `requirements_met: true`.\n\n**Exceptions you need to decide.** Decide.\n- **MATH111** needs a note\n\nI put the electives in year two.'
     const { unmount } = render(<PlannerPage plan={samplePlan} explanation={text} onBack={vi.fn()} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Show' }))
     const card = screen.getByRole('heading', { name: 'Choices I made' }).closest('.about-card') as HTMLElement
     expect(card).toHaveTextContent('I put the electives in year two.')
     expect(card.textContent).not.toMatch(/check_plan|requirements_met|MATH111|Exceptions/)
     unmount()
     render(<PlannerPage plan={samplePlan} explanation="The plan meets every requirement." onBack={vi.fn()} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Show' }))
     expect(screen.queryByRole('heading', { name: 'Choices I made' })).not.toBeInTheDocument()
   })
 
-  it('can hide and show the About panel to give the board room', () => {
+  it('puts the About panel under the board, closed until the student opens it', () => {
     setup()
-    expect(screen.getByRole('heading', { name: 'Degree requirements' })).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Hide' }))
+    const board = screen.getByTestId('board')
+    const about = screen.getByRole('region', { name: 'About this plan' })
+    expect(board.compareDocumentPosition(about) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy() // the board comes first
     expect(screen.queryByRole('heading', { name: 'Degree requirements' })).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Show' }))
     expect(screen.getByRole('heading', { name: 'Degree requirements' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Hide' }))
+    expect(screen.queryByRole('heading', { name: 'Degree requirements' })).not.toBeInTheDocument()
+  })
+
+  it('keeps the "could not finish" alert above the board, where it is seen first', () => {
+    setup(vi.fn(), { problems: ['Not enough credits.'] })
+    const alert = screen.getByRole('alert')
+    expect(alert.compareDocumentPosition(screen.getByTestId('board')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
   it('shows the assistant\'s markdown as formatting, not as symbols', () => {
     setup(vi.fn(), { explanation: 'It has **130 of 130 credits**.\n- **MATH111** needs a note' })
+    fireEvent.click(screen.getByRole('button', { name: 'Show' }))
     expect(screen.getByText('130 of 130 credits').tagName).toBe('STRONG')
     expect(screen.queryByText(/\*\*/)).not.toBeInTheDocument()
   })

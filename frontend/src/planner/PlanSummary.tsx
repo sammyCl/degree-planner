@@ -1,14 +1,12 @@
 import { useMemo, useState } from 'react'
 import type { Plan } from '../types.ts'
 import { Markdown } from './markdown.tsx'
-import { buildChecklist, buildChecks, extractChoices } from './summary.ts'
+import { buildChecklist, buildChecks, readExplanation } from './summary.ts'
 
 interface Props {
   plan: Plan
   /** what the planning assistant wrote about the plan */
   explanation?: string
-  /** why it could not finish a valid plan, if it could not */
-  problems?: string[]
 }
 
 const Tick = ({ ok }: { ok: boolean }) => (
@@ -17,12 +15,14 @@ const Tick = ({ ok }: { ok: boolean }) => (
   </svg>
 )
 
-/** A short summary of the plan: what is met, what to look at, and what the assistant chose. */
-export function PlanSummary({ plan, explanation, problems = [] }: Props) {
-  const [open, setOpen] = useState(true)
+/** A short summary of the plan under the board: what is met, what to look at, and what the assistant chose. */
+export function PlanSummary({ plan, explanation }: Props) {
+  // starts closed under the board, so the flowchart is what the student sees first
+  const [open, setOpen] = useState(false)
   const checklist = useMemo(() => buildChecklist(plan), [plan])
   const checks = useMemo(() => buildChecks(plan), [plan])
-  const choices = useMemo(() => (explanation ? extractChoices(explanation) : []), [explanation])
+  const notes = useMemo(() => (explanation ? readExplanation(explanation, plan) : { choices: [], checks: [] }), [explanation, plan])
+  const choices = notes.choices
 
   return (
     <section className="about" aria-label="About this plan">
@@ -32,16 +32,6 @@ export function PlanSummary({ plan, explanation, problems = [] }: Props) {
           {open ? 'Hide' : 'Show'}
         </button>
       </div>
-      {problems.length > 0 && (
-        <div className="note-problems" role="alert">
-          <b>The assistant could not finish a valid plan.</b> This is its last attempt; check the flagged courses.
-          <ul>
-            {problems.map((p, i) => (
-              <li key={i}>{p}</li>
-            ))}
-          </ul>
-        </div>
-      )}
       {open && (
         <div className="about-grid">
           <div className="about-card c-req">
@@ -65,7 +55,7 @@ export function PlanSummary({ plan, explanation, problems = [] }: Props) {
 
           <div className="about-card c-check">
             <h3>Things to check</h3>
-            {checks.length === 0 ? (
+            {checks.length === 0 && notes.checks.length === 0 ? (
               <p className="about-none">
                 <Tick ok /> Nothing needs your attention.
               </p>
@@ -74,6 +64,11 @@ export function PlanSummary({ plan, explanation, problems = [] }: Props) {
                 {checks.map((item, i) => (
                   <li key={i} className={`check-item ${item.kind}`}>
                     {item.title && <b>{item.title}</b>} {item.text}
+                  </li>
+                ))}
+                {notes.checks.map((text, i) => (
+                  <li key={`note-${i}`} className="check-item note">
+                    {text}
                   </li>
                 ))}
               </ul>
