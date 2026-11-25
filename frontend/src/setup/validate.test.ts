@@ -21,6 +21,7 @@ const form = (over: Partial<SetupForm> = {}): SetupForm => ({
   year: 2026,
   semesters: 8,
   includeSummers: false,
+  completed: [],
   ...over,
 })
 
@@ -68,6 +69,14 @@ describe('program options', () => {
   })
   it('has unique ids', () => {
     expect(new Set(PROGRAMS.map((p) => p.id)).size).toBe(PROGRAMS.length)
+  })
+})
+
+describe('completed courses in the request', () => {
+  it('sends the reviewed list as the student\'s completed courses', () => {
+    const completed = [{ code: 'MATH111', credits: 4, term: 'Fall 2025', transfer_from: null }]
+    expect(buildRequest(form({ completed })).student.completed_courses).toEqual(completed)
+    expect(buildRequest(form()).student.completed_courses).toEqual([])
   })
 })
 

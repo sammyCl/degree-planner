@@ -3,6 +3,8 @@ import type { AgentRequest } from '../types.ts'
 import { AddOnPicker } from './AddOnPicker.tsx'
 import { Dropdown } from './Dropdown.tsx'
 import { SegmentedControl } from './SegmentedControl.tsx'
+import { TranscriptUpload } from './TranscriptUpload.tsx'
+import { totalCredits } from './transcript.ts'
 import { defaultStart, semesterLabels, SEASONS, type Season } from './terms.ts'
 import {
   ADD_ON_NAMES,
@@ -48,6 +50,7 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
         year: start.year,
         semesters: SEMESTER_LIMITS.bachelor.default,
         includeSummers: false,
+        completed: [],
       },
   )
   const [submitted, setSubmitted] = useState(false)
@@ -148,6 +151,13 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
             ))}
 
           <div className="field">
+            <div className="lbl">
+              Completed courses <span className="opt">optional, from your transcript</span>
+            </div>
+            <TranscriptUpload courses={form.completed} onChange={(completed) => patch({ completed })} thisYear={thisYear} />
+          </div>
+
+          <div className="field">
             <div className="lbl">Starting term</div>
             <div className="row">
               <Dropdown
@@ -246,6 +256,16 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
               </dd>
             </div>
           )}
+          <div className="pv-row">
+            <dt>Completed</dt>
+            <dd>
+              {form.completed.length ? (
+                `${form.completed.length} ${form.completed.length === 1 ? 'course' : 'courses'}, ${totalCredits(form.completed)} cr`
+              ) : (
+                <span className="muted">None</span>
+              )}
+            </dd>
+          </div>
           <div className="pv-row">
             <dt>Starts</dt>
             <dd>{`${form.season} ${form.year}`}</dd>

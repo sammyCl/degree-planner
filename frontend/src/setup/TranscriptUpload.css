@@ -1,0 +1,183 @@
+.tu-drop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1.5px dashed var(--border-strong);
+  border-radius: 12px;
+  background: var(--raised);
+  transition: border-color 120ms, background 120ms;
+}
+
+.tu-drop.over {
+  border-color: var(--acc-bright);
+  background: var(--acc-tint);
+}
+
+.tu-pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 9px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tu-pick:hover:not(:disabled) {
+  border-color: var(--acc-bright);
+}
+
+.tu-pick:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.tu-or {
+  color: var(--mut);
+  font-size: 13px;
+}
+
+.tu-hint,
+.tu-note {
+  margin: 8px 0 0;
+  color: var(--mut);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.tu-note {
+  color: var(--acc);
+}
+
+.tu-list {
+  margin-top: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--raised);
+}
+
+.tu-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.tu-list ul {
+  list-style: none;
+  max-height: 232px;
+  margin: 0;
+  padding: 4px 6px;
+  overflow: auto;
+}
+
+.tu-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 6px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.tu-list li:hover {
+  background: var(--acc-tint);
+}
+
+.tu-code {
+  min-width: 76px;
+  font: 600 13px 'JetBrains Mono', ui-monospace, monospace;
+}
+
+.tu-cr {
+  min-width: 44px;
+  color: var(--mut);
+}
+
+.tu-term {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--mut);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tu-x {
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: var(--mut);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.tu-x:hover {
+  background: var(--err-bg);
+  color: var(--err);
+}
+
+.tu-open {
+  margin-top: 10px;
+}
+
+.tu-add {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--raised);
+}
+
+.tu-add-row {
+  display: grid;
+  grid-template-columns: 1fr 90px 1.3fr;
+  gap: 10px;
+}
+
+.tu-add label,
+.tu-lbl {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--mut);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.tu-add input {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--raised);
+}
+
+.tu-from {
+  margin-top: 10px;
+}
+
+.tu-add-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+@media (max-width: 640px) {
+  .tu-add-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .tu-when {
+    grid-column: 1 / -1;
+  }
+}

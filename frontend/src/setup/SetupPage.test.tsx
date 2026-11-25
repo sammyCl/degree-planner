@@ -134,6 +134,22 @@ describe('SetupPage', () => {
     expect(screen.getAllByRole('option').some((o) => o.textContent?.includes('2025-2026'))).toBe(false)
   })
 
+  it('sends the courses the student listed as completed courses, and shows them in the summary', () => {
+    const onSubmit = setup()
+    pick(program(), CS)
+    fireEvent.click(screen.getByRole('button', { name: '+ Add a course by hand' }))
+    fireEvent.change(screen.getByLabelText('Course code'), { target: { value: 'MATH111' } })
+    fireEvent.change(screen.getByLabelText('Credits'), { target: { value: '4' } })
+    fireEvent.click(screen.getByRole('combobox', { name: 'When you took it' }))
+    fireEvent.mouseDown(screen.getByRole('option', { name: 'Transfer credit' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add course' }))
+    expect(screen.getByLabelText('Your plan at a glance')).toHaveTextContent('1 course, 4 cr')
+    fireEvent.click(screen.getByRole('button', { name: /Build my plan/ }))
+    expect(onSubmit.mock.calls[0][0].student.completed_courses).toEqual([
+      { code: 'MATH111', credits: 4, term: 'transfer', transfer_from: null },
+    ])
+  })
+
   it('shows summer terms in the projected graduation when summers are included', () => {
     setup()
     fireEvent.change(semesters(), { target: { value: '3' } })
@@ -159,7 +175,7 @@ describe('SetupPage', () => {
   })
 
   it('starts from the earlier choices when given them', () => {
-    const initial = { level: 'master' as const, programId: '', addOnIds: [], season: 'Fall' as const, year: 2028, semesters: 5, includeSummers: true }
+    const initial = { level: 'master' as const, programId: '', addOnIds: [], season: 'Fall' as const, year: 2028, semesters: 5, includeSummers: true, completed: [] }
     render(<SetupPage onSubmit={vi.fn()} initial={initial} today={NOV_2026} />)
     expect(screen.getByRole('button', { name: "Master's" })).toHaveAttribute('aria-pressed', 'true')
     expect(screen.getByLabelText('Starting season')).toHaveValue('Fall')

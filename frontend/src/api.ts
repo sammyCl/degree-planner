@@ -1,6 +1,6 @@
 // All backend calls go through /api. In development Vite proxies /api to the FastAPI server
 // (see vite.config.ts), so the browser never needs the backend's address or CORS settings.
-import type { AgentRequest, AgentResponse, Plan } from './types.ts'
+import type { AgentRequest, AgentResponse, CompletedCourse, Plan } from './types.ts'
 
 export async function getHealth(): Promise<{ status: string; database: string }> {
   const response = await fetch('/api/health')
@@ -51,15 +51,14 @@ async function readDetail(response: Response): Promise<string> {
 }
 
 /** POST JSON and read the answer, turning every way it can fail into an ApiError the page can explain. */
-async function postJson<T>(url: string, body: unknown, signal?: AbortSignal): Promise<T> {
+function postJson<T>(url: string, body: unknown, signal?: AbortSignal): Promise<T> {
+  return post(url, { headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }, signal)
+}
+
+async function post<T>(url: string, init: { headers?: Record<string, string>; body: BodyInit }, signal?: AbortSignal): Promise<T> {
   let response: Response
   try {
-    response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-      signal,
-    })
+    response = await fetch(url, { method: 'POST', ...init, signal })
   } catch (error) {
     if (signal?.aborted || (error instanceof DOMException && error.name === 'AbortError')) {
       throw new ApiError('aborted', 'Cancelled.')
@@ -86,4 +85,14 @@ export function submitSetup(request: AgentRequest, signal?: AbortSignal): Promis
 /** Re-run the validator on a plan after the student changed it (docs/plan-format.md, "What drag-and-drop does"). */
 export function checkPlan(plan: Plan, signal?: AbortSignal): Promise<Plan> {
   return postJson('/api/plans/check', plan, signal)
+}
+
+/**
+ * Read an uploaded transcript (.csv or .pdf) into completed courses. The backend does not keep the file; the student
+ * reviews and corrects the courses on the setup page before anything is sent to the planner.
+ */
+export function parseTranscript(file: File, signal?: AbortSignal): Promise<CompletedCourse[]> {
+  const body = new FormData()
+  body.append('file', file)
+  return post('/api/transcripts/parse', { body }, signal)
 }

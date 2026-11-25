@@ -1,4 +1,4 @@
-import type { AgentRequest } from '../types.ts'
+import type { AgentRequest, CompletedCourse } from '../types.ts'
 import options from './programOptions.json'
 import { startTerm, type Season } from './terms.ts'
 
@@ -42,6 +42,8 @@ export interface SetupForm {
   year: number
   semesters: number
   includeSummers: boolean
+  /** courses already finished, from an uploaded transcript and/or typed in; the student has reviewed them */
+  completed: CompletedCourse[]
 }
 
 export type SetupErrors = Partial<Record<'programId' | 'year' | 'semesters', string>>
@@ -61,11 +63,11 @@ export function validateSetup(form: SetupForm): SetupErrors {
   return errors
 }
 
-/** The request body for POST /plans/submit-setup. Completed courses come with the transcript upload task. */
+/** The request body for POST /plans/submit-setup. */
 export function buildRequest(form: SetupForm): AgentRequest {
   const programs = [form.programId, ...(allowsAddOns(form.level) ? form.addOnIds : [])]
   return {
-    student: { degree_level: form.level, programs, catalog_year: CATALOG_YEAR, completed_courses: [] },
+    student: { degree_level: form.level, programs, catalog_year: CATALOG_YEAR, completed_courses: form.completed },
     semesters: form.semesters,
     start_term: startTerm(form.season, form.year),
     include_summers: form.includeSummers,
