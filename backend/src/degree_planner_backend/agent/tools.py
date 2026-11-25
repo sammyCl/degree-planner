@@ -7,6 +7,7 @@ can hand the message back to the model and let it retry.
 
 from __future__ import annotations
 
+import difflib
 import functools
 import json
 import math
@@ -138,6 +139,7 @@ SEARCH_CATALOG_TOOL: dict[str, Any] = {
         "and the title (for example 'linear algebra'); descriptions are not searched. "
         "Returns a list of matching courses with code, title, credits, and catalog_year, sorted by code. "
         "An empty list means nothing matched, not an error: try a shorter or different query. "
+        "A catalog_year with no courses loaded returns an error listing the loaded catalog years instead. "
         "Use get_prerequisites for a course's prerequisites. Only plan with courses this tool returns."
     ),
     "input_schema": {
@@ -177,6 +179,19 @@ def search_catalog(connection: sqlite3.Connection, tool_input: dict[str, Any]) -
     if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= SEARCH_LIMIT_MAX:
         raise _BadInput(f"limit must be a whole number from 1 to {SEARCH_LIMIT_MAX}.")
 
+    if catalog_year is not None:
+        # BUG-013: a year with nothing loaded is not "no match"; saying so stops the model from
+        # rewriting a query that was fine.
+        loaded = _loaded_years_if_missing(connection, catalog_year, "search_catalog")
+        if loaded is not None:
+            return {
+                "error": _year_not_loaded_text(
+                    catalog_year,
+                    loaded,
+                    "Call again with one of them as catalog_year, or omit catalog_year to search every loaded year.",
+                )
+            }
+
     courses = lookups.search_catalog(connection, query, catalog_year=catalog_year, limit=limit)
     return {
         "courses": [
@@ -207,7 +222,8 @@ GET_PREREQUISITES_TOOL: dict[str, Any] = {
         "Codes listed as prerequisites or corequisites may be missing from the catalog; "
         "check each with search_catalog before planning with it. "
         "If the course is in several catalog years, the error lists them: "
-        "call again with catalog_year set to one."
+        "call again with catalog_year set to one. If catalog_year has no courses loaded at all, the error "
+        "lists the loaded catalog years."
     ),
     "input_schema": {
         "type": "object",
@@ -312,6 +328,64 @@ def _shown_year(year: object) -> str:
     return year if isinstance(year, str) and _CATALOG_YEAR.fullmatch(year) else "(invalid year)"
 
 
+def _loaded_years_if_missing(connection: sqlite3.Connection, catalog_year: str, tool_name: str) -> list[str] | None:
+    """BUG-013: the loaded catalog years when no course at all is loaded for catalog_year, else None.
+
+    Only '2026-2027'-shaped stored years are returned, so a bad stored value never reaches the model.
+    It is only a hint: if the lookup fails, None, and the tool carries on as if the year were loaded.
+    """
+    try:
+        loaded = [year for year in lookups.catalog_years(connection) if _CATALOG_YEAR.fullmatch(year)]
+    except sqlite3.Error:
+        logger.exception("%s: catalog year lookup failed", tool_name)
+        return None
+    return None if catalog_year in loaded else loaded
+
+
+def _year_not_loaded_text(catalog_year: str, loaded: list[str], retry: str) -> str:
+    """'no courses are loaded for catalog year X; loaded catalog years: ...' plus retry, the tool's
+    next step. With nothing loaded at all there is no year to retry with, so retry is left out."""
+    if not loaded:
+        return (
+            f"no courses are loaded for catalog year {catalog_year}, or for any other catalog year: "
+            "tell the student the course catalog is not available right now."
+        )
+    return f"no courses are loaded for catalog year {catalog_year}; loaded catalog years: {', '.join(loaded)}. {retry}"
+
+
+# BUG-020: how close a stored program id must be to the one sent to be offered in did_you_mean.
+# 0.8 keeps typos ('computer-science-minr' scores 0.98 against 'computer-science-minor') and drops
+# some unrelated ids ('chemistry-bs' scores 0.74 against 'chemistry-minor'). No cutoff can tell a
+# typo from a different real program ('chemistry-bs' scores 0.92 against 'chemistry-ms'), so the
+# tool descriptions tell the model to check every suggestion against the student's choice.
+DID_YOU_MEAN_CUTOFF = 0.8
+DID_YOU_MEAN_MAX = 3
+
+
+def _did_you_mean(connection: sqlite3.Connection, program_id: str, tool_name: str) -> list[str]:
+    """BUG-020: up to DID_YOU_MEAN_MAX loaded program ids close to program_id, closest first.
+
+    [] when program_id itself is loaded or nothing is close. Only stored, slug-shaped ids are
+    returned, never the input, so nothing the model sent is echoed back. It is only a hint: if the
+    lookup fails, [], so a not-found answer is never turned into a server error.
+    """
+    try:
+        loaded = [pid for pid in lookups.program_ids(connection) if _PROGRAM_ID.fullmatch(pid)]
+    except sqlite3.Error:
+        logger.exception("%s: program id lookup failed", tool_name)
+        return []
+    if program_id in loaded:
+        return []
+    return difflib.get_close_matches(program_id, loaded, n=DID_YOU_MEAN_MAX, cutoff=DID_YOU_MEAN_CUTOFF)
+
+
+def _with_did_you_mean(result: ToolResult, connection: sqlite3.Connection, program_id: str, tool_name: str) -> ToolResult:
+    suggestions = _did_you_mean(connection, program_id, tool_name)
+    if suggestions:
+        result["did_you_mean"] = suggestions
+    return result
+
+
 def _not_in_year_message(
     lookup: Callable[[], Any], *, subject: str, catalog_year: str, unknown_hint: str, tool_name: str
 ) -> str:
@@ -367,12 +441,20 @@ def get_prerequisites(connection: sqlite3.Connection, tool_input: dict[str, Any]
     except lookups.NotFoundError:
         if catalog_year is None:
             return {"error": f"no course {code} in the catalog. Use search_catalog to find the exact code."}
+        unknown_hint = "Use search_catalog to find the exact code, or omit catalog_year."
+        # BUG-013 extension: the hint is only used when the code is in no other year either; then,
+        # if the year itself has nothing loaded, name the years that are.
+        loaded = _loaded_years_if_missing(connection, catalog_year, "get_prerequisites")
+        if loaded:
+            unknown_hint = f"No courses are loaded for that catalog year; loaded catalog years: {', '.join(loaded)}. " + unknown_hint
+        elif loaded == []:
+            unknown_hint = "No courses are loaded for any catalog year: tell the student the course catalog is not available right now."
         return {
             "error": _not_in_year_message(
                 lambda: lookups.get_course(connection, code),
                 subject=f"course {code}",
                 catalog_year=catalog_year,
-                unknown_hint="Use search_catalog to find the exact code, or omit catalog_year.",
+                unknown_hint=unknown_hint,
                 tool_name="get_prerequisites",
             )
         }
@@ -421,6 +503,15 @@ def _program_id_field(tool_input: dict[str, Any], *, required: bool, tail: str) 
         )
     return program_id
 
+# Shared by get_forms and get_program_requirements. A close id can be a different real program
+# ('mining-bs' and 'mining-ms' score 0.89), so the model must check it against the student's choice.
+_DID_YOU_MEAN_DESCRIPTION = (
+    "When the id is not loaded but some loaded ids are close to it, did_you_mean lists up to "
+    f"{DID_YOU_MEAN_MAX} of them, closest first. A close id can be a different program (mining-bs and "
+    "mining-ms are close): use one only if it is the program the student chose, otherwise ask the "
+    "student; never switch the student to another program because its id is similar."
+)
+
 GET_FORMS_TOOL: dict[str, Any] = {
     "name": "get_forms",
     "description": (
@@ -438,7 +529,7 @@ GET_FORMS_TOOL: dict[str, Any] = {
         "chose); do not guess ids or pass 'any' or a subject code. "
         "With program_id, returns that program's forms plus every 'any' form, and program_found. "
         "If program_found is false, the id is mistyped or that program is not loaded yet: the forms "
-        "are still listed and note explains what to do. "
+        "are still listed and note explains what to do. " + _DID_YOU_MEAN_DESCRIPTION + " "
         "Without program_id, returns every form."
     ),
     "input_schema": {
@@ -583,6 +674,7 @@ def get_forms(connection: sqlite3.Connection, tool_input: dict[str, Any]) -> Too
         result["program_found"] = program_found
     if program_found is False:
         result["note"] = PROGRAM_NOT_LOADED_NOTE
+        _with_did_you_mean(result, connection, program_id, "get_forms")
     return result
 
 
@@ -617,7 +709,7 @@ GET_PROGRAM_REQUIREMENTS_TOOL: dict[str, Any] = {
         "Some program rules are not in this data (for example 'at least one elective at the 400 level' or "
         "'not open to students in a given major'), so tell the student to confirm the final plan with "
         "their advisor. program_id must be an id from the loaded program data, such as the one the "
-        "student chose; do not guess ids."
+        "student chose; do not guess ids. " + _DID_YOU_MEAN_DESCRIPTION
     ),
     "input_schema": {
         "type": "object",
@@ -879,16 +971,20 @@ def get_program_requirements(connection: sqlite3.Connection, tool_input: dict[st
         }
     except lookups.NotFoundError:
         if catalog_year is None:
-            return {"error": PROGRAM_NOT_FOUND}
-        return {
-            "error": _not_in_year_message(
-                lambda: lookups.get_program(connection, program_id),
-                subject="program with this id",
-                catalog_year=catalog_year,
-                unknown_hint=PROGRAM_NOT_FOUND[0].upper() + PROGRAM_NOT_FOUND[1:],
-                tool_name="get_program_requirements",
-            )
-        }
+            result: ToolResult = {"error": PROGRAM_NOT_FOUND}
+        else:
+            result = {
+                "error": _not_in_year_message(
+                    lambda: lookups.get_program(connection, program_id),
+                    subject="program with this id",
+                    catalog_year=catalog_year,
+                    unknown_hint=PROGRAM_NOT_FOUND[0].upper() + PROGRAM_NOT_FOUND[1:],
+                    tool_name="get_program_requirements",
+                )
+            }
+        # BUG-020 extension: the same typo hint as get_forms. Empty (and left out) when the id is
+        # loaded in another year, since the error above already names that year.
+        return _with_did_you_mean(result, connection, program_id, "get_program_requirements")
     return _program_to_dict(connection, program)
 
 
