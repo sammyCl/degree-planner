@@ -243,11 +243,17 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
 
     satisfied_before = with_equivalents({completed.code for completed in student.completed_courses})
     for semester in semesters:
+        # BUG-049: a corequisite, unlike a prerequisite, is met by the same semester as well as an
+        # earlier one.
+        satisfied_with_semester = satisfied_before | with_equivalents({c.code for c in semester.courses})
         for course in semester.courses:
             try:
-                requirement = get_course(connection, course.code, catalog_year).prerequisites
+                fetched = get_course(connection, course.code, catalog_year)
+                requirement = fetched.prerequisites
+                coreq = fetched.corequisites
             except NotFoundError:
                 requirement = None
+                coreq = None
 
             for code in _course_codes(requirement):
                 candidates = [(i, cid) for i, cid in code_to_course_ids.get(code, []) if cid != course.course_id]
@@ -271,6 +277,17 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                     "error",
                     course.course_id,
                     f"{course.code} requires {_describe(requirement)} to be completed in an earlier semester.",
+                    False,
+                )
+
+            if course.status == "planned" and not _resolve(coreq, satisfied_with_semester):
+                assert coreq is not None  # _resolve(None, ...) is always True
+                add_flag(
+                    "broken_prerequisite",
+                    "error",
+                    course.course_id,
+                    f"{course.code} needs {_describe(coreq)} as a corequisite, in the same semester "
+                    "or an earlier one.",
                     False,
                 )
 
