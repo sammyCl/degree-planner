@@ -25602,7 +25602,7 @@
     ]
    },
    "corequisites": {
-    "type": "AND",
+    "type": "OR",
     "of": [
      {
       "type": "course",
