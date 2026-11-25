@@ -140,6 +140,10 @@ class Program(BaseModel):
     # may take 700-level credits only if the master's/PhD part is thesis-based. None means unknown,
     # so the validator does not flag it rather than guess.
     thesis_based: bool | None = None
+    # BUG-021: rules the data format has no field for (e.g. "not open to QBE majors",
+    # "CSCI423 and EBGN528 cannot both count"), as plain text for the agent to show the student;
+    # never enforced by the validator, since it can't check free text.
+    notes: list[str] = Field(default_factory=list)
 
 
 class Form(BaseModel):

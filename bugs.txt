@@ -70,7 +70,7 @@ BUG-002  search_catalog crashed on database errors and bad stored rows
              test_malformed_course_row_returns_error
 
 BUG-003  The real course catalog is not loaded: search finds 0 courses
-  Status:    Open
+  Status:    Fixed
   Owner:     Samantha Clapp (bachelor's data: mines-courses.csv) and
              Midhat Sajad (graduate data: mines-graduate-courses.csv; data format)
   Where:     data/Academic Catalog/*.csv, backend data_loader.py
@@ -88,9 +88,15 @@ BUG-003  The real course catalog is not loaded: search finds 0 courses
   Fix idea:  convert each CSV into data-format JSON (docs/data-format.md).
              Until then the agent tool cannot tell "empty catalog" from
              "no match" and tells the model to keep trying other queries.
+  Fixed in:  not marked earlier; found already resolved, 2026-11-24
+             (Midhat). Stale by the time it was checked: data/tools/
+             build_courses_json.py (Abdallah) converts both CSVs into
+             data/json/courses.json, which loads 2137 courses cleanly
+             (`uv run load-data`). No code change; a side effect of the
+             course-catalog conversion task landing, just never ticked here.
 
 BUG-004  The two catalog CSVs overlap and would silently overwrite each other
-  Status:    Open
+  Status:    Fixed
   Owner:     Midhat Sajad (graduate data, data format), with Samantha Clapp
              (bachelor's data)
   Where:     data/Academic Catalog/mines-courses.csv,
@@ -107,6 +113,16 @@ BUG-004  The two catalog CSVs overlap and would silently overwrite each other
   Fix idea:  decide which file wins for shared codes (or merge them) before
              converting; have the loader report duplicates instead of
              replacing quietly.
+  Fixed in:  not marked earlier; found already resolved, 2026-11-24 (Midhat).
+             data/CONFLICT-LOG.md ("Same code in both CSVs") documents the
+             decision: one entry per code, undergraduate row wins, empty
+             fields filled from the other, a shorter description replaced by
+             a longer one, and real disagreements (title/credits/
+             prerequisites) kept at the undergraduate value and logged in
+             the review file. Verified the math: 2131 undergrad rows + 953
+             distinct grad codes - 947 overlapping = 2137, exactly
+             courses.json's count. No code change; a side effect of the
+             course-catalog conversion task landing, just never ticked here.
 
 BUG-005  search_catalog crashed on a lone surrogate character in the input
   Status:    Fixed
@@ -505,7 +521,7 @@ BUG-020  No way to list program ids, so a mistyped id cannot be corrected
              test_catalog_years_and_program_ids in test_data_hardening.py.
 
 BUG-021  Program rules that the data format cannot hold never reach the agent
-  Status:    Open
+  Status:    Open (data-format half fixed)
   Owner:     Midhat Sajad (data format); Abdallah Salhi (minors and ASIs data,
              data/tools/build_minors_json.py); then Samantha Clapp (agent tools)
   Where:     backend/src/degree_planner_backend/models.py (Program),
@@ -525,6 +541,23 @@ BUG-021  Program rules that the data format cannot hold never reach the agent
              have build_minors_json.py fill it from the same text it writes to
              REVIEW.md; then the agent tool returns the notes (cleaned and
              capped) with each program.
+  Fixed in:  not yet committed (backend: Midhat), the schema half only:
+             Program.notes: list[str] = [] (models.py, docs/data-format.md).
+             Did not wire up build_minors_json.py: its x.notes list mixes
+             real degree-policy text (e.g. "Not open to QBE majors") with
+             internal data-conversion documentation (e.g. how CAS electives
+             were modeled), and only Abdallah can tell which of his own
+             notes are which — guessing risks showing a student internal
+             conversion commentary as if it were degree policy, which would
+             be worse than the field staying empty. Also did not touch
+             agent/tools.py's get_program_requirements to return it:
+             test_program_result_fields in test_agent_tools.py asserts an
+             exact output key set that doesn't include "notes" yet, and
+             that tool builds its own output dict rather than dumping the
+             model, so this schema addition doesn't affect it either way —
+             adding "notes" to what it returns is Samantha's call and her
+             test to update. Covered by test_program_notes_default_to_empty
+             and test_program_notes_can_be_set in test_models.py.
 
 BUG-022  Program credit fields accept NaN, infinity, zero, and negative values
   Status:    Open

@@ -58,6 +58,7 @@ A bachelor's, master's, PhD, minor, or ASI. A combined BS+MS is its own program 
 | `requirement_groups` | array of RequirementGroup | yes | see below |
 | `combines` | array of program_id | no | only on a `combined` program, e.g. `["mining-bs", "mining-ms"]` |
 | `thesis_based` | boolean \| null | no | only meaningful when `degree_level` is `master` or `phd`; whether the program is thesis-based. `null`/omitted means unknown. A combined program's non-thesis master's/PhD part limits when its student may take 700-level credits (see below) |
+| `notes` | array of string | no | rules the format has no field for (e.g. "not open to QBE majors", "CSCI423 and EBGN528 cannot both count"), as plain text for the agent to show the student. Default `[]`. The validator never checks these; it can't enforce free text |
 
 ### Requirement group
 
