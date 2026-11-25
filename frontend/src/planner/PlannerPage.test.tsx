@@ -93,14 +93,38 @@ describe('PlannerPage', () => {
     expect(screen.getByRole('dialog', { name: 'MATH213 details' })).toBeInTheDocument()
   })
 
-  it('lists every flag and goes to the course when one is chosen', () => {
+  it('lists only the errors when Errors is clicked, and goes to the course when one is chosen', () => {
     setup()
     fireEvent.click(screen.getByRole('button', { name: '2 errors' }))
     const items = screen.getAllByRole('menuitem')
-    expect(items).toHaveLength(samplePlan.flags.length)
+    expect(items).toHaveLength(samplePlan.flags.filter((f) => f.severity === 'error').length)
+    expect(items.some((i) => /credit/i.test(i.textContent ?? '') && /warning|short/i.test(i.textContent ?? ''))).toBe(false)
     fireEvent.click(items.find((i) => /out of order/i.test(i.textContent ?? ''))!)
     expect(screen.queryByRole('menu')).not.toBeInTheDocument()
     expect(card('CSCI400')).toHaveClass('pulse')
+  })
+
+  it('lists only the warnings, or only the to-confirm items, for the badge that was clicked', () => {
+    const confirm = {
+      flag_id: 'c1',
+      type: 'exception_claimed' as const,
+      severity: 'warning' as const,
+      course_id: 'sem-2-csci200',
+      message: 'CSCI200 relies on a claimed exception; confirm it still applies.',
+      overridable: true,
+      overridden: false,
+    }
+    render(<PlannerPage plan={{ ...samplePlan, flags: [...samplePlan.flags, confirm] }} onBack={vi.fn()} />)
+    fireEvent.click(screen.getByRole('button', { name: '1 to confirm' }))
+    expect(screen.getByRole('menu', { name: 'To confirm' })).toBeInTheDocument()
+    expect(screen.getAllByRole('menuitem')).toHaveLength(1)
+    expect(screen.getByRole('menuitem')).toHaveTextContent('claimed exception')
+    fireEvent.click(screen.getByRole('button', { name: '1 warning' }))
+    expect(screen.getByRole('menu', { name: 'Warnings' })).toBeInTheDocument()
+    expect(screen.getAllByRole('menuitem')).toHaveLength(1)
+    expect(screen.getByRole('menuitem')).not.toHaveTextContent('claimed exception')
+    fireEvent.click(screen.getByRole('button', { name: '2 errors' }))
+    expect(screen.getAllByRole('menuitem')).toHaveLength(2)
   })
 
   it('marks an under-full-time semester', () => {
