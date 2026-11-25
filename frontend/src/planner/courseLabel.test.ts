@@ -42,9 +42,15 @@ describe('courseLabel', () => {
     expect(courseLabel({ ...samplePlan, counts_toward: {} }, 'sem-1-csci128')).toBeNull()
   })
 
-  it('shows a course that only fills a minor as Minor, and an ASI as ASI', () => {
-    expect(courseLabel(plan({ x: [entry('computer-science-minor', 'core')] }), 'x')).toEqual({ primary: 'Minor' })
-    expect(courseLabel(plan({ x: [entry('aerospace-engineering-asi', 'core')] }), 'x')).toEqual({ primary: 'ASI' })
+  it('says just Core when a course is core for the degree, whether or not it is also core for the minor', () => {
+    const both = plan({ x: [entry('mining-bs', 'required'), entry('computer-science-minor', 'core')] })
+    expect(courseLabel(both, 'x')).toEqual({ primary: 'Core', also: undefined })
+  })
+
+  it('shows a course that only fills a minor as Minor core or Minor elective, and an ASI the same way', () => {
+    expect(courseLabel(plan({ x: [entry('computer-science-minor', 'core')] }), 'x')).toEqual({ primary: 'Minor core' })
+    expect(courseLabel(plan({ x: [entry('computer-science-minor', 'electives')] }), 'x')).toEqual({ primary: 'Minor elective' })
+    expect(courseLabel(plan({ x: [entry('aerospace-engineering-asi', 'core')] }), 'x')).toEqual({ primary: 'ASI core' })
   })
 
   it('shows both uses when one course counts for the degree and a minor', () => {
