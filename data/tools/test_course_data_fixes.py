@@ -1,6 +1,6 @@
-"""Regression tests for hand-corrected course data in data/json/courses.json.
+"""Regression tests for hand-corrected data in data/json (courses.json, bachelors.json).
 
-Each test pins one fix logged in bugs.txt, so a rebuild or re-scrape that brings the old data back fails here.
+Each test pins one fix logged in bugs.txt or data/CONFLICT-LOG.md, so a rebuild or re-scrape that brings the old data back fails here.
 Run from backend/: uv run pytest ../data/tools
 """
 
@@ -29,3 +29,14 @@ def test_bug_047_csci478_prerequisite_is_one_of_three_courses():
             {"type": "course", "code": "CSCI128"},
         ],
     }
+
+
+def test_mining_bs_special_topics_slot_is_only_mngn298():
+    # The agent planned MNGN299 Independent Study for "MNGN2XX New Special Topics" (eval ex3,
+    # 2026-11-23) because the slot allowed every 200-level MNGN course. Only MNGN298 Special Topics
+    # in Mining Engineering counts (Samantha, 2026-11-25; CONFLICT-LOG Bachelor's 18).
+    bachelors = json.loads((COURSES.parent / "bachelors.json").read_text(encoding="utf-8"))
+    mining = next(p for p in bachelors["programs"] if p["program_id"] == "mining-bs")
+    slot = next(g for g in mining["requirement_groups"] if g["group_id"] == "mngn-2xx")
+    assert slot["courses"] == ["MNGN298"]
+    assert slot["credits_required"] == 3
