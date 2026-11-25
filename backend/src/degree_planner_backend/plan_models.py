@@ -22,11 +22,9 @@ class Student(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     degree_level: Literal["bachelor", "master", "phd", "combined", "minor", "asi"]
-    # BUG-028 (held back): agent/tools.py's check_plan has its own test for an empty programs list
-    # (no_programs error), built by constructing Student(programs=[]) directly; rejecting that at
-    # the model means that test can no longer build its scenario. Needs reconciling with that path
-    # before this can reject here instead.
-    programs: list[str]
+    # BUG-028: a student always has at least one program; an empty list only used to fail later,
+    # inside build_plan.
+    programs: list[str] = Field(min_length=1)
     catalog_year: str
     completed_courses: list[CompletedCourse] = Field(default_factory=list)
 
