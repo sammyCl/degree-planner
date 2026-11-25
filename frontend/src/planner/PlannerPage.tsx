@@ -3,9 +3,9 @@ import { ApiError, checkPlan } from '../api.ts'
 import { LEVELS, PROGRAMS } from '../setup/validate.ts'
 import type { Flag, Plan } from '../types.ts'
 import { Arrows } from './Arrows.tsx'
-import { AssistantNote } from './AssistantNote.tsx'
 import { CourseCard, type CardState } from './CourseCard.tsx'
 import { CoursePopover } from './CoursePopover.tsx'
+import { PlanSummary } from './PlanSummary.tsx'
 import { courseLabel } from './courseLabel.ts'
 import {
   chainOf,
@@ -140,7 +140,7 @@ export function PlannerPage({ plan: initialPlan, explanation, problems, onBack }
           Edit setup
         </button>
       </div>
-      <AssistantNote explanation={explanation} problems={problems} />
+      <PlanSummary plan={plan} explanation={explanation} problems={problems} />
       <div className="board">
         <div className="board-inner">
           <div className={`cols${chain ? ' chain-mode' : ''}${dragId ? ' dragging-any' : ''}`} ref={setCols} data-testid="board">
@@ -173,7 +173,7 @@ export function PlannerPage({ plan: initialPlan, explanation, problems, onBack }
                 >
                   <div className="sem-h">
                     <b>{term}</b>
-                    <span>{year}</span>
+                    <span className="sem-year">{year}</span>
                     {isRemovable(s) && (
                       <button type="button" className="sem-remove" aria-label={`Remove ${s.label}`} onClick={() => applyEdit(removeSemester(plan, s.semester_id))}>
                         &times;

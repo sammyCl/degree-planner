@@ -100,6 +100,23 @@ class CountsToward(BaseModel):
     label: str
 
 
+class RequirementStatus(BaseModel):
+    """Whether one requirement group of one program is met, for the planner page's checklist (computed by check_plan)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    program_id: str
+    group_id: str
+    label: str
+    kind: Literal["all", "choose_credits", "requirement"]
+    met: bool
+    # choose_credits (and the nominal count of a requirement group): what the group needs and what the plan earns
+    credits_required: float | None = None
+    credits_earned: float | None = None
+    # an "all" group: how many of its fixed courses the plan lacks
+    missing_count: int = 0
+
+
 class Plan(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -113,3 +130,7 @@ class Plan(BaseModel):
     # elective", "Minor", and so on. Filled in by check_plan from the same assignment it uses for the group checks
     # (a course fills at most one group per program). A planned course missing from the map fills no group.
     counts_toward: dict[str, list[CountsToward]] = Field(default_factory=dict)
+    # Every requirement group of every program the student is in, in the programs' own order, with whether the plan meets
+    # it. The same checks that raise requirement_unmet and credit_shortfall flags, reported for the groups that pass too,
+    # so the planner page can show a checklist (Core, Free electives, ...). Never trusted from the client.
+    requirement_status: list[RequirementStatus] = Field(default_factory=list)

@@ -8,6 +8,8 @@ afterEach(() => vi.unstubAllGlobals())
 
 const card = (code: string) => screen.getByRole('button', { name: new RegExp(`^${code} `) })
 const column = (label: string) => screen.getByRole('region', { name: label })
+/** the semester columns, in order (the About panel is also a region) */
+const semesterLabels = () => [...document.querySelectorAll('section.sem')].map((s) => s.getAttribute('aria-label'))
 const codesIn = (label: string) => within(column(label)).queryAllByRole('button', { name: /credits/ }).map((b) => b.textContent?.match(/^[A-Z]{3,4}\d{3}/)?.[0])
 
 /** A backend that answers every /plans/check with the plan it was sent, plus whatever `change` does to it. */
@@ -159,7 +161,7 @@ describe('adding a semester', () => {
 
     const summer = column('Summer 2027')
     expect(within(summer).getByText('Drag courses here')).toBeInTheDocument()
-    const labels = screen.getAllByRole('region').map((r) => r.getAttribute('aria-label'))
+    const labels = semesterLabels()
     expect(labels.slice(0, 4)).toEqual(['Fall 2026', 'Spring 2027', 'Summer 2027', 'Fall 2027']) // in calendar order
     await waitFor(() => expect(sent).toHaveLength(1))
     expect(sent[0].semesters.map((s) => s.label).slice(0, 4)).toEqual(['Fall 2026', 'Spring 2027', 'Summer 2027', 'Fall 2027'])
@@ -181,7 +183,7 @@ describe('adding a semester', () => {
     stubCheck()
     render(<PlannerPage plan={samplePlan} onBack={vi.fn()} />)
     fireEvent.click(screen.getByRole('button', { name: 'Add Fall 2030 at the end' }))
-    const labels = screen.getAllByRole('region').map((r) => r.getAttribute('aria-label'))
+    const labels = semesterLabels()
     expect(labels[labels.length - 1]).toBe('Fall 2030')
     await waitFor(() => expect(screen.queryByText('Checking your change...')).not.toBeInTheDocument())
     expect(screen.getByRole('button', { name: 'Add Spring 2031 at the end' })).toBeInTheDocument() // and so on

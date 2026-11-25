@@ -1,5 +1,5 @@
 import type { Flag, PlannedCourse } from '../types.ts'
-import type { CourseLabel } from './courseLabel.ts'
+import { categoryOf, type CourseLabel } from './courseLabel.ts'
 import { flagKind, formatCredits, subjectColor } from './graph.ts'
 
 export type CardState = 'idle' | 'in-chain' | 'focus' | 'dim'
@@ -69,14 +69,9 @@ export function CourseCard({ course, flag, label, state, col, row, setRef, onEnt
         <span className="card-dot" />
         <span className="card-code">{course.code}</span>
         <span className="card-cr">{formatCredits(course.credits)} cr</span>
+        {label && <span className={`card-tag cat-${categoryOf(label.primary)}`}>{label.primary}</span>}
       </div>
       <div className="card-title">{course.title}</div>
-      {label && (
-        <div className="card-tags">
-          <span className={`tag-pill kind-${label.primary.toLowerCase().replace(/[^a-z]+/g, '-')}`}>{label.primary}</span>
-          {label.also && <span className="tag-pill also">+ {label.also}</span>}
-        </div>
-      )}
       {open && (
         <div className="card-warn" aria-hidden="true">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -86,6 +81,7 @@ export function CourseCard({ course, flag, label, state, col, row, setRef, onEnt
           {flag.type === 'broken_prerequisite' ? 'Prerequisite out of order' : kind === 'confirm' ? 'To confirm' : kind === 'warning' ? 'Check this' : 'Needs attention'}
         </div>
       )}
+      {label?.also && <div className="card-also cat-minor">+ also counts for {label.also}</div>}
     </div>
   )
 }

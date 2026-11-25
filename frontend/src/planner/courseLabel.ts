@@ -45,3 +45,27 @@ export function courseLabel(plan: Plan, courseId: string): CourseLabel | null {
   if (degree) return { primary: groupCategory(degree.group_id), also: addOnName }
   return { primary: addOnName ?? 'Requirement' }
 }
+
+/** The colour family of a label or requirement: one place, so the cards, the checklist and the page all agree. */
+export type Category = 'core' | 'elective' | 'free' | 'cas' | 'minor' | 'extra' | 'other'
+
+export function categoryOf(primary: string): Category {
+  switch (primary) {
+    case 'Core':
+      return 'core'
+    case 'Free elective':
+      return 'free'
+    case 'CAS':
+    case 'S&W':
+      return 'cas'
+    case 'Minor':
+    case 'ASI':
+      return 'minor'
+    case 'Extra':
+      return 'extra'
+    case 'Requirement':
+      return 'other'
+    default:
+      return 'elective' // CS, EE, ME and tech electives, focus areas, tracks
+  }
+}

@@ -22,7 +22,7 @@ describe('PlannerPage', () => {
 
   it('shows the program, catalog year, notice and credit total', async () => {
     setup()
-    expect(screen.getByText('Bachelor of Science in Computer Science (General Track)')).toBeInTheDocument()
+    expect(within(document.querySelector('.bar') as HTMLElement).getByText('Bachelor of Science in Computer Science (General Track)')).toBeInTheDocument()
     expect(screen.getByText('Catalog 2026-2027')).toBeInTheDocument()
     expect(screen.getByText('Plain explanation of the plan.')).toBeInTheDocument()
     expect(screen.getByText(/Bachelor's plan, 8 semesters, starting Fall 2026/)).toBeInTheDocument()
@@ -115,15 +115,49 @@ describe('PlannerPage', () => {
     expect(within(alert).getAllByRole('listitem')).toHaveLength(2)
   })
 
-  it('collapses a long explanation without cutting its text, and expands it on request', () => {
-    const long = 'word '.repeat(200).trim()
-    setup(vi.fn(), { explanation: long })
-    const text = screen.getByText(long) // the whole text is there; CSS clamps how much shows
-    expect(text.closest('.note-text')).toHaveClass('clamped')
-    fireEvent.click(screen.getByRole('button', { name: 'Show more' }))
-    expect(text.closest('.note-text')).not.toHaveClass('clamped')
-    fireEvent.click(screen.getByRole('button', { name: 'Show less' }))
-    expect(screen.getByRole('button', { name: 'Show more' })).toBeInTheDocument()
+  it('shows what is met as a short checklist, with check marks and no course numbers', () => {
+    setup()
+    const panel = screen.getByRole('region', { name: 'About this plan' })
+    const req = within(panel).getByRole('heading', { name: 'Degree requirements' }).closest('.about-card') as HTMLElement
+    const row = (name: string) => within(req).getByText(name).closest('li') as HTMLElement
+    expect(row('CS electives')).toHaveClass('met')
+    expect(row('CS electives')).toHaveTextContent('18/18 credits')
+    expect(row('Core courses')).toHaveClass('unmet')
+    expect(row('Core courses')).toHaveTextContent('3 courses missing')
+    expect(row('Free electives')).toHaveClass('met')
+    expect(within(req).getByText('Prerequisites in order').closest('li')).toHaveClass('unmet')
+    expect(req.textContent).not.toMatch(/[A-Z]{3,4}\d{3}/)
+  })
+
+  it('lists what to check by course title, and says so when there is nothing', () => {
+    const flag = { flag_id: 'x', type: 'exception_claimed' as const, severity: 'warning' as const, course_id: 'sem-1-csci128', message: 'CSCI128 relies on a claimed exception (instructor consent); confirm it still applies.', overridable: true, overridden: false }
+    const { unmount } = render(<PlannerPage plan={{ ...samplePlan, flags: [flag] }} onBack={vi.fn()} />)
+    const card = screen.getByRole('heading', { name: 'Things to check' }).closest('.about-card') as HTMLElement
+    expect(card).toHaveTextContent('Computer Science for STEM needs instructor consent; confirm it still applies')
+    expect(card.textContent).not.toMatch(/CSCI128/)
+    unmount()
+    render(<PlannerPage plan={{ ...samplePlan, flags: [] }} onBack={vi.fn()} />)
+    expect(screen.getByText('Nothing needs your attention.')).toBeInTheDocument()
+  })
+
+  it('shows the assistant\'s choices without its talk about tools, and hides the section when there are none', () => {
+    const text = 'The plan meets every requirement. `check_plan` reports `requirements_met: true`.\n\n**Exceptions you need to decide.** Decide.\n- **MATH111** needs a note\n\nI put the electives in year two.'
+    const { unmount } = render(<PlannerPage plan={samplePlan} explanation={text} onBack={vi.fn()} />)
+    const card = screen.getByRole('heading', { name: 'Choices I made' }).closest('.about-card') as HTMLElement
+    expect(card).toHaveTextContent('I put the electives in year two.')
+    expect(card.textContent).not.toMatch(/check_plan|requirements_met|MATH111|Exceptions/)
+    unmount()
+    render(<PlannerPage plan={samplePlan} explanation="The plan meets every requirement." onBack={vi.fn()} />)
+    expect(screen.queryByRole('heading', { name: 'Choices I made' })).not.toBeInTheDocument()
+  })
+
+  it('can hide and show the About panel to give the board room', () => {
+    setup()
+    expect(screen.getByRole('heading', { name: 'Degree requirements' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Hide' }))
+    expect(screen.queryByRole('heading', { name: 'Degree requirements' })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Show' }))
+    expect(screen.getByRole('heading', { name: 'Degree requirements' })).toBeInTheDocument()
   })
 
   it('shows the assistant\'s markdown as formatting, not as symbols', () => {
@@ -154,7 +188,7 @@ describe('PlannerPage', () => {
 
   it('labels each course with what it counts as, and says Extra when it fills no group', () => {
     setup()
-    const labelOf = (code: string) => card(code).querySelector('.tag-pill')?.textContent
+    const labelOf = (code: string) => card(code).querySelector('.card-tag')?.textContent
     expect(labelOf('CSCI200')).toBe('Core')
     expect(labelOf('PAGN101')).toBe('Extra')
     expect(screen.getAllByText('Free elective').length).toBeGreaterThan(0)
@@ -163,7 +197,7 @@ describe('PlannerPage', () => {
 
   it('shows no labels when the plan has no assignments', () => {
     render(<PlannerPage plan={{ ...samplePlan, counts_toward: undefined }} onBack={vi.fn()} />)
-    expect(document.querySelector('.tag-pill')).toBeNull()
+    expect(document.querySelector('.card-tag')).toBeNull()
   })
 
   it('goes back to setup', () => {
