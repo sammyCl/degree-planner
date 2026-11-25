@@ -2,7 +2,10 @@ import sqlite3
 import tempfile
 from pathlib import Path
 
-from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
+from fastapi import Depends, FastAPI, File, HTTPException, Request, UploadFile
+from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 
 from degree_planner_backend.agent.chat_loop import run_chat
 from degree_planner_backend.agent.chat_models import ChatRequest, ChatResponse
@@ -19,6 +22,15 @@ from degree_planner_backend.transcript_parser import (
 from degree_planner_backend.validator import check_plan
 
 app = FastAPI(title="Degree Planner API")
+
+
+@app.exception_handler(RequestValidationError)
+async def _on_request_validation_error(request: Request, exc: RequestValidationError) -> JSONResponse:
+    """FastAPI's default handler echoes each error's "input" back in the response; a lone
+    surrogate in the request body (valid JSON, not valid text, e.g. "\\ud800") can't then be
+    encoded as UTF-8, turning an ordinary 422 into a 500 (BUG-046). Drop "input" instead."""
+    errors = [{key: value for key, value in error.items() if key != "input"} for error in exc.errors()]
+    return JSONResponse(status_code=422, content=jsonable_encoder({"detail": errors}))
 
 
 @app.get("/health")

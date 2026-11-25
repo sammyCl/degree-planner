@@ -1268,7 +1268,7 @@ BUG-045  Terms offered are not in the course data (summer only, spring
 
 BUG-046  A lone surrogate in a request body gives 500 instead of 422 (all
          JSON endpoints)
-  Status:    Open
+  Status:    Fixed
   Owner:     Midhat Sajad (backend API)
   Where:     backend/src/degree_planner_backend/main.py (FastAPI's default
              RequestValidationError handler)
@@ -1287,6 +1287,16 @@ BUG-046  A lone surrogate in a request body gives 500 instead of 422 (all
   Fix idea:  add an exception handler for RequestValidationError that
              leaves out each error's "input" (or encodes it with
              errors="replace")
+  Fixed in:  not yet committed (backend: Midhat), exactly the fix idea
+             above: main.py registers an exception_handler for
+             RequestValidationError that drops "input" from each error
+             dict (via jsonable_encoder, same as FastAPI's default handler
+             uses, for anything else non-JSON-native in an error's "ctx")
+             and returns the usual {"detail": [...]} 422 shape. Verified
+             the fix is real by reverting main.py and confirming
+             test_a_lone_surrogate_in_the_body_gets_422_not_500 reproduces
+             the exact UnicodeEncodeError from "Actual" above, then
+             restoring it. Covered by that test in test_api_plans.py.
 
 BUG-047  CSCI478's prerequisite is stored as an exception, so every plan
          with CSCI478 gets an exception warning
@@ -1337,7 +1347,7 @@ BUG-048  get_forms has no course substitution form, so the chatbot cannot
              saying to ask the advisor
 
 BUG-049  The validator does not check corequisites
-  Status:    Open
+  Status:    Fixed
   Owner:     Midhat Sajad (validator)
   Where:     backend/src/degree_planner_backend/validator.py (corequisites is
              defined in models.py and filled in the course data, but never
@@ -1358,3 +1368,18 @@ BUG-049  The validator does not check corequisites
              against the courses completed before the semester plus the
              semester's own courses. Until then, chat.md tells the chatbot
              to check corequisites itself and say when one is unmet
+  Fixed in:  not yet committed (backend: Midhat), exactly the fix idea
+             above: the per-course loop now also resolves corequisites
+             against completed-before-this-semester plus this semester's
+             own courses (unlike a prerequisite, which must be strictly
+             earlier), flagging an unmet one as broken_prerequisite with a
+             message naming it as a corequisite. Verified against the real
+             catalog: 217 courses have a structured corequisite (168
+             course, 16 AND, 15 OR, 18 exception), so this isn't blocked on
+             BUG-012 the way BUG-026(b) is. Updated two existing tests
+             whose sample plan has an unmet CSCI400 corequisite that's now
+             correctly caught too (test_check_plan_matches_the_sample_plan,
+             test_check_plan_endpoint_flags_broken_prerequisite). Covered
+             by test_validator_corequisites.py (3 tests). chat.md's
+             "check corequisites itself" instruction is now redundant,
+             worth Samantha simplifying once she sees this.

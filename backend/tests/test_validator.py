@@ -32,10 +32,12 @@ def test_check_plan_matches_the_sample_plan(connection: sqlite3.Connection) -> N
     assert _edge_pairs(result) == {("sem-1-csci200", "sem-2-csci306"), ("sem-2-csci306", "sem-2-csci400")}
 
     broken = [flag for flag in result.flags if flag.type == "broken_prerequisite"]
-    assert len(broken) == 1
-    assert broken[0].course_id == "sem-2-csci400"
-    assert broken[0].severity == "error"
-    assert "CSCI306 and (MATH201 or MATH223)" in broken[0].message
+    # BUG-049: CSCI400's corequisite (MATH201 or MATH223) is now also checked, and isn't met in
+    # the sample plan either, alongside its unmet prerequisite.
+    assert len(broken) == 2
+    assert all(flag.course_id == "sem-2-csci400" and flag.severity == "error" for flag in broken)
+    assert any("CSCI306 and (MATH201 or MATH223)" in flag.message for flag in broken)
+    assert any("as a corequisite" in flag.message for flag in broken)
 
     shortfalls = [flag for flag in result.flags if flag.type == "credit_shortfall"]
     # BUG-025: Core (CSCI200, CSCI306, CSCI400) claims those courses first, so Free Electives
