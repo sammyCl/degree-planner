@@ -158,13 +158,15 @@ describe('PlannerPage', () => {
 
   it('lists what to check by course title, and says so when there is nothing', () => {
     const flag = { flag_id: 'x', type: 'exception_claimed' as const, severity: 'warning' as const, course_id: 'sem-1-csci128', message: 'CSCI128 relies on a claimed exception (instructor consent); confirm it still applies.', overridable: true, overridden: false }
-    const { unmount } = render(<PlannerPage plan={{ ...samplePlan, flags: [flag] }} onBack={vi.fn()} />)
+    // CSCI303 is treated as the same course as DSCI403, which adds its own note; leave it out here
+    const plain = { ...samplePlan, semesters: samplePlan.semesters.map((s) => ({ ...s, courses: s.courses.filter((c) => c.code !== 'CSCI303') })) }
+    const { unmount } = render(<PlannerPage plan={{ ...plain, flags: [flag] }} onBack={vi.fn()} />)
     fireEvent.click(screen.getByRole('button', { name: 'Show' }))
     const card = screen.getByRole('heading', { name: 'Things to check' }).closest('.about-card') as HTMLElement
     expect(card).toHaveTextContent('Computer Science for STEM needs instructor consent; confirm it still applies')
     expect(card.textContent).not.toMatch(/CSCI128/)
     unmount()
-    render(<PlannerPage plan={{ ...samplePlan, flags: [] }} onBack={vi.fn()} />)
+    render(<PlannerPage plan={{ ...plain, flags: [] }} onBack={vi.fn()} />)
     fireEvent.click(screen.getByRole('button', { name: 'Show' }))
     expect(screen.getByText('Nothing needs your attention.')).toBeInTheDocument()
   })

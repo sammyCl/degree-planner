@@ -12,6 +12,7 @@ Regenerated every run; do not edit by hand. Rules: `data/CONFLICT-LOG.md`, secti
 - credit ranges (upper bound used): 311
 - credit/repeat notes dropped from prerequisites: 153
 - csv rows: 3168
+- equivalent groups inferred (not in the catalog text): 5
 - graduate-only courses without a source URL: 6
 - independent study (set to 3 credits): 160
 - placement-level prerequisites left out (not a course): 1
@@ -957,6 +958,14 @@ Regenerated every run; do not edit by hand. Rules: `data/CONFLICT-LOG.md`, secti
 - SCED599: 0.5-6 -> 3
 - SPRS599: 0.5-6 -> 3
 - SYGN599: 0-6 -> 3
+
+## Equivalent courses the catalog does not state, inferred by the team's rule (shown to students as to confirm) (5)
+
+- CSCI303, DSCI403: same title and description, and EBGN280 names both as prerequisites
+- ENGY475, MEGN475: same title and description, and NUGN510 names both as prerequisites
+- GEOL310, MNGN310: same title and description, and GEOL311 names both as prerequisites
+- MLGN502, PHGN440: same title and description, and MLGN607 names both as prerequisites
+- GEOL311, MNGN311: same title, description, number and prerequisites as an equivalent pair of the same two subjects
 
 ## Equivalent courses named in a description but not in the catalog CSVs (left out) (183)
 

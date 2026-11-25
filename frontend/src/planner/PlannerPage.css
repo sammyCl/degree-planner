@@ -1066,6 +1066,11 @@
   border-left-color: var(--acc-bright);
 }
 
+/* a plain explanation, nothing to fix */
+.check-item.info {
+  border-left-color: var(--cat-minor);
+}
+
 /* something the assistant says to confirm with an advisor */
 .check-item.note {
   border-left-color: var(--cat-other);
