@@ -15,6 +15,7 @@ This is a different thing from the [data format](data-format.md): the data forma
 | `prerequisite_edges` | array of Edge | yes | see below; drives the arrows on the planner page |
 | `flags` | array of Flag | yes | validator output; `[]` if the plan is clean |
 | `summary` | Summary | yes | `{"total_credits": number, "total_credits_required": number, "requirements_met": boolean}` |
+| `counts_toward` | object | no | `{course_id: [{"program_id": string, "group_id": string, "label": string}, ...]}`: the requirement groups each planned course fills, so the planner page can label it Core, Free elective, Minor and so on. Computed by the validator from the same assignment it uses for the group checks (a course fills at most one group per program); never trusted from the client. A planned course that fills no group is missing from the map. Defaults to `{}` |
 
 ### Student
 

@@ -88,8 +88,9 @@
   grid-area: 1 / 1;
   margin: 0;
   opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 650ms var(--ease-out), transform 650ms var(--ease-out);
+  transform: translateY(10px);
+  /* a long, even ease in and out so one fact melts into the next instead of snapping */
+  transition: opacity 1800ms cubic-bezier(0.45, 0, 0.25, 1), transform 1800ms cubic-bezier(0.45, 0, 0.25, 1);
   pointer-events: none;
 }
 
@@ -124,7 +125,7 @@
   height: 6px;
   border-radius: 50%;
   background: var(--border-strong);
-  transition: background 300ms, transform 300ms var(--spring);
+  transition: background 900ms ease-in-out, transform 900ms ease-in-out;
 }
 
 .facts-dots i.on {

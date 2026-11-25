@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { Fact } from './facts.ts'
+import { FACT_INTERVAL_MS, type Fact } from './facts.ts'
 
 interface Props {
   facts: Fact[]
@@ -10,7 +10,7 @@ interface Props {
 }
 
 /** One fact at a time that cross-fades to the next. All facts sit in the same spot, so the box never jumps in size. */
-export function FactSlideshow({ facts, intervalMs = 6500, startAt }: Props) {
+export function FactSlideshow({ facts, intervalMs = FACT_INTERVAL_MS, startAt }: Props) {
   const [index, setIndex] = useState(() => startAt ?? Math.floor(Math.random() * facts.length))
   useEffect(() => {
     if (facts.length < 2) return

@@ -90,6 +90,16 @@ class Summary(BaseModel):
     requirements_met: bool
 
 
+class CountsToward(BaseModel):
+    """One requirement group a planned course counts toward (computed by check_plan, never trusted from the client)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    program_id: str
+    group_id: str
+    label: str
+
+
 class Plan(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -99,3 +109,7 @@ class Plan(BaseModel):
     prerequisite_edges: list[Edge] = Field(default_factory=list)
     flags: list[Flag] = Field(default_factory=list)
     summary: Summary
+    # course_id -> the requirement groups that course fills, so the planner page can label a course "Core", "Free
+    # elective", "Minor", and so on. Filled in by check_plan from the same assignment it uses for the group checks
+    # (a course fills at most one group per program). A planned course missing from the map fills no group.
+    counts_toward: dict[str, list[CountsToward]] = Field(default_factory=dict)

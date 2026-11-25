@@ -15,7 +15,7 @@ describe('PlannerPage', () => {
     setup()
     for (const s of samplePlan.semesters) {
       const column = screen.getByRole('region', { name: s.label })
-      expect(within(column).getAllByRole('button')).toHaveLength(s.courses.length)
+      expect(within(column).getAllByRole('button', { name: /credits/ })).toHaveLength(s.courses.length)
     }
     expect(screen.getByText('Principles of Programming Languages')).toBeInTheDocument()
   })
@@ -150,6 +150,20 @@ describe('PlannerPage', () => {
 
     render(<PlannerPage plan={withFlag('credit_shortfall', 'error')} onBack={vi.fn()} />)
     expect(card('CSCI400')).toHaveClass('flagged')
+  })
+
+  it('labels each course with what it counts as, and says Extra when it fills no group', () => {
+    setup()
+    const labelOf = (code: string) => card(code).querySelector('.tag-pill')?.textContent
+    expect(labelOf('CSCI200')).toBe('Core')
+    expect(labelOf('PAGN101')).toBe('Extra')
+    expect(screen.getAllByText('Free elective').length).toBeGreaterThan(0)
+    expect(card('CSCI200')).toHaveAccessibleName(/, Core/)
+  })
+
+  it('shows no labels when the plan has no assignments', () => {
+    render(<PlannerPage plan={{ ...samplePlan, counts_toward: undefined }} onBack={vi.fn()} />)
+    expect(document.querySelector('.tag-pill')).toBeNull()
   })
 
   it('goes back to setup', () => {

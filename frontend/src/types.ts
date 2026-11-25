@@ -44,6 +44,13 @@ export interface Flag {
   overridden: boolean
 }
 
+/** One requirement group a planned course fills (computed by the backend's validator). */
+export interface CountsToward {
+  program_id: string
+  group_id: string
+  label: string
+}
+
 export interface Plan {
   plan_id: string | null
   student: {
@@ -60,6 +67,8 @@ export interface Plan {
     total_credits_required: number
     requirements_met: boolean
   }
+  /** course_id to the groups it fills; a planned course missing from here fills no group. Absent on older plans. */
+  counts_toward?: Record<string, CountsToward[]>
 }
 
 // What the backend's POST /plans/submit-setup takes (docs/agent-request-format.md, owner: Midhat and Samantha).

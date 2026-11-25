@@ -28,9 +28,11 @@ interface Props {
   plan: Plan
   programName: string
   onSelectFlag: (flag: Flag) => void
+  /** true while the backend re-checks the plan after the student changed it */
+  checking?: boolean
 }
 
-export function SummaryBar({ plan, programName, onSelectFlag }: Props) {
+export function SummaryBar({ plan, programName, onSelectFlag, checking }: Props) {
   const { total_credits: total, total_credits_required: required } = plan.summary
   const { errors, warnings, confirm } = flagCounts(plan.flags)
   const shown = useCountUp(total)
@@ -131,6 +133,12 @@ export function SummaryBar({ plan, programName, onSelectFlag }: Props) {
           </div>
         )}
       </div>
+      {checking && (
+        <span className="checking" role="status">
+          <i aria-hidden="true" />
+          Checking your change...
+        </span>
+      )}
       <span className="grow" />
       <div className="legend" aria-hidden="true">
         <span>

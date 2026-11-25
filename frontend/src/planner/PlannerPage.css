@@ -778,3 +778,212 @@
 .planner-notice .link {
   flex: none;
 }
+
+/* ---------- Course labels (what a course counts as) ---------- */
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.tag-pill {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--col);
+  color: var(--mut);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+}
+
+/* Core is the plainest on purpose; the electives and extras stand out a little so they are easy to spot */
+.tag-pill.kind-core {
+  background: transparent;
+}
+
+.tag-pill.kind-free-elective {
+  color: var(--ok);
+  border-color: color-mix(in srgb, var(--ok) 35%, transparent);
+  background: var(--ok-bg);
+}
+
+.tag-pill.kind-tech-elective,
+.tag-pill.kind-cs-elective,
+.tag-pill.kind-ee-elective,
+.tag-pill.kind-me-elective,
+.tag-pill.kind-elective,
+.tag-pill.kind-focus-area,
+.tag-pill.kind-track {
+  color: var(--acc);
+  border-color: color-mix(in srgb, var(--acc) 30%, transparent);
+  background: var(--acc-tint);
+}
+
+.tag-pill.kind-extra {
+  color: var(--warn);
+  border-color: color-mix(in srgb, var(--warn) 35%, transparent);
+  background: var(--warn-bg);
+}
+
+.tag-pill.also {
+  color: var(--sub-chgn);
+  border-color: color-mix(in srgb, var(--sub-chgn) 35%, transparent);
+  background: transparent;
+}
+
+/* ---------- Moving courses and adding semesters ---------- */
+.card[draggable='true'] {
+  cursor: grab;
+}
+
+.card.dragging {
+  opacity: 0.4;
+  border-style: dashed;
+  box-shadow: none;
+}
+
+.sem.drop-target {
+  background: color-mix(in srgb, var(--acc) 9%, var(--col));
+  border-color: color-mix(in srgb, var(--acc) 45%, transparent);
+  box-shadow: 0 0 0 3px var(--acc-tint);
+}
+
+.sem-empty {
+  padding: 22px 8px;
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--mut);
+  border: 1.5px dashed var(--border-strong);
+  border-radius: 10px;
+}
+
+.sem-h {
+  position: relative;
+}
+
+.sem-remove {
+  position: absolute;
+  right: -2px;
+  top: -4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 0;
+  background: none;
+  color: var(--mut);
+  font-size: 16px;
+  line-height: 1;
+}
+
+.sem-remove:hover {
+  background: var(--col);
+  color: var(--err);
+}
+
+/* "+ Summer": a round button in the gap after a Spring column */
+.add-between {
+  position: absolute;
+  z-index: 5;
+  right: -42px;
+  top: 14px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1.5px dashed var(--border-strong);
+  background: var(--surface);
+  color: var(--acc);
+  font-size: 18px;
+  line-height: 1;
+  transition: transform 200ms var(--spring), border-color 120ms, background 120ms;
+}
+
+.add-between:hover,
+.add-between:focus-visible {
+  transform: scale(1.12);
+  border-style: solid;
+  border-color: var(--acc-bright);
+  background: var(--acc-tint);
+}
+
+.sem.add-end {
+  display: grid;
+  place-items: start center;
+  padding: 18px 10px;
+  background: transparent;
+  border-style: dashed;
+}
+
+.checking {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--mut);
+}
+
+.checking i {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--border-strong);
+  border-top-color: var(--acc-bright);
+  animation: spin 800ms linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.planner-toast {
+  position: fixed;
+  z-index: 60;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: min(560px, calc(100vw - 32px));
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #0f1a2e;
+  color: #e6eaf2;
+  box-shadow: var(--sh-3);
+  font-size: 13.5px;
+  animation: rise 300ms var(--ease-out);
+}
+
+.planner-toast .link {
+  color: #7ea6f2;
+  flex: none;
+}
+
+.pop-move {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.pop-move .dd {
+  flex: 1;
+  min-width: 0;
+}
+
+.pop-move .btn {
+  flex: none;
+}
+
+.pop-move .btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .checking i {
+    animation: none;
+  }
+}

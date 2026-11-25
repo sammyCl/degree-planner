@@ -1,6 +1,6 @@
 // All backend calls go through /api. In development Vite proxies /api to the FastAPI server
 // (see vite.config.ts), so the browser never needs the backend's address or CORS settings.
-import type { AgentRequest, AgentResponse } from './types.ts'
+import type { AgentRequest, AgentResponse, Plan } from './types.ts'
 
 export async function getHealth(): Promise<{ status: string; database: string }> {
   const response = await fetch('/api/health')
@@ -50,17 +50,14 @@ async function readDetail(response: Response): Promise<string> {
   return `The backend returned ${response.status}.`
 }
 
-/**
- * Ask the backend to build a plan for the setup form. The agent can take minutes (the backend stops it after ten),
- * so there is no timeout here; the caller passes a signal so the student can stop waiting.
- */
-export async function submitSetup(request: AgentRequest, signal?: AbortSignal): Promise<AgentResponse> {
+/** POST JSON and read the answer, turning every way it can fail into an ApiError the page can explain. */
+async function postJson<T>(url: string, body: unknown, signal?: AbortSignal): Promise<T> {
   let response: Response
   try {
-    response = await fetch('/api/plans/submit-setup', {
+    response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(request),
+      body: JSON.stringify(body),
       signal,
     })
   } catch (error) {
@@ -76,4 +73,17 @@ export async function submitSetup(request: AgentRequest, signal?: AbortSignal): 
   if (response.status === 503) throw new ApiError('agent_unavailable', detail, 503)
   if (response.status === 400 || response.status === 422) throw new ApiError('invalid_request', detail, response.status)
   throw new ApiError('server', detail, response.status)
+}
+
+/**
+ * Ask the backend to build a plan for the setup form. The agent can take minutes (the backend stops it after ten),
+ * so there is no timeout here; the caller passes a signal so the student can stop waiting.
+ */
+export function submitSetup(request: AgentRequest, signal?: AbortSignal): Promise<AgentResponse> {
+  return postJson('/api/plans/submit-setup', request, signal)
+}
+
+/** Re-run the validator on a plan after the student changed it (docs/plan-format.md, "What drag-and-drop does"). */
+export function checkPlan(plan: Plan, signal?: AbortSignal): Promise<Plan> {
+  return postJson('/api/plans/check', plan, signal)
 }

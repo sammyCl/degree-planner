@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { BuildingScreen } from './BuildingScreen.tsx'
-import { FACTS } from './facts.ts'
+import { FACT_INTERVAL_MS, FACTS } from './facts.ts'
 import type { AgentRequest } from '../types.ts'
 
 const request: AgentRequest = {
@@ -22,7 +22,8 @@ describe('FACTS', () => {
     expect(FACTS.length).toBeGreaterThanOrEqual(8)
     for (const f of FACTS) {
       expect(f.topic.trim()).not.toBe('')
-      expect(f.text.trim().length).toBeGreaterThan(40)
+      expect(f.text.trim().length).toBeGreaterThan(30)
+      expect(f.text.length).toBeLessThanOrEqual(110) // brief: about one short sentence
     }
     expect(new Set(FACTS.map((f) => f.topic)).size).toBe(FACTS.length)
     expect(new Set(FACTS.map((f) => f.text)).size).toBe(FACTS.length)
@@ -41,16 +42,16 @@ describe('BuildingScreen', () => {
     render(<BuildingScreen request={request} onCancel={vi.fn()} factStart={0} />)
     expect(document.querySelectorAll('.fact.on')).toHaveLength(1)
     expect(visibleFact()).toBe(FACTS[0].topic)
-    act(() => vi.advanceTimersByTime(6500))
+    act(() => vi.advanceTimersByTime(FACT_INTERVAL_MS))
     expect(visibleFact()).toBe(FACTS[1].topic)
-    act(() => vi.advanceTimersByTime(6500))
+    act(() => vi.advanceTimersByTime(FACT_INTERVAL_MS))
     expect(visibleFact()).toBe(FACTS[2].topic)
   })
 
   it('wraps around to the first fact after the last', () => {
     render(<BuildingScreen request={request} onCancel={vi.fn()} factStart={FACTS.length - 1} />)
     expect(visibleFact()).toBe(FACTS[FACTS.length - 1].topic)
-    act(() => vi.advanceTimersByTime(6500))
+    act(() => vi.advanceTimersByTime(FACT_INTERVAL_MS))
     expect(visibleFact()).toBe(FACTS[0].topic)
   })
 

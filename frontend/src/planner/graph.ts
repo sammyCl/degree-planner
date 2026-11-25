@@ -88,10 +88,14 @@ export function flagsByCourse(flags: Flag[]): Map<string, Flag[]> {
   return map
 }
 
-/** Full time is 12 or more credits; more than 19 is an overload. Only used to colour the semester's credit bar. */
-export function creditLevel(credits: number): 'low' | 'ok' | 'high' {
-  if (credits > 0 && credits < 12) return 'low'
-  return credits > 19 ? 'high' : 'ok'
+/**
+ * Full time is 12 or more credits; more than 19 is an overload. Only used to colour the semester's credit bar.
+ * A Summer is a short, optional term, so a light one is normal and is never marked as under full time.
+ */
+export function creditLevel(credits: number, label = ''): 'low' | 'ok' | 'high' {
+  if (credits > 19) return 'high'
+  if (credits > 0 && credits < 12 && !label.startsWith('Summer')) return 'low'
+  return 'ok'
 }
 
 export const formatCredits = (n: number): string => String(Math.round(n * 10) / 10)
@@ -106,4 +110,79 @@ export function subjectColor(code: string): string {
     CHGN: 'var(--sub-chgn)',
   }
   return known[subject] ?? 'var(--sub-other)'
+}
+
+// ---------- Edits the student makes on the board ----------
+// These only rearrange the plan. They never decide whether the result is valid: the backend's validator does that
+// (POST /plans/check) and its answer replaces the plan.
+
+const sumCredits = (courses: PlannedCourse[]): number => courses.reduce((sum, c) => sum + c.credits, 0)
+
+/** The plan with one planned course moved to the end of another semester. */
+export function movePlanned(plan: Plan, courseId: string, toIndex: number): Plan {
+  const fromIndex = plan.semesters.findIndex((s) => s.courses.some((c) => c.course_id === courseId))
+  if (fromIndex < 0 || toIndex < 0 || toIndex >= plan.semesters.length || fromIndex === toIndex) return plan
+  const course = plan.semesters[fromIndex].courses.find((c) => c.course_id === courseId)!
+  const semesters = plan.semesters.map((s, i) => {
+    if (i !== fromIndex && i !== toIndex) return s
+    const courses = i === fromIndex ? s.courses.filter((c) => c.course_id !== courseId) : [...s.courses, course]
+    return { ...s, courses, total_credits: sumCredits(courses) }
+  })
+  return { ...plan, semesters }
+}
+
+const ADDED = 'sem-added-'
+
+/** The plan with an empty semester inserted at `index` (0 to length). */
+export function insertSemester(plan: Plan, index: number, label: string): Plan {
+  const used = plan.semesters.map((s) => s.semester_id)
+  let n = 1
+  while (used.includes(`${ADDED}${n}`)) n++
+  const semester = { semester_id: `${ADDED}${n}`, label, courses: [], total_credits: 0 }
+  const semesters = [...plan.semesters.slice(0, index), semester, ...plan.semesters.slice(index)]
+  return { ...plan, semesters }
+}
+
+/** A semester the student added and has not put anything in can be taken away again. */
+export const isRemovable = (semester: { semester_id: string; courses: unknown[] }): boolean =>
+  semester.semester_id.startsWith(ADDED) && semester.courses.length === 0
+
+export function removeSemester(plan: Plan, semesterId: string): Plan {
+  const target = plan.semesters.find((s) => s.semester_id === semesterId)
+  if (!target || !isRemovable(target)) return plan
+  return { ...plan, semesters: plan.semesters.filter((s) => s.semester_id !== semesterId) }
+}
+
+// ---------- Terms ----------
+
+const LABEL = /^(Fall|Spring|Summer) (\d{4})$/
+
+/** The term that follows in the calendar: Fall Y then Spring Y+1, Spring Y then Summer Y, Summer Y then Fall Y. */
+export function termAfter(label: string): string | null {
+  const m = LABEL.exec(label)
+  if (!m) return null
+  const year = Number(m[2])
+  if (m[1] === 'Fall') return `Spring ${year + 1}`
+  return m[1] === 'Spring' ? `Summer ${year}` : `Fall ${year}`
+}
+
+/** The next regular (Fall or Spring) term after a label, for a semester added at the end. */
+export function nextRegularTerm(label: string): string | null {
+  const m = LABEL.exec(label)
+  if (!m) return null
+  const year = Number(m[2])
+  return m[1] === 'Fall' ? `Spring ${year + 1}` : `Fall ${year}`
+}
+
+/** Where a Summer can be added: right after a Spring that is not already followed by a Summer. */
+export function summerSlots(plan: Plan): { after: number; label: string }[] {
+  const slots: { after: number; label: string }[] = []
+  plan.semesters.forEach((s, i) => {
+    const m = LABEL.exec(s.label)
+    if (!m || m[1] !== 'Spring') return
+    const next = plan.semesters[i + 1]
+    if (next && next.label.startsWith('Summer')) return
+    slots.push({ after: i, label: `Summer ${m[2]}` })
+  })
+  return slots
 }
