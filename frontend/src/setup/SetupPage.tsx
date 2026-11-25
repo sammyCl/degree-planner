@@ -9,7 +9,6 @@ import {
   addOns,
   addOnsOfKind,
   allowsAddOns,
-  staleAddOns,
   type AddOnKind,
   buildRequest,
   CATALOG_YEAR,
@@ -79,8 +78,6 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
   const chosenOfKind = (kind: AddOnKind) => form.addOnIds.filter((id) => byId.get(id)?.level === kind)
   const setKind = (kind: AddOnKind, ids: string[]) =>
     patch({ addOnIds: [...form.addOnIds.filter((id) => byId.get(id)?.level !== kind), ...ids] })
-  // add-on data older than the catalog the plan uses is still offered, with a warning at the top
-  const stale = useMemo(() => staleAddOns(allAddOns), [allAddOns])
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -100,13 +97,6 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
   return (
     <main className="setup-wrap">
       <div>
-        {stale.length > 0 && (
-          <div className="stale-warning" role="note">
-            <b>Minor, ASI and certification data may not be up to date.</b>{' '}
-            {stale.map((s) => `The ${ADD_ON_NAMES[s.kind].many} shown come from the ${s.years.join(' and ')} catalog`).join('; ')}
-            , not {CATALOG_YEAR}. Check each one against the current Mines catalog before you rely on it.
-          </div>
-        )}
         <div className="hero">
           <h2>
             Plan your path to <span className="grad">graduation</span>.

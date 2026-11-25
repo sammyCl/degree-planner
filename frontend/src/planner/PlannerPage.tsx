@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ApiError, checkPlan } from '../api.ts'
-import { LEVELS, PROGRAMS } from '../setup/validate.ts'
-import type { Flag, Plan } from '../types.ts'
+import { ADD_ON_NAMES, LEVELS, PROGRAMS, staleInPlan } from '../setup/validate.ts'
+import type { Flag, Plan, PlannedCourse } from '../types.ts'
 import { Arrows } from './Arrows.tsx'
 import { CourseCard, type CardState } from './CourseCard.tsx'
 import { CoursePopover } from './CoursePopover.tsx'
 import { PlanSummary } from './PlanSummary.tsx'
 import { courseLabel } from './courseLabel.ts'
 import {
+  attachedLabs,
   chainOf,
   creditLevel,
   flagsByCourse,
@@ -20,6 +21,7 @@ import {
   nextRegularTerm,
   removeSemester,
   summerSlots,
+  togetherWith,
 } from './graph.ts'
 import { SummaryBar } from './SummaryBar.tsx'
 import './PlannerPage.css'
@@ -32,6 +34,8 @@ interface Props {
   problems?: string[]
   onBack: () => void
 }
+
+const HISTORY_LIMIT = 50
 
 const programName = (plan: Plan): string => {
   const id = plan.student.programs[0]
@@ -53,6 +57,8 @@ export function PlannerPage({ plan: initialPlan, explanation, problems, onBack }
   const [notice, setNotice] = useState<string | null>(null)
 
   const index = useMemo(() => indexPlan(plan), [plan])
+  const stale = useMemo(() => staleInPlan(plan.student.programs, plan.student.catalog_year), [plan.student])
+  const labs = useMemo(() => attachedLabs(plan), [plan]) // lab course_id to the lecture it is drawn under
   const byCourse = useMemo(() => flagsByCourse(plan.flags), [plan.flags])
   const brokenTargets = useMemo(
     () =>
@@ -78,6 +84,8 @@ export function PlannerPage({ plan: initialPlan, explanation, problems, onBack }
   const [pulseId, setPulseId] = useState<string | null>(null)
   const [dragId, setDragId] = useState<string | null>(null)
   const [overIndex, setOverIndex] = useState<number | null>(null)
+  // a lecture and its lab are dragged as one, so both look lifted
+  const dragIds = useMemo(() => new Set(dragId ? togetherWith(plan, dragId) : []), [plan, dragId])
   const closePopover = useCallback(() => setOpenCard(null), [setOpenCard])
 
   useEffect(() => {
@@ -86,11 +94,18 @@ export function PlannerPage({ plan: initialPlan, explanation, problems, onBack }
     return () => clearTimeout(t)
   }, [pulseId])
 
-  /** Show an edit at once, then have the backend check it; its answer replaces the plan, or the edit is undone. */
-  const applyEdit = (next: Plan) => {
-    if (next === plan) return
+  // Every change goes on a history, so it can be undone and redone. The buttons show once there is something to undo.
+  const [past, setPast] = useState<Plan[]>([])
+  const [future, setFuture] = useState<Plan[]>([])
+
+  /** Show a plan at once, then have the backend check it; its answer replaces the plan, or the change is undone. */
+  const run = (next: Plan, nextPast: Plan[], nextFuture: Plan[]) => {
+    const before = { past, future }
     const mine = ++latest.current
     setPlan(next)
+    setPast(nextPast)
+    setFuture(nextFuture)
+    setOpenCard(null)
     setChecking(true)
     setNotice(null)
     checkPlan(next)
@@ -103,10 +118,37 @@ export function PlannerPage({ plan: initialPlan, explanation, problems, onBack }
       .catch((error) => {
         if (latest.current !== mine) return
         setPlan(confirmed.current)
+        setPast(before.past)
+        setFuture(before.future)
         setChecking(false)
         setNotice(undoMessage(error))
       })
   }
+  const applyEdit = (next: Plan) => {
+    if (next !== plan) run(next, [...past.slice(-(HISTORY_LIMIT - 1)), plan], [])
+  }
+  const undo = () => past.length > 0 && run(past[past.length - 1], past.slice(0, -1), [...future, plan])
+  const redo = () => future.length > 0 && run(future[future.length - 1], [...past, plan], future.slice(0, -1))
+
+  // Ctrl or Cmd+Z undoes, Shift+Ctrl or Cmd+Z (or Ctrl+Y) redoes, unless the student is typing in a field
+  const keys = useRef({ undo, redo })
+  useEffect(() => {
+    keys.current = { undo, redo } // the shortcut always calls the latest undo and redo
+  })
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return
+      if (!(e.metaKey || e.ctrlKey)) return
+      const k = e.key.toLowerCase()
+      if (k === 'z' && !e.shiftKey) keys.current.undo()
+      else if ((k === 'z' && e.shiftKey) || k === 'y') keys.current.redo()
+      else return
+      e.preventDefault()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [])
 
   const move = (courseId: string, toIndex: number) => applyEdit(movePlanned(plan, courseId, toIndex))
 
@@ -131,18 +173,38 @@ export function PlannerPage({ plan: initialPlan, explanation, problems, onBack }
   return (
     <div className="planner">
       <SummaryBar plan={plan} programName={programName(plan)} onSelectFlag={selectFlag} checking={checking} />
+      {stale.length > 0 && (
+        <div className="stale-warning" role="note">
+          <b>Minor, ASI and certification data may not be up to date.</b>{' '}
+          {stale.map((s) => `${s.name} (${ADD_ON_NAMES[s.kind].one}) is from the ${s.year} catalog`).join('; ')}, not{' '}
+          {plan.student.catalog_year}. Check {stale.length === 1 ? 'it' : 'each one'} against the current Mines catalog before you rely on{' '}
+          {stale.length === 1 ? 'it' : 'them'}.
+        </div>
+      )}
       <div className="planner-notice">
         <span>
           {LEVELS.find((l) => l.value === plan.student.degree_level)?.label ?? plan.student.degree_level} plan,{' '}
           {plan.semesters.length} semesters, starting {plan.semesters[0]?.label}. Drag a course to another semester to move it.
         </span>
-        <button type="button" className="link" onClick={onBack}>
-          Edit setup
-        </button>
+        <span className="history">
+          {(past.length > 0 || future.length > 0) && (
+            <>
+              <button type="button" className="link" disabled={past.length === 0} onClick={undo} title="Undo (Ctrl or Cmd+Z)">
+                &#8630; Undo
+              </button>
+              <button type="button" className="link" disabled={future.length === 0} onClick={redo} title="Redo (Shift+Ctrl or Cmd+Z)">
+                Redo &#8631;
+              </button>
+            </>
+          )}
+          <button type="button" className="link" onClick={onBack}>
+            Edit setup
+          </button>
+        </span>
       </div>
       {problems && problems.length > 0 && (
         <div className="note-problems planner-problems" role="alert">
-          <b>The assistant could not finish a valid plan.</b> This is its last attempt; check the flagged courses.
+          <b>The assistant could not build a plan that passes every rule.</b> It tried several times and this is its best attempt. The courses marked in red still break a rule, and the reasons are listed below.
           <ul>
             {problems.map((p, i) => (
               <li key={i}>{p}</li>
@@ -196,33 +258,47 @@ export function PlannerPage({ plan: initialPlan, explanation, problems, onBack }
                     <span className="meter-val">{formatCredits(s.total_credits)} cr</span>
                   </div>
                   {s.courses.length === 0 && <div className="sem-empty">Drag courses here</div>}
-                  {s.courses.map((c, j) => (
-                    <CourseCard
-                      key={c.course_id}
-                      course={c}
-                      flag={byCourse.get(c.course_id)?.[0]}
-                      label={courseLabel(plan, c.course_id)}
-                      state={stateOf(c.course_id)}
-                      col={i}
-                      row={j}
-                      setRef={setRef}
-                      onEnter={setActiveId}
-                      onLeave={() => setActiveId(null)}
-                      onOpen={(id, el) => setOpenCard({ id, el })}
-                      canDrag={c.status === 'planned'}
-                      dragging={dragId === c.course_id}
-                      onDragStart={(id) => {
-                        setActiveId(null)
-                        setOpenCard(null)
-                        setDragId(id)
-                      }}
-                      onDragEnd={() => {
-                        setDragId(null)
-                        setOverIndex(null)
-                      }}
-                      pulse={pulseId === c.course_id}
-                    />
-                  ))}
+                  {s.courses
+                    .filter((c) => !labs.has(c.course_id))
+                    .map((c) => {
+                      const attached = s.courses.filter((x) => labs.get(x.course_id) === c.course_id)
+                      const card = (x: PlannedCourse, attachedTo?: string) => (
+                        <CourseCard
+                          key={x.course_id}
+                          course={x}
+                          flag={byCourse.get(x.course_id)?.[0]}
+                          label={courseLabel(plan, x.course_id)}
+                          state={stateOf(x.course_id)}
+                          col={i}
+                          row={s.courses.indexOf(x)}
+                          setRef={setRef}
+                          onEnter={setActiveId}
+                          onLeave={() => setActiveId(null)}
+                          onOpen={(id, el) => setOpenCard({ id, el })}
+                          canDrag={x.status === 'planned'}
+                          dragging={dragIds.has(x.course_id)}
+                          attachedTo={attachedTo}
+                          onDragStart={(id) => {
+                            setActiveId(null)
+                            setOpenCard(null)
+                            setDragId(id)
+                          }}
+                          onDragEnd={() => {
+                            setDragId(null)
+                            setOverIndex(null)
+                          }}
+                          pulse={pulseId === x.course_id}
+                        />
+                      )
+                      return attached.length === 0 ? (
+                        card(c)
+                      ) : (
+                        <div className="card-group" key={c.course_id}>
+                          {card(c)}
+                          {attached.map((lab) => card(lab, c.code))}
+                        </div>
+                      )
+                    })}
                   {summer && (
                     <button
                       type="button"

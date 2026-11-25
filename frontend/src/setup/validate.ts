@@ -84,11 +84,13 @@ export const addOnsOfKind = (kind: AddOnKind): ProgramOption[] =>
 /** Every minor, ASI and certificate. */
 export const addOns = (): ProgramOption[] => (['minor', 'asi', 'certificate'] as const).flatMap(addOnsOfKind)
 
-/** The kinds of add-on whose data is not from the student's catalog year, with the year(s) actually shown. */
-export function staleAddOns(options: ProgramOption[] = addOns()): { kind: AddOnKind; years: string[] }[] {
-  return (['minor', 'asi', 'certificate'] as const).flatMap((kind) => {
-    const years = [...new Set(options.filter((o) => o.level === kind && o.catalog_year !== CATALOG_YEAR).map((o) => o.catalog_year))].sort()
-    return years.length ? [{ kind, years }] : []
+/** The minors, ASIs and certificates in a plan whose data is from an older catalog than the plan's, with the year used. */
+export function staleInPlan(programIds: string[], planYear: string): { name: string; kind: AddOnKind; year: string }[] {
+  return programIds.flatMap((id) => {
+    const p = PROGRAMS.find((o) => o.id === id)
+    return p && (p.level === 'minor' || p.level === 'asi' || p.level === 'certificate') && p.catalog_year !== planYear
+      ? [{ name: shortName(p.name), kind: p.level, year: p.catalog_year }]
+      : []
   })
 }
 

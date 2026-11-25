@@ -118,11 +118,9 @@ describe('SetupPage', () => {
     expect(screen.queryByRole('button', { name: /^Remove Computer Science/ })).not.toBeInTheDocument()
   })
 
-  it('keeps ASIs in their own picker, apart from minors, and warns that their data is from an older catalog', () => {
+  it('keeps ASIs in their own picker, apart from minors, with each one marked with its older catalog year', () => {
     setup()
-    const warning = screen.getByRole('note')
-    expect(warning).toHaveTextContent('may not be up to date')
-    expect(warning).toHaveTextContent('ASIs shown come from the 2025-2026 catalog, not 2026-2027')
+    expect(screen.queryByRole('note')).not.toBeInTheDocument() // the catalog warning is on the planner page
     const box = screen.getByRole('combobox', { name: 'Search ASIs' })
     fireEvent.focus(box)
     const options = screen.getAllByRole('option')

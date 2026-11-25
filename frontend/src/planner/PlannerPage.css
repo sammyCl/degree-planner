@@ -1118,3 +1118,67 @@
   padding-left: 20px;
   color: var(--text);
 }
+
+/* ---------- A lab drawn under its lecture ---------- */
+.card-group {
+  margin-bottom: 8px;
+}
+
+.card-group .card {
+  margin-bottom: 0;
+}
+
+.card-group .card:not(.attached) {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.card-group .card.attached {
+  margin-top: -1px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-top-style: dashed;
+  background: color-mix(in srgb, var(--acc-tint) 55%, var(--raised));
+}
+
+.card-group .card:hover {
+  transform: none;
+}
+
+.card-lab {
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--acc);
+}
+
+.pop-note {
+  margin-top: 10px;
+  padding: 9px 10px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  background: var(--acc-tint);
+  color: var(--acc);
+}
+
+/* ---------- Undo and redo ---------- */
+.history {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.history .link:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* Warning that add-on data comes from an older catalog */
+.stale-warning {
+  padding: 10px 20px;
+  border-bottom: 1px solid color-mix(in srgb, var(--warn) 35%, transparent);
+  background: var(--warn-bg);
+  color: var(--warn);
+  font-size: 13.5px;
+  line-height: 1.5;
+}

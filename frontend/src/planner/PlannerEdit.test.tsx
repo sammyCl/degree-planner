@@ -225,3 +225,50 @@ describe('adding a semester', () => {
     expect(screen.queryByRole('region', { name: 'Summer 2027' })).not.toBeInTheDocument()
   })
 })
+
+describe('undo and redo', () => {
+  it('shows no undo or redo until the plan is edited', () => {
+    render(<PlannerPage plan={samplePlan} onBack={vi.fn()} />)
+    expect(screen.queryByRole('button', { name: /Undo/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Redo/ })).not.toBeInTheDocument()
+  })
+
+  it('undoes and redoes a move, asking the backend to check each plan', async () => {
+    const { sent } = stubCheck()
+    render(<PlannerPage plan={samplePlan} onBack={vi.fn()} />)
+    drag('CSM101', 'Spring 2027')
+    await waitFor(() => expect(sent).toHaveLength(1))
+    expect(screen.getByRole('button', { name: /Redo/ })).toBeDisabled()
+
+    fireEvent.click(screen.getByRole('button', { name: /Undo/ }))
+    expect(codesIn('Fall 2026')).toContain('CSM101')
+    expect(screen.getByRole('button', { name: /Undo/ })).toBeDisabled()
+    await waitFor(() => expect(sent).toHaveLength(2))
+
+    fireEvent.click(screen.getByRole('button', { name: /Redo/ }))
+    expect(codesIn('Spring 2027')).toContain('CSM101')
+    await waitFor(() => expect(sent).toHaveLength(3))
+  })
+
+  it('also undoes adding a semester, and the keyboard shortcut works', async () => {
+    stubCheck()
+    render(<PlannerPage plan={samplePlan} onBack={vi.fn()} />)
+    const before = semesterLabels().length
+    fireEvent.click(screen.getByRole('button', { name: /^Add .* at the end$/ }))
+    expect(semesterLabels()).toHaveLength(before + 1)
+    fireEvent.keyDown(document.body, { key: 'z', ctrlKey: true })
+    await waitFor(() => expect(semesterLabels()).toHaveLength(before))
+    fireEvent.keyDown(document.body, { key: 'z', ctrlKey: true, shiftKey: true })
+    await waitFor(() => expect(semesterLabels()).toHaveLength(before + 1))
+  })
+
+  it('forgets the redo list when a new change is made after an undo', async () => {
+    stubCheck()
+    render(<PlannerPage plan={samplePlan} onBack={vi.fn()} />)
+    drag('CSM101', 'Spring 2027')
+    fireEvent.click(await screen.findByRole('button', { name: /Undo/ }))
+    expect(screen.getByRole('button', { name: /Redo/ })).toBeEnabled()
+    drag('CSM101', 'Spring 2027')
+    expect(screen.getByRole('button', { name: /Redo/ })).toBeDisabled()
+  })
+})

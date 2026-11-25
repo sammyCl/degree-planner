@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Dropdown } from '../setup/Dropdown.tsx'
 import type { Flag, Plan } from '../types.ts'
-import { flagKind, formatCredits, type PlanIndex } from './graph.ts'
+import { flagKind, formatCredits, togetherWith, type PlanIndex } from './graph.ts'
 
 interface Props {
   plan: Plan
@@ -62,6 +62,7 @@ export function CoursePopover({ plan, index, courseId, anchor, flags, onMove, on
       </span>
     )
   }
+  const partners = togetherWith(plan, courseId).filter((id) => id !== courseId)
   const needs = index.needs.get(courseId) ?? []
   const unlocks = index.unlocks.get(courseId) ?? []
 
@@ -80,6 +81,11 @@ export function CoursePopover({ plan, index, courseId, anchor, flags, onMove, on
           {f.message}
         </div>
       ))}
+      {partners.length > 0 && onMove && (
+        <div className="pop-note">
+          Taken together with {partners.map((id) => index.courses.get(id)?.code).join(', ')}, so they move as one.
+        </div>
+      )}
       <div className="pop-sec">Needs</div>
       <div className="pop-list">
         {needs.length ? needs.map((id) => tag(id, (index.semesterOf.get(id) ?? 0) >= here)) : <span className="tag">Nothing in this plan</span>}

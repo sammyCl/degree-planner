@@ -8,9 +8,8 @@ import {
   majorsFor,
   PROGRAMS,
   SEMESTER_LIMITS,
-  staleAddOns,
+  staleInPlan,
   validateSetup,
-  type ProgramOption,
   type SetupForm,
 } from './validate.ts'
 
@@ -59,12 +58,13 @@ describe('program options', () => {
     expect(asis.length).toBeGreaterThan(0)
     expect(asis.every((a) => /^\d{4}-\d{4}$/.test(a.catalog_year))).toBe(true)
   })
-  it('reports the kinds of add-on whose data is not from the catalog year, with the year shown', () => {
-    const opt = (level: ProgramOption['level'], catalog_year: string): ProgramOption => ({ id: `${level}-${catalog_year}`, name: level, level, catalog_year })
-    expect(staleAddOns([opt('minor', CATALOG_YEAR), opt('asi', '2025-2026'), opt('asi', '2024-2025')])).toEqual([
-      { kind: 'asi', years: ['2024-2025', '2025-2026'] },
+  it('lists the add-ons in a plan whose data is from an older catalog, with the year used', () => {
+    const asi = addOnsOfKind('asi')[0]
+    const minor = addOnsOfKind('minor')[0]
+    expect(staleInPlan([asi.id, minor.id, 'not-a-program'], CATALOG_YEAR)).toEqual([
+      { name: expect.any(String), kind: 'asi', year: asi.catalog_year },
     ])
-    expect(staleAddOns([opt('minor', CATALOG_YEAR)])).toEqual([])
+    expect(staleInPlan([minor.id], CATALOG_YEAR)).toEqual([])
   })
   it('has unique ids', () => {
     expect(new Set(PROGRAMS.map((p) => p.id)).size).toBe(PROGRAMS.length)

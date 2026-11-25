@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
+import { PROGRAMS } from '../setup/validate.ts'
 import { samplePlan } from '../samplePlan.ts'
 import { PlannerPage } from './PlannerPage.tsx'
 
@@ -112,7 +113,7 @@ describe('PlannerPage', () => {
   it('lists the problems when the assistant could not finish a valid plan', () => {
     setup(vi.fn(), { problems: ['CSCI400 cannot be placed after CSCI306.', 'Not enough credits.'] })
     const alert = screen.getByRole('alert')
-    expect(alert).toHaveTextContent('could not finish a valid plan')
+    expect(alert).toHaveTextContent('could not build a plan that passes every rule')
     expect(within(alert).getAllByRole('listitem')).toHaveLength(2)
   })
 
@@ -170,6 +171,17 @@ describe('PlannerPage', () => {
     expect(body).not.toHaveAttribute('inert')
     fireEvent.click(screen.getByRole('button', { name: 'Hide' }))
     expect(body).toHaveClass('peek')
+  })
+
+  it('warns at the top when the plan uses an ASI from an older catalog, and says nothing otherwise', () => {
+    const { unmount } = render(<PlannerPage plan={samplePlan} onBack={vi.fn()} />)
+    expect(screen.queryByRole('note')).not.toBeInTheDocument()
+    unmount()
+    const asi = PROGRAMS.find((p) => p.level === 'asi')!
+    render(<PlannerPage plan={{ ...samplePlan, student: { ...samplePlan.student, programs: [...samplePlan.student.programs, asi.id] } }} onBack={vi.fn()} />)
+    const note = screen.getByRole('note')
+    expect(note).toHaveTextContent('may not be up to date')
+    expect(note).toHaveTextContent(`from the ${asi.catalog_year} catalog, not 2026-2027`)
   })
 
   it('keeps the "could not finish" alert above the board, where it is seen first', () => {
