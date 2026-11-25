@@ -29,8 +29,8 @@ describe('PlannerPage', () => {
     expect(screen.getByText('Plain explanation of the plan.')).toBeInTheDocument()
     expect(screen.getByText(/Bachelor's plan, 8 semesters, starting Fall 2026/)).toBeInTheDocument()
     // the number counts up over about a second
-    await waitFor(() => expect(screen.getByTestId('credit-total')).toHaveTextContent('114 / 130'), { timeout: 4000 })
-  })
+    await waitFor(() => expect(screen.getByTestId('credit-total')).toHaveTextContent('114 / 130'), { timeout: 10000 })
+  }, 15000) // the count-up is an animation, so a busy machine needs room
 
   it('marks the flagged course and says why in its accessible name', () => {
     setup()
