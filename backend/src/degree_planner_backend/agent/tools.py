@@ -900,6 +900,7 @@ SEMESTERS_MAX = 18
 COURSES_PER_SEMESTER_MAX = 12
 SEMESTER_LABEL_MAX = 40
 FLAG_MESSAGE_MAX = 600
+COURSE_DESCRIPTION_MAX = 1000
 FLAGS_SHOWN_MAX = 30
 # Only these flag types may be overridden by the student (docs/plan-format.md, DECISIONS.md).
 # Any other override in the record is ignored and logged: it must never hide a real error.
@@ -1173,6 +1174,8 @@ def build_plan(connection: sqlite3.Connection, context: StudentContext, semester
                     title=clean_text(course.title, PROGRAM_NAME_MAX) or code,
                     credits=course.credits,
                     status="planned",
+                    description=clean_text(course.description, COURSE_DESCRIPTION_MAX),
+                    corequisites=course.corequisites,
                 )
             )
         plan_semesters.append(Semester(semester_id=f"sem-{index}", label=label, courses=planned))

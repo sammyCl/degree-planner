@@ -55,6 +55,12 @@ def program_ids(connection: sqlite3.Connection) -> list[str]:
     return sorted(row[0] for row in rows)
 
 
+def program_years(connection: sqlite3.Connection, program_id: str) -> list[str]:
+    """Every catalog year this program_id is stored for, sorted; [] if it isn't loaded at all."""
+    rows = connection.execute("SELECT DISTINCT catalog_year FROM programs WHERE program_id = ?", (program_id,)).fetchall()
+    return sorted(row[0] for row in rows)
+
+
 def get_course(connection: sqlite3.Connection, code: str, catalog_year: str | None = None) -> Course:
     year = _resolve_catalog_year(connection, "courses", "code", code, catalog_year)
     row = connection.execute("SELECT data FROM courses WHERE code = ? AND catalog_year = ?", (code, year)).fetchone()

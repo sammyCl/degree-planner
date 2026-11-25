@@ -8433,6 +8433,9 @@
    },
    "equivalent_with": [
     "DSCI403"
+   ],
+   "equivalent_with_inferred": [
+    "DSCI403"
    ]
   },
   {
@@ -11097,6 +11100,9 @@
     "url": "https://catalog.mines.edu/coursesaz/datascience/"
    },
    "equivalent_with": [
+    "CSCI303"
+   ],
+   "equivalent_with_inferred": [
     "CSCI303"
    ]
   },
@@ -16194,6 +16200,9 @@
    },
    "equivalent_with": [
     "MEGN475"
+   ],
+   "equivalent_with_inferred": [
+    "MEGN475"
    ]
   },
   {
@@ -18429,6 +18438,9 @@
    },
    "equivalent_with": [
     "MNGN310"
+   ],
+   "equivalent_with_inferred": [
+    "MNGN310"
    ]
   },
   {
@@ -18466,6 +18478,9 @@
     "url": "https://catalog.mines.edu/coursesaz/geology/"
    },
    "equivalent_with": [
+    "MNGN311"
+   ],
+   "equivalent_with_inferred": [
     "MNGN311"
    ]
   },
@@ -28011,6 +28026,9 @@
    "equivalent_with": [
     "EENG475",
     "ENGY475"
+   ],
+   "equivalent_with_inferred": [
+    "ENGY475"
    ]
   },
   {
@@ -29089,6 +29107,9 @@
    },
    "equivalent_with": [
     "PHGN440"
+   ],
+   "equivalent_with_inferred": [
+    "PHGN440"
    ]
   },
   {
@@ -29963,6 +29984,9 @@
    },
    "equivalent_with": [
     "GEOL310"
+   ],
+   "equivalent_with_inferred": [
+    "GEOL310"
    ]
   },
   {
@@ -30000,6 +30024,9 @@
     "url": "https://catalog.mines.edu/coursesaz/miningeng/"
    },
    "equivalent_with": [
+    "GEOL311"
+   ],
+   "equivalent_with_inferred": [
     "GEOL311"
    ]
   },
@@ -38989,6 +39016,9 @@
     "url": "https://catalog.mines.edu/coursesaz/physics/"
    },
    "equivalent_with": [
+    "MLGN502"
+   ],
+   "equivalent_with_inferred": [
     "MLGN502"
    ]
   },
