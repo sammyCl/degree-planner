@@ -76,11 +76,11 @@ export function Legend() {
           <div className="key-sec">Semester bar</div>
           <div className="key-row">
             <i className="key-swatch low" />
-            <span>Amber: under 12 credits (not counted for Summer)</span>
+            <span>Amber: under full time, 12 credits (9 for a master's); Summer is never marked</span>
           </div>
           <div className="key-row">
             <i className="key-swatch high" />
-            <span>Red: over 19 credits</span>
+            <span>Red: over the limit, 18 credits (15 for graduate students)</span>
           </div>
         </div>
       )}

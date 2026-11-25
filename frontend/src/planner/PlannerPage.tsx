@@ -11,6 +11,7 @@ import {
   attachedLabs,
   chainOf,
   creditLevel,
+  overloadedSemesters,
   flagsByCourse,
   formatCredits,
   indexPlan,
@@ -58,6 +59,7 @@ export function PlannerPage({ plan: initialPlan, explanation, problems, onBack }
 
   const index = useMemo(() => indexPlan(plan), [plan])
   const stale = useMemo(() => staleInPlan(plan.student.programs, plan.student.catalog_year), [plan.student])
+  const overloaded = useMemo(() => overloadedSemesters(plan.flags), [plan.flags])
   const labs = useMemo(() => attachedLabs(plan), [plan]) // lab course_id to the lecture it is drawn under
   const byCourse = useMemo(() => flagsByCourse(plan.flags), [plan.flags])
   const brokenTargets = useMemo(
@@ -212,7 +214,7 @@ export function PlannerPage({ plan: initialPlan, explanation, problems, onBack }
             {plan.semesters.map((s, i) => {
               const [term, year] = s.label.split(' ')
               const credits = s.courses.reduce((sum, c) => sum + c.credits, 0)
-              const level = creditLevel(credits, s.label)
+              const level = creditLevel(credits, s.label, overloaded.has(s.label), plan.student.degree_level === 'master' ? 9 : 12)
               const summer = summers.get(i)
               return (
                 <section

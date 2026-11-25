@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
+import type { Flag } from '../types.ts'
 import { samplePlan } from '../samplePlan.ts'
 import {
   chainOf,
   creditLevel,
+  overloadedSemesters,
   flagCounts,
   flagKind,
   flagsByCourse,
@@ -88,11 +90,18 @@ describe('creditLevel and subjectColor', () => {
   it('marks under full time, normal and overloaded semesters', () => {
     expect(creditLevel(6)).toBe('low')
     expect(creditLevel(15)).toBe('ok')
-    expect(creditLevel(20)).toBe('high')
+    expect(creditLevel(20)).toBe('ok') // over the limit is the validator's call, passed in
+    expect(creditLevel(20, 'Fall 2027', true)).toBe('high')
     expect(creditLevel(0)).toBe('ok')
     expect(creditLevel(3, 'Summer 2027')).toBe('ok') // a light Summer is normal
     expect(creditLevel(3, 'Spring 2027')).toBe('low')
-    expect(creditLevel(21, 'Summer 2027')).toBe('high')
+    expect(creditLevel(9, 'Fall 2027', false, 9)).toBe('ok') // full time for a master's student is 9
+    expect(creditLevel(6, 'Fall 2027', false, 9)).toBe('low')
+  })
+  it('finds the overloaded semesters from the validator\'s flags, ignoring overridden or other flags', () => {
+    const flag = (over: object) => ({ flag_id: 'f', type: 'semester_overload', severity: 'error', course_id: null, message: 'Fall 2027 has 20 credits, over the 18-credit limit for an undergraduate semester.', overridable: false, overridden: false, ...over }) as Flag
+    expect([...overloadedSemesters([flag({}), flag({ type: 'credit_shortfall' }), flag({ message: 'Spring 2028 has 16 credits, over the 15-credit limit for a graduate semester.' })])]).toEqual(['Fall 2027', 'Spring 2028'])
+    expect(overloadedSemesters([flag({ overridden: true })]).size).toBe(0)
   })
   it('colours known subjects and greys the rest', () => {
     expect(subjectColor('CSCI200')).toContain('csci')

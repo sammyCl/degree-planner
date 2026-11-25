@@ -166,5 +166,7 @@ const TITLES: Record<string, string> = {
   requirement_unmet: 'Requirement not met',
   double_count_exceeded: 'Too many shared courses',
   exception_claimed: 'To confirm',
+  ineligible_course: 'Course not allowed here',
+  semester_overload: 'Too many credits in a semester',
 }
 const flagTitle = (f: Flag): string => TITLES[f.type] ?? 'Needs attention'
