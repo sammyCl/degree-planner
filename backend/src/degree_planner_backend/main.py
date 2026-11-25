@@ -1,3 +1,4 @@
+import logging
 import sqlite3
 import tempfile
 from pathlib import Path
@@ -21,6 +22,8 @@ from degree_planner_backend.transcript_parser import (
 )
 from degree_planner_backend.validator import check_plan
 
+logger = logging.getLogger(__name__)
+
 app = FastAPI(title="Degree Planner API")
 
 
@@ -31,6 +34,21 @@ async def _on_request_validation_error(request: Request, exc: RequestValidationE
     encoded as UTF-8, turning an ordinary 422 into a 500 (BUG-046). Drop "input" instead."""
     errors = [{key: value for key, value in error.items() if key != "input"} for error in exc.errors()]
     return JSONResponse(status_code=422, content=jsonable_encoder({"detail": errors}))
+
+
+@app.exception_handler(Exception)
+async def _on_unexpected_error(request: Request, exc: Exception) -> JSONResponse:
+    """Trial-ready API: an HTTPException or RequestValidationError is handled above or by FastAPI
+    itself and never reaches this; this is only for a genuine bug or server problem we did not
+    anticipate (e.g. a locked database). The real exception and traceback go to the server log
+    (same principle as BUG-006: internals are never a student's problem or an attacker's map of
+    this server); the response stays a plain, fixed message so the frontend has something to show
+    and retry, instead of the connection just failing."""
+    logger.exception("unhandled error on %s %s", request.method, request.url.path)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Something went wrong on our end. Please try again in a moment."},
+    )
 
 
 @app.get("/health")

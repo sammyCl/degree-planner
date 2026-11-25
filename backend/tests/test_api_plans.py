@@ -208,3 +208,28 @@ def test_a_lone_surrogate_in_the_body_gets_422_not_500(client_with_empty_db: Tes
 
     assert response.status_code == 422
     assert "detail" in response.json()
+
+
+def test_an_unexpected_error_is_a_clean_500_not_a_bare_crash(
+    client_with_catalog: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Trial-ready API: a genuine bug or server problem we didn't anticipate (not an HTTPException
+    # or a validation error, both handled elsewhere) should still reach the student as a normal,
+    # readable response, with the real exception only in the server log.
+    def fake_check_plan(connection, plan):
+        raise RuntimeError("the database is locked")
+
+    monkeypatch.setattr(main, "check_plan", fake_check_plan)
+
+    # client_with_catalog's dependency override is on the shared `app`, so it still applies; a
+    # plain TestClient(app) re-raises an unhandled exception instead of returning our 500 (so a
+    # real bug stays loud in tests by default) — raise_server_exceptions=False shows what the
+    # student's browser would actually get.
+    client = TestClient(app, raise_server_exceptions=False)
+    response = client.post("/plans/check", json=json.loads(
+        (REPO_ROOT / "docs" / "plan-format.sample.json").read_text()
+    ))
+
+    assert response.status_code == 500
+    assert "locked" not in response.text
+    assert response.json() == {"detail": "Something went wrong on our end. Please try again in a moment."}
