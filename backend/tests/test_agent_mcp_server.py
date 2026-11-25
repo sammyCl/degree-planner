@@ -200,16 +200,16 @@ def test_server_opens_the_catalog_read_only(db_path: Path, tmp_path: Path) -> No
     assert db_path.stat().st_mtime_ns == before
 
 
-# --- submit_summary: the agent's choices and notes as separate fields ----------------------------
+# --- submit_summary: the agent's choices and checks as separate fields ---------------------------
 
-SUMMARY = {"choices": ["I put TEST101 first because TEST102 needs it."], "notes": ["Confirm the plan with your advisor."]}
+SUMMARY = {"choices": ["I put TEST101 first because TEST102 needs it."], "checks": ["Confirm the plan with your advisor."]}
 
 
 def test_summary_is_saved_next_to_the_plan(planner: PlannerTools) -> None:
     planner.call("check_plan", GOOD_PLAN)
     result = planner.call("submit_summary", SUMMARY)
 
-    assert result == {"saved": True, "choices": 1, "notes": 1}
+    assert result == {"saved": True, "choices": 1, "checks": 1}
     assert planner.summary_path == planner.plan_path.with_name("summary.json")
     assert json.loads(planner.summary_path.read_text()) == SUMMARY
 
@@ -241,14 +241,14 @@ def test_a_rejected_check_plan_keeps_the_summary(planner: PlannerTools) -> None:
 
 def test_empty_lists_are_fine(planner: PlannerTools) -> None:
     planner.call("check_plan", GOOD_PLAN)
-    assert planner.call("submit_summary", {"choices": [], "notes": []})["saved"] is True
+    assert planner.call("submit_summary", {"choices": [], "checks": []})["saved"] is True
 
 
 def test_summary_text_is_cleaned_and_capped(planner: PlannerTools) -> None:
     from degree_planner_backend.agent.request_models import SUMMARY_ITEM_MAX
 
     planner.call("check_plan", GOOD_PLAN)
-    planner.call("submit_summary", {"choices": ["Line one\nline‮ two", "x" * 2000], "notes": []})
+    planner.call("submit_summary", {"choices": ["Line one\nline‮ two", "x" * 2000], "checks": []})
 
     saved = json.loads(planner.summary_path.read_text())
     assert saved["choices"][0] == "Line one line two"
@@ -260,11 +260,11 @@ def test_summary_text_is_cleaned_and_capped(planner: PlannerTools) -> None:
     [
         {},
         {"choices": []},
-        {"choices": "one choice", "notes": []},
-        {"choices": [1], "notes": []},
-        {"choices": ["   "], "notes": []},
-        {"choices": ["\ud800"], "notes": []},
-        {"choices": ["a"] * 13, "notes": []},
+        {"choices": "one choice", "checks": []},
+        {"choices": [1], "checks": []},
+        {"choices": ["   "], "checks": []},
+        {"choices": ["\ud800"], "checks": []},
+        {"choices": ["a"] * 13, "checks": []},
         "not an object",
     ],
 )

@@ -48,9 +48,9 @@ SUBMIT_SUMMARY_TOOL: dict[str, Any] = {
     "name": "submit_summary",
     "description": (
         "Call once at the very end, after your last check_plan and before your final message, to hand "
-        "back two short lists for the student's planner page. choices: each choice you made where the "
+        "back two short lists for the student's planner page. choices (shown as 'Choices I made'): each choice you made where the "
         "requirements left it open, such as which elective fills a group or which semester a course "
-        "went in when either would work, one per item. notes: each thing the student should confirm "
+        "went in when either would work, one per item. checks (shown as 'Things to check'): each thing the student should confirm "
         "with their advisor or the department, such as an approval, a course offered only some terms, "
         "or a catalog year the data comes from, one per item. Write each item as one or two plain "
         "sentences for the student, with no tool or field names; use [] when there is nothing. "
@@ -61,9 +61,9 @@ SUBMIT_SUMMARY_TOOL: dict[str, Any] = {
         "type": "object",
         "properties": {
             "choices": {"type": "array", "items": {"type": "string"}, "maxItems": SUMMARY_ITEMS_MAX},
-            "notes": {"type": "array", "items": {"type": "string"}, "maxItems": SUMMARY_ITEMS_MAX},
+            "checks": {"type": "array", "items": {"type": "string"}, "maxItems": SUMMARY_ITEMS_MAX},
         },
-        "required": ["choices", "notes"],
+        "required": ["choices", "checks"],
     },
 }
 
@@ -147,9 +147,9 @@ class PlannerTools:
         if not self.plan_path.exists():
             return {"error": "call check_plan with your plan first; submit_summary describes the plan check_plan accepted."}
         if not isinstance(tool_input, dict):
-            return {"error": "tool input must be a JSON object with choices and notes, each a list of text."}
+            return {"error": "tool input must be a JSON object with choices and checks, each a list of text."}
         lists: dict[str, list[str]] = {}
-        for field in ("choices", "notes"):
+        for field in ("choices", "checks"):
             items = tool_input.get(field)
             if not isinstance(items, list) or not all(isinstance(item, str) for item in items):
                 return {"error": f"{field} must be a list of text items (use [] when there is nothing)."}
@@ -167,7 +167,7 @@ class PlannerTools:
         partial = self.summary_path.with_name(self.summary_path.name + ".partial")
         partial.write_text(json.dumps(lists))
         os.replace(partial, self.summary_path)
-        return {"saved": True, "choices": len(lists["choices"]), "notes": len(lists["notes"])}
+        return {"saved": True, "choices": len(lists["choices"]), "checks": len(lists["checks"])}
 
     def _save_plan(self, tool_input: dict[str, Any]) -> None:
         # Written to a temporary file and renamed, so the loop never reads half a plan.

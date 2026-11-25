@@ -165,23 +165,23 @@ def run_agent(connection: sqlite3.Connection, request: AgentRequest, runner: Run
 
 
 def _with_summary(response: AgentResponse, summary: Any) -> AgentResponse:
-    """The choices and notes from submit_summary, which mcp_server.py already checked and cleaned;
+    """The choices and checks from submit_summary, which mcp_server.py already checked and cleaned;
     checked again here, so a summary file that is somehow off leaves both lists empty instead of
     failing the request."""
     if response.plan is None or not isinstance(summary, dict):
         return response
-    choices, notes = summary.get("choices", []), summary.get("notes", [])
-    if not isinstance(choices, list) or not isinstance(notes, list):
-        logger.warning("agent summary file was not usable; choices and notes left empty")
+    choices, checks = summary.get("choices", []), summary.get("checks", [])
+    if not isinstance(choices, list) or not isinstance(checks, list):
+        logger.warning("agent summary file was not usable; choices and checks left empty")
         return response
     try:
         return AgentResponse(
             status=response.status, plan=response.plan, explanation=response.explanation,
             problems=response.problems, usage=response.usage,
-            choices=tuple(choices), notes=tuple(notes),
+            choices=tuple(choices), checks=tuple(checks),
         )
     except ValidationError:
-        logger.warning("agent summary file was not usable; choices and notes left empty")
+        logger.warning("agent summary file was not usable; choices and checks left empty")
         return response
 
 

@@ -431,18 +431,18 @@ def test_the_returned_plan_keeps_the_validators_labels_and_checklist(connection:
     assert response.plan.counts_toward, "the course labels were dropped"
 
 
-# --- choices and notes from submit_summary --------------------------------------------------------
+# --- choices and checks from submit_summary -------------------------------------------------------
 
-SUMMARY = {"choices": ["I put TEST101 first because TEST102 needs it."], "notes": ["Confirm the plan with your advisor."]}
+SUMMARY = {"choices": ["I put TEST101 first because TEST102 needs it."], "checks": ["Confirm the plan with your advisor."]}
 
 
-def test_summary_becomes_choices_and_notes(connection: sqlite3.Connection) -> None:
+def test_summary_becomes_choices_and_checks(connection: sqlite3.Connection) -> None:
     fake = FakeClaude([("check_plan", GOOD_PLAN), ("submit_summary", SUMMARY)], claude_result("TEST101 first."))
     response = run_agent(connection, make_request(), runner=fake)
 
     assert response.status == "ok"
     assert response.choices == ("I put TEST101 first because TEST102 needs it.",)
-    assert response.notes == ("Confirm the plan with your advisor.",)
+    assert response.checks == ("Confirm the plan with your advisor.",)
     assert response.explanation == "TEST101 first."  # the full message is still there
 
 
@@ -450,14 +450,14 @@ def test_no_summary_means_empty_lists(connection: sqlite3.Connection) -> None:
     response = run_agent(connection, make_request(), runner=FakeClaude([("check_plan", GOOD_PLAN)]))
 
     assert response.status == "ok"
-    assert response.choices == () and response.notes == ()
+    assert response.choices == () and response.checks == ()
 
 
 def test_summary_sent_before_the_last_check_plan_is_dropped(connection: sqlite3.Connection) -> None:
     calls = [("check_plan", HALF_PLAN), ("submit_summary", SUMMARY), ("check_plan", GOOD_PLAN)]
     response = run_agent(connection, make_request(), runner=FakeClaude(calls))
 
-    assert response.choices == () and response.notes == ()
+    assert response.choices == () and response.checks == ()
 
 
 def test_summary_is_dropped_when_the_run_did_not_finish(connection: sqlite3.Connection) -> None:
@@ -466,7 +466,7 @@ def test_summary_is_dropped_when_the_run_did_not_finish(connection: sqlite3.Conn
     response = run_agent(connection, make_request(), runner=fake)
 
     assert response.status == "cannot_work"
-    assert response.choices == () and response.notes == ()
+    assert response.choices == () and response.checks == ()
 
 
 def test_summary_is_kept_on_a_plan_that_does_not_work(connection: sqlite3.Connection) -> None:
@@ -480,7 +480,7 @@ def test_summary_is_kept_on_a_plan_that_does_not_work(connection: sqlite3.Connec
 
 @pytest.mark.parametrize(
     "content",
-    ['{"choices": "one", "notes": []}', '{"choices": ["  "], "notes": []}', '["not", "an", "object"]'],
+    ['{"choices": "one", "checks": []}', '{"choices": ["  "], "checks": []}', '["not", "an", "object"]'],
 )
 def test_an_unusable_summary_file_leaves_the_lists_empty(connection: sqlite3.Connection, content: str) -> None:
     fake = FakeClaude([("check_plan", GOOD_PLAN)])
@@ -493,4 +493,4 @@ def test_an_unusable_summary_file_leaves_the_lists_empty(connection: sqlite3.Con
     response = run_agent(connection, make_request(), runner=runner)
 
     assert response.status == "ok"
-    assert response.choices == () and response.notes == ()
+    assert response.choices == () and response.checks == ()
