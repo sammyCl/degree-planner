@@ -1162,23 +1162,36 @@
 }
 
 /* ---------- Undo and redo ---------- */
-.history {
+/* under the flowchart, bottom left; sticky so it stays in view while the board scrolls sideways */
+.board-tools {
+  position: sticky;
+  left: 20px;
+  z-index: 3;
+  display: flex;
+  gap: 8px;
+  width: max-content;
+  margin-top: 6px;
+}
+
+.tool {
   display: inline-flex;
   align-items: center;
-  gap: 16px;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--raised);
+  box-shadow: var(--sh-1);
+  font-weight: 500;
+  font-size: 13px;
 }
 
-.history .link:disabled {
+.tool:hover:not(:disabled) {
+  border-color: var(--border-strong);
+  box-shadow: var(--sh-2);
+}
+
+.tool:disabled {
   opacity: 0.4;
   cursor: default;
-}
-
-/* Warning that add-on data comes from an older catalog */
-.stale-warning {
-  padding: 10px 20px;
-  border-bottom: 1px solid color-mix(in srgb, var(--warn) 35%, transparent);
-  background: var(--warn-bg);
-  color: var(--warn);
-  font-size: 13.5px;
-  line-height: 1.5;
 }

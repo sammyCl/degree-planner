@@ -186,21 +186,9 @@ export function PlannerPage({ plan: initialPlan, explanation, problems, onBack }
           {LEVELS.find((l) => l.value === plan.student.degree_level)?.label ?? plan.student.degree_level} plan,{' '}
           {plan.semesters.length} semesters, starting {plan.semesters[0]?.label}. Drag a course to another semester to move it.
         </span>
-        <span className="history">
-          {(past.length > 0 || future.length > 0) && (
-            <>
-              <button type="button" className="link" disabled={past.length === 0} onClick={undo} title="Undo (Ctrl or Cmd+Z)">
-                &#8630; Undo
-              </button>
-              <button type="button" className="link" disabled={future.length === 0} onClick={redo} title="Redo (Shift+Ctrl or Cmd+Z)">
-                Redo &#8631;
-              </button>
-            </>
-          )}
-          <button type="button" className="link" onClick={onBack}>
-            Edit setup
-          </button>
-        </span>
+        <button type="button" className="link" onClick={onBack}>
+          Edit setup
+        </button>
       </div>
       {problems && problems.length > 0 && (
         <div className="note-problems planner-problems" role="alert">
@@ -329,6 +317,24 @@ export function PlannerPage({ plan: initialPlan, explanation, problems, onBack }
               brokenTargets={brokenTargets}
             />
           </div>
+          {(past.length > 0 || future.length > 0) && (
+            <div className="board-tools" role="group" aria-label="Undo and redo">
+              <button type="button" className="tool" disabled={past.length === 0} onClick={undo} title="Undo (Ctrl or Cmd+Z)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M9 14L4 9l5-5" />
+                  <path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
+                </svg>
+                Undo
+              </button>
+              <button type="button" className="tool" disabled={future.length === 0} onClick={redo} title="Redo (Shift+Ctrl or Cmd+Z)">
+                Redo
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M15 14l5-5-5-5" />
+                  <path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13" />
+                </svg>
+              </button>
+            </div>
+          )}
         </div>
       </div>
       <PlanSummary plan={plan} explanation={explanation} />
