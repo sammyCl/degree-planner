@@ -127,6 +127,18 @@ describe('PlannerPage', () => {
     expect(screen.getAllByRole('menuitem')).toHaveLength(2)
   })
 
+  it('keeps the colour and label key closed until the Key button is pressed, and closes it with Escape', () => {
+    setup()
+    expect(screen.queryByRole('dialog', { name: 'Colour and label key' })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Key' }))
+    const key = screen.getByRole('dialog', { name: 'Colour and label key' })
+    expect(key).toHaveTextContent('Required for your degree')
+    expect(key).toHaveTextContent('Minor core')
+    expect(key).toHaveTextContent('over 19 credits')
+    fireEvent.keyDown(document, { key: 'Escape' })
+    expect(screen.queryByRole('dialog', { name: 'Colour and label key' })).not.toBeInTheDocument()
+  })
+
   it('marks an under-full-time semester', () => {
     setup()
     const last = screen.getByRole('region', { name: 'Spring 2030' })

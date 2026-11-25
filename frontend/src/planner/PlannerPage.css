@@ -1246,3 +1246,117 @@
 :root[data-theme='dark'] .edit-setup {
   color: #0b1a33;
 }
+
+/* ---------- Key: colours and labels ---------- */
+.key-wrap {
+  position: relative;
+}
+
+.key-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--raised);
+  color: var(--mut);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.key-btn:hover,
+.key-btn[aria-expanded='true'] {
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.key-pop {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 330px;
+  max-width: calc(100vw - 32px);
+  padding: 8px 14px 12px;
+  border-radius: 14px;
+  background: var(--raised);
+  border: 1px solid var(--border);
+  box-shadow: var(--sh-3);
+  font-size: 12.5px;
+  animation: menuIn 160ms var(--ease-out);
+}
+
+.key-sec {
+  margin: 10px 0 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--mut);
+}
+
+.key-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 3px 0;
+  line-height: 1.35;
+}
+
+.key-row .card-tag {
+  margin-left: 0;
+  min-width: 78px;
+  text-align: center;
+}
+
+.key-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+}
+
+.key-dots i {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 3px;
+  border-radius: 50%;
+}
+
+.key-swatch {
+  flex: none;
+  width: 78px;
+  height: 14px;
+  border-radius: 5px;
+  border: 1.5px solid var(--border-strong);
+  background: var(--raised);
+}
+
+.key-swatch.err {
+  border-color: var(--err);
+  background: var(--err-bg);
+}
+
+.key-swatch.warn {
+  border-color: var(--warn);
+  background: var(--warn-bg);
+}
+
+.key-swatch.dashed {
+  border-style: dashed;
+  background: color-mix(in srgb, var(--acc-tint) 55%, var(--raised));
+}
+
+.key-swatch.low {
+  height: 6px;
+  border: 0;
+  background: var(--warn);
+}
+
+.key-swatch.high {
+  height: 6px;
+  border: 0;
+  background: var(--err);
+}

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { Flag, Plan } from '../types.ts'
 import { flagCounts, flagKind } from './graph.ts'
+import { Legend } from './Legend.tsx'
 import { useCountUp } from './useCountUp.ts'
 
 const R = 19
@@ -154,6 +155,7 @@ export function SummaryBar({ plan, programName, onSelectFlag, checking }: Props)
           <i className="bad" /> out of order
         </span>
       </div>
+      <Legend />
     </div>
   )
 }
