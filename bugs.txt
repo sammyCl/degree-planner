@@ -1424,7 +1424,7 @@ BUG-046  A lone surrogate in a request body gives 500 instead of 422 (all
 
 BUG-047  CSCI478's prerequisite is stored as an exception, so every plan
          with CSCI478 gets an exception warning
-  Status:    Open
+  Status:    Fixed
   Owner:     Samantha Clapp (bachelor's data: course entries); Abdallah
              Salhi (prerequisite parser)
   Where:     data/Academic Catalog/mines-courses.csv (CSCI478 row);
@@ -1448,6 +1448,16 @@ BUG-047  CSCI478's prerequisite is stored as an exception, so every plan
   Fix idea:  confirm the wording on catalog.mines.edu, then correct the
              CSCI478 entry (a fix in the slice, or a known-fix rule in the
              parser), and rebuild courses.json
+  Fixed in:  2026-11-25, branch data/fix-bug-047-csci478 (bachelor's data:
+             Samantha). The catalog page reads "CSCI101 or CSCI102 or
+             CSCI128"; corrected the CSCI478 row in mines-courses.csv to
+             match (a fix in the slice, not a parser rule) and rebuilt
+             courses.json, so prerequisites is now an OR of the three
+             courses. Only CSCI478 changed (a rebuild before the edit gave
+             no diff); courses.REVIEW.md's free-text count went 225 -> 224.
+             Covered by test_bug_047_csci478_prerequisite_is_one_of_three_
+             courses in data/tools/test_course_data_fixes.py. A re-scrape
+             that brings back the old text fails that test.
 
 BUG-048  get_forms has no course substitution form, so the chatbot cannot
          point a student to one
