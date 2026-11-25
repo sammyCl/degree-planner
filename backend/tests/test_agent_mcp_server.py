@@ -170,10 +170,12 @@ def run_session(db_path: Path, tmp_path: Path, calls: list[tuple[str, dict]]) ->
     return asyncio.run(session())
 
 
-def test_server_lists_the_five_tools(db_path: Path, tmp_path: Path) -> None:
+def test_server_lists_the_six_tools(db_path: Path, tmp_path: Path) -> None:
     names, _ = run_session(db_path, tmp_path, [])
 
-    assert names == ["search_catalog", "get_prerequisites", "get_program_requirements", "get_forms", "check_plan"]
+    assert names == [
+        "search_catalog", "get_prerequisites", "get_program_requirements", "get_forms", "check_plan", "submit_summary",
+    ]
 
 
 def test_server_runs_tools_and_saves_the_plan(db_path: Path, tmp_path: Path) -> None:
@@ -196,3 +198,79 @@ def test_server_opens_the_catalog_read_only(db_path: Path, tmp_path: Path) -> No
     run_session(db_path, tmp_path, [("check_plan", GOOD_PLAN)])
 
     assert db_path.stat().st_mtime_ns == before
+
+
+# --- submit_summary: the agent's choices and notes as separate fields ----------------------------
+
+SUMMARY = {"choices": ["I put TEST101 first because TEST102 needs it."], "notes": ["Confirm the plan with your advisor."]}
+
+
+def test_summary_is_saved_next_to_the_plan(planner: PlannerTools) -> None:
+    planner.call("check_plan", GOOD_PLAN)
+    result = planner.call("submit_summary", SUMMARY)
+
+    assert result == {"saved": True, "choices": 1, "notes": 1}
+    assert planner.summary_path == planner.plan_path.with_name("summary.json")
+    assert json.loads(planner.summary_path.read_text()) == SUMMARY
+
+
+def test_summary_needs_a_plan_first(planner: PlannerTools) -> None:
+    result = planner.call("submit_summary", SUMMARY)
+
+    assert "check_plan" in result["error"]
+    assert not planner.summary_path.exists()
+
+
+def test_a_later_check_plan_clears_the_summary(planner: PlannerTools) -> None:
+    # A summary describes one plan, so a changed plan must not keep the old one.
+    planner.call("check_plan", GOOD_PLAN)
+    planner.call("submit_summary", SUMMARY)
+    result = planner.call("check_plan", GOOD_PLAN)
+
+    assert "submit_summary again" in result["summary_cleared"]
+    assert not planner.summary_path.exists()
+
+
+def test_a_rejected_check_plan_keeps_the_summary(planner: PlannerTools) -> None:
+    planner.call("check_plan", GOOD_PLAN)
+    planner.call("submit_summary", SUMMARY)
+    planner.call("check_plan", {"semesters": [{"label": "Fall 2099", "courses": []}]})
+
+    assert planner.summary_path.exists()  # the plan did not change
+
+
+def test_empty_lists_are_fine(planner: PlannerTools) -> None:
+    planner.call("check_plan", GOOD_PLAN)
+    assert planner.call("submit_summary", {"choices": [], "notes": []})["saved"] is True
+
+
+def test_summary_text_is_cleaned_and_capped(planner: PlannerTools) -> None:
+    from degree_planner_backend.agent.request_models import SUMMARY_ITEM_MAX
+
+    planner.call("check_plan", GOOD_PLAN)
+    planner.call("submit_summary", {"choices": ["Line one\nline‮ two", "x" * 2000], "notes": []})
+
+    saved = json.loads(planner.summary_path.read_text())
+    assert saved["choices"][0] == "Line one line two"
+    assert len(saved["choices"][1]) == SUMMARY_ITEM_MAX
+
+
+@pytest.mark.parametrize(
+    "tool_input",
+    [
+        {},
+        {"choices": []},
+        {"choices": "one choice", "notes": []},
+        {"choices": [1], "notes": []},
+        {"choices": ["   "], "notes": []},
+        {"choices": ["\ud800"], "notes": []},
+        {"choices": ["a"] * 13, "notes": []},
+        "not an object",
+    ],
+)
+def test_bad_summary_input_is_an_error_and_saves_nothing(planner: PlannerTools, tool_input: object) -> None:
+    planner.call("check_plan", GOOD_PLAN)
+    result = planner.call("submit_summary", tool_input)
+
+    assert set(result) == {"error"}
+    assert not planner.summary_path.exists()

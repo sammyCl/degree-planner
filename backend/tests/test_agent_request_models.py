@@ -428,3 +428,36 @@ def test_response_text_limits():
         response(problems=["p"] * (PROBLEMS_MAX + 1))
     with pytest.raises(ValidationError):
         response(problems=["p" * (PROBLEM_MAX + 1)])
+
+
+# --- choices and notes (submit_summary) ---------------------------------------------------------
+
+
+def test_choices_and_notes_default_to_empty() -> None:
+    # Older responses (and the docs sample) have neither field, and still load.
+    response = AgentResponse(status="ok", plan=_plan(True), explanation="Eight semesters.", usage=_usage())
+    assert response.choices == () and response.notes == ()
+    AgentResponse.model_validate_json((DOCS / "agent-response.sample.json").read_text())
+
+
+def test_choices_and_notes_are_kept() -> None:
+    response = AgentResponse(
+        status="ok", plan=_plan(True), explanation="x", usage=_usage(),
+        choices=["CSCI403 fills the elective."], notes=["Confirm CSCI403 is offered in the fall."],
+    )
+    assert response.choices == ("CSCI403 fills the elective.",)
+    assert json.loads(response.model_dump_json())["notes"] == ["Confirm CSCI403 is offered in the fall."]
+
+
+@pytest.mark.parametrize(
+    "field, value",
+    [
+        ("choices", ["  "]),
+        ("notes", ["​"]),
+        ("choices", ["x" * 501]),
+        ("notes", ["a"] * 13),
+    ],
+)
+def test_bad_choices_or_notes_are_rejected(field: str, value: list[str]) -> None:
+    with pytest.raises(ValidationError):
+        AgentResponse(status="ok", plan=_plan(True), explanation="x", usage=_usage(), **{field: value})
