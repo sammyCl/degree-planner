@@ -1,4 +1,4 @@
-from degree_planner_backend.models import Course, CourseRequirement
+from degree_planner_backend.models import Course, CourseRequirement, Program
 
 BASE_COURSE = {
     "code": "MNGN598",
@@ -9,6 +9,27 @@ BASE_COURSE = {
     "description": "",
     "catalog_year": "2026-2027",
 }
+
+BASE_PROGRAM = {
+    "program_id": "test-minor",
+    "name": "Test Minor",
+    "degree_level": "minor",
+    "catalog_year": "2026-2027",
+    "total_credits_required": 18,
+    "requirement_groups": [],
+}
+
+
+def test_program_notes_default_to_empty() -> None:
+    program = Program.model_validate(BASE_PROGRAM)
+
+    assert program.notes == []
+
+
+def test_program_notes_can_be_set() -> None:
+    program = Program.model_validate({**BASE_PROGRAM, "notes": ["Not open to QBE majors."]})
+
+    assert program.notes == ["Not open to QBE majors."]
 
 
 def test_course_credits_min_max_are_optional() -> None:
