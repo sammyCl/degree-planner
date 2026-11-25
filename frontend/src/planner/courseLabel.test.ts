@@ -61,3 +61,14 @@ describe('courseLabel', () => {
     expect(courseLabel(reversed, 'x')).toEqual({ primary: 'CS elective', also: 'Minor' })
   })
 })
+
+describe('groupCategory reads the label when the id says nothing', () => {
+  it('calls a pick-one-of-these-courses requirement Core, and an elective-style group an Elective', () => {
+    expect(groupCategory('linear-algebra', 'MATH332 Linear Algebra or MATH342 (honors)')).toBe('Core')
+    expect(groupCategory('circuits', 'Circuits: EENG281 or EENG282')).toBe('Core')
+    expect(groupCategory('cbe-400', '400-Level Chemical Engineering Elective')).toBe('Elective')
+    expect(groupCategory('distributed-science', 'Distributed Science Selection')).toBe('Elective')
+    expect(groupCategory('quantum-devices-lab', 'Quantum Devices Laboratory (new course, no code yet)')).toBe('Requirement')
+    expect(groupCategory('required', 'anything')).toBe('Core')
+  })
+})

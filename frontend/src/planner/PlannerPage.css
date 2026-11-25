@@ -308,6 +308,41 @@
   background: var(--surface);
 }
 
+.planner-notice {
+  min-height: 52px;
+}
+
+/* the way back to the setup page: a real button, not a text link */
+.edit-setup {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--acc);
+  color: #fff;
+  font: 600 14.5px/1 Inter, sans-serif;
+  box-shadow: var(--sh-2);
+  cursor: pointer;
+  transition: background 120ms, transform 80ms, box-shadow 200ms;
+}
+
+.edit-setup:hover {
+  background: var(--acc-bright);
+  box-shadow: var(--sh-3);
+}
+
+.edit-setup:active {
+  transform: scale(0.97);
+}
+
+.edit-setup:focus-visible {
+  outline: 3px solid var(--acc-tint);
+  outline-offset: 2px;
+}
+
 .link {
   border: 0;
   background: none;
@@ -1199,4 +1234,15 @@
 .tool:disabled {
   opacity: 0.4;
   cursor: default;
+}
+
+/* in dark mode the accent is light, so the button text goes dark */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .edit-setup {
+    color: #0b1a33;
+  }
+}
+
+:root[data-theme='dark'] .edit-setup {
+  color: #0b1a33;
 }

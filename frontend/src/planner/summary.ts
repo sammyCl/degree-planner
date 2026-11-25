@@ -44,7 +44,7 @@ const programTitle = (programId: string): string => PROGRAMS.find((p) => p.id ==
 function rowsFor(statuses: RequirementStatus[]): ChecklistRow[] {
   const merged = new Map<string, RequirementStatus[]>()
   for (const s of statuses) {
-    const category = groupCategory(s.group_id)
+    const category = groupCategory(s.group_id, s.label)
     const key = category === 'Requirement' ? `label:${plainLabel(s.label)}` : category
     merged.set(key, [...(merged.get(key) ?? []), s])
   }
