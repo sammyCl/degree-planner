@@ -61,7 +61,17 @@ export function Arrows({ plan, index, container, cardEls, hotEdges, brokenTarget
       out.push({ k, d, bad: sa >= sb && brokenTargets.has(e.to) })
     })
     setPaths(out)
-    setSize({ w: container.scrollWidth, h: container.scrollHeight })
+    // Sized from the columns, not the container's scroll size: that includes this layer itself, so the board could
+    // never shrink again (after completed courses are folded away, it kept their height as empty space).
+    let w = 0
+    let h = 0
+    for (const child of Array.from(container.children)) {
+      if (child.tagName.toLowerCase() === 'svg') continue
+      const r = child.getBoundingClientRect()
+      w = Math.max(w, r.right - box.left)
+      h = Math.max(h, r.bottom - box.top)
+    }
+    setSize({ w: Math.ceil(w), h: Math.ceil(h) })
   }, [plan, index, container, cardEls, brokenTargets])
 
   useLayoutEffect(() => {
