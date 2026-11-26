@@ -175,7 +175,7 @@ describe('PlannerPage', () => {
     const { unmount } = render(<PlannerPage plan={{ ...plain, flags: [flag] }} onBack={vi.fn()} />)
     fireEvent.click(screen.getByRole('button', { name: 'Show' }))
     const card = screen.getByRole('heading', { name: 'Things to check' }).closest('.about-card') as HTMLElement
-    expect(card).toHaveTextContent('Computer Science for STEM needs instructor consent; confirm it still applies')
+    expect(card).toHaveTextContent('Computer Science for STEM: needs instructor consent; confirm it still applies')
     expect(card.textContent).not.toMatch(/CSCI128/)
     unmount()
     render(<PlannerPage plan={{ ...plain, flags: [] }} onBack={vi.fn()} />)
@@ -228,11 +228,57 @@ describe('PlannerPage', () => {
     expect(alert.compareDocumentPosition(screen.getByTestId('board')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
-  it('shows the assistant\'s markdown as formatting, not as symbols', () => {
-    setup(vi.fn(), { explanation: 'It has **130 of 130 credits**.\n- **MATH111** needs a note' })
+  it('shows the assistant\'s text without markdown symbols or tables', () => {
+    setup(vi.fn(), { explanation: 'It has **130 of 130 credits**.\n\n| Semester | Courses |\n|---|---|\n| Fall 2026 | MATH111 |\n\n- **MATH111** needs a note' })
     fireEvent.click(screen.getByRole('button', { name: 'Show' }))
-    expect(screen.getByText('130 of 130 credits').tagName).toBe('STRONG')
-    expect(screen.queryByText(/\*\*/)).not.toBeInTheDocument()
+    expect(screen.getByText(/It has 130 of 130 credits/)).toBeInTheDocument()
+    expect(screen.queryByText(/\*\*|\|/)).not.toBeInTheDocument()
+  })
+
+  it('lists a requirement\'s courses only when its name is clicked', () => {
+    const plan = { ...samplePlan, requirement_status: [{ program_id: 'cs-bs-general-track', group_id: 'cs-electives', label: 'CS electives', kind: 'choose_credits' as const, met: true, credits_required: 3, credits_earned: 3, missing_count: 0 }],
+      counts_toward: { 'sem-5-csci400': [{ program_id: 'cs-bs-general-track', group_id: 'cs-electives', label: 'CS electives' }] } }
+    render(<PlannerPage plan={plan} onBack={vi.fn()} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Show' }))
+    const card = screen.getByRole('heading', { name: 'Degree requirements' }).closest('.about-card') as HTMLElement
+    expect(card).not.toHaveTextContent('Principles of Programming Languages')
+    fireEvent.click(within(card).getByRole('button', { name: 'See the courses for CS electives' }))
+    expect(card).toHaveTextContent('CSCI400 Principles of Programming Languages')
+  })
+
+  it('shows the assistant\'s choices as short headings with the courses behind a click, and checks as tagged notes', () => {
+    render(
+      <PlannerPage
+        plan={samplePlan}
+        explanation="ignored when the lists are sent"
+        choices={[
+          'Computer Science electives (18 credits): CSCI403 Data Base Management, CSCI404 Artificial Intelligence and CSCI470 Machine Learning. Swap any of these.',
+          'I moved CSCI437 to Spring 2031 so the last two semesters are balanced. Fall 2028 is the heaviest.',
+          'Success and Wellness elective: PAGN205 Beginning Karate.',
+          'First-year core: HASS100 and EDNS151 rather than the Thorson Honors pair (HNRS105 and HNRS115).',
+          'Culture and Society: HASS320 and HASS344.',
+        ]}
+        checks={['Confirm with the registrar that your AP credit is posted. It can take a week.', 'Check when each course is offered.', 'Ask your advisor to review the plan.', 'A fourth note.']}
+        onBack={vi.fn()}
+      />,
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Show' }))
+    const choices = screen.getByRole('heading', { name: 'Choices I made' }).closest('.about-card') as HTMLElement
+    expect(within(choices).getByText('Computer Science electives (18 credits)')).toBeInTheDocument()
+    expect(choices).not.toHaveTextContent('Data Base Management') // course names only after a click
+    fireEvent.click(within(choices).getByRole('button', { name: 'See the courses for Computer Science electives (18 credits)' }))
+    expect(choices).toHaveTextContent('CSCI403')
+    expect(choices).toHaveTextContent('Swap any of these.')
+    expect(choices).toHaveTextContent('I moved CSCI437 to Spring 2031 so the last two semesters are balanced.')
+    expect(choices).not.toHaveTextContent('Fall 2028 is the heaviest') // the rest is behind "more"
+    expect(within(choices).queryByText(/Culture and Society/)).not.toBeInTheDocument() // the fifth is behind "Show 1 more"
+    fireEvent.click(within(choices).getByRole('button', { name: 'Show 1 more choices' }))
+    expect(within(choices).getByText(/Culture and Society/)).toBeInTheDocument()
+
+    const checks = screen.getByRole('heading', { name: 'Things to check' }).closest('.about-card') as HTMLElement
+    expect(within(checks).getAllByText('Ask your advisor').length).toBeGreaterThan(0)
+    expect(checks).toHaveTextContent(/Show \d+ more to check/) // only 3 shown at first
+    expect(checks).not.toHaveTextContent('explanation')
   })
 
   it('draws an error in red, a warning in amber, and a claimed exception as a calm "to confirm"', () => {

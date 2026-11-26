@@ -102,6 +102,6 @@ describe('buildCompletedChecklist', () => {
       ...samplePlan,
       requirement_status: [status('required', 'Required core', false, 19), status('core', 'Core choice', true, 6, 6)],
     } as Plan
-    expect(buildCompletedChecklist(done)[0].rows).toEqual([{ name: 'Core courses', category: 'core', met: false, detail: '25 credits done' }])
+    expect(buildCompletedChecklist(done)[0].rows).toMatchObject([{ name: 'Core courses', category: 'core', met: false, detail: '25 credits done' }])
   })
 })

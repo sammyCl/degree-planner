@@ -112,7 +112,7 @@ describe('buildChecks: assumed equivalents and the minor credit note', () => {
     const item = checks.find((c) => c.title === 'Earth Materials')!
     expect(item.kind).toBe('confirm')
     expect(item.text).toContain('GEOL310')
-    expect(item.text).toContain('Confirm with your advisor')
+    expect(item.text).toMatch(/^Counted as the same course as GEOL310; confirm with your advisor./)
     expect(buildChecks(withCourses([['MATH111', 'Calculus']], ['mining-bs'])).some((c) => c.kind === 'confirm')).toBe(false)
   })
 

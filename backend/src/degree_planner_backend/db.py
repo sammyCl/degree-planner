@@ -34,7 +34,10 @@ CREATE TABLE IF NOT EXISTS plans (
 
 
 def get_connection() -> sqlite3.Connection:
-    connection = sqlite3.connect(DB_PATH)
+    # check_same_thread=False: FastAPI may run get_db and the endpoint on different worker threads, and SQLite then
+    # refused the connection ("objects created in a thread can only be used in that same thread"), a 500 whenever two
+    # requests overlapped. Safe here: each request gets its own connection, never shared between requests.
+    connection = sqlite3.connect(DB_PATH, check_same_thread=False)
     connection.row_factory = sqlite3.Row
     return connection
 

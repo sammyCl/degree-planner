@@ -1653,3 +1653,202 @@
   font-size: 11px;
   font-style: italic;
 }
+
+/* ---------- About this plan: short rows, details behind a click ---------- */
+.req-row {
+  flex-wrap: wrap;
+}
+
+.req-line {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.course-toggle {
+  margin-left: 28px;
+  font-size: 12px;
+}
+
+.req-row .course-toggle {
+  margin-left: 8px;
+}
+
+.course-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  width: 100%;
+  margin: 6px 0 4px 24px;
+  padding: 0;
+  list-style: none;
+}
+
+.course-chips li {
+  max-width: 100%;
+  padding: 2px 8px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.course-chips b {
+  font: 600 11.5px 'JetBrains Mono', ui-monospace, monospace;
+}
+
+.done-total span {
+  display: block;
+  font-size: 12px;
+}
+
+.done-courses {
+  display: inline-block;
+  margin: 8px 0 0;
+}
+
+.skeleton {
+  display: grid;
+  gap: 8px;
+  margin: 6px 0;
+}
+
+.skeleton i {
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--border) 0%, var(--surface) 50%, var(--border) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s linear infinite;
+}
+
+.skeleton i + i {
+  width: 70%;
+}
+
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+.check-list .check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.check-tag {
+  flex: none;
+  margin-top: 1px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  background: var(--acc-tint);
+  color: var(--acc);
+}
+
+.check-item.warning .check-tag { background: color-mix(in srgb, var(--warn) 14%, transparent); color: var(--warn); }
+.check-item.info .check-tag { background: var(--col); color: var(--mut); border: 1px solid var(--border); }
+.check-item.advisor .check-tag { background: color-mix(in srgb, var(--cat-elective) 12%, transparent); color: var(--cat-elective); }
+
+.more-inline {
+  margin-left: 6px;
+  font-size: 12px;
+}
+
+.more-btn {
+  margin-top: 6px;
+  font-size: 12.5px;
+}
+
+.choice-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.choice-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+}
+
+.choice-line .course-toggle {
+  margin-left: 0;
+}
+
+.choice-line .course-chips {
+  margin-left: 0;
+}
+
+.choice-note {
+  display: block;
+  color: var(--mut);
+  font-size: 12px;
+}
+
+.choice-foot {
+  margin: 10px 0 0;
+  color: var(--mut);
+  font-size: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton i { animation: none; }
+}
+
+.req-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+}
+
+.req-toggle:hover,
+.req-toggle:focus-visible {
+  color: var(--acc);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.req-toggle .chev {
+  flex: none;
+  color: var(--mut);
+  transition: transform 160ms var(--ease-out);
+}
+
+.req-toggle .chev.open {
+  transform: rotate(90deg);
+}
+
+.req-row .course-chips {
+  margin: 4px 0 6px 40px;
+}
+
+.done-courses .course-toggle {
+  margin-left: 0;
+}
+
+.done-courses {
+  margin-top: 8px;
+}

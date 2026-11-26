@@ -68,7 +68,7 @@ describe('completed courses on the planner page', () => {
     expect(screen.getByTestId('credit-remaining')).toHaveTextContent(`${planned} remaining · 4 completed`)
     fireEvent.click(screen.getByRole('button', { name: 'Show' }))
     const card = screen.getByText('Already completed').closest('.about-card') as HTMLElement
-    expect(card).toHaveTextContent(/4 of \d+ credits from 1 course \(1 transfer, AP or IB\)/)
+    expect(card).toHaveTextContent(/4 of \d+ credits1 course · 1 transfer, AP or IB/)
     await waitFor(() => expect(within(card).getByText('Core courses')).toBeInTheDocument())
     expect(within(card).getByText('8 credits done')).toBeInTheDocument()
   })

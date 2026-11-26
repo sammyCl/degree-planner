@@ -33,6 +33,9 @@ interface Props {
   plan: Plan
   /** what the planning assistant says about the plan */
   explanation?: string
+  /** the assistant's choices and things to check, one per item */
+  choices?: string[]
+  checks?: string[]
   /** why it could not finish a valid plan, if it could not */
   problems?: string[]
   onBack: () => void
@@ -50,7 +53,7 @@ const undoMessage = (error: unknown): string =>
     ? 'Could not reach the backend, so your change was undone.'
     : `The backend could not re-check the plan, so your change was undone.${error instanceof ApiError ? ` ${error.message}` : ''}`
 
-export function PlannerPage({ plan: initialPlan, explanation, problems, onBack }: Props) {
+export function PlannerPage({ plan: initialPlan, explanation, choices, checks, problems, onBack }: Props) {
   // The plan on screen. After every change the backend re-checks it and its answer replaces this, so the flags,
   // arrows and totals are always the validator's, never the page's own.
   const [plan, setPlan] = useState(initialPlan)
@@ -72,12 +75,16 @@ export function PlannerPage({ plan: initialPlan, explanation, problems, onBack }
   )
   // the validator's answer for the completed courses alone: their labels, and the requirements they already meet
   const [donePlan, setDonePlan] = useState<Plan | null>(null)
+  const [doneState, setDoneState] = useState<'loading' | 'ready' | 'failed'>('loading')
   useEffect(() => {
     if (doneColumns.length === 0) return
     const abort = new AbortController()
     checkPlan(completedOnlyPlan(initialPlan, doneColumns), abort.signal)
-      .then(setDonePlan)
-      .catch(() => {}) // without it the completed cards just have no labels
+      .then((result) => {
+        setDonePlan(result)
+        setDoneState('ready')
+      })
+      .catch(() => setDoneState('failed')) // without it the completed cards just have no labels
     return () => abort.abort()
   }, [initialPlan, doneColumns])
 
@@ -381,7 +388,7 @@ export function PlannerPage({ plan: initialPlan, explanation, problems, onBack }
           )}
         </div>
       </div>
-      <PlanSummary plan={plan} explanation={explanation} donePlan={donePlan} />
+      <PlanSummary plan={plan} explanation={explanation} choices={choices} checks={checks} donePlan={donePlan} doneState={doneState} />
       {notice && (
         <div className="planner-toast" role="alert">
           <span>{notice}</span>

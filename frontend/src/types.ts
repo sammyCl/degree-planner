@@ -152,6 +152,10 @@ export interface AgentResponse {
   plan: Plan | null
   /** what the plan does and any choices the agent made, written for the student */
   explanation: string
+  /** the agent's choices where the requirements left it open, one per item; empty on older responses */
+  choices?: string[]
+  /** what the student should confirm with an advisor, one per item; empty on older responses */
+  checks?: string[]
   /** why the agent could not finish a valid plan; empty when status is "ok" */
   problems: string[]
   usage: Usage
