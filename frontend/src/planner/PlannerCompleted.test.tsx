@@ -92,6 +92,22 @@ describe('completed courses on the planner page', () => {
     expect(within(transfer).getByText('Free Elective: Example Course')).toBeInTheDocument()
   })
 
+  it('continues a long completed column in the next one, 8 courses at most each', () => {
+    stubCompletedCheck()
+    const many = Array.from({ length: 19 }, (_, k) => ({ code: `FREE1XX-${k + 1}`, credits: 3, term: 'transfer', transfer_from: 'Example State University' }))
+    render(<PlannerPage plan={withCompleted(many)} onBack={vi.fn()} />)
+    fireEvent.click(screen.getByRole('button', { name: /Show completed courses/ }))
+    const group = screen.getByRole('group', { name: /Completed courses/ })
+    const regions = within(group).getAllByRole('region')
+    expect(regions.map((r) => r.getAttribute('aria-label'))).toEqual([
+      'Transfer credit from Example State University, completed',
+      'Transfer credit from Example State University, completed, continued (2)',
+      'Transfer credit from Example State University, completed, continued (3)',
+    ])
+    expect(regions.map((r) => r.querySelectorAll('.card').length)).toEqual([8, 8, 3])
+    expect(within(regions[0]).getByText('57 cr')).toBeInTheDocument() // the total stays on the first column
+  })
+
   it('shows no completed area and no remaining line when nothing is completed', () => {
     stubCompletedCheck()
     render(<PlannerPage plan={withCompleted([])} onBack={vi.fn()} />)

@@ -22,6 +22,12 @@ const Check = ({ size = 12 }: { size?: number }) => (
   </svg>
 )
 
+/** Most courses in one completed column; more continue in the next column. */
+export const COLUMN_HEIGHT = 8
+
+const chunks = <T,>(items: T[], size: number): T[][] =>
+  Array.from({ length: Math.max(1, Math.ceil(items.length / size)) }, (_, k) => items.slice(k * size, (k + 1) * size))
+
 const Clock = () => (
   <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <circle cx="12" cy="12" r="9" />
@@ -87,32 +93,42 @@ export function CompletedColumns({ columns, inProgress, donePlan, collapsible, o
         )}
       </div>
       <div className="done-cols">
-        {columns.map((col, i) => {
+        {columns.flatMap((col, i) => {
           const [term, year] = /^(Fall|Spring|Summer) \d{4}$/.test(col.label) ? col.label.split(' ') : [col.label, '']
           const name = col.from ? `${col.label} from ${col.from}` : col.label
-          return (
-            <section className="sem done" key={col.key} aria-label={`${name}, ${col.inProgress ? 'in progress' : 'completed'}`} style={{ ['--col' as string]: i }}>
+          const state = col.inProgress ? 'in progress' : 'completed'
+          // a long column continues in the next one, so no column is taller than COLUMN_HEIGHT courses
+          return chunks(col.courses, COLUMN_HEIGHT).map((part, n) => (
+            <section
+              className={`sem done${n > 0 ? ' cont' : ''}`}
+              key={`${col.key}:${n}`}
+              aria-label={n === 0 ? `${name}, ${state}` : `${name}, ${state}, continued (${n + 1})`}
+              style={{ ['--col' as string]: i }}
+            >
               <div className="sem-h">
                 <b>{col.from ? 'Transfer' : term}</b>
                 {year && <span className="sem-year">{year}</span>}
-                {col.inProgress && <span className="sem-ip">In progress</span>}
+                {n > 0 && <span className="sem-cont">continued</span>}
+                {n === 0 && col.inProgress && <span className="sem-ip">In progress</span>}
               </div>
               {col.from && (
                 <div className="sem-from" title={col.from}>
                   {col.from}
                 </div>
               )}
-              <div className="meter done">
-                <span className="meter-track">
-                  <i style={{ width: `${Math.min(100, (col.credits / 18) * 100)}%` }} />
-                </span>
-                <span className="meter-val">{formatCredits(col.credits)} cr</span>
-              </div>
-              {col.courses.map((c, row) => (
+              {n === 0 && (
+                <div className="meter done">
+                  <span className="meter-track">
+                    <i style={{ width: `${Math.min(100, (col.credits / 18) * 100)}%` }} />
+                  </span>
+                  <span className="meter-val">{formatCredits(col.credits)} cr</span>
+                </div>
+              )}
+              {part.map((c, row) => (
                 <CompletedCard key={c.course_id} course={c} inProgress={inProgress.has(c.code)} donePlan={donePlan} col={i} row={row} />
               ))}
             </section>
-          )
+          ))
         })}
       </div>
     </div>

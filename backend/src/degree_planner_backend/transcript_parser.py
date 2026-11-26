@@ -131,6 +131,7 @@ class TranscriptRow:
         self.subject, self.number, self.title, self.grade = subject, number, title, grade
         self.credits, self.term, self.source, self.in_progress = credits, term, source, in_progress
         self.code = f"{subject}{number}"
+        self.lab_label: str | None = None  # "CHEM 2038": a lab taken with this lecture (transfer_credit.pair_labs)
 
     @property
     def is_placeholder(self) -> bool:

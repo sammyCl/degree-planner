@@ -184,6 +184,7 @@ def read_transcript(
                 reading.skipped.append(f"{row.subject} {row.number} {row.title}: grade {row.grade}, no credit")
         return reading
 
+    rows = pair_labs(rows)
     canonical = _known_name(school, data) if school else None
     system_id = next((sid for name, sid in known_schools(data) if name == canonical and sid), None)
     if canonical:
@@ -196,7 +197,7 @@ def read_transcript(
     present = {(r.subject, r.number) for r in rows}
 
     for row in rows:
-        label = f"{row.subject} {row.number}"
+        label = f"{row.subject} {row.number}" + (f" + {row.lab_label}" if row.lab_label else "")
         if row.grade is not None and row.grade not in _TRANSFERS and not row.in_progress:
             reading.skipped.append(f"{label} {row.title}: grade {row.grade}; Mines needs a C or better to transfer")
             continue
@@ -243,6 +244,51 @@ def _add_suggestions(reading: TranscriptReading, suggest: Suggester, school: str
         course.suggested_by = "claude"
         course.confidence = guess.confidence  # type: ignore[assignment]
         course.suggestion_reason = guess.reason or None
+
+
+_LAB_TITLE = re.compile(r"\b(lab|labs|laboratory)\b", re.IGNORECASE)
+_TITLE_WORD = re.compile(r"[a-z0-9]+")
+_NOT_TOPIC = {"lab", "labs", "laboratory", "and", "of", "the", "for", "in", "to", "w", "with", "i", "ii", "iii", "1", "2", "3"}
+
+
+def _topic(title: str) -> set[str]:
+    return {w for w in _TITLE_WORD.findall(title.lower()) if w not in _NOT_TOPIC}
+
+
+def pair_labs(rows: list[TranscriptRow]) -> list[TranscriptRow]:
+    """A lab taken with its lecture is one course for transfer: the lab's credits are added to the lecture, and the
+    lab is not matched (or suggested as a free elective) on its own. The lecture is the same subject, preferably the
+    same term, with title words in common or a nearby number (CHEM 2031 and its lab CHEM 2038). A lab with no lecture
+    stays a course of its own."""
+    labs = [r for r in rows if _LAB_TITLE.search(r.title)]
+    lectures = [r for r in rows if r not in labs]
+    taken: set[int] = set()
+    merged: set[int] = set()
+    for lab in labs:
+        if lab.grade is not None and lab.grade not in _TRANSFERS and not lab.in_progress:
+            continue  # a failed or dropped lab stays separate (and is skipped later)
+        best: tuple[int, TranscriptRow] | None = None
+        for lecture in lectures:
+            if id(lecture) in taken or lecture.subject != lab.subject:
+                continue
+            shared = len(_topic(lab.title) & _topic(lecture.title))
+            near = lab.number[:3] == lecture.number[:3] or (
+                lab.number.isdigit() and lecture.number.isdigit() and abs(int(lab.number) - int(lecture.number)) <= 10
+            )
+            if not shared and not near:
+                continue
+            score = shared * 2 + (3 if near else 0) + (2 if lecture.term == lab.term else 0)
+            if best is None or score > best[0]:
+                best = (score, lecture)
+        if best is None:
+            continue
+        lecture = best[1]
+        taken.add(id(lecture))
+        merged.add(id(lab))
+        lecture.credits = round(lecture.credits + lab.credits, 2)
+        lecture.lab_label = f"{lab.subject} {lab.number}"
+        lecture.title = f"{lecture.title} (with {lab.title})"
+    return [r for r in rows if id(r) not in merged]
 
 
 def _unmatched(row: TranscriptRow, label: str, suggestion: str | None, reason: str) -> UnmatchedCourse:

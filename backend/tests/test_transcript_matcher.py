@@ -89,3 +89,24 @@ def test_a_cccs_course_keeps_the_free_elective_rule_when_claude_has_nothing_bett
     lines = ["Front Range Community College", "Fall 2023", "ENG 1021 English Composition I B 3.000"]
     reading = read_transcript(lines, suggest=lambda courses, _s: [None for _ in courses])
     assert [(u.suggestion, u.suggested_by) for u in reading.unmatched] == [("FREE1XX", "rule")]
+
+
+def test_a_course_with_its_lab_is_offered_a_mines_lecture_and_lab_together_and_never_a_lab_alone() -> None:
+    from degree_planner_backend.agent.transcript_matcher import _lab_pairs, with_lab_pairs
+
+    full = with_lab_pairs(CATALOG)
+    with_lab = [m.code for m in shortlist(OutsideCourse("CHEM 3411 + CHEM 3418", "Organic Chemistry I (with Organic Chemistry Lab I)", 5), full)]
+    assert with_lab[0] == "CHGN221+CHGN223"
+    alone = [m.code for m in shortlist(OutsideCourse("CHEM 3411", "Organic Chemistry I", 3), full)]
+    assert "CHGN221" in alone and not any("+" in c for c in alone[:4])
+    labs = set(_lab_pairs())
+    assert not labs & set(with_lab) and not labs & set(alone)  # e.g. CHGN223 is never offered on its own
+
+
+def test_suggest_accepts_a_lecture_and_lab_pair_from_the_shortlist() -> None:
+    def runner(_c: list[str], _m: str, _w: Path) -> ClaudeRun:
+        return ClaudeRun(result={"structured_output": {"suggestions": [
+            {"index": 0, "mines_code": "CHGN221+CHGN223", "confidence": "high", "reason": "Both are organic chemistry with lab."}]}})
+
+    out = suggest([OutsideCourse("CHEM 3411 + CHEM 3418", "Organic Chemistry I (with Organic Chemistry Lab I)", 5)], None, CATALOG, runner)
+    assert out[0] is not None and out[0].mines_code == "CHGN221+CHGN223" and "Laboratory" in out[0].title

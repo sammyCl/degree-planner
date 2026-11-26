@@ -13,6 +13,7 @@ import json
 import re
 import tempfile
 from dataclasses import dataclass
+from functools import cache
 from pathlib import Path
 from typing import Any
 
@@ -113,20 +114,50 @@ def _level(number: str) -> int:
     return int(digits.group()[0]) if digits else 0
 
 
+LAB_PAIRS_PATH = Path(__file__).resolve().parents[4] / "data" / "json" / "lab-pairs.json"
+
+
+@cache
+def _lab_pairs() -> dict[str, str]:
+    """Mines lab code -> its lecture (data/json/lab-pairs.json, built by data/tools/build_lab_pairs.py)."""
+    return json.loads(LAB_PAIRS_PATH.read_text())["pairs"] if LAB_PAIRS_PATH.exists() else {}
+
+
+def with_lab_pairs(catalog: list[CatalogCourse]) -> list[CatalogCourse]:
+    """The catalog plus each Mines lecture and its lab as one choice ("CHGN221+CHGN223"), for an outside course taken
+    with its lab."""
+    by_code = {c.code: c for c in catalog}
+    pairs = []
+    for lab, lecture in _lab_pairs().items():
+        if lab in by_code and lecture in by_code:
+            a, b = by_code[lecture], by_code[lab]
+            pairs.append(CatalogCourse(f"{a.code}+{b.code}", f"{a.title} with {b.title}", a.credits + b.credits))
+    return catalog + pairs
+
+
 def shortlist(course: OutsideCourse, catalog: list[CatalogCourse]) -> list[CatalogCourse]:
-    """The Mines courses this course most likely matches: shared title words, the usual Mines subject, the same level."""
-    subject, _, number = course.code.partition(" ")
+    """The Mines courses this course most likely matches: shared title words, the usual Mines subject, the same level.
+    A course taken with its lab ("CHEM 2031 + CHEM 2038") prefers a Mines lecture with its lab, and a course without
+    one does not get those."""
+    has_lab = "+" in course.code
+    subject, _, rest = course.code.partition(" ")
+    number = rest.split(" ")[0]
     subjects = SUBJECTS.get(subject, [subject])
     level = _level(number)
     words = _words(course.title)
     scored: list[tuple[float, CatalogCourse]] = []
+    labs_only = set(_lab_pairs())
     for mines in catalog:
+        if mines.code in labs_only:
+            continue  # a Mines lab is only ever suggested together with its lecture ("CHGN221+CHGN223")
         m_subject = re.match(r"[A-Z]+", mines.code).group()  # type: ignore[union-attr]
         m_level = _level(mines.code[len(m_subject):])
         if m_level > 4:
             continue  # graduate courses are not suggested for transfer credit
         shared = len(words & _words(mines.title))
         score = shared * 3 + (4 if m_subject in subjects else 0) + (2 if m_level == level else 0) - abs(m_level - level) * 0.5
+        if "+" in mines.code:
+            score += 3 if has_lab else -6
         if shared or m_subject in subjects:
             scored.append((score, mines))
     scored.sort(key=lambda pair: (-pair[0], pair[1].code))
@@ -160,7 +191,8 @@ def suggest(
     """A suggestion (or None) for each course, in order. Raises on any failure; the caller then shows none."""
     if not courses:
         return []
-    lists = [shortlist(c, catalog) for c in courses]
+    full = with_lab_pairs(catalog)
+    lists = [shortlist(c, full) for c in courses]
     entries = []
     for index, (course, options) in enumerate(zip(courses, lists)):
         entries.append({

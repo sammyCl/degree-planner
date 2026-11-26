@@ -261,6 +261,18 @@ describe('TranscriptUpload', () => {
     expect(within(screen.getByRole('group', { name: /need a Mines equivalent/ })).getByText('ART 1000')).toBeInTheDocument()
   })
 
+  it('adds a Mines lecture and its lab together, with the credits split by the catalog', async () => {
+    const pair = { code: 'CHEM 3411 + CHEM 3418', title: 'Organic Chemistry I (with Organic Chemistry Lab I)', credits: 5, term: 'transfer', in_progress: false, suggestion: 'CHGN221+CHGN223', reason: 'TES', suggested_by: 'claude' as const, suggestion_title: 'Organic Chemistry I with Organic Chemistry I Laboratory', confidence: 'high' as const }
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(reply(200, reading([], { school: 'Example State University', from_mines: false, unmatched: [pair] }))))
+    const latest = setup()
+    upload('esu.pdf')
+    const group = await screen.findByRole('group', { name: /need a Mines equivalent/ })
+    expect(group).toHaveTextContent('Suggested: CHGN221 + CHGN223')
+    fireEvent.click(within(group).getByRole('button', { name: 'Add' }))
+    // CHGN221 is 3 credits and CHGN223 is 1 in the catalog, so the 5 transfer credits split 3.75 and 1.25
+    expect(latest.current.map((c) => [c.code, c.credits])).toEqual([['CHGN221', 3.75], ['CHGN223', 1.25]])
+  })
+
   it('renumbers placeholder credit from a second transcript instead of dropping it', async () => {
     const free = (n: number, title: string): CompletedCourse => ({ code: `FREE1XX-${n}`, credits: 3, term: 'transfer', transfer_from: 'IB credit', title })
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(reply(200, reading([free(1, 'Art History')]))))

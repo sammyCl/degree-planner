@@ -248,3 +248,32 @@ def test_a_mines_transcript_names_its_transfer_schools_properly() -> None:
 def test_a_community_college_transcript_naming_a_university_lower_down_is_still_the_college() -> None:
     lines = ["Red Rocks Community College", "Official Transcript", "Transfer credit from University of Colorado Denver", "Fall 2023", "MAT 2410 Calculus I A 5.000"]
     assert read_transcript(lines).school == "Red Rocks Community College"
+
+
+# ---------- a lab taken with its lecture is one course ----------
+
+def test_a_lab_is_paired_with_its_lecture_and_never_counted_alone() -> None:
+    lines = ["Example State University", "Fall 2022", "CHEM 2031 General Chemistry I A 3.000", "CHEM 2038 General Chemistry Lab I A 1.000",
+             "BIOL 2051 General Biology I B 3.000", "BIOL 2071 General Biology Lab I B 1.000", "ART 1000 Drawing A 3.000"]
+    reading = read_transcript(lines)
+    assert [(u.code, u.credits) for u in reading.unmatched] == [
+        ("CHEM 2031 + CHEM 2038", 4.0),
+        ("BIOL 2051 + BIOL 2071", 4.0),
+        ("ART 1000", 3.0),
+    ]
+    assert "with General Chemistry Lab I" in reading.unmatched[0].title
+
+
+def test_a_failed_lab_stays_separate_and_a_lab_with_no_lecture_stays_a_course() -> None:
+    lines = ["Example State University", "Fall 2022", "CHEM 2031 General Chemistry I A 3.000", "CHEM 2038 General Chemistry Lab I F 1.000",
+             "PHYS 2321 General Physics Lab II A 1.000"]
+    reading = read_transcript(lines)
+    assert [(u.code, u.credits) for u in reading.unmatched] == [("CHEM 2031", 3.0), ("PHYS 2321", 1.0)]
+    assert any("CHEM 2038" in s for s in reading.skipped)
+
+
+def test_a_cccs_lecture_and_lab_count_as_one_matched_course() -> None:
+    lines = ["Red Rocks Community College", "Fall 2023", "CHE 1111 General College Chemistry I A 4.000", "CHE 1118 General Chemistry Lab I A 1.000"]
+    reading = read_transcript(lines)
+    assert [(c.code, c.credits) for c in reading.courses] == [("CHGN121", 5.0)]
+    assert reading.unmatched == []

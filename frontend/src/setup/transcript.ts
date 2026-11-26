@@ -36,6 +36,7 @@ export const isPlaceholder = (code: string): boolean => PLACEHOLDER.test(code)
 
 /** How a code reads on screen: "FREE1XX-3" is "FREE 1XX"; a real code stays as it is. */
 export function displayCode(code: string): string {
+  if (code.includes('+')) return code.split('+').map(displayCode).join(' + ') // a lecture and its lab: "CHGN221 + CHGN223"
   const m = PLACEHOLDER.exec(code)
   return m ? `${m[1]} ${m[2]}XX` : code
 }

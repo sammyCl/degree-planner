@@ -1642,3 +1642,14 @@
 .card.completed.in-progress .card-done {
   color: var(--acc);
 }
+
+/* a completed column that continues the one before it: no total of its own, and a little closer to it */
+.sem.done.cont {
+  margin-left: -8px;
+}
+
+.sem-cont {
+  color: var(--mut);
+  font-size: 11px;
+  font-style: italic;
+}

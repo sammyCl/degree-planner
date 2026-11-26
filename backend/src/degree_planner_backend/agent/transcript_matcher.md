@@ -19,4 +19,6 @@ For each course, return:
 - confidence: "high" when the match is plainly the same course, "medium" when it is likely, "low" when it is a guess.
 - reason: one short sentence a student can read, such as "Both are first-semester calculus." Do not repeat the course codes.
 
+A course written as "CHEM 2031 + CHEM 2038" was taken together with its lab: treat the two as one course and match them together, never the lab alone. Mines includes some labs in the lecture course (Principles of Chemistry I) and lists others separately; a shortlist entry such as "CHGN221+CHGN223" is a Mines lecture and its lab together, and you may choose it as one code.
+
 Never use a code that is not in that course's shortlist.

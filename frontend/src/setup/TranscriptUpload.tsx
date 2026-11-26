@@ -122,17 +122,24 @@ export function TranscriptUpload({ courses, files = [], onChange, thisYear }: Pr
     const fresh: CompletedCourse[] = []
     for (const { course, mines } of picks) {
       if (!mines) continue
-      let code = normalizeCode(mines)
-      if (/^[A-Z]{2,5}\dXX$/.test(code)) code = nextPlaceholder(code, taken)
-      if (taken.has(code)) continue
-      taken.add(code)
-      fresh.push({
-        code,
-        credits: course.credits,
-        term: 'transfer',
-        transfer_from: file.school ?? null,
-        title: `${course.code} ${course.title}`.trim(),
-        in_progress: course.in_progress,
+      // "CHGN221+CHGN223" is a Mines lecture and its lab: both are added, the credits split by the catalog's credits
+      const parts = mines.split('+').map((part) => normalizeCode(part)).filter(Boolean)
+      const catalogCredits = parts.map((part) => catalogCourse(part)?.credits ?? 0)
+      const total = catalogCredits.reduce((a, b) => a + b, 0)
+      parts.forEach((part, i) => {
+        let code = part
+        if (/^[A-Z]{2,5}\dXX$/.test(code)) code = nextPlaceholder(code, taken)
+        if (taken.has(code)) return
+        taken.add(code)
+        const credits = parts.length === 1 || total === 0 ? course.credits / parts.length : (course.credits * catalogCredits[i]) / total
+        fresh.push({
+          code,
+          credits: Math.round(credits * 100) / 100,
+          term: 'transfer',
+          transfer_from: file.school ?? null,
+          title: `${course.code} ${course.title}`.trim(),
+          in_progress: course.in_progress,
+        })
       })
     }
     const done = new Set(picks.map((p) => p.course))
@@ -465,7 +472,9 @@ function FileIcon({ kind }: { kind: 'pdf' | 'csv' }) {
 const CONFIDENCE = { high: 'Strong match', medium: 'Likely match', low: 'A guess' } as const
 
 /** A Mines code the page can add: a catalog course, or placeholder credit such as FREE1XX. */
-const addable = (value: string): boolean => !!value.trim() && (!!catalogCourse(value) || /^[A-Z]{2,5}\dXX$/.test(normalizeCode(value)))
+const addable = (value: string): boolean =>
+  !!value.trim() &&
+  value.split('+').every((part) => !!catalogCourse(part) || /^[A-Z]{2,5}\dXX$/.test(normalizeCode(part)))
 
 /**
  * Courses from another school with no saved Mines equivalent. Each box is pre-filled with a suggestion (a guess from
