@@ -30,6 +30,7 @@ export function PlanSummary({ plan, explanation, donePlan }: Props) {
   const completed = plan.student.completed_courses
   const doneChecklist = useMemo(() => (donePlan ? buildCompletedChecklist(donePlan) : []), [donePlan])
   const transfer = completed.filter((c) => c.term === 'transfer' || c.term === 'aplcredit').length
+  const inProgress = completed.filter((c) => c.in_progress).length
 
   return (
     <section className="about" aria-label="About this plan">
@@ -66,7 +67,9 @@ export function PlanSummary({ plan, explanation, donePlan }: Props) {
               <p className="done-total">
                 <b>{formatCredits(completedCredits(plan))}</b> of {formatCredits(plan.summary.total_credits_required)} credits from{' '}
                 {completed.length} {completed.length === 1 ? 'course' : 'courses'}
-                {transfer > 0 ? ` (${transfer} transfer or AP)` : ''}
+                {transfer > 0 || inProgress > 0
+                  ? ` (${[transfer > 0 ? `${transfer} transfer, AP or IB` : '', inProgress > 0 ? `${inProgress} in progress` : ''].filter(Boolean).join(', ')})`
+                  : ''}
               </p>
               {!donePlan && <p className="about-none">Checking which requirements they meet...</p>}
               {doneChecklist.map((section) => (

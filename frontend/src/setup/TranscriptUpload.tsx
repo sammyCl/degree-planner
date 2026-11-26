@@ -1,16 +1,20 @@
 import { useEffect, useId, useRef, useState } from 'react'
-import { ApiError, parseTranscript } from '../api.ts'
-import type { CompletedCourse } from '../types.ts'
+import { ApiError, readTranscript } from '../api.ts'
+import type { CompletedCourse, UnmatchedCourse } from '../types.ts'
 import { Dropdown } from './Dropdown.tsx'
 import {
   CATALOG,
   catalogCourse,
+  completedTitle,
+  displayCode,
   fileKind,
   fileProblem,
   manualProblem,
   mergeCourses,
+  nextPlaceholder,
+  normalizeCode,
+  sourceLabel,
   TEMPLATE_CSV,
-  termLabel,
   termOptions,
   toCourse,
   totalCredits,
@@ -45,11 +49,14 @@ export function TranscriptUpload({ courses, files = [], onChange, thisYear }: Pr
   // credits filled in from the catalog, until the student types their own
   const [autoCredits, setAutoCredits] = useState(false)
   const [readingName, setReadingName] = useState<string | null>(null)
+  // the files themselves, by name, so a file can be read again once the student says which school it is from
+  const [fileObjects, setFileObjects] = useState<ReadonlyMap<string, File>>(() => new Map())
+  const [changingSchool, setChangingSchool] = useState<string | null>(null)
   const terms = termOptions(thisYear)
 
   useEffect(() => () => controller.current?.abort(), [])
 
-  const read = async (file: File) => {
+  const read = async (file: File, school: string | null = null) => {
     setNote(null)
     const bad = fileProblem(file)
     if (bad) {
@@ -59,18 +66,38 @@ export function TranscriptUpload({ courses, files = [], onChange, thisYear }: Pr
     setProblem(null)
     setReading(true)
     setReadingName(file.name)
+    setChangingSchool(null)
     controller.current = new AbortController()
     try {
-      const found = await parseTranscript(file, controller.current.signal)
-      const { merged, added } = mergeCourses(courses, found)
-      const codes = merged.slice(courses.length).map((c) => c.code)
-      // the same file read again replaces its chip instead of adding a second one
+      const result = await readTranscript(file, school, controller.current.signal)
+      setFileObjects((m) => new Map(m).set(file.name, file))
+      // the same file read again replaces what it added before, and its chip
+      const earlier = files.find((f) => f.name === file.name)
+      const drop = new Set(earlier?.added ?? [])
+      const base = courses.filter((c) => !drop.has(c.code))
+      const { merged, added } = mergeCourses(base, result.courses)
       const others = files.filter((f) => f.name !== file.name)
-      onChange(merged, [...others, { name: file.name, kind: fileKind(file.name), found: found.length, added: codes }])
+      const found = result.courses.length + result.unmatched.length
+      onChange(merged, [
+        ...others,
+        {
+          name: file.name,
+          kind: fileKind(file.name),
+          found,
+          added: merged.slice(base.length).map((c) => c.code),
+          school: result.school,
+          fromMines: result.from_mines,
+          system: result.system,
+          unmatched: result.unmatched,
+          skipped: result.skipped,
+          tesUrl: result.tes_url,
+          knownSchools: result.known_schools,
+        },
+      ])
       setNote(
-        found.length === 0
+        found === 0
           ? 'No courses were found in that file. Check it, or add your courses by hand.'
-          : `Found ${found.length} ${found.length === 1 ? 'course' : 'courses'}${added < found.length ? `, ${added} new` : ''}. Check the list below.`,
+          : `Found ${found} ${found === 1 ? 'course' : 'courses'}${added < result.courses.length ? `, ${added} new` : ''}.${result.unmatched.length ? ` ${result.unmatched.length} still need a Mines equivalent.` : ''} Check the list below.`,
       )
     } catch (error) {
       if (error instanceof ApiError && error.kind === 'aborted') return
@@ -85,6 +112,34 @@ export function TranscriptUpload({ courses, files = [], onChange, thisYear }: Pr
       setReading(false)
       setReadingName(null)
     }
+  }
+
+  /** A course from another school becomes the Mines course the student chose (or is skipped, with `mines` null). */
+  const resolve = (file: UploadedFile, picks: { course: UnmatchedCourse; mines: string | null }[]) => {
+    const taken = new Set(courses.map((c) => c.code))
+    const fresh: CompletedCourse[] = []
+    for (const { course, mines } of picks) {
+      if (!mines) continue
+      let code = normalizeCode(mines)
+      if (/^[A-Z]{2,5}\dXX$/.test(code)) code = nextPlaceholder(code, taken)
+      if (taken.has(code)) continue
+      taken.add(code)
+      fresh.push({
+        code,
+        credits: course.credits,
+        term: 'transfer',
+        transfer_from: file.school ?? null,
+        title: `${course.code} ${course.title}`.trim(),
+        in_progress: course.in_progress,
+      })
+    }
+    const done = new Set(picks.map((p) => p.course))
+    onChange(
+      [...courses, ...fresh],
+      files.map((f) =>
+        f === file ? { ...f, added: [...f.added, ...fresh.map((c) => c.code)], unmatched: (f.unmatched ?? []).filter((u) => !done.has(u)) } : f,
+      ),
+    )
   }
 
   const addByHand = () => {
@@ -158,6 +213,20 @@ export function TranscriptUpload({ courses, files = [], onChange, thisYear }: Pr
                 <small>
                   Uploaded &middot; {f.found} {f.found === 1 ? 'course' : 'courses'} found
                 </small>
+                {f.kind === 'pdf' && (
+                  <small className={f.school ? 'tu-school' : 'tu-school unknown'}>
+                    {f.school ? `${f.fromMines ? 'Mines transcript' : `From ${f.school}`}` : 'School not recognised'}
+                    {fileObjects.has(f.name) && (
+                      <>
+                        {' '}
+                        &middot;{' '}
+                        <button type="button" className="link" onClick={() => setChangingSchool(changingSchool === f.name ? null : f.name)}>
+                          {f.school ? 'Not right?' : 'Choose the school'}
+                        </button>
+                      </>
+                    )}
+                  </small>
+                )}
               </span>
               <button
                 type="button"
@@ -188,6 +257,52 @@ export function TranscriptUpload({ courses, files = [], onChange, thisYear }: Pr
           )}
         </ul>
       )}
+      {files.map((f) => {
+        const file = fileObjects.get(f.name)
+        const pickSchool = file && (changingSchool === f.name || (!f.school && f.kind === 'pdf'))
+        const unmatched = f.unmatched ?? []
+        if (!pickSchool && unmatched.length === 0 && !(f.skipped ?? []).length) return null
+        return (
+          <div className="tu-review" key={`review-${f.name}`}>
+            {pickSchool && (
+              <div className="tu-school-pick">
+                <span>Which school is {f.name} from?</span>
+                <Dropdown
+                  searchable
+                  label={`School for ${f.name}`}
+                  placeholder="Choose the school..."
+                  options={(f.knownSchools ?? []).map((name) => ({ value: name, label: name }))}
+                  value={f.school ?? ''}
+                  onChange={(school) => void read(file, school)}
+                />
+                <small>
+                  Mines and the 15 Colorado community colleges have saved course lists. For another school, keep it as it is and
+                  look each course up in TES below.
+                </small>
+              </div>
+            )}
+            {unmatched.length > 0 && (
+              <UnmatchedList
+                file={f}
+                courses={unmatched}
+                onResolve={(picks) => resolve(f, picks)}
+              />
+            )}
+            {(f.skipped ?? []).length > 0 && (
+              <details className="tu-skipped">
+                <summary>
+                  {f.skipped!.length} {f.skipped!.length === 1 ? 'row earns' : 'rows earn'} no Mines credit
+                </summary>
+                <ul>
+                  {f.skipped!.map((line) => (
+                    <li key={line}>{line}</li>
+                  ))}
+                </ul>
+              </details>
+            )}
+          </div>
+        )
+      })}
       {reading && (
         <p className="tu-note" role="status">
           Reading your file...
@@ -217,13 +332,16 @@ export function TranscriptUpload({ courses, files = [], onChange, thisYear }: Pr
           <ul aria-label="Completed courses">
             {courses.map((c) => (
               <li key={c.code}>
-                <span className="tu-code">{c.code}</span>
+                <span className="tu-code">{displayCode(c.code)}</span>
                 <span className="tu-cr">{c.credits} cr</span>
-                <span className="tu-term">
-                  {termLabel(c.term)}
-                  {c.transfer_from ? ` (${c.transfer_from})` : ''}
+                <span className="tu-what" title={completedTitle(c)}>
+                  {completedTitle(c)}
                 </span>
-                <button type="button" className="tu-x" aria-label={`Remove ${c.code}`} onClick={() => onChange(courses.filter((x) => x.code !== c.code), files)}>
+                <span className="tu-term">
+                  {c.in_progress && <span className="tu-ip">In progress</span>}
+                  {sourceLabel(c)}
+                </span>
+                <button type="button" className="tu-x" aria-label={`Remove ${displayCode(c.code)}${displayCode(c.code) !== c.code ? ` (${completedTitle(c)})` : ''}`} onClick={() => onChange(courses.filter((x) => x.code !== c.code), files)}>
                   &times;
                 </button>
               </li>
@@ -344,5 +462,77 @@ function FileIcon({ kind }: { kind: 'pdf' | 'csv' }) {
         {kind.toUpperCase()}
       </text>
     </svg>
+  )
+}
+
+/** Courses from another school with no Mines equivalent yet: the student picks one (after a TES look-up) or skips it. */
+function UnmatchedList({ file, courses, onResolve }: { file: UploadedFile; courses: UnmatchedCourse[]; onResolve: (picks: { course: UnmatchedCourse; mines: string | null }[]) => void }) {
+  const listId = useId()
+  const [typed, setTyped] = useState<Record<string, string>>({})
+  const suggested = courses.filter((c) => c.suggestion)
+  return (
+    <div className="tu-unmatched" role="group" aria-label={`Courses that need a Mines equivalent from ${file.name}`}>
+      <div className="tu-unmatched-head">
+        <b>
+          {courses.length} {courses.length === 1 ? 'course needs' : 'courses need'} a Mines equivalent
+        </b>
+        {file.tesUrl && (
+          <a className="tu-tes" href={file.tesUrl} target="_blank" rel="noreferrer noopener">
+            Look them up in TES
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M7 17L17 7M9 7h8v8" />
+            </svg>
+          </a>
+        )}
+      </div>
+      <p className="tu-unmatched-help">
+        {file.system
+          ? `${file.school} is a ${file.system} college. These courses are not on Mines' preapproved list; an academic course usually transfers as a free elective.`
+          : `Mines has no saved list for ${file.school ?? 'this school'}. Search for the school in Mines' Transfer Evaluation System (TES), find each course, and enter the Mines course it became.`}{' '}
+        TES results are unofficial; the registrar decides when your official transcript arrives.
+      </p>
+      <datalist id={listId}>
+        <option value="FREE1XX">Free elective</option>
+        <option value="HASS2XX">CAS/HASS mid-level elective</option>
+        <option value="CSM2XX">Success &amp; Wellness</option>
+      </datalist>
+      <ul>
+        {courses.map((c) => {
+          const key = `${c.code}|${c.title}`
+          const value = typed[key] ?? ''
+          const known = value.trim() && (catalogCourse(value) || /^[A-Z]{2,5}\dXX$/i.test(value.replace(/\s+/g, '')))
+          return (
+            <li key={key}>
+              <span className="tu-their">
+                <b>{c.code}</b> {c.title} <small>{c.credits} cr{c.in_progress ? ', in progress' : ''}</small>
+              </span>
+              <input
+                aria-label={`Mines course for ${c.code}`}
+                placeholder="Mines course, e.g. MATH111"
+                list={listId}
+                value={value}
+                onChange={(e) => setTyped({ ...typed, [key]: e.target.value })}
+              />
+              <button type="button" className="tu-pick small" disabled={!known} onClick={() => onResolve([{ course: c, mines: value }])}>
+                Add
+              </button>
+              {c.suggestion && (
+                <button type="button" className="link" onClick={() => onResolve([{ course: c, mines: c.suggestion }])}>
+                  {c.suggestion === 'FREE1XX' ? 'Free elective' : c.suggestion}
+                </button>
+              )}
+              <button type="button" className="tu-x" aria-label={`Skip ${c.code}`} title="No Mines credit for this course" onClick={() => onResolve([{ course: c, mines: null }])}>
+                &times;
+              </button>
+            </li>
+          )
+        })}
+      </ul>
+      {suggested.length > 1 && (
+        <button type="button" className="link" onClick={() => onResolve(suggested.map((c) => ({ course: c, mines: c.suggestion })))}>
+          Count all {suggested.length} as free electives
+        </button>
+      )}
+    </div>
   )
 }

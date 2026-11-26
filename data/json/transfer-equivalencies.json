@@ -1,0 +1,1983 @@
+{
+ "about": "Outside courses Mines has preapproved, and the Mines course each becomes. Built by data/tools/build_transfer_equivalencies.py from data/Transfer Credit/. Not a guarantee: the registrar decides when official transcripts arrive.",
+ "retrieved": "2026-11-26",
+ "sources": [
+  "https://www.mines.edu/registrar/cccs-preapproved-transfer/",
+  "https://www.mines.edu/registrar/cccs-core-general/",
+  "https://www.mines.edu/registrar/cccs-compsci-engr/",
+  "https://www.mines.edu/registrar/cccs-hass-courses/"
+ ],
+ "tes_url": "https://tes.collegesource.com/publicview/TES_publicview01.aspx?rid=2827e8b2-59b1-46b1-8274-ad33fdab2135&aid=72fb7eaa-493b-439c-93bb-6419eeb87a48",
+ "systems": {
+  "cccs": {
+   "name": "Colorado Community College System",
+   "schools": [
+    "Red Rocks Community College",
+    "Front Range Community College",
+    "Arapahoe Community College",
+    "Pikes Peak State College",
+    "Community College of Denver",
+    "Community College of Aurora",
+    "Colorado Mountain College",
+    "Aims Community College",
+    "Pueblo Community College",
+    "Lamar Community College",
+    "Morgan Community College",
+    "Northeastern Community College",
+    "Colorado Northwestern Community College",
+    "Otero Junior College",
+    "Trinidad State Junior College"
+   ],
+   "min_grade": "C",
+   "unlisted": "Academic courses not on the lists transfer as free electives (FREE1XX), up to the hours the degree needs. No credit for vocational or developmental courses (pre-calculus, introductory chemistry)."
+  }
+ },
+ "equivalencies": [
+  {
+   "system": "cccs",
+   "subjects": [
+    "BIO"
+   ],
+   "numbers": [
+    "111",
+    "1111"
+   ],
+   "any_number": false,
+   "title": "Biology I",
+   "mines": [
+    "CBEN110"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "BIO"
+   ],
+   "numbers": [
+    "112",
+    "1112"
+   ],
+   "any_number": false,
+   "title": "Gen College Biology II",
+   "mines": [
+    "CBEN120"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "CHE"
+   ],
+   "numbers": [
+    "111",
+    "1111"
+   ],
+   "any_number": false,
+   "title": "Chemistry I",
+   "mines": [
+    "CHGN121"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "CHE"
+   ],
+   "numbers": [
+    "112",
+    "1112"
+   ],
+   "any_number": false,
+   "title": "Chemistry II",
+   "mines": [
+    "CHGN122"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "CHE"
+   ],
+   "numbers": [
+    "211",
+    "2111"
+   ],
+   "any_number": false,
+   "title": "Organic Chemistry I",
+   "mines": [
+    "CHGN221",
+    "CHGN223"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "CHE"
+   ],
+   "numbers": [
+    "212",
+    "2112"
+   ],
+   "any_number": false,
+   "title": "Organic Chemistry II",
+   "mines": [
+    "CHGN222",
+    "CHGN224"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "HWE"
+   ],
+   "numbers": [
+    "100",
+    "1050"
+   ],
+   "any_number": false,
+   "title": "Human Nutrition",
+   "mines": [
+    "CSM2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "HWE"
+   ],
+   "numbers": [
+    "1003"
+   ],
+   "any_number": false,
+   "title": "Mental Health First Aid",
+   "mines": [
+    "CSM2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "HWE"
+   ],
+   "numbers": [
+    "1062"
+   ],
+   "any_number": false,
+   "title": "Health and Wellness",
+   "mines": [
+    "CSM2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "ECO"
+   ],
+   "numbers": [
+    "201",
+    "202",
+    "2001",
+    "2002"
+   ],
+   "any_number": false,
+   "title": "Prin Macroeconomics or Microconomics",
+   "mines": [
+    "EBGN201"
+   ],
+   "note": "students entering fall 2021 or later; prior to this, students must still take both courses",
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "EGG"
+   ],
+   "numbers": [
+    "1040"
+   ],
+   "any_number": false,
+   "title": "Engineering Projects",
+   "mines": [
+    "EDNS151"
+   ],
+   "note": "Only when taken at CC Aurora, Front Range CC, Pikes Peak, Arapahoe CC & Red Rocks CC",
+   "only_at": [
+    "Community College of Aurora",
+    "Front Range Community College",
+    "Pikes Peak State College",
+    "Arapahoe Community College",
+    "Red Rocks Community College"
+   ],
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "GEY"
+   ],
+   "numbers": [
+    "111",
+    "1111"
+   ],
+   "any_number": false,
+   "title": "Physical Geology",
+   "mines": [
+    "GEGN101"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "GEY"
+   ],
+   "numbers": [
+    "112",
+    "1112"
+   ],
+   "any_number": false,
+   "title": "Historical Geology w/Lab",
+   "mines": [
+    "GEGN204"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "HIS"
+   ],
+   "numbers": [
+    "247",
+    "2015"
+   ],
+   "any_number": false,
+   "title": "20th Century World History",
+   "mines": [
+    "HASS200"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "SOC"
+   ],
+   "numbers": [
+    "207",
+    "2007"
+   ],
+   "any_number": false,
+   "title": "Environmental Sociology",
+   "mines": [
+    "HASS200"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "LIT"
+   ],
+   "numbers": [
+    "202",
+    "2002"
+   ],
+   "any_number": false,
+   "title": "World Lit After 1600",
+   "mines": [
+    "HASS200"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "PSC",
+    "POS"
+   ],
+   "numbers": [
+    "225",
+    "2025"
+   ],
+   "any_number": false,
+   "title": "Comparative Government",
+   "mines": [
+    "HASS200"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "PHI"
+   ],
+   "numbers": [
+    "218",
+    "2018"
+   ],
+   "any_number": false,
+   "title": "Environmental Ethics",
+   "mines": [
+    "HASS100"
+   ],
+   "note": "Two courses make HASS100 (PHI 2018 with ENG 1022 or 1031); the other's hours are a free elective.",
+   "only_at": null,
+   "pair": "HASS100"
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "ENG"
+   ],
+   "numbers": [
+    "122",
+    "131",
+    "1022",
+    "1031"
+   ],
+   "any_number": false,
+   "title": "English Composition II or Technical Writing I",
+   "mines": [
+    "HASS100"
+   ],
+   "note": "Two courses make HASS100 (PHI 2018 with ENG 1022 or 1031); the other's hours are a free elective.",
+   "only_at": null,
+   "pair": "HASS100"
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "MAT"
+   ],
+   "numbers": [
+    "201",
+    "2410"
+   ],
+   "any_number": false,
+   "title": "Calculus I",
+   "mines": [
+    "MATH111"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "MAT"
+   ],
+   "numbers": [
+    "202",
+    "2420"
+   ],
+   "any_number": false,
+   "title": "Calculus II",
+   "mines": [
+    "MATH112"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "MAT"
+   ],
+   "numbers": [
+    "203",
+    "204",
+    "2430",
+    "2431"
+   ],
+   "any_number": false,
+   "title": "Calculus III",
+   "mines": [
+    "MATH213"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "MAT"
+   ],
+   "numbers": [
+    "135",
+    "1260"
+   ],
+   "any_number": false,
+   "title": "Introduction to Statistics",
+   "mines": [
+    "MATH201"
+   ],
+   "note": "students entering fall 2021 or later",
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "MAT"
+   ],
+   "numbers": [
+    "261",
+    "265",
+    "2560",
+    "2561",
+    "2562"
+   ],
+   "any_number": false,
+   "title": "Differential Equations",
+   "mines": [
+    "MATH225"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "MAT"
+   ],
+   "numbers": [
+    "255",
+    "2540"
+   ],
+   "any_number": false,
+   "title": "Linear Algebra",
+   "mines": [
+    "MATH332"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "PHY"
+   ],
+   "numbers": [
+    "211",
+    "2111"
+   ],
+   "any_number": false,
+   "title": "Physics I",
+   "mines": [
+    "PHGN100"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "PHY"
+   ],
+   "numbers": [
+    "212",
+    "2112"
+   ],
+   "any_number": false,
+   "title": "Physics II",
+   "mines": [
+    "PHGN200"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "PED"
+   ],
+   "numbers": [],
+   "any_number": true,
+   "title": "Any PED course 1004 or higher, except spec topics, indep study & internship-type courses",
+   "mines": [
+    "PAGN1XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "CSC"
+   ],
+   "numbers": [
+    "160",
+    "1060"
+   ],
+   "any_number": false,
+   "title": "Computer Science I",
+   "mines": [
+    "CSCI128"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "EGG"
+   ],
+   "numbers": [
+    "1060"
+   ],
+   "any_number": false,
+   "title": "Intro to Engineering Computing",
+   "mines": [
+    "CSCI128"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "CSC"
+   ],
+   "numbers": [
+    "161",
+    "1061"
+   ],
+   "any_number": false,
+   "title": "Computer Science II",
+   "mines": [
+    "CSCI200"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "MAT"
+   ],
+   "numbers": [
+    "2520"
+   ],
+   "any_number": false,
+   "title": "Discrete Mathematics",
+   "mines": [
+    "CSCI358"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "CSC"
+   ],
+   "numbers": [
+    "2065"
+   ],
+   "any_number": false,
+   "title": "Discrete Structures",
+   "mines": [
+    "CSCI358"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "CSC"
+   ],
+   "numbers": [
+    "119",
+    "1019"
+   ],
+   "any_number": false,
+   "title": "Intro to Programming",
+   "mines": [
+    "CSCI102"
+   ],
+   "note": "for continuing students only",
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "EGG"
+   ],
+   "numbers": [
+    "211",
+    "2011"
+   ],
+   "any_number": false,
+   "title": "Engr Mechanics I - Statics",
+   "mines": [
+    "CEEN241"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "EGG"
+   ],
+   "numbers": [
+    "212",
+    "2012"
+   ],
+   "any_number": false,
+   "title": "Engr Mechanics II - Dynamics",
+   "mines": [
+    "MEGN315"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "ANT"
+   ],
+   "numbers": [
+    "215",
+    "2115"
+   ],
+   "any_number": false,
+   "title": "Native Peoples N. America",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "ANT"
+   ],
+   "numbers": [
+    "221",
+    "1101"
+   ],
+   "any_number": false,
+   "title": "Exploring other Cultures I",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "ANT"
+   ],
+   "numbers": [
+    "225",
+    "2125"
+   ],
+   "any_number": false,
+   "title": "Anthropology of Religion",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "ART"
+   ],
+   "numbers": [
+    "207",
+    "1113"
+   ],
+   "any_number": false,
+   "title": "Art History 1900 to Present",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "COM"
+   ],
+   "numbers": [
+    "220",
+    "2300"
+   ],
+   "any_number": false,
+   "title": "Intercultural Communication",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "COM"
+   ],
+   "numbers": [
+    "230",
+    "2400"
+   ],
+   "any_number": false,
+   "title": "Argumentation & Debate",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "CRJ"
+   ],
+   "numbers": [
+    "210",
+    "2010"
+   ],
+   "any_number": false,
+   "title": "Constitutional Law",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "CRJ"
+   ],
+   "numbers": [
+    "220",
+    "2020"
+   ],
+   "any_number": false,
+   "title": "Human Rel/Social Conflict",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "ECO"
+   ],
+   "numbers": [
+    "201",
+    "2001"
+   ],
+   "any_number": false,
+   "title": "Prin Macroeconomics",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": "Only for 2023-24 and later catalog years Students cannot transfer in both ECO 2001 and ECO 2002 as EBGN 201; only one can count toward CAS/HASS mid-level credit",
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "ECO"
+   ],
+   "numbers": [
+    "202",
+    "2002"
+   ],
+   "any_number": false,
+   "title": "Prin Microeconomics",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": "Only for 2023-24 and later catalog years Students cannot transfer in both ECO 2001 and ECO 2002 as EBGN 201; only one can count toward CAS/HASS mid-level credit",
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "ENG"
+   ],
+   "numbers": [
+    "221",
+    "2021"
+   ],
+   "any_number": false,
+   "title": "Creative Writing I",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "ENG"
+   ],
+   "numbers": [
+    "226",
+    "2026"
+   ],
+   "any_number": false,
+   "title": "Fiction Writing",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "ENG"
+   ],
+   "numbers": [
+    "227",
+    "2027"
+   ],
+   "any_number": false,
+   "title": "Poetry Writing",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "ENG"
+   ],
+   "numbers": [
+    "230",
+    "2030"
+   ],
+   "any_number": false,
+   "title": "Creative Nonfiction",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "HIS"
+   ],
+   "numbers": [
+    "205",
+    "2005"
+   ],
+   "any_number": false,
+   "title": "Women in World History",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "HIS"
+   ],
+   "numbers": [
+    "207",
+    "2125"
+   ],
+   "any_number": false,
+   "title": "American Environment Hist",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "HIS"
+   ],
+   "numbers": [
+    "208",
+    "2115"
+   ],
+   "any_number": false,
+   "title": "American Indian History",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "HIS"
+   ],
+   "numbers": [
+    "215",
+    "2105"
+   ],
+   "any_number": false,
+   "title": "Women in U.S. History",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "HIS"
+   ],
+   "numbers": [
+    "225",
+    "2135"
+   ],
+   "any_number": false,
+   "title": "Colorado History",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "HIS"
+   ],
+   "numbers": [
+    "235",
+    "2130"
+   ],
+   "any_number": false,
+   "title": "History of American West",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "HIS"
+   ],
+   "numbers": [
+    "236",
+    "2145"
+   ],
+   "any_number": false,
+   "title": "U.S. History Since 1945",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "HIS"
+   ],
+   "numbers": [
+    "243",
+    "2610"
+   ],
+   "any_number": false,
+   "title": "History of Modern China",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "HIS"
+   ],
+   "numbers": [
+    "244",
+    "2200"
+   ],
+   "any_number": false,
+   "title": "History of Latin America",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "HIS"
+   ],
+   "numbers": [
+    "248",
+    "2320"
+   ],
+   "any_number": false,
+   "title": "History of Modern Russia",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "HIS"
+   ],
+   "numbers": [
+    "249",
+    "2500"
+   ],
+   "any_number": false,
+   "title": "History Islamic Civiliz",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "HIS"
+   ],
+   "numbers": [
+    "260",
+    "2120"
+   ],
+   "any_number": false,
+   "title": "U.S. Foreign Relat History",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "HUM"
+   ],
+   "numbers": [
+    "1003"
+   ],
+   "any_number": false,
+   "title": "Intro to Film Art",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "LIT"
+   ],
+   "numbers": [
+    "201",
+    "2001"
+   ],
+   "any_number": false,
+   "title": "World Lit to 1600",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "LIT"
+   ],
+   "numbers": [
+    "205",
+    "2005"
+   ],
+   "any_number": false,
+   "title": "Ethnic Literature",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "LIT"
+   ],
+   "numbers": [
+    "211",
+    "2011"
+   ],
+   "any_number": false,
+   "title": "Amer Lit to Civil War",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "LIT"
+   ],
+   "numbers": [
+    "212",
+    "2012"
+   ],
+   "any_number": false,
+   "title": "Amer Lit Aft Civil War",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "LIT"
+   ],
+   "numbers": [
+    "221",
+    "2021"
+   ],
+   "any_number": false,
+   "title": "British Lit to 1770",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "LIT"
+   ],
+   "numbers": [
+    "222",
+    "2022"
+   ],
+   "any_number": false,
+   "title": "British Lit Since 1770",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "LIT"
+   ],
+   "numbers": [
+    "225",
+    "2025"
+   ],
+   "any_number": false,
+   "title": "Intro to Shakespeare",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "LIT"
+   ],
+   "numbers": [
+    "235",
+    "2035"
+   ],
+   "any_number": false,
+   "title": "Science Fiction",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "LIT"
+   ],
+   "numbers": [
+    "246",
+    "2046"
+   ],
+   "any_number": false,
+   "title": "Literature of Women",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "LIT"
+   ],
+   "numbers": [
+    "257",
+    "2057"
+   ],
+   "any_number": false,
+   "title": "Literature and Film",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "PHI"
+   ],
+   "numbers": [
+    "201",
+    "2001"
+   ],
+   "any_number": false,
+   "title": "Social & Political Philosophy",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "PHI"
+   ],
+   "numbers": [
+    "202",
+    "2002"
+   ],
+   "any_number": false,
+   "title": "Religion and Film",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "PHI"
+   ],
+   "numbers": [
+    "203",
+    "2003"
+   ],
+   "any_number": false,
+   "title": "Introduction to Buddhism",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "PHI"
+   ],
+   "numbers": [
+    "204",
+    "2004"
+   ],
+   "any_number": false,
+   "title": "Introduction to Hinduism",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "PHI"
+   ],
+   "numbers": [
+    "214",
+    "2014"
+   ],
+   "any_number": false,
+   "title": "Philosophy of Religion",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "PHI"
+   ],
+   "numbers": [
+    "220",
+    "2020"
+   ],
+   "any_number": false,
+   "title": "Philosophy of Death & Dying",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "PHI"
+   ],
+   "numbers": [
+    "221",
+    "2021"
+   ],
+   "any_number": false,
+   "title": "Ancient Philosophy",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "PHI"
+   ],
+   "numbers": [
+    "222",
+    "2022"
+   ],
+   "any_number": false,
+   "title": "Modern Philosophy",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "PSC",
+    "POS"
+   ],
+   "numbers": [
+    "205",
+    "2005"
+   ],
+   "any_number": false,
+   "title": "International Relations",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "PSC",
+    "POS"
+   ],
+   "numbers": [
+    "215",
+    "1050"
+   ],
+   "any_number": false,
+   "title": "Current Political Issues",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "PSC",
+    "POS"
+   ],
+   "numbers": [
+    "260",
+    "2060"
+   ],
+   "any_number": false,
+   "title": "Energy Security Policy",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "PSY"
+   ],
+   "numbers": [
+    "205",
+    "2105"
+   ],
+   "any_number": false,
+   "title": "Psychology of Gender",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "PSY"
+   ],
+   "numbers": [
+    "217",
+    "2107"
+   ],
+   "any_number": false,
+   "title": "Human Sexuality",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "PSY"
+   ],
+   "numbers": [
+    "226",
+    "2221"
+   ],
+   "any_number": false,
+   "title": "Social Psychology",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "PSY"
+   ],
+   "numbers": [
+    "227",
+    "2222"
+   ],
+   "any_number": false,
+   "title": "Psychology of Death/Dying",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "PSY"
+   ],
+   "numbers": [
+    "235",
+    "2440"
+   ],
+   "any_number": false,
+   "title": "Human Growth & Development",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "PSY"
+   ],
+   "numbers": [
+    "249",
+    "2552"
+   ],
+   "any_number": false,
+   "title": "Abnormal Psychology",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "PSY"
+   ],
+   "numbers": [
+    "265",
+    "2771"
+   ],
+   "any_number": false,
+   "title": "Psychology of Personality",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "SOC"
+   ],
+   "numbers": [
+    "203",
+    "2003"
+   ],
+   "any_number": false,
+   "title": "Urban Sociology",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "SOC"
+   ],
+   "numbers": [
+    "205",
+    "2005"
+   ],
+   "any_number": false,
+   "title": "Soc of Family Dynamics",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "SOC"
+   ],
+   "numbers": [
+    "215",
+    "2015"
+   ],
+   "any_number": false,
+   "title": "Contemp. Social Problems",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "SOC"
+   ],
+   "numbers": [
+    "216",
+    "2016"
+   ],
+   "any_number": false,
+   "title": "Sociology of Gender",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "SOC"
+   ],
+   "numbers": [
+    "218",
+    "2018"
+   ],
+   "any_number": false,
+   "title": "Sociology of Diversity",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "SOC"
+   ],
+   "numbers": [
+    "220",
+    "2020"
+   ],
+   "any_number": false,
+   "title": "Sociology of Religion",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "SOC"
+   ],
+   "numbers": [
+    "231",
+    "2031"
+   ],
+   "any_number": false,
+   "title": "Sociology-Deviant Behavior",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "SOC"
+   ],
+   "numbers": [
+    "237",
+    "2037"
+   ],
+   "any_number": false,
+   "title": "Sociology of Death & Dying",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "SOC"
+   ],
+   "numbers": [
+    "265",
+    "2065"
+   ],
+   "any_number": false,
+   "title": "Violence and Culture",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "ARA"
+   ],
+   "numbers": [],
+   "any_number": true,
+   "title": "Any Arabic Language Course",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "CHI"
+   ],
+   "numbers": [],
+   "any_number": true,
+   "title": "Any Chinese Language Course",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "FRE"
+   ],
+   "numbers": [],
+   "any_number": true,
+   "title": "Any French Language Course",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "GER"
+   ],
+   "numbers": [],
+   "any_number": true,
+   "title": "Any German Language Course",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "ITA"
+   ],
+   "numbers": [],
+   "any_number": true,
+   "title": "Any Italian Language Course",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "JPN"
+   ],
+   "numbers": [],
+   "any_number": true,
+   "title": "Any Japanese Language Course",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "RUS"
+   ],
+   "numbers": [],
+   "any_number": true,
+   "title": "Any Russian Language Course",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "SPA"
+   ],
+   "numbers": [],
+   "any_number": true,
+   "title": "Any Spanish Language Course",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  },
+  {
+   "system": "cccs",
+   "subjects": [
+    "ASL"
+   ],
+   "numbers": [],
+   "any_number": true,
+   "title": "Any Sign Language Course",
+   "mines": [
+    "HASS2XX"
+   ],
+   "note": null,
+   "only_at": null,
+   "pair": null
+  }
+ ]
+}

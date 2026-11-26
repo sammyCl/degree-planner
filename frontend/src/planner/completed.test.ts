@@ -7,19 +7,36 @@ import { buildCompletedChecklist } from './summary.ts'
 const course = (code: string, credits: number, term: string): CompletedCourse => ({ code, credits, term, transfer_from: null })
 
 describe('completedColumns', () => {
-  it('puts transfer and AP credit first, then the terms in the order they were taken, with catalog titles', () => {
+  it('puts AP, IB and transfer credit first (one column per school), then the terms in order, with catalog titles', () => {
     const columns = completedColumns([
       course('CSCI128', 3, 'Spring 2026'),
       course('MATH111', 4, 'aplcredit'),
       course('CHGN121', 4, 'Fall 2025'),
-      course('PHGN100', 4, 'transfer'),
+      { code: 'PHGN100', credits: 4, term: 'transfer', transfer_from: 'Example State University' },
+      { code: 'CHGN122', credits: 4, term: 'transfer', transfer_from: 'IB credit' },
       course('MATH112', 4, 'Spring 2026'),
     ])
-    expect(columns.map((c) => c.label)).toEqual(['Transfer credit', 'AP credit', 'Fall 2025', 'Spring 2026'])
-    expect(columns[3].courses.map((c) => c.code)).toEqual(['CSCI128', 'MATH112'])
-    expect(columns[3].credits).toBe(7)
-    expect(columns[1].courses[0]).toMatchObject({ course_id: 'done-MATH111', status: 'completed' })
-    expect(columns[1].courses[0].title).toMatch(/Calculus/)
+    expect(columns.map((c) => [c.label, c.from])).toEqual([
+      ['AP credit', undefined],
+      ['IB credit', undefined],
+      ['Transfer credit', 'Example State University'],
+      ['Fall 2025', undefined],
+      ['Spring 2026', undefined],
+    ])
+    expect(columns[4].courses.map((c) => c.code)).toEqual(['CSCI128', 'MATH112'])
+    expect(columns[4].credits).toBe(7)
+    expect(columns[0].courses[0]).toMatchObject({ course_id: 'done-MATH111', status: 'completed' })
+    expect(columns[0].courses[0].title).toMatch(/Calculus/)
+  })
+
+  it('titles placeholder credit from the transcript, and marks a term that is all in progress', () => {
+    const columns = completedColumns([
+      { code: 'FREE1XX-1', credits: 3, term: 'transfer', transfer_from: 'IB credit', title: 'Free Elective-Art History' },
+      { code: 'HASS2XX-1', credits: 3, term: 'transfer', transfer_from: 'IB credit' },
+      { code: 'CSCI261', credits: 3, term: 'Fall 2025', transfer_from: null, in_progress: true },
+    ])
+    expect(columns[0].courses.map((c) => c.title)).toEqual(['Free Elective-Art History', 'CAS/HASS mid-level elective credit'])
+    expect(columns[1]).toMatchObject({ label: 'Fall 2025', inProgress: true })
   })
 
   it('names a course the catalog does not have by where it came from', () => {

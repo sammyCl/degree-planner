@@ -3,7 +3,7 @@ import sqlite3
 import tempfile
 from pathlib import Path
 
-from fastapi import Depends, FastAPI, File, HTTPException, Request, UploadFile
+from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -13,13 +13,16 @@ from degree_planner_backend.agent.chat_models import ChatRequest, ChatResponse
 from degree_planner_backend.agent.loop import ClaudeCodeError, run_agent
 from degree_planner_backend.agent.request_models import AgentRequest, AgentResponse
 from degree_planner_backend.db import get_db
+from degree_planner_backend.lookups import get_course
 from degree_planner_backend.plan_models import CompletedCourse, Plan
 from degree_planner_backend.plan_store import PlanNotFoundError, load_plan, save_plan
 from degree_planner_backend.transcript_parser import (
     TranscriptParseError,
     parse_transcript_csv,
     parse_transcript_pdf,
+    pdf_lines,
 )
+from degree_planner_backend.transfer_credit import TranscriptReading, load_equivalencies, read_transcript
 from degree_planner_backend.validator import check_plan
 
 logger = logging.getLogger(__name__)
@@ -122,6 +125,40 @@ def parse_transcript(file: UploadFile = File(...)) -> list[CompletedCourse]:
                 tmp.write(contents)
                 tmp.flush()
                 return parse_transcript_pdf(Path(tmp.name))
+        raise HTTPException(status_code=400, detail="Transcript must be a .csv or .pdf file")
+    except TranscriptParseError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/transcripts/read", response_model=TranscriptReading)
+def read_transcript_file(
+    file: UploadFile = File(...),
+    school: str | None = Form(None),
+    connection: sqlite3.Connection = Depends(get_db),
+) -> TranscriptReading:
+    """Read a transcript for the setup page: the school it is from, its courses as Mines courses, and the courses
+    from another school that still need a Mines equivalent (transfer_credit.py). `school` names the school when the
+    student corrects it. The file is read from a temporary file and not kept."""
+    suffix = Path(file.filename or "").suffix.lower()
+    contents = file.file.read()
+
+    def credits_of(code: str) -> float | None:
+        try:
+            return get_course(connection, code).credits
+        except LookupError:  # NotFoundError or AmbiguousLookupError
+            return None
+
+    try:
+        if suffix == ".csv":
+            # our own CSV already uses Mines course codes
+            return TranscriptReading(
+                school=None, from_mines=True, courses=parse_transcript_csv(contents.decode("utf-8")), tes_url=load_equivalencies()["tes_url"]
+            )
+        if suffix == ".pdf":
+            with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp:
+                tmp.write(contents)
+                tmp.flush()
+                return read_transcript(pdf_lines(Path(tmp.name)), school=school, credits_of=credits_of)
         raise HTTPException(status_code=400, detail="Transcript must be a .csv or .pdf file")
     except TranscriptParseError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc

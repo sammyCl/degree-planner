@@ -1,13 +1,17 @@
 // Completed courses on the planner page. The agent plans only what is left, starting at the chosen semester; the
 // courses the student already finished stay in plan.student.completed_courses, outside the semester columns. These
 // helpers turn them into columns of their own (one per term they were taken in) for the left side of the board.
-import { catalogCourse, termLabel } from '../setup/transcript.ts'
+import { completedTitle, termLabel } from '../setup/transcript.ts'
 import type { CompletedCourse, Plan, PlannedCourse, Semester } from '../types.ts'
 
 export interface CompletedColumn {
   key: string
-  /** what the column header says: "Fall 2025", "Transfer credit" or "AP credit" */
+  /** what the column header says: "Fall 2025", "AP credit", "IB credit" or "Transfer credit" */
   label: string
+  /** for transfer credit, the school it came from */
+  from?: string
+  /** every course in it is still in progress */
+  inProgress: boolean
   courses: PlannedCourse[]
   credits: number
 }
@@ -17,10 +21,11 @@ export const completedId = (code: string): string => `done-${code}`
 
 const SEASON_ORDER: Record<string, number> = { Spring: 0, Summer: 1, Fall: 2 }
 
-/** Transfer and AP credit first (they come before Mines), then the semesters in the order they were taken. */
+/** AP, IB and transfer credit first (they come before Mines), then the semesters in the order they were taken. */
 function termRank(term: string): [number, number, number] {
-  if (term === 'transfer') return [0, 0, 0]
-  if (term === 'aplcredit') return [0, 0, 1]
+  if (term === 'aplcredit') return [0, 0, 0]
+  if (term === 'transfer|IB credit') return [0, 0, 1]
+  if (term.startsWith('transfer')) return [0, 0, 2]
   const m = /^(Fall|Spring|Summer) (\d{4})$/.exec(term)
   return m ? [1, Number(m[2]), SEASON_ORDER[m[1]]] : [2, 0, 0]
 }
@@ -30,23 +35,30 @@ const compare = (a: string, b: string): number => {
   return x[0] - y[0] || x[1] - y[1] || x[2] - y[2] || a.localeCompare(b)
 }
 
-/** The completed courses as board columns, one per term, with the catalog's titles. */
+/** Transfer credit is grouped by where it came from (IB, or each school); everything else by term. */
+const groupKey = (c: CompletedCourse): string => (c.term === 'transfer' ? `transfer|${c.transfer_from ?? ''}` : c.term)
+
+/** The completed courses as board columns, one per term or source, with titles to show. */
 export function completedColumns(completed: CompletedCourse[]): CompletedColumn[] {
   const byTerm = new Map<string, CompletedCourse[]>()
-  for (const c of completed) byTerm.set(c.term, [...(byTerm.get(c.term) ?? []), c])
-  return [...byTerm.keys()].sort(compare).map((term) => {
-    const courses = byTerm.get(term)!.map(
+  for (const c of completed) byTerm.set(groupKey(c), [...(byTerm.get(groupKey(c)) ?? []), c])
+  return [...byTerm.keys()].sort(compare).map((key) => {
+    const records = byTerm.get(key)!
+    const courses = records.map(
       (c): PlannedCourse => ({
         course_id: completedId(c.code),
         code: c.code,
-        title: catalogCourse(c.code)?.title ?? (c.transfer_from ? `Transfer from ${c.transfer_from}` : 'Completed course'),
+        title: completedTitle(c),
         credits: c.credits,
         status: 'completed',
       }),
     )
+    const [term, from] = key.startsWith('transfer|') ? ['transfer', key.slice('transfer|'.length)] : [key, '']
     return {
-      key: `done:${term}`,
-      label: termLabel(term),
+      key: `done:${key}`,
+      label: from === 'IB credit' ? 'IB credit' : termLabel(term),
+      from: from && from !== 'IB credit' ? from : undefined,
+      inProgress: records.every((c) => c.in_progress),
       courses,
       credits: Math.round(courses.reduce((sum, c) => sum + c.credits, 0) * 10) / 10,
     }

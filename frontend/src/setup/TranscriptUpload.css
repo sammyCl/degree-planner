@@ -267,3 +267,163 @@
   color: var(--mut);
   font-size: 12.5px;
 }
+
+/* Which school the transcript is from, under the file name */
+.tu-file-text small.tu-school {
+  color: var(--mut);
+}
+
+.tu-file-text small.tu-school.unknown {
+  color: var(--warn);
+  font-weight: 600;
+}
+
+.tu-file-text .link {
+  font-size: 12px;
+}
+
+/* The course list: code, credits, title, where it came from */
+.tu-what {
+  flex: 1.4;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tu-ip {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--acc-tint);
+  color: var(--acc);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* After a file is read: which school, courses that need a Mines equivalent, rows with no credit */
+.tu-review {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.tu-school-pick {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent);
+  border-radius: 12px;
+  background: var(--raised);
+  font-size: 13px;
+}
+
+.tu-school-pick small {
+  color: var(--mut);
+}
+
+.tu-unmatched {
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--warn-bg, #fff8eb) 70%, var(--raised));
+}
+
+.tu-unmatched-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.tu-tes {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: var(--fill);
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.tu-tes:hover {
+  background: var(--fill-hover);
+}
+
+.tu-unmatched-help {
+  margin: 6px 0 8px;
+  color: var(--mut);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.tu-unmatched ul {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 6px;
+  padding: 0;
+  list-style: none;
+}
+
+.tu-unmatched li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 160px auto auto auto;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.tu-their {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tu-their small {
+  color: var(--mut);
+}
+
+.tu-unmatched input {
+  min-height: 34px;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  font: 500 12.5px 'JetBrains Mono', ui-monospace, monospace;
+}
+
+.tu-pick.small {
+  padding: 5px 10px;
+  font-size: 12.5px;
+}
+
+.tu-skipped {
+  color: var(--mut);
+  font-size: 12.5px;
+}
+
+.tu-skipped summary {
+  cursor: pointer;
+}
+
+.tu-skipped ul {
+  margin: 4px 0 0;
+  padding-left: 18px;
+}
+
+@media (max-width: 640px) {
+  .tu-unmatched li {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .tu-their {
+    grid-column: 1 / -1;
+  }
+}

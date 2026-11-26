@@ -34,6 +34,7 @@ describe('completed courses on the planner page', () => {
     render(<PlannerPage plan={withCompleted([c('MATH111', 4, 'transfer'), c('CHGN121', 4, 'aplcredit')])} onBack={vi.fn()} />)
     const group = screen.getByRole('group', { name: /Completed courses: 2 courses, 8 cr/ })
     expect(within(group).getByRole('region', { name: 'Transfer credit, completed' })).toBeInTheDocument()
+    expect(within(group).getByRole('region', { name: 'AP credit, completed' })).toBeInTheDocument()
     expect(within(group).getAllByText('Completed', { selector: '.card-done' })).toHaveLength(2)
     expect(screen.queryByRole('button', { name: /Hide completed courses/ })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Show completed courses/ })).not.toBeInTheDocument()
@@ -62,9 +63,28 @@ describe('completed courses on the planner page', () => {
     expect(screen.getByTestId('credit-remaining')).toHaveTextContent(`${planned} remaining · 4 completed`)
     fireEvent.click(screen.getByRole('button', { name: 'Show' }))
     const card = screen.getByText('Already completed').closest('.about-card') as HTMLElement
-    expect(card).toHaveTextContent(/4 of \d+ credits from 1 course \(1 transfer or AP\)/)
+    expect(card).toHaveTextContent(/4 of \d+ credits from 1 course \(1 transfer, AP or IB\)/)
     await waitFor(() => expect(within(card).getByText('Core courses')).toBeInTheDocument())
     expect(within(card).getByText('8 credits done')).toBeInTheDocument()
+  })
+
+  it('marks in-progress courses as in progress, not completed, and shows placeholder credit readably', () => {
+    stubCompletedCheck()
+    render(
+      <PlannerPage
+        plan={withCompleted([
+          { code: 'FREE1XX-1', credits: 3, term: 'transfer', transfer_from: 'Example State University', title: 'Free Elective: Example Course' },
+          { code: 'CSCI261', credits: 3, term: 'Fall 2025', transfer_from: null, in_progress: true },
+        ])}
+        onBack={vi.fn()}
+      />,
+    )
+    const group = screen.getByRole('group', { name: /Completed courses/ })
+    const ip = within(group).getByRole('region', { name: 'Fall 2025, in progress' })
+    expect(within(ip).getByText('In progress', { selector: '.card-done' })).toBeInTheDocument()
+    const transfer = within(group).getByRole('region', { name: 'Transfer credit from Example State University, completed' })
+    expect(within(transfer).getByText('FREE 1XX')).toBeInTheDocument()
+    expect(within(transfer).getByText('Free Elective: Example Course')).toBeInTheDocument()
   })
 
   it('shows no completed area and no remaining line when nothing is completed', () => {

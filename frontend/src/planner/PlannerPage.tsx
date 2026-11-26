@@ -66,6 +66,10 @@ export function PlannerPage({ plan: initialPlan, explanation, problems, onBack }
     [plan.student.completed_courses, plan.student.degree_level],
   )
   const [showDone, setShowDone] = useState(!doneCollapsible)
+  const doneInProgress = useMemo(
+    () => new Set(plan.student.completed_courses.filter((c) => c.in_progress).map((c) => c.code)),
+    [plan.student.completed_courses],
+  )
   // the validator's answer for the completed courses alone: their labels, and the requirements they already meet
   const [donePlan, setDonePlan] = useState<Plan | null>(null)
   useEffect(() => {
@@ -235,6 +239,7 @@ export function PlannerPage({ plan: initialPlan, explanation, problems, onBack }
             {doneColumns.length > 0 && (
               <CompletedColumns
                 columns={doneColumns}
+                inProgress={doneInProgress}
                 donePlan={donePlan}
                 collapsible={doneCollapsible}
                 open={showDone}

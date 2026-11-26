@@ -25,7 +25,7 @@ This is a different thing from the [data format](data-format.md): the data forma
 | `degree_level` | string | yes | `bachelor`, `master`, `phd`, `combined`, `minor`, `asi`, `certificate` |
 | `programs` | array of program_id | yes | from the data format; more than one for a combined degree or a major+minor |
 | `catalog_year` | string | yes | |
-| `completed_courses` | array of CompletedCourse | yes | `[]` if none. `{"code": string, "credits": number, "term": "transfer" \| "aplcredit" \| a semester label, "transfer_from": string \| null}` |
+| `completed_courses` | array of CompletedCourse | yes | `[]` if none. `{"code": string, "credits": number, "term": "transfer" \| "aplcredit" \| a semester label, "transfer_from": string \| null}`, plus two optional fields for display only (the validator ignores them): `"title": string \| null` (as the transcript wrote it) and `"in_progress": boolean` (default `false`; an in-progress course counts as completed so it is not planned again). IB credit is `term: "transfer"` with `transfer_from: "IB credit"`. Placeholder credit from a transcript (`FREE 1XX`, `HASS 2XX`) is numbered so each row stays separate: `FREE1XX-1`, `FREE1XX-2`, ... |
 
 ## Semester
 

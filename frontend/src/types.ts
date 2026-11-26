@@ -1,10 +1,38 @@
 // TypeScript shape of the plan JSON. Mirrors docs/plan-format.md (owner: Midhat); keep the two in sync.
 
 export interface CompletedCourse {
-  code: string
+  code: string // a Mines code, or numbered placeholder credit from a transcript: "FREE1XX-3", "HASS2XX-1"
   credits: number
-  term: string // "transfer", "aplcredit", or a semester label
+  term: string // "transfer", "aplcredit", or a semester label; IB credit is "transfer" from "IB credit"
   transfer_from: string | null
+  /** the title as the transcript wrote it; optional */
+  title?: string | null
+  /** the transcript lists it as in progress: counted as completed, shown as in progress */
+  in_progress?: boolean
+}
+
+/** A course from another school with no Mines equivalent found yet (POST /transcripts/read). */
+export interface UnmatchedCourse {
+  code: string // as the other school writes it, "MATH 1401"
+  title: string
+  credits: number
+  term: string
+  in_progress: boolean
+  /** the Mines course to offer first ("FREE1XX"), or null */
+  suggestion: string | null
+  reason: string
+}
+
+/** What POST /transcripts/read returns (backend transfer_credit.py). */
+export interface TranscriptReading {
+  school: string | null
+  from_mines: boolean
+  system: string | null
+  courses: CompletedCourse[]
+  unmatched: UnmatchedCourse[]
+  skipped: string[]
+  tes_url: string
+  known_schools: string[]
 }
 
 export interface PlannedCourse {

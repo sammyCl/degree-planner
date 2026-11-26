@@ -538,6 +538,7 @@
 .card-code {
   font: 600 12.5px/1.2 'JetBrains Mono', ui-monospace, monospace;
   letter-spacing: -0.01em;
+  white-space: nowrap; /* "FREE 1XX" stays on one line */
 }
 
 .card-dot {
@@ -1559,4 +1560,36 @@
   border-radius: 50%;
   border: 2px solid var(--ok);
   background: linear-gradient(90deg, var(--ok) 50%, transparent 50%);
+}
+
+/* a transfer column names the school; an in-progress term says so */
+.sem-from {
+  margin: -4px 4px 8px;
+  overflow: hidden;
+  color: var(--mut);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sem-ip {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--acc-tint);
+  color: var(--acc);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.card.completed.in-progress {
+  background: var(--raised);
+  border-style: dashed;
+}
+
+.card.completed.in-progress::before {
+  background: var(--acc-bright);
+}
+
+.card.completed.in-progress .card-done {
+  color: var(--acc);
 }

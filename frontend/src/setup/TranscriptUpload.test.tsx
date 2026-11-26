@@ -1,15 +1,27 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { useState } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import type { CompletedCourse } from '../types.ts'
+import type { CompletedCourse, TranscriptReading } from '../types.ts'
 import type { UploadedFile } from './transcript.ts'
 import { TranscriptUpload } from './TranscriptUpload.tsx'
 
 afterEach(() => vi.unstubAllGlobals())
 
 const reply = (status: number, body: unknown) => ({ ok: status >= 200 && status < 300, status, json: async () => body })
+/** What POST /transcripts/read answers: a Mines transcript with these courses, unless `extra` says otherwise. */
+const reading = (courses: CompletedCourse[], extra: Partial<TranscriptReading> = {}): TranscriptReading => ({
+  school: 'Colorado School of Mines',
+  from_mines: true,
+  system: null,
+  courses,
+  unmatched: [],
+  skipped: [],
+  tes_url: 'https://tes.collegesource.com/publicview/x',
+  known_schools: ['Colorado School of Mines', 'Front Range Community College'],
+  ...extra,
+})
 const found: CompletedCourse[] = [
-  { code: 'MATH111', credits: 4, term: 'Fall 2025', transfer_from: null },
+  { code: 'MATH111', credits: 4, term: 'Fall 2024', transfer_from: null },
   { code: 'PHGN100', credits: 4, term: 'transfer', transfer_from: 'Front Range CC' },
 ]
 
@@ -51,12 +63,12 @@ describe('TranscriptUpload', () => {
   })
 
   it('sends the file to the backend and lists what it found, with transfer credit worded plainly', async () => {
-    const fetchMock = vi.fn().mockResolvedValue(reply(200, found))
+    const fetchMock = vi.fn().mockResolvedValue(reply(200, reading(found)))
     vi.stubGlobal('fetch', fetchMock)
     setup()
     upload()
     expect(await screen.findByText('MATH111')).toBeInTheDocument()
-    expect(fetchMock.mock.calls[0][0]).toBe('/api/transcripts/parse')
+    expect(fetchMock.mock.calls[0][0]).toBe('/api/transcripts/read')
     expect(list().getByText('Transfer credit (Front Range CC)')).toBeInTheDocument()
     expect(screen.getByText('2 courses, 8 credits')).toBeInTheDocument()
     expect(screen.getByText(/Found 2 courses/)).toBeInTheDocument()
@@ -86,13 +98,13 @@ describe('TranscriptUpload', () => {
     setup()
     upload()
     expect(await screen.findByRole('alert')).toHaveTextContent('Could not reach the backend')
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(reply(200, [])))
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(reply(200, reading([]))))
     upload()
     expect(await screen.findByText(/No courses were found in that file/)).toBeInTheDocument()
   })
 
   it('adds a second file to the list without repeating a course already there', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(reply(200, found)))
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(reply(200, reading(found))))
     const latest = setup([found[0]])
     upload()
     await waitFor(() => expect(latest.current).toHaveLength(2))
@@ -124,8 +136,8 @@ describe('TranscriptUpload', () => {
   })
 
   it('shows the uploaded file by name with a PDF icon, and removing it removes only the courses it added', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(reply(200, found)))
-    const mine = { code: 'CSCI101', credits: 3, term: 'Fall 2025', transfer_from: null }
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(reply(200, reading(found))))
+    const mine = { code: 'CSCI101', credits: 3, term: 'Fall 2024', transfer_from: null }
     const latest = setup([mine])
     upload('my-transcript.pdf')
     const files = within(await screen.findByRole('list', { name: 'Uploaded files' }))
@@ -146,6 +158,82 @@ describe('TranscriptUpload', () => {
     fireEvent.change(screen.getByLabelText('Course code'), { target: { value: 'ENGL101' } })
     expect(screen.getByLabelText('Credits')).toHaveValue('') // the catalog's credits go when the code stops matching
     expect(screen.getByText(/Not in the Mines catalog/)).toBeInTheDocument()
+  })
+
+  it('shows the school, in-progress courses, placeholder credit by its title, and rows with no credit', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        reply(
+          200,
+          reading(
+            [
+              { code: 'FREE1XX-1', credits: 3, term: 'transfer', transfer_from: 'IB credit', title: 'Free Elective-Art History' },
+              { code: 'CSCI261', credits: 3, term: 'Fall 2024', transfer_from: null, title: 'PROGRAMMING CONCEPTS', in_progress: true },
+            ],
+            { skipped: ['PHGN 200 PHYSICS II: grade F, no credit'] },
+          ),
+        ),
+      ),
+    )
+    setup()
+    upload('t.pdf')
+    expect(await screen.findByText(/Mines transcript/)).toBeInTheDocument()
+    const rows = list()
+    expect(rows.getByText('FREE 1XX')).toBeInTheDocument()
+    expect(rows.getByText('Free Elective-Art History')).toBeInTheDocument()
+    expect(rows.getByText('IB credit')).toBeInTheDocument()
+    expect(rows.getByText('In progress')).toBeInTheDocument()
+    expect(screen.getByText('1 row earns no Mines credit')).toBeInTheDocument()
+  })
+
+  it('asks which school when it cannot tell, and reads the file again for that school', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(reply(200, reading([], { school: null, from_mines: false, unmatched: [] })))
+      .mockResolvedValueOnce(reply(200, reading([{ code: 'MATH111', credits: 5, term: 'transfer', transfer_from: 'Front Range Community College' }], { school: 'Front Range Community College', from_mines: false })))
+    vi.stubGlobal('fetch', fetchMock)
+    const latest = setup()
+    upload('other.pdf')
+    expect(await screen.findByText(/School not recognised/)).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('combobox', { name: 'School for other.pdf' }))
+    fireEvent.mouseDown(screen.getByRole('option', { name: 'Front Range Community College' }))
+    await waitFor(() => expect(latest.current.map((c) => c.code)).toEqual(['MATH111']))
+    const body = fetchMock.mock.calls[1][1].body as FormData
+    expect(body.get('school')).toBe('Front Range Community College')
+  })
+
+  it('lets the student give each unmatched course its Mines equivalent, take the suggestion, or skip it', async () => {
+    const u = (code: string, suggestion: string | null) => ({ code, title: `Course ${code}`, credits: 3, term: 'transfer', in_progress: false, suggestion, reason: 'Look it up in TES' })
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        reply(200, reading([], { school: 'Example State University', from_mines: false, unmatched: [u('MATH 1401', null), u('ENG 1021', 'FREE1XX'), u('ART 1000', null)] })),
+      ),
+    )
+    const latest = setup()
+    upload('esu.pdf')
+    const group = await screen.findByRole('group', { name: /need a Mines equivalent/ })
+    expect(within(group).getByRole('link', { name: /Look them up in TES/ })).toHaveAttribute('href', 'https://tes.collegesource.com/publicview/x')
+    const add = within(group).getAllByRole('button', { name: 'Add' })[0]
+    expect(add).toBeDisabled()
+    fireEvent.change(within(group).getByLabelText('Mines course for MATH 1401'), { target: { value: 'math111' } })
+    fireEvent.click(add)
+    fireEvent.click(within(group).getByRole('button', { name: 'Free elective' }))
+    fireEvent.click(within(group).getByRole('button', { name: 'Skip ART 1000' }))
+    expect(latest.current).toEqual([
+      { code: 'MATH111', credits: 3, term: 'transfer', transfer_from: 'Example State University', title: 'MATH 1401 Course MATH 1401', in_progress: false },
+      { code: 'FREE1XX-1', credits: 3, term: 'transfer', transfer_from: 'Example State University', title: 'ENG 1021 Course ENG 1021', in_progress: false },
+    ])
+    expect(screen.queryByRole('group', { name: /need a Mines equivalent/ })).not.toBeInTheDocument()
+  })
+
+  it('renumbers placeholder credit from a second transcript instead of dropping it', async () => {
+    const free = (n: number, title: string): CompletedCourse => ({ code: `FREE1XX-${n}`, credits: 3, term: 'transfer', transfer_from: 'IB credit', title })
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(reply(200, reading([free(1, 'Art History')]))))
+    const latest = setup([free(1, 'Music')])
+    upload('second.pdf')
+    await waitFor(() => expect(latest.current.map((c) => c.code)).toEqual(['FREE1XX-1', 'FREE1XX-2']))
   })
 
   it('downloads a CSV template in the format the backend reads', () => {

@@ -1,7 +1,7 @@
 // Small, pure helpers for the "Completed courses" part of the setup page: checking a file before it is sent,
 // merging what was read with what the student typed, and wording a term the way a student would say it.
 import catalog from '../courseCatalog.json'
-import type { CompletedCourse } from '../types.ts'
+import type { CompletedCourse, UnmatchedCourse } from '../types.ts'
 
 /** A transcript file that was read: its name and kind for the chip, and the courses it added to the list. */
 export interface UploadedFile {
@@ -11,6 +11,56 @@ export interface UploadedFile {
   found: number
   /** the codes this file added (not ones already in the list), so removing the file removes only those */
   added: string[]
+  /** the school the transcript is from, or null when it could not tell */
+  school?: string | null
+  fromMines?: boolean
+  /** "Colorado Community College System" when the school is on Mines' preapproved list */
+  system?: string | null
+  /** courses from another school still waiting for a Mines equivalent (or to be skipped) */
+  unmatched?: UnmatchedCourse[]
+  /** rows that earn no Mines credit, with the reason */
+  skipped?: string[]
+  /** Mines' Transfer Evaluation System, where the student looks up a course from another school */
+  tesUrl?: string
+  /** schools the student can say the transcript is from (Mines, and every school with a saved list) */
+  knownSchools?: string[]
+}
+
+/** Placeholder credit: "FREE1XX-3" or "HASS2XX" (a level of a subject, not a named course). */
+const PLACEHOLDER = /^([A-Z]{2,5})(\d)XX(?:-(\d+))?$/
+export const isPlaceholder = (code: string): boolean => PLACEHOLDER.test(code)
+
+/** How a code reads on screen: "FREE1XX-3" is "FREE 1XX"; a real code stays as it is. */
+export function displayCode(code: string): string {
+  const m = PLACEHOLDER.exec(code)
+  return m ? `${m[1]} ${m[2]}XX` : code
+}
+
+/** What a placeholder is, in words, for its card when the transcript gave no title. */
+export const PLACEHOLDER_NAMES: Record<string, string> = {
+  FREE1XX: 'Free elective credit',
+  HASS2XX: 'CAS/HASS mid-level elective credit',
+  CSM2XX: 'Success & Wellness credit',
+  PAGN1XX: 'Physical activity credit',
+}
+
+/** The Mines course to show for a completed course: the catalog's title, else the transcript's, else the kind. */
+export function completedTitle(c: CompletedCourse): string {
+  if (isPlaceholder(c.code)) return c.title || PLACEHOLDER_NAMES[c.code.replace(/-\d+$/, '')] || 'Elective credit'
+  return catalogCourse(c.code)?.title ?? c.title ?? (c.transfer_from ? `Transfer from ${c.transfer_from}` : 'Completed course')
+}
+
+/** Where a completed course came from, the way a student says it: "IB credit", "AP credit", "Transfer from X", "Fall 2025". */
+export function sourceLabel(c: CompletedCourse): string {
+  if (c.term === 'transfer' && c.transfer_from === 'IB credit') return 'IB credit'
+  return `${termLabel(c.term)}${c.transfer_from ? ` (${c.transfer_from})` : ''}`
+}
+
+/** The next free number for a placeholder code among `taken`: FREE1XX with FREE1XX-1, -2 taken is FREE1XX-3. */
+export function nextPlaceholder(base: string, taken: Set<string>): string {
+  let n = 1
+  while (taken.has(`${base}-${n}`)) n++
+  return `${base}-${n}`
 }
 
 export const fileKind = (name: string): 'pdf' | 'csv' => (name.toLowerCase().endsWith('.pdf') ? 'pdf' : 'csv')
@@ -66,12 +116,13 @@ export function manualProblem(entry: ManualCourse, existing: CompletedCourse[]):
   if (!COURSE_CODE.test(code)) return 'Enter a course code like MATH111.'
   const credits = Number(entry.credits)
   if (entry.credits.trim() === '' || !Number.isFinite(credits) || credits < 0 || credits > 20) return 'Enter the credits, from 0 to 20.'
-  if (!isKnownTerm(entry.term)) return 'Choose when you took it.'
+  if (!isKnownTerm(entry.term) && entry.term !== 'ibcredit') return 'Choose when you took it.'
   if (existing.some((c) => c.code === code)) return `${code} is already in the list.`
   return null
 }
 
 export function toCourse(entry: ManualCourse): CompletedCourse {
+  if (entry.term === 'ibcredit') return { code: normalizeCode(entry.code), credits: Number(entry.credits), term: 'transfer', transfer_from: 'IB credit' }
   const transfer = entry.term === 'transfer' ? entry.transferFrom.trim() : ''
   return { code: normalizeCode(entry.code), credits: Number(entry.credits), term: entry.term, transfer_from: transfer || null }
 }
@@ -81,7 +132,9 @@ export function mergeCourses(existing: CompletedCourse[], incoming: CompletedCou
   const have = new Set(existing.map((c) => c.code))
   const fresh: CompletedCourse[] = []
   for (const c of incoming) {
-    const code = normalizeCode(c.code)
+    let code = normalizeCode(c.code)
+    // two transcripts both number their placeholders from 1: a second FREE1XX-1 is a different course, renumbered
+    if (have.has(code) && isPlaceholder(code)) code = nextPlaceholder(code.replace(/-\d+$/, ''), have)
     if (have.has(code)) continue
     have.add(code)
     fresh.push({ ...c, code })
@@ -97,6 +150,7 @@ export function termOptions(thisYear: number): { value: string; label: string }[
   const options = [
     { value: 'transfer', label: 'Transfer credit' },
     { value: 'aplcredit', label: 'AP credit' },
+    { value: 'ibcredit', label: 'IB credit' },
   ]
   for (let year = thisYear; year >= thisYear - 8; year--) {
     for (const season of ['Fall', 'Summer', 'Spring']) {

@@ -1,6 +1,6 @@
 // All backend calls go through /api. In development Vite proxies /api to the FastAPI server
 // (see vite.config.ts), so the browser never needs the backend's address or CORS settings.
-import type { AgentRequest, AgentResponse, CompletedCourse, Plan } from './types.ts'
+import type { AgentRequest, AgentResponse, CompletedCourse, Plan, TranscriptReading } from './types.ts'
 
 export async function getHealth(): Promise<{ status: string; database: string }> {
   const response = await fetch('/api/health')
@@ -88,9 +88,18 @@ export function checkPlan(plan: Plan, signal?: AbortSignal): Promise<Plan> {
 }
 
 /**
- * Read an uploaded transcript (.csv or .pdf) into completed courses. The backend does not keep the file; the student
- * reviews and corrects the courses on the setup page before anything is sent to the planner.
+ * Read an uploaded transcript (.csv or .pdf): the school it is from, its courses as Mines courses, and any course from
+ * another school that still needs a Mines equivalent. `school` names the school when the student corrects it. The
+ * backend does not keep the file; the student reviews the list before anything is sent to the planner.
  */
+export function readTranscript(file: File, school: string | null, signal?: AbortSignal): Promise<TranscriptReading> {
+  const body = new FormData()
+  body.append('file', file)
+  if (school) body.append('school', school)
+  return post('/api/transcripts/read', { body }, signal)
+}
+
+/** The older call: only the courses, read as Mines courses. Kept for the CSV template path and its tests. */
 export function parseTranscript(file: File, signal?: AbortSignal): Promise<CompletedCourse[]> {
   const body = new FormData()
   body.append('file', file)

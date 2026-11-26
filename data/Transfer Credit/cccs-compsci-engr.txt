@@ -1,0 +1,15 @@
+# CCCS Preapproved Computer Science & Engineering Courses
+# Source: https://www.mines.edu/registrar/cccs-compsci-engr/
+# Retrieved: 2026-11-26 (Colorado School of Mines registrar, public page). Table rows copied as text;
+# a row with empty Mines columns is another CCCS course for the Mines course above it.
+# The courses below have been preapproved to transfer to Mines as indicated below provided a grade of “C” or higher is earned.
+ | Mines Subject | Mines Course Number | Mines Course Title | | CCCS Subject | CCCS Course Number (pre-summer 2022) | CCCS Course Number (begin summer 2022) | CCCS Course Title
+ | CSCI | 128 | Comp Science for STEM | | CSC | 160 | 1060 | Computer Science I
+ | | | | or | EGG | N/A | 1060 | Intro to Engineering Computing
+ | CSCI | 200 | Foundational Programming Concepts and Design | | CSC | 161 | 1061 | Computer Science II
+ | CSCI | 220 | Data Structures and Algorithms | | No CCCS Equivalent | | |
+ | CSCI | 358 | Discrete Mathematics | | MAT | N/A | 2520 | Discrete Mathematics
+ | | | | | CSC | N/A | 2065 | Discrete Structures
+ | CSCI | 102 *for continuing students only | Intro Comp Science Lab | | CSC | 119 | 1019 | Intro to Programming
+ | CEEN | 241 | Statics | | EGG | 211 | 2011 | Engr Mechanics I - Statics
+ | MEGN | 315 | Dynamics | | EGG | 212 | 2012 | Engr Mechanics II - Dynamics
