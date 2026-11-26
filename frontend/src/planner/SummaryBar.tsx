@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { Flag, Plan } from '../types.ts'
-import { flagCounts, flagKind } from './graph.ts'
+import { completedCredits, remainingCredits } from './completed.ts'
+import { flagCounts, flagKind, formatCredits } from './graph.ts'
 import { Legend } from './Legend.tsx'
 import { useCountUp } from './useCountUp.ts'
 
@@ -66,9 +67,19 @@ export function SummaryBar({ plan, programName, onSelectFlag, checking }: Props)
   const toggle = (kind: FlagKind) => setMenu((m) => (m === kind ? null : kind))
   const listed = menu ? plan.flags.filter((f) => flagKind(f) === menu) : []
   const progress = required > 0 ? Math.min(1, total / required) : 0
+  const done = completedCredits(plan)
+  const remaining = remainingCredits(plan)
+  const doneProgress = required > 0 ? Math.min(progress, done / required) : 0
   return (
     <div className="bar">
-      <div className="prog" title="Credits planned plus completed, out of the degree total">
+      <div
+        className="prog"
+        title={
+          done > 0
+            ? `${formatCredits(total)} credits in all: ${formatCredits(done)} completed and ${formatCredits(remaining)} still to take, out of the degree's ${formatCredits(required)}`
+            : 'Credits planned plus completed, out of the degree total'
+        }
+      >
         <svg className="ring" viewBox="0 0 46 46" aria-hidden="true">
           <circle className="ring-bg" cx="23" cy="23" r={R} />
           <circle
@@ -79,12 +90,27 @@ export function SummaryBar({ plan, programName, onSelectFlag, checking }: Props)
             strokeDasharray={CIRCUMFERENCE}
             strokeDashoffset={ready ? CIRCUMFERENCE * (1 - progress) : CIRCUMFERENCE}
           />
+          {done > 0 && (
+            <circle
+              className="ring-done"
+              cx="23"
+              cy="23"
+              r={R}
+              strokeDasharray={CIRCUMFERENCE}
+              strokeDashoffset={ready ? CIRCUMFERENCE * (1 - doneProgress) : CIRCUMFERENCE}
+            />
+          )}
         </svg>
         <div>
           <div className="prog-credits" data-testid="credit-total">
             {Math.round(shown)} / {required}
           </div>
           <div className="prog-sub">credits</div>
+          {done > 0 && (
+            <div className="prog-rem" data-testid="credit-remaining">
+              <b>{formatCredits(remaining)}</b> remaining <span>&middot; {formatCredits(done)} completed</span>
+            </div>
+          )}
         </div>
       </div>
       <span className="sep" />
@@ -166,5 +192,7 @@ const TITLES: Record<string, string> = {
   requirement_unmet: 'Requirement not met',
   double_count_exceeded: 'Too many shared courses',
   exception_claimed: 'To confirm',
+  ineligible_course: 'Course not allowed here',
+  semester_overload: 'Too many credits in a semester',
 }
 const flagTitle = (f: Flag): string => TITLES[f.type] ?? 'Needs attention'

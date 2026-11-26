@@ -18,6 +18,11 @@ class CompletedCourse(BaseModel):
     credits: float = Field(ge=0, allow_inf_nan=False)
     term: str
     transfer_from: str | None = None
+    # Both optional and only for showing the record (the validator ignores them): the course's title as the
+    # transcript wrote it (useful for placeholder credit like "FREE1XX-3", "Free Elective: Art History"), and
+    # whether the transcript lists it as in progress (counted as completed so it is not planned again).
+    title: str | None = None
+    in_progress: bool = False
 
 
 class Student(BaseModel):

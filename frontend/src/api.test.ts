@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { ApiError, submitSetup } from './api.ts'
+import { ApiError, parseTranscript, submitSetup } from './api.ts'
 import type { AgentRequest } from './types.ts'
 
 const request: AgentRequest = {
@@ -55,5 +55,32 @@ describe('submitSetup', () => {
     vi.stubGlobal('fetch', vi.fn().mockImplementation(() => Promise.reject(new DOMException('aborted', 'AbortError'))))
     controller.abort()
     await expect(submitSetup(request, controller.signal)).rejects.toMatchObject({ kind: 'aborted' })
+  })
+})
+
+describe('parseTranscript', () => {
+  const file = new File(['code,credits,term\nMATH111,4.0,Fall 2025'], 'transcript.csv', { type: 'text/csv' })
+
+  it('sends the file as a multipart upload and returns the completed courses', async () => {
+    const courses = [{ code: 'MATH111', credits: 4, term: 'Fall 2025', transfer_from: null }]
+    const fetchMock = vi.fn().mockResolvedValue(reply(200, courses))
+    vi.stubGlobal('fetch', fetchMock)
+    await expect(parseTranscript(file)).resolves.toEqual(courses)
+    const [url, init] = fetchMock.mock.calls[0]
+    expect(url).toBe('/api/transcripts/parse')
+    expect(init.method).toBe('POST')
+    expect(init.body).toBeInstanceOf(FormData)
+    expect((init.body as FormData).get('file')).toBeInstanceOf(File)
+    expect(init.headers).toBeUndefined() // the browser sets the multipart boundary itself
+  })
+
+  it('passes on the backend\'s reason when a file cannot be read', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(reply(400, { detail: 'row 2: credits \'x\' is not a number' })))
+    await expect(parseTranscript(file)).rejects.toMatchObject({ kind: 'invalid_request', message: "row 2: credits 'x' is not a number" })
+  })
+
+  it('reports an unreachable backend', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')))
+    await expect(parseTranscript(file)).rejects.toMatchObject({ kind: 'network' })
   })
 })

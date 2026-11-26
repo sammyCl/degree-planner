@@ -1,0 +1,558 @@
+.tu-drop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1.5px dashed var(--border-strong);
+  border-radius: 12px;
+  background: var(--raised);
+  transition: border-color 120ms, background 120ms;
+}
+
+.tu-drop.over {
+  border-color: var(--acc-bright);
+  background: var(--acc-tint);
+}
+
+.tu-pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 9px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tu-pick:hover:not(:disabled) {
+  border-color: var(--acc-bright);
+}
+
+.tu-pick:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.tu-or {
+  color: var(--mut);
+  font-size: 13px;
+}
+
+.tu-hint,
+.tu-note {
+  margin: 8px 0 0;
+  color: var(--mut);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.tu-note {
+  color: var(--acc);
+}
+
+.tu-list {
+  margin-top: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--raised);
+}
+
+.tu-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.tu-list ul {
+  list-style: none;
+  max-height: 232px;
+  margin: 0;
+  padding: 4px 6px;
+  overflow: auto;
+}
+
+.tu-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 6px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.tu-list li:hover {
+  background: var(--acc-tint);
+}
+
+.tu-code {
+  min-width: 76px;
+  font: 600 13px 'JetBrains Mono', ui-monospace, monospace;
+}
+
+.tu-cr {
+  min-width: 44px;
+  color: var(--mut);
+}
+
+.tu-term {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--mut);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tu-x {
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: var(--mut);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.tu-x:hover {
+  background: var(--err-bg);
+  color: var(--err);
+}
+
+.tu-open {
+  margin-top: 10px;
+}
+
+.tu-add {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--raised);
+}
+
+.tu-add-row {
+  display: grid;
+  grid-template-columns: 1fr 90px 1.3fr;
+  gap: 10px;
+}
+
+.tu-add label,
+.tu-lbl {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--mut);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.tu-add input {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--raised);
+}
+
+.tu-from {
+  margin-top: 10px;
+}
+
+.tu-add-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+@media (max-width: 640px) {
+  .tu-add-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .tu-when {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Files that were read: a chip per file with a PDF or CSV icon, so the student sees the upload worked */
+.tu-files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tu-file {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 100%;
+  padding: 7px 8px 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--raised);
+  box-shadow: var(--sh-1);
+  animation: tu-in 220ms var(--ease-out);
+}
+
+.tu-file.reading {
+  opacity: 0.7;
+}
+
+@keyframes tu-in {
+  from { opacity: 0; transform: translateY(4px); }
+}
+
+.tu-file-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.tu-file-text b {
+  max-width: 260px;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tu-file-text small {
+  color: var(--ok);
+  font-size: 12px;
+}
+
+.tu-file.reading small {
+  color: var(--mut);
+}
+
+.tu-icon {
+  flex: none;
+}
+
+.tu-icon-page {
+  fill: var(--surface);
+  stroke: var(--border-strong);
+  stroke-width: 1.5;
+}
+
+.tu-icon-fold {
+  fill: none;
+  stroke: var(--border-strong);
+  stroke-width: 1.5;
+}
+
+.tu-icon.pdf .tu-icon-band { fill: #d93025; }
+.tu-icon.csv .tu-icon-band { fill: #1e8e3e; }
+
+.tu-icon text {
+  fill: #fff;
+  font: 700 7.5px Inter, sans-serif;
+  letter-spacing: 0.04em;
+}
+
+.tu-title {
+  margin: 8px 0 0;
+  color: var(--mut);
+  font-size: 12.5px;
+}
+
+/* Which school the transcript is from, under the file name */
+.tu-file-text small.tu-school {
+  color: var(--mut);
+}
+
+.tu-file-text small.tu-school.unknown {
+  color: var(--warn);
+  font-weight: 600;
+}
+
+.tu-file-text .link {
+  font-size: 12px;
+}
+
+/* The course list: code, credits, title, where it came from */
+.tu-what {
+  flex: 1.4;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tu-ip {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--acc-tint);
+  color: var(--acc);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* After a file is read: which school, courses that need a Mines equivalent, rows with no credit */
+.tu-review {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.tu-school-pick {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent);
+  border-radius: 12px;
+  background: var(--raised);
+  font-size: 13px;
+}
+
+.tu-school-pick small {
+  color: var(--mut);
+}
+
+.tu-unmatched {
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--warn-bg, #fff8eb) 70%, var(--raised));
+}
+
+.tu-unmatched-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.tu-tes {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: var(--fill);
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.tu-tes:hover {
+  background: var(--fill-hover);
+}
+
+.tu-unmatched-help {
+  margin: 6px 0 8px;
+  color: var(--mut);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.tu-unmatched ul {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 6px;
+  padding: 0;
+  list-style: none;
+}
+
+.tu-unmatched li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150px 52px 92px 24px; /* fixed, so every row lines up */
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.tu-their {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tu-their small {
+  color: var(--mut);
+}
+
+.tu-unmatched input {
+  min-height: 34px;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  font: 500 12.5px 'JetBrains Mono', ui-monospace, monospace;
+}
+
+.tu-pick.small {
+  padding: 5px 10px;
+  font-size: 12.5px;
+}
+
+.tu-skipped {
+  color: var(--mut);
+  font-size: 12.5px;
+}
+
+.tu-skipped summary {
+  cursor: pointer;
+}
+
+.tu-skipped ul {
+  margin: 4px 0 0;
+  padding-left: 18px;
+}
+
+@media (max-width: 640px) {
+  .tu-unmatched li {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .tu-their {
+    grid-column: 1 / -1;
+  }
+}
+
+.tu-claude {
+  color: var(--acc);
+}
+
+.tu-notice {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent);
+  background: var(--raised);
+  color: var(--text);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+/* While a file is read: a scanning line over the icon, a moving bar, and the current step */
+.tu-file.reading {
+  opacity: 1;
+  min-width: 280px;
+  border-color: color-mix(in srgb, var(--acc-bright) 45%, transparent);
+}
+
+.tu-scan {
+  position: relative;
+  display: inline-flex;
+  overflow: hidden;
+}
+
+.tu-scan i {
+  position: absolute;
+  left: 0;
+  right: 4px;
+  top: 0;
+  height: 6px;
+  background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--acc-bright) 70%, transparent), transparent);
+  animation: tu-scan 1.4s ease-in-out infinite;
+}
+
+@keyframes tu-scan {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(30px); }
+  100% { transform: translateY(0); }
+}
+
+.tu-step {
+  color: var(--acc) !important;
+  animation: tu-in 260ms var(--ease-out);
+}
+
+.tu-slow {
+  color: var(--mut) !important;
+}
+
+.tu-bar {
+  position: relative;
+  display: block;
+  height: 4px;
+  margin-top: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--acc-tint);
+}
+
+.tu-bar i {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40%;
+  border-radius: 999px;
+  background: var(--acc-bright);
+  animation: tu-bar 1.2s ease-in-out infinite;
+}
+
+@keyframes tu-bar {
+  from { left: -40%; }
+  to { left: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tu-scan i,
+  .tu-bar i {
+    animation: none;
+  }
+
+  .tu-bar i {
+    left: 0;
+    width: 100%;
+    opacity: 0.5;
+  }
+}
+
+/* The suggestion under each course: what was filled in, how sure, and why */
+.tu-suggest {
+  grid-column: 1 / -1;
+  margin: -2px 0 4px;
+  color: var(--mut);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.tu-suggest b {
+  color: var(--text);
+  font: 600 12px 'JetBrains Mono', ui-monospace, monospace;
+}
+
+.tu-suggest .conf {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 0 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.tu-suggest .conf.high { background: var(--ok-bg); color: var(--ok); }
+.tu-suggest .conf.medium { background: var(--acc-tint); color: var(--acc); }
+.tu-suggest .conf.low { background: var(--raised); color: var(--warn); border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent); }
+
+.tu-unmatched li {
+  row-gap: 2px;
+}
+
+.tu-accept {
+  margin-top: 6px;
+  border-color: var(--ok);
+  color: var(--ok);
+}

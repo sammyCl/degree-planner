@@ -3,6 +3,8 @@ import type { AgentRequest } from '../types.ts'
 import { AddOnPicker } from './AddOnPicker.tsx'
 import { Dropdown } from './Dropdown.tsx'
 import { SegmentedControl } from './SegmentedControl.tsx'
+import { TranscriptUpload } from './TranscriptUpload.tsx'
+import { totalCredits } from './transcript.ts'
 import { defaultStart, semesterLabels, SEASONS, type Season } from './terms.ts'
 import {
   ADD_ON_NAMES,
@@ -33,7 +35,7 @@ interface Props {
 
 export function SetupPage({ onSubmit, initial, today }: Props) {
   const [now] = useState(() => today ?? new Date())
-  const ids = { major: useId(), semesters: useId() }
+  const ids = { major: useId(), semesters: useId(), completed: useId() }
   const start = useMemo(() => defaultStart(now), [now])
   const thisYear = now.getFullYear()
   const years = Array.from({ length: 6 }, (_, i) => thisYear + i)
@@ -48,6 +50,9 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
         year: start.year,
         semesters: SEMESTER_LIMITS.bachelor.default,
         includeSummers: false,
+        hasCompleted: false,
+        completed: [],
+        files: [],
       },
   )
   const [submitted, setSubmitted] = useState(false)
@@ -148,6 +153,35 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
             ))}
 
           <div className="field">
+            <div className="lbl">
+              Completed courses <span className="opt">optional</span>
+            </div>
+            <label className="check check-first">
+              <input
+                type="checkbox"
+                checked={form.hasCompleted}
+                aria-controls={ids.completed}
+                onChange={(e) => patch({ hasCompleted: e.target.checked })}
+              />
+              I have already completed some courses, or I am a transfer student
+            </label>
+            {form.hasCompleted && (
+              <div id={ids.completed} className="completed-box">
+                <p className="completed-help">
+                  Upload your transcript, or add the courses you finished one by one. Your plan then holds only the courses
+                  you still need, starting {form.season} {form.year}.
+                </p>
+                <TranscriptUpload
+                  courses={form.completed}
+                  files={form.files}
+                  onChange={(completed, files) => patch({ completed, files })}
+                  thisYear={thisYear}
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="field">
             <div className="lbl">Starting term</div>
             <div className="row">
               <Dropdown
@@ -246,6 +280,16 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
               </dd>
             </div>
           )}
+          <div className="pv-row">
+            <dt>Completed</dt>
+            <dd>
+              {form.hasCompleted && form.completed.length ? (
+                `${form.completed.length} ${form.completed.length === 1 ? 'course' : 'courses'}, ${totalCredits(form.completed)} cr`
+              ) : (
+                <span className="muted">None</span>
+              )}
+            </dd>
+          </div>
           <div className="pv-row">
             <dt>Starts</dt>
             <dd>{`${form.season} ${form.year}`}</dd>

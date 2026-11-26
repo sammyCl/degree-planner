@@ -11,6 +11,8 @@ interface Props {
   hotEdges: Set<number>
   /** edges whose target has an open broken-prerequisite flag are drawn red and dashed */
   brokenTargets: Set<string>
+  /** changes when something moves the cards without changing the plan (completed courses shown or hidden) */
+  layoutKey?: unknown
 }
 
 interface Path {
@@ -20,7 +22,7 @@ interface Path {
 }
 
 /** Curved arrows between prerequisite and dependent course, measured from where the cards actually are. */
-export function Arrows({ plan, index, container, cardEls, hotEdges, brokenTargets }: Props) {
+export function Arrows({ plan, index, container, cardEls, hotEdges, brokenTargets, layoutKey }: Props) {
   const [paths, setPaths] = useState<Path[]>([])
   const [size, setSize] = useState({ w: 0, h: 0 })
 
@@ -59,7 +61,17 @@ export function Arrows({ plan, index, container, cardEls, hotEdges, brokenTarget
       out.push({ k, d, bad: sa >= sb && brokenTargets.has(e.to) })
     })
     setPaths(out)
-    setSize({ w: container.scrollWidth, h: container.scrollHeight })
+    // Sized from the columns, not the container's scroll size: that includes this layer itself, so the board could
+    // never shrink again (after completed courses are folded away, it kept their height as empty space).
+    let w = 0
+    let h = 0
+    for (const child of Array.from(container.children)) {
+      if (child.tagName.toLowerCase() === 'svg') continue
+      const r = child.getBoundingClientRect()
+      w = Math.max(w, r.right - box.left)
+      h = Math.max(h, r.bottom - box.top)
+    }
+    setSize({ w: Math.ceil(w), h: Math.ceil(h) })
   }, [plan, index, container, cardEls, brokenTargets])
 
   useLayoutEffect(() => {
@@ -76,7 +88,7 @@ export function Arrows({ plan, index, container, cardEls, hotEdges, brokenTarget
       window.removeEventListener('resize', onResize)
       observer?.disconnect()
     }
-  }, [measure, container])
+  }, [measure, container, layoutKey])
 
   return (
     <svg className="arrows" width={size.w} height={size.h} aria-hidden="true">

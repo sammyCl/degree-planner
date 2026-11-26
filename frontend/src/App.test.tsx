@@ -18,6 +18,8 @@ function stubBackend(submit: (init: RequestInit) => unknown) {
   const calls: RequestInit[] = []
   const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
     if (String(url).endsWith('/health')) return ok({ status: 'ok', database: 'ok' })
+    // the planner page checks the completed courses on their own; answer with what was sent
+    if (String(url).endsWith('/plans/check')) return ok(JSON.parse(init?.body as string))
     calls.push(init ?? {})
     return submit(init ?? {})
   })

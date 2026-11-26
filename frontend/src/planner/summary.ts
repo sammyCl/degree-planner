@@ -14,6 +14,8 @@ export interface ChecklistRow {
   met: boolean
   /** "12/18 credits" or "3 courses missing"; empty when there is nothing useful to add */
   detail: string
+  /** the requirement groups behind this row ("program|group"), to list the courses that fill it */
+  groups?: string[]
 }
 
 export interface ChecklistSection {
@@ -40,8 +42,10 @@ const plainLabel = (label: string): string => label.replace(/\s*\([^)]*\)/g, '')
 
 const programTitle = (programId: string): string => PROGRAMS.find((p) => p.id === programId)?.name ?? programId
 
-/** One row per kind of requirement (Core, Free electives, ...), merging groups of the same kind, per program. */
-function rowsFor(statuses: RequirementStatus[]): ChecklistRow[] {
+/** Requirement groups of the same kind (Core, Free electives, ...) merged into one row each, per program. */
+const groupKey = (s: { program_id: string; group_id: string }) => `${s.program_id}|${s.group_id}`
+
+function mergeByKind(statuses: RequirementStatus[]): { name: string; category: Category; group: RequirementStatus[] }[] {
   const merged = new Map<string, RequirementStatus[]>()
   for (const s of statuses) {
     const category = groupCategory(s.group_id, s.label)
@@ -50,6 +54,17 @@ function rowsFor(statuses: RequirementStatus[]): ChecklistRow[] {
   }
   return [...merged.entries()].map(([key, group]) => {
     const category = key.startsWith('label:') ? 'Requirement' : key
+    return {
+      name: category === 'Requirement' ? key.slice('label:'.length) : (ROW_NAMES[category] ?? category),
+      category: categoryOf(category),
+      group,
+    }
+  })
+}
+
+/** One row per kind of requirement (Core, Free electives, ...), merging groups of the same kind, per program. */
+function rowsFor(statuses: RequirementStatus[]): ChecklistRow[] {
+  return mergeByKind(statuses).map(({ name, category, group }) => {
     const met = group.every((s) => s.met)
     const required = group.reduce((sum, s) => sum + (s.kind === 'choose_credits' ? (s.credits_required ?? 0) : 0), 0)
     const earned = group.reduce((sum, s) => sum + (s.kind === 'choose_credits' ? (s.credits_earned ?? 0) : 0), 0)
@@ -57,13 +72,38 @@ function rowsFor(statuses: RequirementStatus[]): ChecklistRow[] {
     let detail = ''
     if (required > 0) detail = `${formatCredits(Math.min(earned, required))}/${formatCredits(required)} credits`
     else if (!met && missing > 0) detail = `${missing} ${missing === 1 ? 'course' : 'courses'} missing`
-    return {
-      name: category === 'Requirement' ? key.slice('label:'.length) : (ROW_NAMES[category] ?? category),
-      category: categoryOf(category),
-      met,
-      detail,
-    }
+    return { name, category, met, detail, groups: group.map(groupKey) }
   })
+}
+
+/**
+ * What the completed courses already cover, from the validator's check of the completed courses on their own
+ * (`donePlan`): each kind of requirement they count toward, ticked when they fill it completely. Kinds they do not
+ * touch are left out.
+ */
+export function buildCompletedChecklist(donePlan: Plan): ChecklistSection[] {
+  const byProgram = new Map<string, RequirementStatus[]>()
+  for (const s of donePlan.requirement_status ?? []) byProgram.set(s.program_id, [...(byProgram.get(s.program_id) ?? []), s])
+  const sections: ChecklistSection[] = []
+  for (const [programId, statuses] of byProgram) {
+    const rows: ChecklistRow[] = []
+    for (const { name, category, group } of mergeByKind(statuses)) {
+      const earned = group.reduce((sum, s) => sum + (s.credits_earned ?? 0), 0)
+      const met = group.every((s) => s.met)
+      if (!met && earned <= 0) continue
+      // "x/y credits" only when every merged group is a credit count; a fixed list of courses has no credit target
+      const allCredits = group.every((s) => s.kind === 'choose_credits')
+      const required = group.reduce((sum, s) => sum + (s.credits_required ?? 0), 0)
+      const detail = met
+        ? 'already met'
+        : allCredits && required > 0
+          ? `${formatCredits(Math.min(earned, required))}/${formatCredits(required)} credits done`
+          : `${formatCredits(earned)} credits done`
+      rows.push({ name, category, met, detail, groups: group.map(groupKey) })
+    }
+    if (rows.length) sections.push({ title: programTitle(programId), rows })
+  }
+  return sections
 }
 
 /** The requirement checklist: each program's groups, then the plan-wide checks (credits, prerequisites). */
@@ -95,6 +135,46 @@ export function buildChecklist(plan: Plan): ChecklistSection[] {
     ],
   })
   return sections
+}
+
+/** The courses of a plan that fill a checklist row, in plan order (from the backend's counts_toward). */
+export function coursesFor(plan: Plan, row: ChecklistRow): { code: string; title: string }[] {
+  const wanted = new Set(row.groups ?? [])
+  const map = plan.counts_toward ?? {}
+  return plan.semesters
+    .flatMap((s) => s.courses)
+    .filter((c) => (map[c.course_id] ?? []).some((g) => wanted.has(groupKey(g))))
+    .map((c) => ({ code: c.code, title: c.title }))
+}
+
+/** "Computer Science electives (18 credits): CSCI403 Data Base Management, ..." as a heading and its courses. */
+export interface ChoiceParts {
+  heading: string
+  /** course codes named in the choice, in order */
+  codes: string[]
+  /** the choice in plain words when it is not a list of courses, or what follows the list */
+  text: string
+}
+
+const CODE = /\b[A-Z]{3,4}\d{3}[A-Z]?\b/g
+
+export function splitChoice(choice: string): ChoiceParts {
+  const clean = choice.replace(/\*\*/g, '').trim()
+  const lead = /^([^:.]{3,70}):\s*(.+)$/s.exec(clean)
+  const codes = [...new Set(clean.match(CODE) ?? [])]
+  if (lead && codes.length >= 2) {
+    // the list ends at the first sentence that is not part of it ("Swap any of these for courses you prefer.")
+    const sentences = lead[2].match(/[^.!?]+[.!?]*/g) ?? [lead[2]]
+    const after = sentences.slice(1).join(' ').trim()
+    return { heading: lead[1].trim(), codes, text: after }
+  }
+  return { heading: '', codes, text: clean }
+}
+
+/** A long note as its first sentence and the rest, so the panel shows one line and "more". */
+export function firstSentence(text: string): { head: string; rest: string } {
+  const match = /^(.+?[.!?])(\s+[A-Z(].*)?$/s.exec(text.trim())
+  return match ? { head: match[1], rest: (match[2] ?? '').trim() } : { head: text.trim(), rest: '' }
 }
 
 export interface CheckItem {
@@ -133,7 +213,7 @@ function inferredEquivalentChecks(plan: Plan): CheckItem[] {
     const others = group.codes.filter((code) => code !== mine)
     items.push({
       title: inPlan.get(mine)!.title,
-      text: `(${mine}) is treated as the same course as ${others.join(' and ')}. The catalog does not say so; the data assumes it because the catalog names both as prerequisites of other courses. Confirm with your advisor.`,
+      text: `Counted as the same course as ${others.join(' and ')}; confirm with your advisor. The catalog does not say so (${mine}); the data assumes it because the catalog names both as prerequisites of other courses.`,
       kind: 'confirm',
     })
   }
@@ -206,7 +286,12 @@ export function readExplanation(explanation: string, plan: Plan): AssistantNotes
   // back to the choices.
   let untilNextHeading = true
   let listMayFollow = false
-  for (const block of parseBlocks(explanation)) {
+  // a table (the assistant's semester-by-semester rundown) repeats the board and reads as gibberish as text
+  const withoutTables = explanation
+    .split('\n')
+    .filter((line) => !/^\s*\|/.test(line))
+    .join('\n')
+  for (const block of parseBlocks(withoutTables)) {
     if (block.type === 'p') {
       const lead = /^\*\*([^*]+)\*\*[.:]?\s*/.exec(block.text)
       let text = block.text

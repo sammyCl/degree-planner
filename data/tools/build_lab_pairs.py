@@ -1,4 +1,4 @@
-"""Build frontend/src/planner/labPairs.json: which lab course belongs to which lecture course.
+"""Build frontend/src/planner/labPairs.json (and data/json/lab-pairs.json): which lab course belongs to which lecture.
 
     python3 data/tools/build_lab_pairs.py
 
@@ -49,6 +49,12 @@ def main() -> None:
             pairs[lab["code"]] = lecture
     out = ROOT / "frontend" / "src" / "planner" / "labPairs.json"
     out.write_text(json.dumps(dict(sorted(pairs.items())), indent=1) + "\n")
+    # The same pairs for the backend's transfer-credit suggestions (a lecture and its lab can be one suggestion).
+    # The data loader skips this file: it has no courses, programs or forms.
+    (ROOT / "data" / "json" / "lab-pairs.json").write_text(
+        json.dumps({"about": "Mines lab course -> its lecture. Built by data/tools/build_lab_pairs.py.",
+                    "pairs": dict(sorted(pairs.items()))}, indent=1) + "\n"
+    )
     print(f"wrote {out.relative_to(ROOT)}: {len(pairs)} labs paired with a lecture")
 
 

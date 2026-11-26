@@ -1,10 +1,48 @@
 // TypeScript shape of the plan JSON. Mirrors docs/plan-format.md (owner: Midhat); keep the two in sync.
 
 export interface CompletedCourse {
-  code: string
+  code: string // a Mines code, or numbered placeholder credit from a transcript: "FREE1XX-3", "HASS2XX-1"
   credits: number
-  term: string // "transfer", "aplcredit", or a semester label
+  term: string // "transfer", "aplcredit", or a semester label; IB credit is "transfer" from "IB credit"
   transfer_from: string | null
+  /** the title as the transcript wrote it; optional */
+  title?: string | null
+  /** the transcript lists it as in progress: counted as completed, shown as in progress */
+  in_progress?: boolean
+}
+
+/** A course from another school with no Mines equivalent found yet (POST /transcripts/read). */
+export interface UnmatchedCourse {
+  code: string // as the other school writes it, "MATH 1401"
+  title: string
+  credits: number
+  term: string
+  in_progress: boolean
+  /** the Mines course to offer first ("FREE1XX", "MATH111"), or null */
+  suggestion: string | null
+  reason: string
+  /** the suggested Mines course's title */
+  suggestion_title?: string | null
+  /** "rule": the registrar's free-elective rule; "claude": a guess from the title, to confirm in TES */
+  suggested_by?: 'rule' | 'claude' | null
+  confidence?: 'high' | 'medium' | 'low' | null
+  suggestion_reason?: string | null
+}
+
+/** What POST /transcripts/read returns (backend transfer_credit.py). */
+export interface TranscriptReading {
+  school: string | null
+  from_mines: boolean
+  system: string | null
+  courses: CompletedCourse[]
+  unmatched: UnmatchedCourse[]
+  skipped: string[]
+  tes_url: string
+  known_schools: string[]
+  /** "claude" when the layout was not one the built-in reader knows, so Claude read it (personal details removed) */
+  read_by?: 'rules' | 'claude'
+  /** something the student should know about how the file was read */
+  notice?: string | null
 }
 
 export interface PlannedCourse {
@@ -33,6 +71,8 @@ export type FlagType =
   | 'requirement_unmet'
   | 'double_count_exceeded'
   | 'exception_claimed'
+  | 'ineligible_course'
+  | 'semester_overload'
 
 export interface Flag {
   flag_id: string
@@ -112,6 +152,10 @@ export interface AgentResponse {
   plan: Plan | null
   /** what the plan does and any choices the agent made, written for the student */
   explanation: string
+  /** the agent's choices where the requirements left it open, one per item; empty on older responses */
+  choices?: string[]
+  /** what the student should confirm with an advisor, one per item; empty on older responses */
+  checks?: string[]
   /** why the agent could not finish a valid plan; empty when status is "ok" */
   problems: string[]
   usage: Usage

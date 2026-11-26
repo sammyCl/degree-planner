@@ -26,9 +26,9 @@ export function semesterLabels(season: Season, year: number, count: number, incl
   return labels
 }
 
-/** The next Fall or Spring after `today`: Sep to Dec starts next Spring, Jan to Aug starts that Fall. */
+/** The next Fall after `today` (most students start in a Fall): Jan to Aug starts that Fall, Sep to Dec the next one. */
 export function defaultStart(today: Date = new Date()): { season: Season; year: number } {
   const month = today.getMonth() + 1
   const year = today.getFullYear()
-  return month >= 9 ? { season: 'Spring', year: year + 1 } : { season: 'Fall', year }
+  return { season: 'Fall', year: month >= 9 ? year + 1 : year }
 }

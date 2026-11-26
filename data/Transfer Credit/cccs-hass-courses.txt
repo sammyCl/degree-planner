@@ -1,0 +1,86 @@
+# CCCS Preapproved CAS/HASS Mid-Level Elective Courses
+# Source: https://www.mines.edu/registrar/cccs-hass-courses/
+# Retrieved: 2026-11-26 (Colorado School of Mines registrar, public page). Table rows copied as text;
+# a row with empty Mines columns is another CCCS course for the Mines course above it.
+# NOTE:  CAS/HASS mid-level elective courses are different from the HASS 200 – Global Studies requirement.  Refer to the Core and General Courses list for HASS 200 equivalents.
+# Also note that CAS/HASS mid-level elective courses are commonly referred to as HASS 2XX, HASS 3XX, and HASS 300-level.
+# The courses below have been preapproved to transfer to Mines and will count toward HASS mid-level elective requirements provided a grade of “C” or higher is earned.
+ | CCCS Subject | CCCS Course Number (pre-summer 2022) | CCCS Course Number (begin summer 2022) | CCCS Course Title
+ | ANT | 215 | 2115 | Native Peoples N. America
+ | ANT | 221 | 1101 | Exploring other Cultures I
+ | ANT | 225 | 2125 | Anthropology of Religion
+ | ART | 207 | 1113 | Art History 1900 to Present
+ | COM | 220 | 2300 | Intercultural Communication
+ | COM | 230 | 2400 | Argumentation & Debate
+ | CRJ | 210 | 2010 | Constitutional Law
+ | CRJ | 220 | 2020 | Human Rel/Social Conflict
+ | ECO | 201 | 2001 | Prin Macroeconomics
+*Only for 2023-24 and later catalog years
+*Students cannot transfer in both ECO 2001 and ECO 2002 as EBGN 201; only one can count toward CAS/HASS mid-level credit
+ | ECO | 202 | 2002 | Prin Microeconomics
+*Only for 2023-24 and later catalog years
+*Students cannot transfer in both ECO 2001 and ECO 2002 as EBGN 201; only one can count toward CAS/HASS mid-level credit
+ | ENG | 221 | 2021 | Creative Writing I
+ | ENG | 226 | 2026 | Fiction Writing
+ | ENG | 227 | 2027 | Poetry Writing
+ | ENG | 230 | 2030 | Creative Nonfiction
+ | HIS | 205 | 2005 | Women in World History
+ | HIS | 207 | 2125 | American Environment Hist
+ | HIS | 208 | 2115 | American Indian History
+ | HIS | 215 | 2105 | Women in U.S. History
+ | HIS | 225 | 2135 | Colorado History
+ | HIS | 235 | 2130 | History of American West
+ | HIS | 236 | 2145 | U.S. History Since 1945
+ | HIS | 243 | 2610 | History of Modern China
+ | HIS | 244 | 2200 | History of Latin America
+ | HIS | 248 | 2320 | History of Modern Russia
+ | HIS | 249 | 2500 | History Islamic Civiliz
+ | HIS | 260 | 2120 | U.S. Foreign Relat History
+ | HUM | | 1003 | Intro to Film Art
+ | LIT | 201 | 2001 | World Lit to 1600
+ | LIT | 205 | 2005 | Ethnic Literature
+ | LIT | 211 | 2011 | Amer Lit to Civil War
+ | LIT | 212 | 2012 | Amer Lit Aft Civil War
+ | LIT | 221 | 2021 | British Lit to 1770
+ | LIT | 222 | 2022 | British Lit Since 1770
+ | LIT | 225 | 2025 | Intro to Shakespeare
+ | LIT | 235 | 2035 | Science Fiction
+ | LIT | 246 | 2046 | Literature of Women
+ | LIT | 257 | 2057 | Literature and Film
+ | PHI | 201 | 2001 | Social & Political Philosophy
+ | PHI | 202 | 2002 | Religion and Film
+ | PHI | 203 | 2003 | Introduction to Buddhism
+ | PHI | 204 | 2004 | Introduction to Hinduism
+ | PHI | 214 | 2014 | Philosophy of Religion
+ | PHI | 220 | 2020 | Philosophy of Death & Dying
+ | PHI | 221 | 2021 | Ancient Philosophy
+ | PHI | 222 | 2022 | Modern Philosophy
+ | PSC/POS | 205 | 2005 | International Relations
+ | PSC/POS | 215 | 1050 | Current Political Issues
+ | PSC/POS | 260 | 2060 | Energy Security Policy
+ | PSY | 205 | 2105 | Psychology of Gender
+ | PSY | 217 | 2107 | Human Sexuality
+ | PSY | 226 | 2221 | Social Psychology
+ | PSY | 227 | 2222 | Psychology of Death/Dying
+ | PSY | 235 | 2440 | Human Growth & Development
+ | PSY | 249 | 2552 | Abnormal Psychology
+ | PSY | 265 | 2771 | Psychology of Personality
+ | SOC | 203 | 2003 | Urban Sociology
+ | SOC | 205 | 2005 | Soc of Family Dynamics
+ | SOC | 215 | 2015 | Contemp. Social Problems
+ | SOC | 216 | 2016 | Sociology of Gender
+ | SOC | 218 | 2018 | Sociology of Diversity
+ | SOC | 220 | 2020 | Sociology of Religion
+ | SOC | 231 | 2031 | Sociology-Deviant Behavior
+ | SOC | 237 | 2037 | Sociology of Death & Dying
+ | SOC | 265 | 2065 | Violence and Culture
+ | | | |
+ | ARA | Any Number | Any Number | Any Arabic Language Course
+ | CHI | Any Number | Any Number | Any Chinese Language Course
+ | FRE | Any Number | Any Number | Any French Language Course
+ | GER | Any Number | Any Number | Any German Language Course
+ | ITA | Any Number | Any Number | Any Italian Language Course
+ | JPN | Any Number | Any Number | Any Japanese Language Course
+ | RUS | Any Number | Any Number | Any Russian Language Course
+ | SPA | Any Number | Any Number | Any Spanish Language Course
+ | ASL | Any Number | Any Number | Any Sign Language Course

@@ -545,3 +545,23 @@
 .menu-kind.old {
   color: var(--warn);
 }
+
+/* "I have completed courses": the checkbox opens the transcript upload under it */
+.check.check-first {
+  margin-top: 2px;
+  color: var(--text);
+}
+
+.completed-box {
+  margin-top: 12px;
+  padding-left: 14px;
+  border-left: 2px solid var(--acc-tint);
+  animation: tu-in 220ms var(--ease-out);
+}
+
+.completed-help {
+  margin: 0 0 10px;
+  color: var(--mut);
+  font-size: 13px;
+  line-height: 1.45;
+}

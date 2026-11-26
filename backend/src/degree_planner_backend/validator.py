@@ -25,6 +25,9 @@ from degree_planner_backend.plan_models import (
     Summary,
 )
 
+# A transcript's placeholder credit, as the transcript reader numbers it: "HASS2XX-1" (subject, level digit).
+_PLACEHOLDER_CODE = re.compile(r"^([A-Z]{2,5})(\d)XX(?:-?\d+)?$")  # the agent drops the hyphen: "HASS2XX1"
+_SUBJECT_LEVEL = re.compile(r"^([A-Z]{2,5})(\d)\d{2}[A-Z]?$")
 _GRADUATE_LEVELS = ("master", "phd")
 # 2026-2027 Graduate Catalog: up to 15 credits a semester without extra approval for a graduate
 # student; 18 for an undergraduate (BUG-026a). The same numbers the agent's planner.md already
@@ -572,6 +575,21 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                 credits_required = group.credits_required or 0.0
                 earned = 0.0
                 claimed: set[str] = set()
+                # Placeholder credit from a transcript ("HASS2XX-1": a 200-level HASS elective Mines granted
+                # without naming the course) fills a listed group when the group lists a course of the same
+                # subject and level. It counts before planned courses: credit already earned fills the group
+                # first, so a planned course it makes unnecessary shows as extra. "FREE1XX" matches no list,
+                # so it stays a free elective.
+                if group.courses:
+                    levels = {(m.group(1), m.group(2)) for c in group.courses if (m := _SUBJECT_LEVEL.match(c))}
+                    for code in sorted(available):
+                        placeholder = _PLACEHOLDER_CODE.match(code)
+                        if not placeholder or (placeholder.group(1), placeholder.group(2)) not in levels:
+                            continue
+                        if earned >= credits_required:
+                            break
+                        earned += code_credits.get(code, 0.0)
+                        claimed.add(code)
                 for listed_code in candidates:
                     code = listed_code if listed_code in available else stand_in.get(listed_code, "")
                     if code not in available or code in claimed:

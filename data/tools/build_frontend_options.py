@@ -4,6 +4,8 @@
 
 The backend has no endpoint that lists programs yet, so the setup page reads this file. It is built from the
 program files in data/json/ (bachelor's, master's, combined, minors, ASIs). Re-run it after program data changes.
+It also writes frontend/src/courseCatalog.json (each course's title and credits, from data/json/courses.json), which the
+setup page uses for courses typed in by hand and the planner page for completed courses.
 PhD programs are left out on purpose: the proposal covers bachelor's, master's, combined BS+MS, minors and ASIs.
 Degrees are offered only for the student's catalog year. Minors, ASIs and certificates are offered from the newest
 catalog year stored for them, even when that is older (today all 18 ASIs are from 2025-2026): each option carries its own
@@ -49,6 +51,16 @@ def main() -> None:
         print(f"add-ons not from {CATALOG_YEAR}: {older}")
     if left_out:
         print(f"left out, not in catalog year {CATALOG_YEAR}: {left_out}")
+    write_course_catalog()
+
+
+def write_course_catalog() -> None:
+    """frontend/src/courseCatalog.json: code -> [title, credits], for completed courses the plan has no title for."""
+    courses = json.loads((ROOT / "data" / "json" / "courses.json").read_text())["courses"]
+    catalog = {c["code"]: [c["title"], c["credits"]] for c in sorted(courses, key=lambda c: c["code"])}
+    out = ROOT / "frontend" / "src" / "courseCatalog.json"
+    out.write_text(json.dumps(catalog, separators=(",", ":"), ensure_ascii=False) + "\n")
+    print(f"wrote {out.relative_to(ROOT)}: {len(catalog)} courses")
 
 
 if __name__ == "__main__":

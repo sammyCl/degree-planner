@@ -1,0 +1,38 @@
+# CCCS Preapproved Core and General Courses
+# Source: https://www.mines.edu/registrar/cccs-core-general/
+# Retrieved: 2026-11-26 (Colorado School of Mines registrar, public page). Table rows copied as text;
+# a row with empty Mines columns is another CCCS course for the Mines course above it.
+# The courses below have been preapproved to transfer to Mines as indicated below provided a grade of “C” or higher is earned.
+ | Mines Subject | Mines Course Number | Mines Course Title | | CCCS Subject | CCCS Course Number (pre-summer 2022) | CCCS Course Number (begin summer 2022) | CCCS Course Title
+ | CBEN | 110 | Fundamentals of Biology I | | BIO | 111 | 1111 | Biology I
+ | CBEN | 120 | Fundamentals of Biology II | | BIO | 112 | 1112 | Gen College Biology II
+ | CHGN | 121 | Principles of Chemistry I | | CHE | 111 | 1111 | Chemistry I
+ | CHGN | 122 | Principles of Chemistry II | | CHE | 112 | 1112 | Chemistry II
+ | CHGN | 221 & 223 | Organic Chemistry I & Organic Chemistry I Lab | | CHE | 211 | 2111 | Organic Chemistry I
+ | CHGN | 222 & 224 | Organic Chemistry II & Organic Chemistry II Lab | | CHE | 212 | 2112 | Organic Chemistry II
+ | CSM | 2XX | Success and Wellness | | HWE | 100 | 1050 | Human Nutrition
+ | | | | or | HWE | N/A | 1003 | Mental Health First Aid
+ | | | | or | HWE | N/A | 1062 | Health and Wellness
+ | EBGN | 201 | Principles of Economics | | ECO | 201 or 202 | 2001 or 2002 | Prin Macroeconomics or Microconomics*
+ | | | | | | | | *students entering fall 2021 or later; prior to this, students must still take both courses
+ | EDNS | 151 | Introduction to Design | | EGG | N/A | 1040 | Engineering Projects
+ | | | | | | | | *Only when taken at CC Aurora, Front
+Range CC, Pikes Peak, Arapahoe CC & Red Rocks CC
+ | GEGN | 101 | Earth & Env Systems | | GEY | 111 | 1111 | Physical Geology
+ | GEGN | 204 | Geologic Principles & Processes | | GEY | 112 | 1112 | Historical Geology w/Lab
+ | HASS | 200 | Global Studies | | HIS | 247 | 2015 | 20th Century World History
+ | | | | or | SOC | 207 | 2007 | Environmental Sociology
+ | | | | or | LIT | 202 | 2002 | World Lit After 1600
+ | | | | or | PSC/POS | 225 | 2025 | Comparative Government
+ | HASS | 100 | Nature & Human Values + Free Elective hours | *2 courses required | *PHI | 218 | 2018 | Environmental Ethics
+ | | | | and | *ENG | 122 or 131 | 1022 or 1031 | English Composition II or Technical Writing I
+ | MATH | 111 | Calculus for Scientists & Engineers I | | MAT | 201 | 2410 | Calculus I
+ | MATH | 112 | Calculus for Scientists & Engineers II | | MAT | 202 | 2420 | Calculus II
+ | MATH | 213 | Calculus for Scientists & Engineers III | | MAT | 203 or 204 | 2430 or 2431 | Calculus III
+ | MATH | 201 | Probability & Statistics for Engineers | | MAT | 135 | 1260 | Introduction to Statistics*
+ | | | | | | | | *students entering fall 2021 or later
+ | MATH | 225 | Differential Equations | | MAT | 261 or 265 | 2560 or 2561 or 2562 | Differential Equations
+ | MATH | 332 | Linear Algebra | | MAT | 255 | 2540 | Linear Algebra
+ | PHGN | 100 | Physics I- Mechanics | | PHY | 211 | 2111 | Physics I
+ | PHGN | 200 | Physics II-Electromagnetism & Optics | | PHY | 212 | 2112 | Physics II
+ | PAGN | 101+ | PAGN Physical Activities | | PED | Any Number | Any Number | Any PED course 1004 or higher, except spec topics, indep study & internship-type courses

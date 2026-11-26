@@ -538,6 +538,7 @@
 .card-code {
   font: 600 12.5px/1.2 'JetBrains Mono', ui-monospace, monospace;
   letter-spacing: -0.01em;
+  white-space: nowrap; /* "FREE 1XX" stays on one line */
 }
 
 .card-dot {
@@ -1359,4 +1360,495 @@
   height: 6px;
   border: 0;
   background: var(--err);
+}
+
+/* ---------- Completed courses (left of the board) ---------- */
+/* a column per term the student already took courses in; green so they read as done, never as planned */
+.done-group {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 10px 10px;
+  border: 1px dashed color-mix(in srgb, var(--ok) 45%, transparent);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--ok-bg) 55%, transparent);
+  animation: rise 300ms var(--ease-out) backwards;
+}
+
+.done-group-h {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 2px 4px;
+  font-size: 12.5px;
+}
+
+.done-badge,
+.card-done {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--ok);
+  font-weight: 600;
+}
+
+.done-badge {
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--ok-bg);
+  border: 1px solid color-mix(in srgb, var(--ok) 35%, transparent);
+  font-size: 12px;
+}
+
+.done-sum {
+  color: var(--mut);
+}
+
+.done-hide {
+  margin-left: auto;
+  font-size: 12.5px;
+}
+
+.done-cols {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+.sem.done {
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  border-color: color-mix(in srgb, var(--ok) 25%, transparent);
+}
+
+.meter.done .meter-track i {
+  background: var(--ok);
+}
+
+.card.completed {
+  cursor: default;
+}
+
+.card.completed:hover {
+  transform: none;
+}
+
+.card.completed::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--ok);
+}
+
+.card-done {
+  margin-top: 6px;
+  font-size: 11.5px;
+}
+
+/* folded away: a card on the left, read left to right, that the student opens with one click */
+.done-fold {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-sizing: border-box;
+  width: 236px;
+  padding: 12px;
+  border: 1px dashed color-mix(in srgb, var(--ok) 50%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--ok-bg) 75%, var(--surface));
+  animation: rise 300ms var(--ease-out) backwards;
+}
+
+.done-fold-h {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.done-fold-h b {
+  color: var(--ok);
+  font: 600 12px/1 Inter, sans-serif;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.done-fold-ic {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--ok);
+  color: #fff;
+}
+
+.done-fold-total {
+  color: var(--mut);
+  font-size: 13px;
+}
+
+.done-fold-total b {
+  color: var(--text);
+  font: 600 22px/1.1 'Inter Tight', Inter, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.done-fold-total small {
+  display: block;
+  font-size: 12px;
+}
+
+.done-fold-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr); /* a long school name shortens with "..." instead of widening the card */
+  gap: 4px;
+  margin: 0;
+  padding: 8px 0 0;
+  border-top: 1px solid color-mix(in srgb, var(--ok) 25%, transparent);
+  list-style: none;
+  font-size: 12.5px;
+}
+
+.done-fold-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.done-fold-list span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.done-fold-list span.ip {
+  color: var(--acc);
+}
+
+.done-fold-list em {
+  flex: none;
+  color: var(--mut);
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+}
+
+.done-fold-list .more {
+  color: var(--mut);
+}
+
+.done-fold-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in srgb, var(--ok) 45%, transparent);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--ok);
+  font-weight: 600;
+  font-size: 13px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 160ms, border-color 160ms;
+}
+
+.done-fold-btn:hover,
+.done-fold-btn:focus-visible {
+  border-color: var(--ok);
+  background: var(--ok-bg);
+}
+
+/* credits: completed is the green part of the ring, the rest is what is planned */
+.ring-done {
+  stroke: var(--ok);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 900ms var(--ease-out);
+}
+
+.prog-rem {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--mut);
+  white-space: nowrap;
+}
+
+.prog-rem b {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.prog-rem span {
+  color: var(--ok);
+}
+
+.about-card.c-done { --accent: var(--ok); }
+
+.done-total {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--mut);
+}
+
+.done-total b {
+  color: var(--text);
+  font-size: 15px;
+}
+
+.req-icon.part {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--ok);
+  background: linear-gradient(90deg, var(--ok) 50%, transparent 50%);
+}
+
+/* a transfer column names the school; an in-progress term says so */
+.sem-from {
+  margin: -4px 4px 8px;
+  overflow: hidden;
+  color: var(--mut);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sem-ip {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--acc-tint);
+  color: var(--acc);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.card.completed.in-progress {
+  background: var(--raised);
+  border-style: dashed;
+}
+
+.card.completed.in-progress::before {
+  background: var(--acc-bright);
+}
+
+.card.completed.in-progress .card-done {
+  color: var(--acc);
+}
+
+/* a completed column that continues the one before it: no total of its own, and a little closer to it */
+.sem.done.cont {
+  margin-left: -8px;
+}
+
+.sem-cont {
+  color: var(--mut);
+  font-size: 11px;
+  font-style: italic;
+}
+
+/* ---------- About this plan: short rows, details behind a click ---------- */
+.req-row {
+  flex-wrap: wrap;
+}
+
+.req-line {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.course-toggle {
+  margin-left: 28px;
+  font-size: 12px;
+}
+
+.req-row .course-toggle {
+  margin-left: 8px;
+}
+
+.course-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  width: 100%;
+  margin: 6px 0 4px 24px;
+  padding: 0;
+  list-style: none;
+}
+
+.course-chips li {
+  max-width: 100%;
+  padding: 2px 8px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.course-chips b {
+  font: 600 11.5px 'JetBrains Mono', ui-monospace, monospace;
+}
+
+.done-total span {
+  display: block;
+  font-size: 12px;
+}
+
+.done-courses {
+  display: inline-block;
+  margin: 8px 0 0;
+}
+
+.skeleton {
+  display: grid;
+  gap: 8px;
+  margin: 6px 0;
+}
+
+.skeleton i {
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--border) 0%, var(--surface) 50%, var(--border) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s linear infinite;
+}
+
+.skeleton i + i {
+  width: 70%;
+}
+
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+.check-list .check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.check-tag {
+  flex: none;
+  margin-top: 1px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  background: var(--acc-tint);
+  color: var(--acc);
+}
+
+.check-item.warning .check-tag { background: color-mix(in srgb, var(--warn) 14%, transparent); color: var(--warn); }
+.check-item.info .check-tag { background: var(--col); color: var(--mut); border: 1px solid var(--border); }
+.check-item.advisor .check-tag { background: color-mix(in srgb, var(--cat-elective) 12%, transparent); color: var(--cat-elective); }
+
+.more-inline {
+  margin-left: 6px;
+  font-size: 12px;
+}
+
+.more-btn {
+  margin-top: 6px;
+  font-size: 12.5px;
+}
+
+.choice-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.choice-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+}
+
+.choice-line .course-toggle {
+  margin-left: 0;
+}
+
+.choice-line .course-chips {
+  margin-left: 0;
+}
+
+.choice-note {
+  display: block;
+  color: var(--mut);
+  font-size: 12px;
+}
+
+.choice-foot {
+  margin: 10px 0 0;
+  color: var(--mut);
+  font-size: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton i { animation: none; }
+}
+
+.req-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+}
+
+.req-toggle:hover,
+.req-toggle:focus-visible {
+  color: var(--acc);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.req-toggle .chev {
+  flex: none;
+  color: var(--mut);
+  transition: transform 160ms var(--ease-out);
+}
+
+.req-toggle .chev.open {
+  transform: rotate(90deg);
+}
+
+.req-row .course-chips {
+  margin: 4px 0 6px 40px;
+}
+
+.done-courses .course-toggle {
+  margin-left: 0;
+}
+
+.done-courses {
+  margin-top: 8px;
 }

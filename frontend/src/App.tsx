@@ -146,6 +146,8 @@ function App() {
         <PlannerPage
           plan={screen.response.plan!}
           explanation={screen.response.explanation}
+          choices={screen.response.choices}
+          checks={screen.response.checks}
           problems={screen.response.status === 'cannot_work' ? screen.response.problems : []}
           onBack={() => setScreen({ name: 'setup' })}
         />

@@ -19,7 +19,7 @@ Regenerated every run; do not edit by hand. Rules: `data/CONFLICT-LOG.md`, secti
 - prerequisites kept as one exception (free text): 224
 - prerequisites partly free text (mixed): 8
 - prerequisites with a grade minimum (grade dropped): 67
-- references to codes not in the catalog: 76
+- references to codes not in the catalog: 75
 - unknown references turned into an overridable exception: 20
 
 ## Prerequisites that are free text, whole or in part (free text becomes an exception the student can override) (232)
@@ -279,7 +279,7 @@ Regenerated every run; do not edit by hand. Rules: `data/CONFLICT-LOG.md`, secti
 - SCED564: Completed/concurrent 3 credits of SCED 562; completed/concurrent with SCED 515 or SCED 545
 - SCED565: Completed/concurrent with SCED 333, SCED 363, SCED 515, and SCED 545
 
-## Prerequisite/corequisite codes that are not courses in the catalog CSVs (typos or retired courses) (76)
+## Prerequisite/corequisite codes that are not courses in the catalog CSVs (typos or retired courses) (75)
 
 - CBEN305 -> CBEN404
 - CSCI406 -> MATH358
@@ -310,7 +310,6 @@ Regenerated every run; do not edit by hand. Rules: `data/CONFLICT-LOG.md`, secti
 - HASS330 -> SYGN200
 - HNRS305 -> HNRS198A
 - HNRS315 -> HNRS198A
-- MATH225 -> CSC128
 - MATH235 -> MATH113
 - MATH572 -> MATH331
 - MLGN502 -> PH320
