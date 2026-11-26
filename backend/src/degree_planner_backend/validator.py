@@ -113,9 +113,14 @@ _ADD_ON_LEVELS = ("minor", "asi", "certificate")
 # stated only for minors and ASIs; no certificate policy is loaded yet, so it stays narrower than
 # _ADD_ON_LEVELS rather than guessing the same rule applies.
 _UNSHARED_MIN_LEVELS = ("minor", "asi")
-# 2026-2027 undergraduate catalog (forms-policies.json, policy-minor-requirements and
-# policy-asi-requirements): at least 9 credits of a minor or ASI not used for any other part of
-# the degree except free electives.
+# Minor and ASI share the same rule: at least 9 credits not used for any other part of the
+# degree except free electives (18 total for a minor, 12 for an ASI). Confirmed 2026-11-25
+# (BUG-052) against the 2025-2026 Undergraduate Catalog (p. 24, "Minimum Hours Outside of Degree
+# Requirements - 9.0", stated identically for Minors and for Areas of Special Interest), the
+# newest catalog PDF Mines has published, plus the live CASA advising FAQ (casa.mines.edu/faqs,
+# current as of Spring 2027 registration), which independently states the same 9-credit minor
+# rule; catalog.mines.edu itself (which may already show 2026-2027) was unreachable to check
+# directly. The rule has held unchanged across at least the 2019-2020 through 2025-2026 catalogs.
 ADD_ON_UNSHARED_MIN = 9.0
 
 
