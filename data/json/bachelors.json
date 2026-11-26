@@ -2916,9 +2916,7 @@
           "label": "MNGN2XX New Special Topics",
           "kind": "choose_credits",
           "courses": [
-            "MNGN205",
-            "MNGN298",
-            "MNGN299"
+            "MNGN298"
           ],
           "credits_required": 3
         },

@@ -16,12 +16,13 @@ Regenerated every run; do not edit by hand. Rules: `data/CONFLICT-LOG.md`, secti
 - graduate-only courses without a source URL: 6
 - independent study (set to 3 credits): 160
 - placement-level prerequisites left out (not a course): 1
-- prerequisites kept as one exception (free text): 225
+- prerequisites kept as one exception (free text): 224
 - prerequisites partly free text (mixed): 8
 - prerequisites with a grade minimum (grade dropped): 67
 - references to codes not in the catalog: 76
+- unknown references turned into an overridable exception: 20
 
-## Prerequisites that are free text, whole or in part (free text becomes an exception the student can override) (233)
+## Prerequisites that are free text, whole or in part (free text becomes an exception the student can override) (232)
 
 - AMFG581: AMFG 501, AMFG 521, AMFG 531
 - CBEN198: CBEN 120 or equivalent
@@ -87,7 +88,6 @@ Regenerated every run; do not edit by hand. Rules: `data/CONFLICT-LOG.md`, secti
 - CHGN625: “Independent Study” form must be completed and submitted to the Registrar
 - CSCI195: None
 - CSCI340: CSCI210 with grade of C- or higher, CSCI220 with grade of C- or higher or CSCI262 with grade of C- or higher
-- CSCI478: CSCI220 or CSCI262
 - CSCI507: 
 - CSCI532: CSCI520
 - CSCI533: Graduate student standing

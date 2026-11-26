@@ -89,6 +89,11 @@ class Course(BaseModel):
     # Courses the catalog calls equivalent ("Equivalent with ..."), in both directions (BUG-041):
     # one satisfies a prerequisite on the other, and only one of them counts toward a degree.
     equivalent_with: list[str] = Field(default_factory=list)
+    # BUG-055: the subset of equivalent_with the catalog text never actually states, inferred
+    # instead by the team's own rule (same title/description/credits, named together as
+    # prerequisites elsewhere). Lets a consumer tell "the catalog says so" apart from "we guessed,"
+    # since only the second kind is a real assumption worth asking the student to confirm.
+    equivalent_with_inferred: list[str] = Field(default_factory=list)
     description: str
     prerequisites: Requirement | None = None
     corequisites: Requirement | None = None
@@ -104,6 +109,12 @@ class Course(BaseModel):
         # back: it would also reject the 14 known placeholder codes already in courses.json
         # (BUG-012, not this fix's data to touch) and needs coordinating with that cleanup first.
         return value.strip().upper().replace(" ", "") if isinstance(value, str) else value
+
+    @model_validator(mode="after")
+    def _check_inferred_equivalents_are_a_subset(self) -> Course:
+        if not set(self.equivalent_with_inferred) <= set(self.equivalent_with):
+            raise ValueError("equivalent_with_inferred must be a subset of equivalent_with")
+        return self
 
 
 class RequirementGroup(BaseModel):
@@ -150,7 +161,7 @@ class DoubleCount(BaseModel):
 class Program(BaseModel):
     program_id: str
     name: str
-    degree_level: Literal["bachelor", "master", "phd", "combined", "minor", "asi"]
+    degree_level: Literal["bachelor", "master", "phd", "combined", "minor", "asi", "certificate"]
     catalog_year: str = Field(pattern=_CATALOG_YEAR)
     total_credits_required: float = Field(gt=0, allow_inf_nan=False)
     requirement_groups: list[RequirementGroup]

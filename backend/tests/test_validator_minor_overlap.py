@@ -37,7 +37,8 @@ def connection(tmp_path: Path) -> sqlite3.Connection:
 
     (tmp_path / "courses.json").write_text(json.dumps({"courses": courses}))
     (tmp_path / "programs.json").write_text(json.dumps({"programs": [major, add_on("t-minor", "minor"),
-                                                                     add_on("t-asi", "asi")]}))
+                                                                     add_on("t-asi", "asi"),
+                                                                     add_on("t-cert", "certificate")]}))
     conn = sqlite3.connect(":memory:")
     assert refresh_database(tmp_path, conn).ok
     return conn
@@ -80,6 +81,20 @@ def test_an_asi_follows_the_same_rule(connection) -> None:
 
 def test_a_minor_alone_has_nothing_to_overlap(connection) -> None:
     checked = check_plan(connection, plan(["t-minor"], ["AAA100", "BBB100", "CCC100"], ["EEE100"], level="minor"))
+    assert overlap_errors(checked) == []
+
+
+def test_a_certificate_adds_no_separate_credit_total(connection) -> None:
+    # Same structural treatment as a minor/ASI (BUG-050-adjacent certificate support): its own
+    # total_credits_required (12) is not added on top of the major's (15) once a degree exists.
+    checked = check_plan(connection, plan(["t-bs", "t-cert"], ["AAA100", "BBB100", "CCC100"], ["EEE100", "HHH100"]))
+    assert checked.summary.total_credits_required == 15
+
+
+def test_a_certificate_does_not_get_the_9_credit_unshared_check(connection) -> None:
+    # Unlike minor/ASI, no certificate policy is loaded yet for the 9-credit-unshared rule, so a
+    # certificate made mostly of the major's own courses is not flagged for it.
+    checked = check_plan(connection, plan(["t-bs", "t-cert"], ["AAA100", "BBB100", "CCC100"], ["EEE100", "HHH100"]))
     assert overlap_errors(checked) == []
 
 

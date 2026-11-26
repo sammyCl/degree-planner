@@ -308,7 +308,7 @@ BUG-012  The catalog CSVs hold placeholder codes and free-text corequisites
              Midhat how the format should carry "X or Y" corequisites.
 
 BUG-013  A catalog year that is not loaded looks like "no match" in search_catalog
-  Status:    Open (Midhat's half fixed)
+  Status:    Fixed
   Owner:     Midhat Sajad (lookups), then Samantha Clapp (agent tools)
   Where:     backend/src/degree_planner_backend/lookups.py,
              backend/src/degree_planner_backend/agent/tools.py
@@ -330,6 +330,20 @@ BUG-013  A catalog year that is not loaded looks like "no match" in search_catal
              added, exactly as the fix idea names it. Samantha's half (calling
              it from search_catalog) is still hers to do. Covered by
              test_catalog_years_and_program_ids in test_data_hardening.py.
+             Samantha's half: 2026-11-25, branch agent/bug-013-020-lookup-
+             helpers (agent: Samantha). search_catalog with a catalog_year
+             that has no courses loaded returns {"error": "no courses are
+             loaded for catalog year 2019-2020; loaded catalog years:
+             2026-2027. Call again with one of them ..."}; a loaded year
+             with no match is still an empty list. Extended to
+             get_prerequisites: when the code is in no year and the year
+             has nothing loaded, the error also lists the loaded years.
+             Only '2026-2027'-shaped stored years are shown, and a failed
+             year lookup falls back to the old behavior (logged). Tool
+             descriptions updated. Covered by the search_catalog and
+             get_prerequisites tests in test_agent_tools_lookup_hints.py;
+             test_catalog_year_filter in test_agent_tools.py became
+             test_catalog_year_filter_unloaded_year_is_an_error.
 
 BUG-014  Exception labels are not checked when data is loaded
   Status:    Fixed
@@ -511,7 +525,7 @@ BUG-019  Forms have no catalog year; the file's catalog_year is dropped
              test_data_hardening.py.
 
 BUG-020  No way to list program ids, so a mistyped id cannot be corrected
-  Status:    Open (Midhat's half fixed)
+  Status:    Fixed
   Owner:     Midhat Sajad (lookups), then Samantha Clapp (agent tools)
   Where:     backend/src/degree_planner_backend/lookups.py,
              backend/src/degree_planner_backend/agent/tools.py (get_forms)
@@ -532,6 +546,19 @@ BUG-020  No way to list program ids, so a mistyped id cannot be corrected
              added, exactly as the fix idea names it. Samantha's half (calling
              it from get_forms) is still hers to do. Covered by
              test_catalog_years_and_program_ids in test_data_hardening.py.
+             Samantha's half: 2026-11-25, branch agent/bug-013-020-lookup-
+             helpers (agent: Samantha). get_forms adds did_you_mean (up to
+             3 loaded ids from difflib.get_close_matches, cutoff 0.8) when
+             program_found is false, e.g. ["computer-science-minor"] for
+             the Steps above; the field is left out when nothing is close.
+             Extended to get_program_requirements' "no program with this
+             id" error. Stored slug-shaped ids only, never the input. A
+             close id can be a different real program (chemistry-bs, not
+             loaded, suggests chemistry-ms, biochemistry-bs, chemistry-asi),
+             so both tool descriptions tell the model to use a suggestion
+             only if it is the program the student chose. Covered by the
+             get_forms and get_program_requirements tests in
+             test_agent_tools_lookup_hints.py.
 
 BUG-021  Program rules that the data format cannot hold never reach the agent
   Status:    Open (data-format half fixed)
@@ -1397,7 +1424,7 @@ BUG-046  A lone surrogate in a request body gives 500 instead of 422 (all
 
 BUG-047  CSCI478's prerequisite is stored as an exception, so every plan
          with CSCI478 gets an exception warning
-  Status:    Open
+  Status:    Fixed
   Owner:     Samantha Clapp (bachelor's data: course entries); Abdallah
              Salhi (prerequisite parser)
   Where:     data/Academic Catalog/mines-courses.csv (CSCI478 row);
@@ -1421,6 +1448,16 @@ BUG-047  CSCI478's prerequisite is stored as an exception, so every plan
   Fix idea:  confirm the wording on catalog.mines.edu, then correct the
              CSCI478 entry (a fix in the slice, or a known-fix rule in the
              parser), and rebuild courses.json
+  Fixed in:  2026-11-25, branch data/fix-bug-047-csci478 (bachelor's data:
+             Samantha). The catalog page reads "CSCI101 or CSCI102 or
+             CSCI128"; corrected the CSCI478 row in mines-courses.csv to
+             match (a fix in the slice, not a parser rule) and rebuilt
+             courses.json, so prerequisites is now an OR of the three
+             courses. Only CSCI478 changed (a rebuild before the edit gave
+             no diff); courses.REVIEW.md's free-text count went 225 -> 224.
+             Covered by test_bug_047_csci478_prerequisite_is_one_of_three_
+             courses in data/tools/test_course_data_fixes.py. A re-scrape
+             that brings back the old text fails that test.
 
 BUG-048  get_forms has no course substitution form, so the chatbot cannot
          point a student to one
@@ -1480,3 +1517,313 @@ BUG-049  The validator does not check corequisites
              by test_validator_corequisites.py (3 tests). chat.md's
              "check corequisites itself" instruction is now redundant,
              worth Samantha simplifying once she sees this.
+
+BUG-050  Most prerequisite/corequisite codes not in the catalog are a dead
+         end, not an overridable exception
+  Status:    Fixed
+  Owner:     Midhat Sajad (data format); Abdallah Salhi (course converter,
+             prereq_parser.py)
+  Where:     data/tools/build_courses_json.py, data/tools/prereq_parser.py,
+             data/json/courses.json
+  Found:     2026-11-25 while running Integration day on Example 1: the
+             agent flagged that MATH225's corequisite data names "CSC128",
+             which does not exist (almost certainly a typo for CSCI128),
+             and worked around it. Checking the other 75 cases already
+             listed in courses.REVIEW.md's "codes not in the catalog"
+             section found most are worse than MATH225's: 55 of the 76
+             (mostly MLGN/MNGN/MTGN/GEGN/GEOL graduate courses) have no OR
+             fallback at all
+  Steps:     before the fix: get_prerequisites {"code": "MNGN531"} (or any
+             of the 55 listed in the Fixed in note); its corequisite names
+             MTGN351, which is not a course in the catalog, with no
+             alternative branch
+  Actual:    the broken code was stored as a literal {"type": "course",
+             "code": "..."}; a plan including one of the 55 courses can
+             never satisfy that requirement, and the validator would flag
+             it forever with no way for the student or advisor to resolve
+             it (unlike an actual exception, which the student can accept).
+             None of the 55 are in mining-ms's or mining-bs-ms-combined's
+             own requirement groups, so Example 3 was not directly hit, but
+             a plan choosing one of these courses as a free elective would
+             be
+  Expected:  a prerequisite/corequisite code that matches no real course
+             becomes an overridable exception instead of a dead end, the
+             same as instructor consent or other free text already is,
+             without guessing at what the typo meant
+  Fix idea:  in build_courses_json.py, after parsing, replace a course
+             reference to an unknown code with {"type": "exception",
+             "label": ...} naming the code, so the student/advisor can
+             confirm it, instead of leaving a code that can never resolve
+  Fixed in:  2026-11-25 (backend: Midhat; told Abdallah, since this changes
+             his converter's output). Team decision (2026-11-25): go ahead.
+             Not a blanket replace-every-unknown-code, which would have
+             regressed MATH225 itself: 21 of the 76 (including CSC128) sit
+             inside an OR with a real course as a working fallback, and
+             are harmless as literal dead branches; converting those to an
+             exception too would make the validator always raise
+             exception_claimed on them (BUG-026(d), held back: an
+             exception's label is surfaced regardless of whether another
+             OR branch is already satisfied), a regression on an otherwise
+             clean plan. build_courses_json.py's new _resolve_unknown_refs
+             walks each prerequisites/corequisites tree and converts a
+             bare unknown-code reference only when it has no safe OR
+             fallback: an AND branch with no fallback, or an OR whose every
+             branch is itself unknown. CSC128 (the 21 safe cases) is left
+             exactly as it was; 20 courses' trees changed (the 55 unsafe
+             references collapse to 20 distinct courses, several of which
+             have more than one). courses.REVIEW.md's "codes not in the
+             catalog" count and list are unchanged (computed before the
+             rewrite, for the same transparency as before); only
+             courses.json's stored trees changed. Re-ran Integration day's
+             Example 1 afterward to confirm no regression: still zero
+             flags, requirements_met true, 128/128 credits. Covered by the
+             new data/tools/test_build_courses_json.py (7 tests). Does not
+             touch the other 21 safe cases or attempt to guess corrections
+             for any of the 76 codes (that remains CSC128's documented
+             policy in CONFLICT-LOG.md, unchanged); see the Course catalog
+             section there for the full writeup.
+
+BUG-051  No degree_level for standalone graduate certificates
+  Status:    Fixed
+  Owner:     Midhat Sajad (data format, validator)
+  Where:     backend/src/degree_planner_backend/models.py (Program.
+             degree_level), plan_models.py (Student.degree_level),
+             validator.py (_ADD_ON_LEVELS, _UNSHARED_MIN_LEVELS)
+  Found:     2026-11-25, flagged by Abdallah from frontend work; already
+             written up in data/CONFLICT-LOG.md line 94 when graduate data
+             was collected (standalone certificates skipped entirely, e.g.
+             CCUS, GIS & GeoInformatics, Additive Manufacturing)
+  Steps:     try to load a program with degree_level "certificate"
+  Actual:    ValidationError: not a permitted degree_level. data/tools/
+             build_frontend_options.py already treats "certificate" as a
+             real level (ADD_ONS set), anticipating this fix
+  Expected:  "certificate" is a valid degree_level, treated the same as
+             minor/ASI for not adding its own credit total on top of a
+             degree
+  Fix idea:  add "certificate" to the Literal on both Program and Student
+  Fixed in:  2026-11-25 (backend: Midhat). "certificate" added to both
+             Literal types and to docs/data-format.md and plan-format.md.
+             validator.py's _ADD_ON_LEVELS (no separate credit total once
+             a degree exists) now includes "certificate", but the 9-credit-
+             unshared rule (_UNSHARED_MIN_LEVELS, unchanged: just "minor",
+             "asi") does not, since that rule is sourced specifically from
+             policy-minor-requirements and policy-asi-requirements with no
+             certificate equivalent loaded yet (see BUG-052). request_models.
+             py's semester-count limit already defaults any level not in
+             its own small graduate set to the bachelor's limit, so a
+             certificate needed no change there. Covered by
+             test_program_accepts_certificate_degree_level (test_models.py),
+             two new tests in test_validator_minor_overlap.py, and a new
+             parametrize case in test_agent_request_models.py. No actual
+             certificate program data exists yet (data collection, not
+             this fix); frontend/src/types.ts likely needs the same literal
+             added (Abdallah's file, flagged to him).
+
+BUG-052  Confirm the minor/ASI 9-credit-unshared rule for 2026-2027
+  Status:    Fixed
+  Owner:     Midhat Sajad (validator) to confirm; source is department/
+             registrar policy, not code
+  Where:     backend/src/degree_planner_backend/validator.py
+             (ADD_ON_UNSHARED_MIN = 9.0)
+  Found:     2026-11-25, flagged by Abdallah from frontend work
+  Steps:     compare ADD_ON_UNSHARED_MIN's source comment against the live
+             2026-2027 Mines catalog
+  Actual:    the constant's comment cites "data/Policies/Minor and ASI
+             Rules (2025-2026 catalog, pp. 23-25).pdf" - a 2025-2026 source,
+             never confirmed against 2026-2027
+  Expected:  confirmed still 18 total / 9 unshared for 2026-2027, or
+             corrected if the catalog changed
+  Fix idea:  check the current catalog.mines.edu minor/ASI rules page (or
+             an equivalent 2026-2027 PDF); update the comment and, if the
+             number changed, ADD_ON_UNSHARED_MIN itself
+  Fixed in:  2026-11-25 (confirmed, no code change needed to the number
+             itself; backend: Midhat). catalog.mines.edu itself was
+             unreachable from this environment (three distinct URLs on
+             that host all failed with connection refused at the network
+             level, not a 404 or page-content issue). Confirmed instead
+             from two independent, currently-reachable sources that agree
+             exactly: (1) the 2025-2026 Undergraduate Catalog PDF (the
+             newest Mines has published; registrar.mines.edu/bulletins/
+             lists no 2026-2027 PDF yet), p. 24: Minors - "Minimum Credit
+             Hours - 18.0", "Minimum Hours Outside of Degree Requirements
+             - 9.0"; ASIs - "Minimum Credit Hours - 12.0", "Minimum Hours
+             Outside of Degree Requirements - 9.0", both stated as "at
+             least 9... must not be used for any part of the degree other
+             than free electives". (2) The live CASA advising FAQ
+             (casa.mines.edu/faqs, reachable and current as of Spring 2027
+             registration per its own navigation links) independently
+             states the same minor rule. The rule has also held unchanged
+             across at least the 2019-2020 through 2025-2026 catalogs
+             (several editions found and compared). ADD_ON_UNSHARED_MIN's
+             comment in validator.py updated to cite this properly
+             (previously cited a stale, unverifiable PDF path).
+
+BUG-053  Minors, ASIs and certificates not re-collected for the student's
+         catalog year were silently dropped from the plan
+  Status:    Fixed
+  Owner:     Midhat Sajad (validator)
+  Where:     backend/src/degree_planner_backend/validator.py (program-
+             loading loop), lookups.py (program_years)
+  Found:     2026-11-25, flagged by Abdallah from frontend work; the
+             symptom (every plan with an ASI failed) was already written
+             up in data/CONFLICT-LOG.md's ASI section, but only worked
+             around on the frontend (hide ASIs from setup) rather than
+             fixed in the validator
+  Steps:     plan a bachelor's degree plus any real ASI (every one is
+             currently stored only for 2025-2026) with the student's
+             catalog_year set to 2026-2027, then call check_plan
+  Actual:    get_program(connection, program_id, catalog_year) raised
+             NotFoundError, caught by a bare "except NotFoundError:
+             continue": the ASI was dropped from the plan with no error,
+             no warning, and none of its requirements checked, while the
+             student would believe it was
+  Expected:  fall back to the ASI/minor/certificate's own newest stored
+             catalog year no later than the student's, with a visible
+             notice, rather than silently dropping it. The student's own
+             degree (bachelor's/master's/combined) should not fall back:
+             using a stale year there is a much bigger deal
+  Fix idea:  on NotFoundError for an add-on-level program, look up its
+             available years and retry with the newest one <= the
+             student's; add a warning flag naming the year used
+  Fixed in:  2026-11-25 (backend: Midhat), exactly the fix idea. New
+             lookups.program_years(connection, program_id) lists every
+             stored year for a program_id. validator.py's new
+             _add_on_with_fallback helper picks the newest year <= the
+             student's for that program_id, re-fetches it, and only
+             accepts it if the fallback year's program is itself an
+             add-on level (so a missing bachelor's/master's program still
+             falls through to the pre-existing silent drop, unchanged).
+             New FlagType "stale_program_year" (plan_models.py, docs/
+             plan-format.md) names the program and the year actually used.
+             Never falls forward to a later-than-requested year (string
+             comparison on "YYYY-YYYY" sorts chronologically). Covered by
+             the new test_validator_add_on_catalog_year_fallback.py (6
+             tests, including one against the real, unmodified data/json/
+             confirming a real ASI now falls back from 2026-2027 to
+             2025-2026 instead of vanishing). Frontend's setup page
+             already offers minors/ASIs/certificates from their newest
+             stored year (build_frontend_options.py, Abdallah, Nov 24);
+             this closes the gap on the backend/validator side so
+             selecting one actually works instead of silently doing
+             nothing.
+
+BUG-054  The plan format carries no corequisites or course description, so
+         the frontend has no way to show either
+  Status:    Fixed
+  Owner:     Midhat Sajad (plan format, agent/tools.py build_plan)
+  Where:     backend/src/degree_planner_backend/plan_models.py
+             (PlannedCourse), agent/tools.py (build_plan)
+  Found:     2026-11-25, flagged by Abdallah from frontend work
+  Steps:     look at PlannedCourse in plan_models.py, or any plan/build_
+             plan response
+  Actual:    PlannedCourse has course_id, code, title, credits, status
+             only; no GET /courses/{code} endpoint exists either, so a
+             course's description and corequisites never reach the
+             frontend at all
+  Expected:  the frontend can read a planned course's description and
+             corequisites, for an About-panel-style display, without a
+             second backend round trip per course
+  Fix idea:  extend PlannedCourse (denormalized, same reason as title) vs.
+             a new GET /courses/{code} endpoint; the data loader already
+             reads both fields from the catalog course lookup build_plan
+             does for every course it plans
+  Fixed in:  2026-11-25 (backend: Midhat; touches agent/tools.py's build_
+             plan, Samantha's file). Chose extending PlannedCourse: build_
+             plan already calls lookups.get_course for every planned
+             course (to get its title and credits), so description and
+             corequisites were already in memory and unused; a new
+             endpoint would mean a second lookup per course for data the
+             backend already has. PlannedCourse gained description: str =
+             "" (cleaned and capped at the new COURSE_DESCRIPTION_MAX =
+             1000, agent/tools.py, since a real catalog description can
+             run to several thousand characters and every other text field
+             reaching the student already gets a cap) and corequisites:
+             Requirement | None = None (same type models.py's Course.
+             corequisites already uses, imported into plan_models.py: the
+             two formats were fully decoupled before this, so this is the
+             plan format's first dependency on the data format's types).
+             Both default so an existing plan (or a course build_plan
+             could not find in the catalog) still validates. docs/
+             plan-format.md updated. Covered by a new test in
+             test_build_plan_includes_description_and_corequisites and an
+             extended assertion in test_build_plan_is_reusable
+             (test_agent_tools.py).
+
+BUG-055  Equivalent courses the catalog states and ones the team only
+         assumed are not told apart, so a plan never shows which is which
+  Status:    Fixed
+  Owner:     Midhat Sajad (data format, validator); data/tools/
+             build_courses_json.py: shared, mostly Abdallah's converter
+  Where:     backend/src/degree_planner_backend/models.py (Course.
+             equivalent_with_inferred), validator.py, data/tools/
+             build_courses_json.py (infer_equivalents)
+  Found:     2026-11-25, flagged by Abdallah from frontend work. The
+             frontend already distinguishes these two kinds for a course
+             card (frontend/src/planner/inferredEquivalents.json, "shown
+             to students as to confirm", 2026-11-24), but the distinction
+             never reached the validator, which treats every equivalent
+             the same once a course actually stands in for a listed
+             requirement
+  Steps:     plan a minor whose "all" group lists GEOL310, using MNGN310
+             instead (an inferred, not catalog-stated, equivalent pair);
+             call check_plan
+  Actual:    the requirement is satisfied with no indication the match
+             was the team's own inference rather than the catalog's word
+  Expected:  a "to confirm" style flag when an assumed (inferred, not
+             catalog-stated) equivalent stands in for a requirement; no
+             flag when the catalog states the equivalence as fact
+  Fix idea:  carry the inferred/stated distinction into the data format
+             itself (not just the frontend's side file), and flag it in
+             the validator at the point an inferred equivalent is actually
+             used to satisfy a group
+  Fixed in:  2026-11-25 (backend: Midhat), exactly the fix idea. Course
+             gained equivalent_with_inferred: list[str] (a model_validator
+             enforces it's a subset of equivalent_with); build_courses_
+             json.py's infer_equivalents now populates both lists for a
+             pair it infers (link_equivalents, the catalog-stated path,
+             only ever touches equivalent_with). New FlagType
+             "assumed_equivalent" (plan_models.py, docs/plan-format.md).
+             validator.py's three group-kind loops ("all", "requirement",
+             "choose_credits") now call a new flag_if_assumed(listed_code,
+             actual_code) at the exact point a stand-in is genuinely
+             consumed to satisfy a group (not merely a theoretical
+             possibility sitting unused in the stand_in map), deduped per
+             (listed, actual) pair so the same substitution isn't flagged
+             twice across groups. Regenerated courses.json: 10 courses
+             gained equivalent_with_inferred (the 5 real inferred pairs,
+             both directions); courses.REVIEW.md and courses.dropped-
+             info.csv unchanged. Covered by 3 new tests in
+             test_validator_equivalents.py (an inferred stand-in is
+             flagged; MATH213/MATH223, catalog-stated, is not; the real
+             data's inferred lists are a genuine, asymmetric-ok subset of
+             equivalent_with) plus the model_validator's own coverage.
+             Touches data/tools/build_courses_json.py, Abdallah's
+             converter; flag to him.
+
+BUG-056  courses.REVIEW.md's free-text prerequisite list shows the previous
+         course's prerequisite text, not the course's own
+  Status:    Open
+  Owner:     Abdallah Salhi (course data converter: data/tools/
+             build_courses_json.py)
+  Where:     data/tools/build_courses_json.py, build(), lines 313-314;
+             data/json/courses.REVIEW.md ("Prerequisites that are free
+             text, whole or in part")
+  Found:     2026-11-25 by Samantha with Claude, while fixing BUG-047
+  Steps:     on main before BUG-047's fix, run python3 data/tools/
+             build_courses_json.py and look for CSCI478 in
+             data/json/courses.REVIEW.md
+  Actual:    "- CSCI478: CSCI220 or CSCI262". That is CSCI477's
+             prerequisite; CSCI478's own text was "CSCI101 or CSCI102
+             CSCI128". Line 313 appends the note using the variable
+             original, which line 314 only assigns afterwards, so each
+             entry carries the text of the course processed before it (and
+             the first one would raise NameError if it came first). The
+             "full text" in this list is wrong for most of its 232 entries.
+             courses.json is not affected: line 309 parses each course's
+             own r["prerequisites"]. The dropped-info entries (lines
+             317-323) are also fine, since they run after line 314
+  Expected:  each entry shows that course's own prerequisite text
+  Fix idea:  move line 314 (original = " ".join(r["prerequisites"].split()))
+             above the "if pre.fallback:" block, rebuild, and add a test
+             that a free-text note's text matches its own course's row
+  Fixed in:

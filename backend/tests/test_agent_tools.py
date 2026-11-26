@@ -81,9 +81,12 @@ def test_no_match_is_empty_not_error(connection: sqlite3.Connection) -> None:
     assert result == {"courses": [], "count": 0}
 
 
-def test_catalog_year_filter(connection: sqlite3.Connection) -> None:
+def test_catalog_year_filter_unloaded_year_is_an_error(connection: sqlite3.Connection) -> None:
+    # BUG-013: this used to return an empty list, which the model read as "rewrite the query".
+    # The full set of cases is in test_agent_tools_lookup_hints.py.
     result = search_catalog(connection, {"query": "MATH", "catalog_year": "2019-2020"})
-    assert result["count"] == 0
+    assert_bad_input(result)
+    assert "loaded catalog years: 2026-2027" in result["error"]
 
 
 def test_limit(connection: sqlite3.Connection) -> None:
@@ -1770,7 +1773,21 @@ def test_build_plan_is_reusable(plan_db: sqlite3.Connection) -> None:
     built = build_plan(plan_db, StudentContext(student(["t-minor"])), [("Fall", ["CSCI100"]), ("Spring", ["CSCI200"])])
     course = built.plan.semesters[1].courses[0]
     assert (course.course_id, course.code, course.title, course.credits) == ("sem-2-csci200", "CSCI200", "Data Structures", 3.0)
+    assert course.description == "Made-up course for tests."
+    assert course.corequisites is None
     assert built.plan.student.programs == ["t-minor"]
+
+
+def test_build_plan_includes_description_and_corequisites(tmp_path: Path) -> None:
+    conn = load_courses(tmp_path, [
+        make_course("CSCI200", title="Data Structures", corequisites={"type": "course", "code": "MATH201"}),
+        make_course("MATH201", title="Statistics"),
+    ])
+    built = build_plan(conn, StudentContext(student(["t-minor"])), [("Fall", ["CSCI200", "MATH201"])])
+    by_code = {c.code: c for c in built.plan.semesters[0].courses}
+    assert by_code["CSCI200"].description == "Made-up course for tests."
+    assert by_code["CSCI200"].corequisites == course("MATH201")
+    assert by_code["MATH201"].corequisites is None
 
 
 @pytest.mark.parametrize(

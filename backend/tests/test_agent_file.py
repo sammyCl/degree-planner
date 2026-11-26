@@ -89,9 +89,10 @@ def test_planner_file_is_what_the_loop_uses() -> None:
     assert loop.ALLOWED_TOOLS == [f"mcp__planner__{name}" for name in agent.tools]
 
 
-def test_planner_file_gives_the_agent_all_five_tools() -> None:
+def test_planner_file_gives_the_agent_all_six_tools() -> None:
     assert load_agent(loop.AGENT_FILE).tools == (
         "search_catalog", "get_prerequisites", "get_program_requirements", "get_forms", "check_plan",
+        "submit_summary",
     )
 
 

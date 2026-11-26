@@ -8433,6 +8433,9 @@
    },
    "equivalent_with": [
     "DSCI403"
+   ],
+   "equivalent_with_inferred": [
+    "DSCI403"
    ]
   },
   {
@@ -9629,8 +9632,21 @@
    "credits": 3.0,
    "description": "Bioinformatics is the theory, application and development of computing tools to solve problems and create hypotheses in all areas of biological sciences, which has contributed to advances in biology by providing tools that handle datasets too large and/or complex for manual analysis. This course focuses on an introduction to computational analysis of genetic variation and computational interdisciplinary research in genetics. The topics of this course include introduction to genetics, identification of genes involved in disease, inferring human population history, technologies for obtaining genetic information, and genetic sequencing, with an emphasis on formulating interdisciplinary problems as computational problems and then solving those problems using computational techniques from statistics and computer science.",
    "prerequisites": {
-    "type": "exception",
-    "label": "CSCI101 or CSCI102 CSCI128"
+    "type": "OR",
+    "of": [
+     {
+      "type": "course",
+      "code": "CSCI101"
+     },
+     {
+      "type": "course",
+      "code": "CSCI102"
+     },
+     {
+      "type": "course",
+      "code": "CSCI128"
+     }
+    ]
    },
    "corequisites": null,
    "catalog_year": "2026-2027",
@@ -11097,6 +11113,9 @@
     "url": "https://catalog.mines.edu/coursesaz/datascience/"
    },
    "equivalent_with": [
+    "CSCI303"
+   ],
+   "equivalent_with_inferred": [
     "CSCI303"
    ]
   },
@@ -14079,8 +14098,8 @@
     "type": "AND",
     "of": [
      {
-      "type": "course",
-      "code": "EDNS570"
+      "type": "exception",
+      "label": "the catalog names \"EDNS570\" here, which is not a course in our data; confirm with your advisor"
      },
      {
       "type": "course",
@@ -15412,8 +15431,8 @@
       "code": "EENG311"
      },
      {
-      "type": "course",
-      "code": "EENG388"
+      "type": "exception",
+      "label": "the catalog names \"EENG388\" here, which is not a course in our data; confirm with your advisor"
      }
     ]
    },
@@ -15710,8 +15729,8 @@
       "code": "EENG480"
      },
      {
-      "type": "course",
-      "code": "EENG481"
+      "type": "exception",
+      "label": "the catalog names \"EENG481\" here, which is not a course in our data; confirm with your advisor"
      }
     ]
    },
@@ -16193,6 +16212,9 @@
     "url": "https://catalog.mines.edu/coursesaz/energy/"
    },
    "equivalent_with": [
+    "MEGN475"
+   ],
+   "equivalent_with_inferred": [
     "MEGN475"
    ]
   },
@@ -17623,8 +17645,8 @@
     "type": "AND",
     "of": [
      {
-      "type": "course",
-      "code": "GEGN467"
+      "type": "exception",
+      "label": "the catalog names \"GEGN467\" here, which is not a course in our data; confirm with your advisor"
      },
      {
       "type": "course",
@@ -18429,6 +18451,9 @@
    },
    "equivalent_with": [
     "MNGN310"
+   ],
+   "equivalent_with_inferred": [
+    "MNGN310"
    ]
   },
   {
@@ -18466,6 +18491,9 @@
     "url": "https://catalog.mines.edu/coursesaz/geology/"
    },
    "equivalent_with": [
+    "MNGN311"
+   ],
+   "equivalent_with_inferred": [
     "MNGN311"
    ]
   },
@@ -19796,8 +19824,8 @@
     "type": "AND",
     "of": [
      {
-      "type": "course",
-      "code": "GEGN206"
+      "type": "exception",
+      "label": "the catalog names \"GEGN206\" here, which is not a course in our data; confirm with your advisor"
      },
      {
       "type": "OR",
@@ -19861,8 +19889,8 @@
       "code": "GEOL321"
      },
      {
-      "type": "course",
-      "code": "GEGN206"
+      "type": "exception",
+      "label": "the catalog names \"GEGN206\" here, which is not a course in our data; confirm with your advisor"
      }
     ]
    },
@@ -20725,8 +20753,8 @@
     "type": "AND",
     "of": [
      {
-      "type": "course",
-      "code": "GPGN314"
+      "type": "exception",
+      "label": "the catalog names \"GPGN314\" here, which is not a course in our data; confirm with your advisor"
      },
      {
       "type": "course",
@@ -21960,8 +21988,8 @@
       ]
      },
      {
-      "type": "course",
-      "code": "CSM192"
+      "type": "exception",
+      "label": "the catalog names \"CSM192\" here, which is not a course in our data; confirm with your advisor"
      },
      {
       "type": "course",
@@ -21973,24 +22001,24 @@
     "type": "AND",
     "of": [
      {
-      "type": "course",
-      "code": "EDNS292"
+      "type": "exception",
+      "label": "the catalog names \"EDNS292\" here, which is not a course in our data; confirm with your advisor"
      },
      {
       "type": "course",
       "code": "HASS215"
      },
      {
-      "type": "course",
-      "code": "LAIS200"
+      "type": "exception",
+      "label": "the catalog names \"LAIS200\" here, which is not a course in our data; confirm with your advisor"
      },
      {
       "type": "course",
       "code": "HNRS315"
      },
      {
-      "type": "course",
-      "code": "SYGN200"
+      "type": "exception",
+      "label": "the catalog names \"SYGN200\" here, which is not a course in our data; confirm with your advisor"
      }
     ]
    },
@@ -28011,6 +28039,9 @@
    "equivalent_with": [
     "EENG475",
     "ENGY475"
+   ],
+   "equivalent_with_inferred": [
+    "ENGY475"
    ]
   },
   {
@@ -29089,6 +29120,9 @@
    },
    "equivalent_with": [
     "PHGN440"
+   ],
+   "equivalent_with_inferred": [
+    "PHGN440"
    ]
   },
   {
@@ -29160,12 +29194,12 @@
       "type": "OR",
       "of": [
        {
-        "type": "course",
-        "code": "MTGN311"
+        "type": "exception",
+        "label": "the catalog names \"MTGN311\" here, which is not a course in our data; confirm with your advisor"
        },
        {
-        "type": "course",
-        "code": "MLGN501"
+        "type": "exception",
+        "label": "the catalog names \"MLGN501\" here, which is not a course in our data; confirm with your advisor"
        }
       ]
      },
@@ -29208,18 +29242,18 @@
       "type": "OR",
       "of": [
        {
-        "type": "course",
-        "code": "MTGN311"
+        "type": "exception",
+        "label": "the catalog names \"MTGN311\" here, which is not a course in our data; confirm with your advisor"
        },
        {
-        "type": "course",
-        "code": "MLGN501"
+        "type": "exception",
+        "label": "the catalog names \"MLGN501\" here, which is not a course in our data; confirm with your advisor"
        }
       ]
      },
      {
-      "type": "course",
-      "code": "MTGN412"
+      "type": "exception",
+      "label": "the catalog names \"MTGN412\" here, which is not a course in our data; confirm with your advisor"
      }
     ]
    },
@@ -29257,12 +29291,12 @@
       "type": "OR",
       "of": [
        {
-        "type": "course",
-        "code": "MTGN311"
+        "type": "exception",
+        "label": "the catalog names \"MTGN311\" here, which is not a course in our data; confirm with your advisor"
        },
        {
-        "type": "course",
-        "code": "MLGN501"
+        "type": "exception",
+        "label": "the catalog names \"MLGN501\" here, which is not a course in our data; confirm with your advisor"
        }
       ]
      },
@@ -29306,8 +29340,8 @@
       "code": "MATH225"
      },
      {
-      "type": "course",
-      "code": "CHEN357"
+      "type": "exception",
+      "label": "the catalog names \"CHEN357\" here, which is not a course in our data; confirm with your advisor"
      }
     ]
    },
@@ -29332,8 +29366,8 @@
     "type": "AND",
     "of": [
      {
-      "type": "course",
-      "code": "CRGN307"
+      "type": "exception",
+      "label": "the catalog names \"CRGN307\" here, which is not a course in our data; confirm with your advisor"
      },
      {
       "type": "OR",
@@ -29963,6 +29997,9 @@
    },
    "equivalent_with": [
     "GEOL310"
+   ],
+   "equivalent_with_inferred": [
+    "GEOL310"
    ]
   },
   {
@@ -30000,6 +30037,9 @@
     "url": "https://catalog.mines.edu/coursesaz/miningeng/"
    },
    "equivalent_with": [
+    "GEOL311"
+   ],
+   "equivalent_with_inferred": [
     "GEOL311"
    ]
   },
@@ -30859,19 +30899,19 @@
       "code": "MNGN414"
      },
      {
-      "type": "course",
-      "code": "EGGN329"
+      "type": "exception",
+      "label": "the catalog names \"EGGN329\" here, which is not a course in our data; confirm with your advisor"
      },
      {
       "type": "OR",
       "of": [
        {
-        "type": "course",
-        "code": "MNGN381"
+        "type": "exception",
+        "label": "the catalog names \"MNGN381\" here, which is not a course in our data; confirm with your advisor"
        },
        {
-        "type": "course",
-        "code": "MNGN384"
+        "type": "exception",
+        "label": "the catalog names \"MNGN384\" here, which is not a course in our data; confirm with your advisor"
        }
       ]
      }
@@ -31647,12 +31687,12 @@
     "type": "AND",
     "of": [
      {
-      "type": "course",
-      "code": "ESGN500"
+      "type": "exception",
+      "label": "the catalog names \"ESGN500\" here, which is not a course in our data; confirm with your advisor"
      },
      {
-      "type": "course",
-      "code": "ESGN504"
+      "type": "exception",
+      "label": "the catalog names \"ESGN504\" here, which is not a course in our data; confirm with your advisor"
      }
     ]
    },
@@ -31778,12 +31818,12 @@
     "type": "OR",
     "of": [
      {
-      "type": "course",
-      "code": "DCGN209"
+      "type": "exception",
+      "label": "the catalog names \"DCGN209\" here, which is not a course in our data; confirm with your advisor"
      },
      {
-      "type": "course",
-      "code": "MTGN351"
+      "type": "exception",
+      "label": "the catalog names \"MTGN351\" here, which is not a course in our data; confirm with your advisor"
      }
     ]
    },
@@ -31995,12 +32035,12 @@
     "type": "AND",
     "of": [
      {
-      "type": "course",
-      "code": "EGGN351"
+      "type": "exception",
+      "label": "the catalog names \"EGGN351\" here, which is not a course in our data; confirm with your advisor"
      },
      {
-      "type": "course",
-      "code": "EGGN320"
+      "type": "exception",
+      "label": "the catalog names \"EGGN320\" here, which is not a course in our data; confirm with your advisor"
      },
      {
       "type": "course",
@@ -34467,12 +34507,12 @@
     "type": "AND",
     "of": [
      {
-      "type": "course",
-      "code": "ESGN500"
+      "type": "exception",
+      "label": "the catalog names \"ESGN500\" here, which is not a course in our data; confirm with your advisor"
      },
      {
-      "type": "course",
-      "code": "ESGN504"
+      "type": "exception",
+      "label": "the catalog names \"ESGN504\" here, which is not a course in our data; confirm with your advisor"
      }
     ]
    },
@@ -34527,12 +34567,12 @@
     "type": "OR",
     "of": [
      {
-      "type": "course",
-      "code": "DCGN209"
+      "type": "exception",
+      "label": "the catalog names \"DCGN209\" here, which is not a course in our data; confirm with your advisor"
      },
      {
-      "type": "course",
-      "code": "MTGN351"
+      "type": "exception",
+      "label": "the catalog names \"MTGN351\" here, which is not a course in our data; confirm with your advisor"
      }
     ]
    },
@@ -38989,6 +39029,9 @@
     "url": "https://catalog.mines.edu/coursesaz/physics/"
    },
    "equivalent_with": [
+    "MLGN502"
+   ],
+   "equivalent_with_inferred": [
     "MLGN502"
    ]
   },

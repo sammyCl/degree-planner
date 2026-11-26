@@ -1,4 +1,4 @@
-"""MCP server that gives Claude Code the planner's tools (the five in tools.py), or in chat mode
+"""MCP server that gives Claude Code the planner's tools (the five in tools.py and submit_summary), or in chat mode
 the chatbot's tools (the four catalog lookups and the six in chat_tools.py).
 
 The agent loop (loop.py) runs `claude -p`, and Claude Code starts this server as a child process
@@ -38,11 +38,39 @@ from mcp.server.stdio import stdio_server
 from degree_planner_backend.agent import tools
 from degree_planner_backend.agent.chat_models import ChatRequest
 from degree_planner_backend.agent.chat_tools import CHAT_EDIT_TOOLS, ChatSession
-from degree_planner_backend.agent.request_models import AgentRequest
+from degree_planner_backend.agent.request_models import SUMMARY_ITEM_MAX, SUMMARY_ITEMS_MAX, AgentRequest
 
 logger = logging.getLogger(__name__)
 
 SERVER_NAME = "planner"
+
+SUBMIT_SUMMARY_TOOL: dict[str, Any] = {
+    "name": "submit_summary",
+    "description": (
+        "Call once at the very end, after your last check_plan and before your final message, to hand "
+        "back two short lists for the student's planner page. choices (shown as 'Choices I made'): each choice you made where the "
+        "requirements left it open, such as which elective fills a group or which semester a course "
+        "went in when either would work, one per item. checks (shown as 'Things to check'): each thing the student should confirm "
+        "with their advisor or the department, such as an approval, a course offered only some terms, "
+        "or a catalog year the data comes from, one per item. Write each item as one or two plain "
+        "sentences for the student, with no tool or field names; use [] when there is nothing. "
+        f"At most {SUMMARY_ITEMS_MAX} items in each list and {SUMMARY_ITEM_MAX} characters in each item. "
+        "A later check_plan clears what you sent, so call it again after any change to the plan."
+    ),
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "choices": {"type": "array", "items": {"type": "string"}, "maxItems": SUMMARY_ITEMS_MAX},
+            "checks": {"type": "array", "items": {"type": "string"}, "maxItems": SUMMARY_ITEMS_MAX},
+        },
+        "required": ["choices", "checks"],
+    },
+}
+
+
+def summary_path_for(plan_path: Path) -> Path:
+    """Where submit_summary saves its lists: next to the plan file, in the run's temporary folder."""
+    return plan_path.with_name("summary.json")
 
 # Fixed order, so the tool list Claude Code sees is the same on every request.
 TOOL_DEFINITIONS = [
@@ -51,6 +79,7 @@ TOOL_DEFINITIONS = [
     tools.GET_PROGRAM_REQUIREMENTS_TOOL,
     tools.GET_FORMS_TOOL,
     tools.CHECK_PLAN_TOOL,
+    SUBMIT_SUMMARY_TOOL,
 ]
 LOOKUP_TOOL_DEFINITIONS = TOOL_DEFINITIONS[:4]
 # Chat mode: the catalog lookups and the edit tools, but not check_plan, so a small request cannot
@@ -84,10 +113,13 @@ class PlannerTools:
         self.context = context_for(request)
         self.labels = request.semester_labels()
         self.plan_path = plan_path
+        self.summary_path = summary_path_for(plan_path)
 
     def call(self, name: str, tool_input: Any) -> tools.ToolResult:
         if name == "check_plan":
             return self._check_plan(tool_input)
+        if name == "submit_summary":
+            return self._submit_summary(tool_input)
         handler = _LOOKUP_HANDLERS.get(name)
         if handler is None:
             names = ", ".join(tool["name"] for tool in TOOL_DEFINITIONS)
@@ -105,7 +137,37 @@ class PlannerTools:
         result = tools.check_plan(self.connection, tool_input, self.context)
         if "error" not in result:
             self._save_plan(tool_input)
+            # A summary describes one plan: once the plan changes, it no longer fits.
+            if self.summary_path.exists():
+                self.summary_path.unlink()
+                result["summary_cleared"] = "The plan changed, so the summary you sent was cleared: call submit_summary again at the end."
         return result
+
+    def _submit_summary(self, tool_input: Any) -> tools.ToolResult:
+        if not self.plan_path.exists():
+            return {"error": "call check_plan with your plan first; submit_summary describes the plan check_plan accepted."}
+        if not isinstance(tool_input, dict):
+            return {"error": "tool input must be a JSON object with choices and checks, each a list of text."}
+        lists: dict[str, list[str]] = {}
+        for field in ("choices", "checks"):
+            items = tool_input.get(field)
+            if not isinstance(items, list) or not all(isinstance(item, str) for item in items):
+                return {"error": f"{field} must be a list of text items (use [] when there is nothing)."}
+            if len(items) > SUMMARY_ITEMS_MAX:
+                return {"error": f"{field} may have at most {SUMMARY_ITEMS_MAX} items; keep the most important ones."}
+            cleaned = []
+            for item in items:
+                if not tools._is_valid_text(item):
+                    return {"error": f"an item in {field} contains characters that are not valid text."}
+                text = tools.clean_text(item, SUMMARY_ITEM_MAX)
+                if not text:
+                    return {"error": f"an item in {field} is empty; leave it out instead."}
+                cleaned.append(text)
+            lists[field] = cleaned
+        partial = self.summary_path.with_name(self.summary_path.name + ".partial")
+        partial.write_text(json.dumps(lists))
+        os.replace(partial, self.summary_path)
+        return {"saved": True, "choices": len(lists["choices"]), "checks": len(lists["checks"])}
 
     def _save_plan(self, tool_input: dict[str, Any]) -> None:
         # Written to a temporary file and renamed, so the loop never reads half a plan.

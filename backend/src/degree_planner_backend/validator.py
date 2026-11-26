@@ -11,7 +11,7 @@ from __future__ import annotations
 import re
 import sqlite3
 
-from degree_planner_backend.lookups import NotFoundError, get_course, get_program
+from degree_planner_backend.lookups import NotFoundError, get_course, get_program, program_years
 from degree_planner_backend.models import Program, Requirement, RequirementGroup
 from degree_planner_backend.plan_models import (
     CountsToward,
@@ -108,10 +108,19 @@ def _exception_labels(requirement: Requirement | None) -> list[str]:
     return [label for sub in requirement.of for label in _exception_labels(sub)]
 
 
-_ADD_ON_LEVELS = ("minor", "asi")
-# 2026-2027 undergraduate catalog (forms-policies.json, policy-minor-requirements and
-# policy-asi-requirements): at least 9 credits of a minor or ASI not used for any other part of
-# the degree except free electives.
+_ADD_ON_LEVELS = ("minor", "asi", "certificate")
+# The 9-credit-unshared rule below (policy-minor-requirements and policy-asi-requirements) is
+# stated only for minors and ASIs; no certificate policy is loaded yet, so it stays narrower than
+# _ADD_ON_LEVELS rather than guessing the same rule applies.
+_UNSHARED_MIN_LEVELS = ("minor", "asi")
+# Minor and ASI share the same rule: at least 9 credits not used for any other part of the
+# degree except free electives (18 total for a minor, 12 for an ASI). Confirmed 2026-11-25
+# (BUG-052) against the 2025-2026 Undergraduate Catalog (p. 24, "Minimum Hours Outside of Degree
+# Requirements - 9.0", stated identically for Minors and for Areas of Special Interest), the
+# newest catalog PDF Mines has published, plus the live CASA advising FAQ (casa.mines.edu/faqs,
+# current as of Spring 2027 registration), which independently states the same 9-credit minor
+# rule; catalog.mines.edu itself (which may already show 2026-2027) was unreachable to check
+# directly. The rule has held unchanged across at least the 2019-2020 through 2025-2026 catalogs.
 ADD_ON_UNSHARED_MIN = 9.0
 
 
@@ -164,6 +173,32 @@ def _equivalents(connection: sqlite3.Connection, code: str, catalog_year: str) -
         return list(get_course(connection, code, catalog_year).equivalent_with)
     except NotFoundError:
         return []
+
+
+def _inferred_equivalents(connection: sqlite3.Connection, code: str, catalog_year: str) -> list[str]:
+    """The subset of _equivalents(code, ...) the catalog text never actually states, only inferred
+    by the team's rule (BUG-055); [] for a code not in the catalog."""
+    try:
+        return list(get_course(connection, code, catalog_year).equivalent_with_inferred)
+    except NotFoundError:
+        return []
+
+
+def _add_on_with_fallback(connection: sqlite3.Connection, program_id: str, requested_year: str) -> tuple[Program, str] | None:
+    """A minor, ASI or certificate not re-collected for the student's own catalog year falls back
+    to its own newest stored year no later than requested_year, unlike the student's actual degree
+    (bachelor's/master's/combined), which never falls back: using a stale year for an add-on is a
+    much smaller risk than for the degree itself. None if nothing usable is stored at or before
+    requested_year, or the fallback year's program turns out not to be an add-on level either."""
+    years = [year for year in program_years(connection, program_id) if year <= requested_year]
+    if not years:
+        return None
+    fallback_year = max(years)
+    try:
+        program = get_program(connection, program_id, fallback_year)
+    except NotFoundError:
+        return None
+    return (program, fallback_year) if program.degree_level in _ADD_ON_LEVELS else None
 
 
 def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
@@ -231,6 +266,7 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
             counts[code].append(entry)
 
     equivalent: dict[str, list[str]] = {}
+    inferred_equivalent: dict[str, list[str]] = {}
 
     def with_equivalents(codes: set[str]) -> set[str]:
         """codes plus their equivalent courses: an equivalent course satisfies a prerequisite (BUG-041)."""
@@ -238,6 +274,7 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
         for code in codes:
             if code not in equivalent:
                 equivalent[code] = _equivalents(connection, code, catalog_year)
+                inferred_equivalent[code] = _inferred_equivalents(connection, code, catalog_year)
             out.update(equivalent[code])
         return out
 
@@ -326,6 +363,26 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
             False,
         )
 
+    # BUG-055: flag a stand-in only once per (listed, actual) pair, and only when the catalog
+    # never actually states the equivalence (it's the team's own inference, worth confirming),
+    # unlike an equivalence the catalog states as fact.
+    flagged_assumed: set[tuple[str, str]] = set()
+
+    def flag_if_assumed(listed_code: str, actual_code: str) -> None:
+        if actual_code == listed_code or (listed_code, actual_code) in flagged_assumed:
+            return
+        if listed_code not in inferred_equivalent.get(actual_code, []):
+            return
+        flagged_assumed.add((listed_code, actual_code))
+        add_flag(
+            "assumed_equivalent",
+            "warning",
+            next((cid for _, cid in code_to_course_ids.get(actual_code, [])), None),
+            f"{actual_code} stands in for {listed_code} here, but the catalog never states they are "
+            "equivalent; this is the team's own inference. Confirm with your advisor.",
+            False,
+        )
+
     # A minor or ASI adds no credit total of its own on top of a degree (BUG-037): its groups make
     # sure its courses are planned, and its courses may also be the degree's free electives. Its
     # total counts only when the student has no degree program.
@@ -334,12 +391,27 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
         try:
             loaded.append(get_program(connection, program_id, catalog_year))
         except NotFoundError:
-            continue
+            fallback = _add_on_with_fallback(connection, program_id, catalog_year)
+            if fallback is None:
+                continue
+            program, fallback_year = fallback
+            loaded.append(program)
+            add_flag(
+                "stale_program_year",
+                "warning",
+                None,
+                f"{program.name} is not in the {catalog_year} catalog data; using the newest version "
+                f"on record ({fallback_year}) instead. Confirm its requirements with your advisor.",
+                False,
+            )
     has_degree = any(p.degree_level not in _ADD_ON_LEVELS for p in loaded)
     total_credits_required = 0.0
     # The first semester after a combined program's bachelor's part is done (BUG-026a: that's also
     # when the per-semester credit limit switches from undergraduate to graduate), or None if the
     # student isn't in a combined program or hasn't planned any of the bachelor's required courses.
+    # KEEP IN SYNC: agent/chat_tools.py (_combined_boundary_semester, semester_credit_limits)
+    # copies this rule to show the chatbot each semester's limit and room. If you change how this
+    # boundary is found, change it there too (test_chat_limits_match_the_validator checks it).
     combined_boundary_semester: int | None = None
     for program in loaded:
         if not (has_degree and program.degree_level in _ADD_ON_LEVELS):
@@ -464,6 +536,7 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                     actual = code if code in plan_codes else stand_in.get(code, "")
                     if actual in plan_codes:
                         record(actual, req_program, group)
+                        flag_if_assumed(code, actual)
                 available -= set(listed) | {stand_in[code] for code in listed if code in stand_in}
 
             for group in requirement_groups_kind:
@@ -484,6 +557,7 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                         actual = code if code in plan_codes else stand_in.get(code, "")
                         if actual in plan_codes:
                             record(actual, req_program, group)
+                            flag_if_assumed(code, actual)
                     available -= set(branch) | {stand_in[code] for code in branch if code in stand_in}
 
             for group in choose_with_list + choose_without_list:
@@ -506,6 +580,7 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                         break
                     earned += code_credits.get(code, 0.0)
                     claimed.add(code)
+                    flag_if_assumed(listed_code, code)
                 report(group, req_program, earned >= credits_required, credits_required=credits_required, credits_earned=earned)
                 if earned < credits_required:
                     add_flag(
@@ -523,6 +598,8 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
     # No semester over the Mines per-term credit limit (BUG-026a): graduate throughout for a
     # master's/PhD student, graduate only after the bachelor's part is done for a combined student,
     # undergraduate otherwise.
+    # KEEP IN SYNC: agent/chat_tools.py (semester_credit_limits, CREDIT_LIMIT_UNDERGRADUATE/GRADUATE)
+    # copies these limits and this rule. If you change them, change it there too.
     for index, semester in enumerate(semesters):
         if student.degree_level in _GRADUATE_LEVELS or (
             combined_boundary_semester is not None and index > combined_boundary_semester
@@ -556,7 +633,7 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                         continue
             else:
                 degree_parts.append(program)
-        for add_on in (p for p in loaded if p.degree_level in _ADD_ON_LEVELS):
+        for add_on in (p for p in loaded if p.degree_level in _UNSHARED_MIN_LEVELS):
             unshared, shared = _unshared_credits(add_on, degree_parts, plan_codes, code_credits)
             if unshared < ADD_ON_UNSHARED_MIN:
                 add_flag(

@@ -582,3 +582,123 @@ def test_tool_descriptions_mention_course_credits() -> None:
     from degree_planner_backend.agent.chat_tools import CHAT_EDIT_TOOLS
 
     assert all("course_credits" in tool["description"] for tool in CHAT_EDIT_TOOLS)
+
+
+# --- per-semester limits in a combined BS+MS plan (copied from the validator, BUG-026a) ---------
+#
+# chat_tools.semester_credit_limits copies the validator's rule (KEEP IN SYNC in both files): in a
+# combined plan, the semesters after the last one holding a bachelor's-part course are graduate,
+# with a limit of 15. These tests use their own catalog: a bachelor's part tb (TEST101, TEST102),
+# a master's part tm (TEST501), the combined program tbm, TEST103 (equivalent to TEST102) and
+# TEST516 (16 credits: over a graduate semester's 15, under an undergraduate one's 18).
+
+COMBINED_LABELS = ["Fall 2026", "Spring 2027", "Fall 2027"]
+
+
+@pytest.fixture
+def combined_db(tmp_path: Path) -> Path:
+    data_dir = tmp_path / "combined-data"
+    data_dir.mkdir()
+    courses = [
+        make_course("TEST101"),
+        make_course("TEST102", equivalent_with=["TEST103"]),
+        make_course("TEST103", equivalent_with=["TEST102"]),
+        make_course("TEST501"),
+        make_course("TEST516", credits=16.0),
+    ]
+    programs = [
+        {"program_id": "tb", "name": "Test BS", "degree_level": "bachelor", "catalog_year": YEAR,
+         "total_credits_required": 6,
+         "requirement_groups": [{"group_id": "core", "label": "Core", "kind": "all", "courses": ["TEST101", "TEST102"]}]},
+        {"program_id": "tm", "name": "Test MS", "degree_level": "master", "catalog_year": YEAR,
+         "total_credits_required": 3,
+         "requirement_groups": [{"group_id": "core", "label": "Core", "kind": "all", "courses": ["TEST501"]}]},
+        {"program_id": "tbm", "name": "Test BS+MS", "degree_level": "combined", "catalog_year": YEAR,
+         "total_credits_required": 9, "combines": ["tb", "tm"], "requirement_groups": []},
+    ]
+    (data_dir / "data.json").write_text(json.dumps({"courses": courses, "programs": programs}))
+    path = tmp_path / "combined.db"
+    conn = sqlite3.connect(path)
+    report = refresh_database(data_dir, conn)
+    assert report.errors == {}
+    conn.close()
+    return path
+
+
+def combined_session(
+    db: Path, state_path: Path, board: list[list[str]], *, degree_level: str = "combined",
+    programs: list[str] | None = None, completed: list[str] | None = None,
+) -> ChatSession:
+    plan = make_plan(dict(zip(COMBINED_LABELS, board)))
+    plan["student"] = {
+        "degree_level": degree_level,
+        "programs": programs or ["tbm"],
+        "catalog_year": YEAR,
+        "completed_courses": [{"code": c, "credits": 3.0, "term": "Spring 2026"} for c in completed or []],
+    }
+    return ChatSession(sqlite3.connect(db), make_request(plan=plan), state_path)
+
+
+def limits(result: dict) -> list[int]:
+    return [s["credit_limit"] for s in result["semesters"]]
+
+
+def test_combined_semesters_after_the_bachelors_part_are_graduate(combined_db: Path, state_path: Path) -> None:
+    session = combined_session(combined_db, state_path, [["TEST101"], ["TEST102"], ["TEST501"]])
+    result = session.call("get_current_plan", {})
+    assert limits(result) == [18, 18, 15]
+    assert [s["room"] for s in result["semesters"]] == [15.0, 15.0, 12.0]
+
+
+def test_moving_a_bachelors_course_later_moves_the_boundary(combined_db: Path, state_path: Path) -> None:
+    session = combined_session(combined_db, state_path, [["TEST101"], ["TEST102"], ["TEST501"]])
+    result = session.call("move_course", {"code": "TEST102", "to_label": "Fall 2027"})
+    assert limits(result) == [18, 18, 18]
+
+
+def test_combined_with_no_bachelors_course_planned_is_undergraduate(combined_db: Path, state_path: Path) -> None:
+    session = combined_session(combined_db, state_path, [["TEST501"], [], []])
+    assert limits(session.call("get_current_plan", {})) == [18, 18, 18]
+
+
+def test_an_equivalent_already_completed_does_not_hold_the_boundary(combined_db: Path, state_path: Path) -> None:
+    # TEST103 completed counts for TEST102, so the TEST102 planned in Fall 2027 adds nothing to the
+    # bachelor's part (BUG-041): the bachelor's part ends in Fall 2026, as the validator sees it.
+    session = combined_session(
+        combined_db, state_path, [["TEST101"], ["TEST501"], ["TEST102"]], completed=["TEST103"]
+    )
+    assert limits(session.call("get_current_plan", {})) == [18, 15, 15]
+
+
+@pytest.mark.parametrize(
+    ("board", "degree_level", "programs", "completed", "over"),
+    [
+        # A 16-credit course after the bachelor's part: over 15, so both flag it.
+        ([["TEST101"], ["TEST102"], ["TEST516"]], "combined", ["tbm"], [], ["Fall 2027"]),
+        # The same course before the bachelor's part ends: under 18, so neither does.
+        ([["TEST101"], ["TEST516"], ["TEST102"]], "combined", ["tbm"], [], []),
+        # No bachelor's course planned: undergraduate throughout.
+        ([["TEST516"], [], []], "combined", ["tbm"], [], []),
+        # A master's student: graduate throughout.
+        ([["TEST516"], [], []], "master", ["tm"], [], ["Fall 2026"]),
+        # An equivalent completed moves the boundary earlier.
+        ([["TEST101"], ["TEST516"], ["TEST102"]], "combined", ["tbm"], ["TEST103"], ["Spring 2027"]),
+    ],
+)
+def test_chat_limits_match_the_validator(
+    combined_db: Path, state_path: Path, board: list[list[str]], degree_level: str,
+    programs: list[str], completed: list[str], over: list[str],
+) -> None:
+    # The KEEP IN SYNC check: the semesters the chat tools call over their limit are exactly the
+    # ones the validator flags as semester_overload. If this fails after a validator change, update
+    # chat_tools.semester_credit_limits to match.
+    session = combined_session(
+        combined_db, state_path, board, degree_level=degree_level, programs=programs, completed=completed
+    )
+    result = session.call("get_current_plan", {})
+    flagged = [
+        label for label in COMBINED_LABELS
+        if any(e["type"] == "semester_overload" and e["message"].startswith(f"{label} ") for e in result["errors"])
+    ]
+    assert result["semesters_over_credit_limit"] == over
+    assert flagged == over

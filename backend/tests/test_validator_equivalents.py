@@ -18,12 +18,17 @@ from degree_planner_backend.validator import check_plan
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
-def course(code: str, credits: float = 3.0, equivalent: list[str] | None = None, prereq: str | None = None) -> dict:
+def course(
+    code: str, credits: float = 3.0, equivalent: list[str] | None = None, prereq: str | None = None,
+    inferred: list[str] | None = None,
+) -> dict:
     data = {"code": code, "subject": code[:4], "number": code[4:], "title": code, "credits": credits,
             "description": "", "catalog_year": "2026-2027",
             "prerequisites": {"type": "course", "code": prereq} if prereq else None}
     if equivalent:
         data["equivalent_with"] = equivalent
+    if inferred:
+        data["equivalent_with_inferred"] = inferred
     return data
 
 
@@ -97,6 +102,43 @@ def test_a_completed_course_counts_before_a_planned_equivalent(connection) -> No
     assert warning.message.startswith("MATH213 is equivalent to MATH223")
 
 
+def test_the_honors_version_is_not_flagged_as_assumed(connection) -> None:
+    # MATH213/MATH223 are a catalog-stated equivalence (BUG-041's own fixture), not an inference:
+    # standing in for the required course should not raise assumed_equivalent (BUG-055).
+    checked = check_plan(connection, plan([["MATH223", "FREE101"], ["MATH225", "FREE102", "HASS100"]]))
+    assert not any(f.type == "assumed_equivalent" for f in checked.flags)
+
+
+@pytest.fixture
+def inferred_connection(tmp_path: Path) -> sqlite3.Connection:
+    """GEOL310/MNGN310: an inference-only equivalent pair (BUG-055), unlike the shared fixture's
+    catalog-stated MATH213/MATH223."""
+    courses = [course("GEOL310", equivalent=["MNGN310"], inferred=["MNGN310"]),
+               course("MNGN310", equivalent=["GEOL310"], inferred=["GEOL310"])]
+    program = {"program_id": "t-minor", "name": "Test Minor", "degree_level": "minor", "catalog_year": "2026-2027",
+               "total_credits_required": 3, "requirement_groups": [
+                   {"group_id": "req", "label": "Required", "kind": "all", "courses": ["GEOL310"]}]}
+    (tmp_path / "courses.json").write_text(json.dumps({"courses": courses}))
+    (tmp_path / "programs.json").write_text(json.dumps({"programs": [program]}))
+    conn = sqlite3.connect(":memory:")
+    assert refresh_database(tmp_path, conn).ok
+    return conn
+
+
+def test_an_inferred_equivalent_standing_in_is_flagged_as_assumed(inferred_connection) -> None:
+    checked = check_plan(inferred_connection, Plan(
+        student=Student(degree_level="minor", programs=["t-minor"], catalog_year="2026-2027"),
+        semesters=[Semester(semester_id="s1", label="S1", courses=[
+            PlannedCourse(course_id="s1-MNGN310", code="MNGN310", title="MNGN310", credits=3.0, status="planned")])],
+        summary=Summary(total_credits=0, total_credits_required=0, requirements_met=False),
+    ))
+    (flag,) = [f for f in checked.flags if f.type == "assumed_equivalent"]
+    assert flag.severity == "warning"
+    assert flag.course_id == "s1-MNGN310"
+    assert "MNGN310 stands in for GEOL310" in flag.message
+    assert checked.summary.requirements_met
+
+
 def test_the_real_data_links_the_examples_equivalents() -> None:
     courses = {c["code"]: Course.model_validate(c)
                for c in json.loads((REPO_ROOT / "data" / "json" / "courses.json").read_text())["courses"]}
@@ -106,3 +148,16 @@ def test_the_real_data_links_the_examples_equivalents() -> None:
     for code, c in courses.items():  # always both ways, and only real catalog codes
         for other in c.equivalent_with:
             assert code in courses[other].equivalent_with, (code, other)
+
+
+def test_the_real_datas_inferred_equivalents_are_a_subset_and_asymmetric_ok() -> None:
+    # BUG-055: GEOL310/MNGN310 is one of the 5 real inferred (not catalog-stated) pairs; MEGN475
+    # has both a catalog-stated equivalent (EENG475) and an inferred one (ENGY475), confirming the
+    # inferred set is a genuine, independent subset, not just a copy of equivalent_with.
+    courses = {c["code"]: Course.model_validate(c)
+               for c in json.loads((REPO_ROOT / "data" / "json" / "courses.json").read_text())["courses"]}
+    assert courses["GEOL310"].equivalent_with_inferred == ["MNGN310"]
+    assert courses["MEGN475"].equivalent_with == ["EENG475", "ENGY475"]
+    assert courses["MEGN475"].equivalent_with_inferred == ["ENGY475"]
+    for code, c in courses.items():
+        assert set(c.equivalent_with_inferred) <= set(c.equivalent_with), code

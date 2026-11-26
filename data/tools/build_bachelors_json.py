@@ -240,15 +240,16 @@ def s_mining(x):
         "MNGN314", "MNGN317", "MNGN321", "MNGN322", "MNGN412", "MNGN414", "MNGN425", "MNGN427", "MNGN428",
         "MNGN429", "MNGN433", "MNGN438", "MNGN482",
     ]
-    x.note("'MNGN2XX New Special Topics' (3 credits, sophomore spring) has no single code; modelled as 3 credits from the "
-           "MNGN 200-level courses in the CSV that are not already required (MNGN205, MNGN298, MNGN299). Confirm with "
-           "the department which course is meant.")
+    x.note("'MNGN2XX New Special Topics' (3 credits, sophomore spring) has no single code; modelled as 3 credits of "
+           "MNGN298 Special Topics in Mining Engineering, the only 200-level MNGN special-topics course. MNGN299 "
+           "Independent Study and MNGN205 Field Experience are not special topics, so they do not count "
+           "(Samantha, 2026-11-25; CONFLICT-LOG Bachelor's 18).")
     x.note("MNGN205 Mining Engineering Field Experience is marked optional, so it is not required. The PDF lists it as "
            "2.0 credits; the CSV says 1.0.")
     x.note("Junior fall lists 'CAS ELECTIVE' with no level; read as a mid-level CAS elective (the table also has one "
            "'CAS Mid Level' and one '400-Level' CAS elective), giving 6 mid-level and 3 400-level CAS credits.")
     x.note("EBGN321 has a prerequisite of 60 credit hours.")
-    mngn2xx = x.pool("MNGN", 200, 299, exclude=set(required))
+    mngn2xx = x.X(["MNGN298"])
     return [P("mining-bs", "Bachelor of Science in Mining Engineering", 131, [
         ALL("required", "Required core and Mining Engineering courses", x.X(required)),
         success_wellness(x),

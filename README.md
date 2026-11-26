@@ -25,6 +25,15 @@ Flow: the frontend sends the student's inputs to the backend, which calls the ag
 
 The agent decides at run time which programs and catalog years are needed, which requirements overlap between a major and a minor, and what to do when a plan fails the check (move a course, swap an elective). Students' situations and exceptions vary too much for rules written in advance, so a fixed workflow would give students fewer options.
 
+## Backend
+
+The backend is a FastAPI app over SQLite (Python 3.12, `uv`); Pydantic models double as both the API's request/response validation and the schema for the common data format ([docs/data-format.md](docs/data-format.md), [docs/plan-format.md](docs/plan-format.md)).
+
+- **Data format and loader.** Courses, programs, and forms are stored in one common JSON shape, built from each data slice's raw source (catalog CSVs, program PDFs) by scripts in `data/tools/`. Prerequisites and corequisites are parsed once, at load, into a typed AND/OR/exception tree rather than kept as free text, so the validator, the agent's tools, and the frontend all read the same structure (see DECISIONS.md, "Data format"). One command (`uv run load-data`) reloads the whole catalog from `data/`, reporting errors per file without aborting the rest of the load. Malformed data (an impossible credit value, an empty required list, a catalog year that isn't a real year, a prerequisite naming a course that doesn't exist and has no safe alternative) is rejected or cleaned at load rather than passed through with a warning attached (DECISIONS.md, "Validation strictness").
+- **Plan validator** (`validator.py`) is plain rules code, not the model: prerequisite and corequisite order, a per-semester credit cap, every program's requirement groups (fixed lists, elective credit choices, and rule-based groups), double-counted credits between a combined program or a minor/ASI and the student's degree, and claimed exceptions (shown as an overridable warning, never silently passed). The same `check_plan` function backs the frontend's drag-and-drop check and the agent's `check_plan` tool, so both get one deterministic answer.
+- **API** (`main.py`): `POST /plans/check` re-validates a plan (used after a drag-and-drop move); `POST /plans` / `PUT /plans/{plan_id}` / `GET /plans/{plan_id}` are the plan store, always re-running the validator before saving so a client can't forge a passing plan into storage; `POST /plans/submit-setup` and `POST /plans/chat` call the agent loop and chat loop; `POST /transcripts/parse` turns an uploaded `.csv` or `.pdf` transcript into completed courses. Validation errors return 422 without echoing request internals back; an unexpected server error returns one fixed, non-revealing 500 message, with the real exception only in the server log.
+- **Tests:** `uv run pytest` from `backend/` (1027 tests); `uv run pytest ../data/tools` for the data-conversion scripts (45 tests).
+
 ## Team and who owns what
 
 All three members share data collection; each also owns one part.

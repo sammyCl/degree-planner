@@ -182,9 +182,10 @@ def test_command_turns_off_built_in_tools_and_allows_only_the_planner(tmp_path: 
     assert "--strict-mcp-config" in command
     assert command[command.index("--setting-sources") + 1] == ""
     start = command.index("--allowedTools") + 1
-    assert command[start:start + 5] == ALLOWED_TOOLS == [
+    assert command[start:start + 6] == ALLOWED_TOOLS == [
         "mcp__planner__search_catalog", "mcp__planner__get_prerequisites",
         "mcp__planner__get_program_requirements", "mcp__planner__get_forms", "mcp__planner__check_plan",
+        "mcp__planner__submit_summary",
     ]
 
 
@@ -428,3 +429,68 @@ def test_the_returned_plan_keeps_the_validators_labels_and_checklist(connection:
     assert response.plan is not None
     assert response.plan.requirement_status, "the requirement checklist was dropped"
     assert response.plan.counts_toward, "the course labels were dropped"
+
+
+# --- choices and checks from submit_summary -------------------------------------------------------
+
+SUMMARY = {"choices": ["I put TEST101 first because TEST102 needs it."], "checks": ["Confirm the plan with your advisor."]}
+
+
+def test_summary_becomes_choices_and_checks(connection: sqlite3.Connection) -> None:
+    fake = FakeClaude([("check_plan", GOOD_PLAN), ("submit_summary", SUMMARY)], claude_result("TEST101 first."))
+    response = run_agent(connection, make_request(), runner=fake)
+
+    assert response.status == "ok"
+    assert response.choices == ("I put TEST101 first because TEST102 needs it.",)
+    assert response.checks == ("Confirm the plan with your advisor.",)
+    assert response.explanation == "TEST101 first."  # the full message is still there
+
+
+def test_no_summary_means_empty_lists(connection: sqlite3.Connection) -> None:
+    response = run_agent(connection, make_request(), runner=FakeClaude([("check_plan", GOOD_PLAN)]))
+
+    assert response.status == "ok"
+    assert response.choices == () and response.checks == ()
+
+
+def test_summary_sent_before_the_last_check_plan_is_dropped(connection: sqlite3.Connection) -> None:
+    calls = [("check_plan", HALF_PLAN), ("submit_summary", SUMMARY), ("check_plan", GOOD_PLAN)]
+    response = run_agent(connection, make_request(), runner=FakeClaude(calls))
+
+    assert response.choices == () and response.checks == ()
+
+
+def test_summary_is_dropped_when_the_run_did_not_finish(connection: sqlite3.Connection) -> None:
+    result = claude_result("API Error: 529 overloaded", subtype="error_during_execution")
+    fake = FakeClaude([("check_plan", GOOD_PLAN), ("submit_summary", SUMMARY)], result)
+    response = run_agent(connection, make_request(), runner=fake)
+
+    assert response.status == "cannot_work"
+    assert response.choices == () and response.checks == ()
+
+
+def test_summary_is_kept_on_a_plan_that_does_not_work(connection: sqlite3.Connection) -> None:
+    # The run finished; the plan just does not meet every requirement. The choices still describe it.
+    fake = FakeClaude([("check_plan", HALF_PLAN), ("submit_summary", SUMMARY)])
+    response = run_agent(connection, make_request(), runner=fake)
+
+    assert response.status == "cannot_work"
+    assert response.choices == ("I put TEST101 first because TEST102 needs it.",)
+
+
+@pytest.mark.parametrize(
+    "content",
+    ['{"choices": "one", "checks": []}', '{"choices": ["  "], "checks": []}', '["not", "an", "object"]'],
+)
+def test_an_unusable_summary_file_leaves_the_lists_empty(connection: sqlite3.Connection, content: str) -> None:
+    fake = FakeClaude([("check_plan", GOOD_PLAN)])
+
+    def runner(command: list[str], first_message: str, cwd: Path) -> ClaudeRun:
+        run = fake(command, first_message, cwd)
+        (cwd / "summary.json").write_text(content)  # as if the file were off, not written by the tool
+        return run
+
+    response = run_agent(connection, make_request(), runner=runner)
+
+    assert response.status == "ok"
+    assert response.choices == () and response.checks == ()
