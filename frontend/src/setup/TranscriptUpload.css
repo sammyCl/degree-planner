@@ -181,3 +181,89 @@
     grid-column: 1 / -1;
   }
 }
+
+/* Files that were read: a chip per file with a PDF or CSV icon, so the student sees the upload worked */
+.tu-files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tu-file {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 100%;
+  padding: 7px 8px 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--raised);
+  box-shadow: var(--sh-1);
+  animation: tu-in 220ms var(--ease-out);
+}
+
+.tu-file.reading {
+  opacity: 0.7;
+}
+
+@keyframes tu-in {
+  from { opacity: 0; transform: translateY(4px); }
+}
+
+.tu-file-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.tu-file-text b {
+  max-width: 260px;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tu-file-text small {
+  color: var(--ok);
+  font-size: 12px;
+}
+
+.tu-file.reading small {
+  color: var(--mut);
+}
+
+.tu-icon {
+  flex: none;
+}
+
+.tu-icon-page {
+  fill: var(--surface);
+  stroke: var(--border-strong);
+  stroke-width: 1.5;
+}
+
+.tu-icon-fold {
+  fill: none;
+  stroke: var(--border-strong);
+  stroke-width: 1.5;
+}
+
+.tu-icon.pdf .tu-icon-band { fill: #d93025; }
+.tu-icon.csv .tu-icon-band { fill: #1e8e3e; }
+
+.tu-icon text {
+  fill: #fff;
+  font: 700 7.5px Inter, sans-serif;
+  letter-spacing: 0.04em;
+}
+
+.tu-title {
+  margin: 8px 0 0;
+  color: var(--mut);
+  font-size: 12.5px;
+}

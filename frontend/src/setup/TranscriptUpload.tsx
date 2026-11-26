@@ -3,6 +3,9 @@ import { ApiError, parseTranscript } from '../api.ts'
 import type { CompletedCourse } from '../types.ts'
 import { Dropdown } from './Dropdown.tsx'
 import {
+  CATALOG,
+  catalogCourse,
+  fileKind,
   fileProblem,
   manualProblem,
   mergeCourses,
@@ -12,12 +15,15 @@ import {
   toCourse,
   totalCredits,
   type ManualCourse,
+  type UploadedFile,
 } from './transcript.ts'
 import './TranscriptUpload.css'
 
 interface Props {
   courses: CompletedCourse[]
-  onChange: (courses: CompletedCourse[]) => void
+  /** the transcript files read so far (shown by name); kept by the form so they survive a trip to the planner */
+  files?: UploadedFile[]
+  onChange: (courses: CompletedCourse[], files: UploadedFile[]) => void
   /** the current year, for the list of semesters to pick from */
   thisYear: number
 }
@@ -25,8 +31,8 @@ interface Props {
 const EMPTY: ManualCourse = { code: '', credits: '', term: '', transferFrom: '' }
 
 /** Completed courses: read them from a transcript file, check the list, fix it, or type them in. */
-export function TranscriptUpload({ courses, onChange, thisYear }: Props) {
-  const ids = { code: useId(), credits: useId(), from: useId() }
+export function TranscriptUpload({ courses, files = [], onChange, thisYear }: Props) {
+  const ids = { code: useId(), credits: useId(), from: useId(), codes: useId() }
   const fileInput = useRef<HTMLInputElement>(null)
   const controller = useRef<AbortController | null>(null)
   const [reading, setReading] = useState(false)
@@ -36,6 +42,9 @@ export function TranscriptUpload({ courses, onChange, thisYear }: Props) {
   const [adding, setAdding] = useState(false)
   const [entry, setEntry] = useState<ManualCourse>(EMPTY)
   const [entryProblem, setEntryProblem] = useState<string | null>(null)
+  // credits filled in from the catalog, until the student types their own
+  const [autoCredits, setAutoCredits] = useState(false)
+  const [readingName, setReadingName] = useState<string | null>(null)
   const terms = termOptions(thisYear)
 
   useEffect(() => () => controller.current?.abort(), [])
@@ -49,11 +58,15 @@ export function TranscriptUpload({ courses, onChange, thisYear }: Props) {
     }
     setProblem(null)
     setReading(true)
+    setReadingName(file.name)
     controller.current = new AbortController()
     try {
       const found = await parseTranscript(file, controller.current.signal)
       const { merged, added } = mergeCourses(courses, found)
-      onChange(merged)
+      const codes = merged.slice(courses.length).map((c) => c.code)
+      // the same file read again replaces its chip instead of adding a second one
+      const others = files.filter((f) => f.name !== file.name)
+      onChange(merged, [...others, { name: file.name, kind: fileKind(file.name), found: found.length, added: codes }])
       setNote(
         found.length === 0
           ? 'No courses were found in that file. Check it, or add your courses by hand.'
@@ -70,6 +83,7 @@ export function TranscriptUpload({ courses, onChange, thisYear }: Props) {
       )
     } finally {
       setReading(false)
+      setReadingName(null)
     }
   }
 
@@ -77,8 +91,9 @@ export function TranscriptUpload({ courses, onChange, thisYear }: Props) {
     const bad = manualProblem(entry, courses)
     setEntryProblem(bad)
     if (bad) return
-    onChange([...courses, toCourse(entry)])
+    onChange([...courses, toCourse(entry)], files)
     setEntry(EMPTY)
+    setAutoCredits(false)
     setNote(null)
   }
 
@@ -133,6 +148,46 @@ export function TranscriptUpload({ courses, onChange, thisYear }: Props) {
           Download a CSV template
         </button>
       </p>
+      {(files.length > 0 || readingName) && (
+        <ul className="tu-files" aria-label="Uploaded files">
+          {files.map((f) => (
+            <li key={f.name} className="tu-file">
+              <FileIcon kind={f.kind} />
+              <span className="tu-file-text">
+                <b title={f.name}>{f.name}</b>
+                <small>
+                  Uploaded &middot; {f.found} {f.found === 1 ? 'course' : 'courses'} found
+                </small>
+              </span>
+              <button
+                type="button"
+                className="tu-x"
+                aria-label={`Remove ${f.name}`}
+                title="Remove this file and the courses it added"
+                onClick={() => {
+                  const drop = new Set(f.added)
+                  onChange(
+                    courses.filter((c) => !drop.has(c.code)),
+                    files.filter((x) => x !== f),
+                  )
+                  setNote(null)
+                }}
+              >
+                &times;
+              </button>
+            </li>
+          ))}
+          {readingName && !files.some((f) => f.name === readingName) && (
+            <li className="tu-file reading">
+              <FileIcon kind={fileKind(readingName)} />
+              <span className="tu-file-text">
+                <b title={readingName}>{readingName}</b>
+                <small>Reading...</small>
+              </span>
+            </li>
+          )}
+        </ul>
+      )}
       {reading && (
         <p className="tu-note" role="status">
           Reading your file...
@@ -155,7 +210,7 @@ export function TranscriptUpload({ courses, onChange, thisYear }: Props) {
             <b>
               {courses.length} {courses.length === 1 ? 'course' : 'courses'}, {totalCredits(courses)} credits
             </b>
-            <button type="button" className="link" onClick={() => onChange([])}>
+            <button type="button" className="link" onClick={() => onChange([], [])}>
               Clear all
             </button>
           </div>
@@ -168,7 +223,7 @@ export function TranscriptUpload({ courses, onChange, thisYear }: Props) {
                   {termLabel(c.term)}
                   {c.transfer_from ? ` (${c.transfer_from})` : ''}
                 </span>
-                <button type="button" className="tu-x" aria-label={`Remove ${c.code}`} onClick={() => onChange(courses.filter((x) => x.code !== c.code))}>
+                <button type="button" className="tu-x" aria-label={`Remove ${c.code}`} onClick={() => onChange(courses.filter((x) => x.code !== c.code), files)}>
                   &times;
                 </button>
               </li>
@@ -182,17 +237,53 @@ export function TranscriptUpload({ courses, onChange, thisYear }: Props) {
           <div className="tu-add-row">
             <div>
               <label htmlFor={ids.code}>Course code</label>
-              <input id={ids.code} value={entry.code} placeholder="MATH111" autoComplete="off" onChange={(e) => setEntry({ ...entry, code: e.target.value })} />
+              <input
+                id={ids.code}
+                value={entry.code}
+                placeholder="MATH111"
+                autoComplete="off"
+                list={ids.codes}
+                aria-describedby={entry.code.trim() ? `${ids.code}-title` : undefined}
+                onChange={(e) => {
+                  const code = e.target.value
+                  const hit = catalogCourse(code)
+                  const fill = hit && (entry.credits.trim() === '' || autoCredits)
+                  setEntry({ ...entry, code, credits: fill ? String(hit.credits) : autoCredits ? '' : entry.credits })
+                  setAutoCredits(!!fill) // credits the catalog filled in are cleared again if the code stops matching
+                }}
+              />
+              <datalist id={ids.codes}>
+                {codeOptions(entry.code).map(([code, title]) => (
+                  <option key={code} value={code}>
+                    {title}
+                  </option>
+                ))}
+              </datalist>
             </div>
             <div>
               <label htmlFor={ids.credits}>Credits</label>
-              <input id={ids.credits} value={entry.credits} inputMode="decimal" placeholder="4" autoComplete="off" onChange={(e) => setEntry({ ...entry, credits: e.target.value })} />
+              <input
+                id={ids.credits}
+                value={entry.credits}
+                inputMode="decimal"
+                placeholder="4"
+                autoComplete="off"
+                onChange={(e) => {
+                  setEntry({ ...entry, credits: e.target.value })
+                  setAutoCredits(false)
+                }}
+              />
             </div>
             <div className="tu-when">
               <div className="tu-lbl">When</div>
               <Dropdown searchable label="When you took it" placeholder="Choose..." options={terms} value={entry.term} onChange={(term) => setEntry({ ...entry, term })} />
             </div>
           </div>
+          {entry.code.trim() && (
+            <p className="tu-title" id={`${ids.code}-title`}>
+              {catalogCourse(entry.code)?.title ?? 'Not in the Mines catalog. That is fine for transfer credit; check the code otherwise.'}
+            </p>
+          )}
           {entry.term === 'transfer' && (
             <div className="tu-from">
               <label htmlFor={ids.from}>Sending school (optional)</label>
@@ -214,6 +305,7 @@ export function TranscriptUpload({ courses, onChange, thisYear }: Props) {
               onClick={() => {
                 setAdding(false)
                 setEntryProblem(null)
+                setAutoCredits(false)
               }}
             >
               Done
@@ -226,5 +318,31 @@ export function TranscriptUpload({ courses, onChange, thisYear }: Props) {
         </button>
       )}
     </div>
+  )
+}
+
+/** Up to 40 catalog courses whose code starts with what the student typed, for the code field's suggestions. */
+function codeOptions(typed: string): [string, string][] {
+  const prefix = typed.replace(/\s+/g, '').toUpperCase()
+  if (prefix.length < 2) return []
+  const out: [string, string][] = []
+  for (const [code, [title]] of Object.entries(CATALOG)) {
+    if (code.startsWith(prefix)) out.push([code, title])
+    if (out.length >= 40) break
+  }
+  return out
+}
+
+/** A small document icon with the file's kind on it: red for a PDF, green for a CSV. */
+function FileIcon({ kind }: { kind: 'pdf' | 'csv' }) {
+  return (
+    <svg className={`tu-icon ${kind}`} width="30" height="36" viewBox="0 0 30 36" aria-hidden="true">
+      <path className="tu-icon-page" d="M3 2h16l8 8v22a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" />
+      <path className="tu-icon-fold" d="M19 2v6a2 2 0 0 0 2 2h6" />
+      <rect className="tu-icon-band" x="0" y="17" width="24" height="11" rx="2" />
+      <text x="12" y="25.5" textAnchor="middle">
+        {kind.toUpperCase()}
+      </text>
+    </svg>
   )
 }

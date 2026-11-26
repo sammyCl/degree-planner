@@ -9,19 +9,28 @@ afterEach(() => vi.unstubAllGlobals())
 const card = (code: string) => screen.getByRole('button', { name: new RegExp(`^${code} `) })
 const column = (label: string) => screen.getByRole('region', { name: label })
 /** the semester columns, in order (the About panel is also a region) */
-const semesterLabels = () => [...document.querySelectorAll('section.sem')].map((s) => s.getAttribute('aria-label'))
+const semesterLabels = () => [...document.querySelectorAll('section.sem:not(.done)')].map((s) => s.getAttribute('aria-label'))
 const codesIn = (label: string) => within(column(label)).queryAllByRole('button', { name: /credits/ }).map((b) => b.textContent?.match(/^[A-Z]{3,4}\d{3}/)?.[0])
 
-/** A backend that answers every /plans/check with the plan it was sent, plus whatever `change` does to it. */
+/** The page's own check of the completed courses alone (completed.ts), not a check of the student's edit. */
+const isCompletedOnly = (plan: Plan) => plan.semesters.length > 0 && plan.semesters.every((s) => s.semester_id.startsWith('done-'))
+
+/**
+ * A backend that answers every /plans/check with the plan it was sent, plus whatever `change` does to it. `sent` and
+ * `fetchMock` record only the checks of the student's edits.
+ */
 function stubCheck(change: (plan: Plan) => Plan = (p) => p) {
   const sent: Plan[] = []
-  const fetchMock = vi.fn(async (_url: string, init: RequestInit) => {
+  const edits = vi.fn()
+  const fetchMock = vi.fn(async (url: string, init: RequestInit) => {
     const plan = JSON.parse(init.body as string) as Plan
+    if (isCompletedOnly(plan)) return { ok: true, status: 200, json: async () => plan }
+    edits(url, init)
     sent.push(plan)
     return { ok: true, status: 200, json: async () => change(plan) }
   })
   vi.stubGlobal('fetch', fetchMock)
-  return { sent, fetchMock }
+  return { sent, fetchMock: edits }
 }
 
 const dataTransfer = () => ({ setData: vi.fn(), effectAllowed: '', dropEffect: '' })

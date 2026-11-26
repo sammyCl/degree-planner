@@ -40,8 +40,8 @@ const plainLabel = (label: string): string => label.replace(/\s*\([^)]*\)/g, '')
 
 const programTitle = (programId: string): string => PROGRAMS.find((p) => p.id === programId)?.name ?? programId
 
-/** One row per kind of requirement (Core, Free electives, ...), merging groups of the same kind, per program. */
-function rowsFor(statuses: RequirementStatus[]): ChecklistRow[] {
+/** Requirement groups of the same kind (Core, Free electives, ...) merged into one row each, per program. */
+function mergeByKind(statuses: RequirementStatus[]): { name: string; category: Category; group: RequirementStatus[] }[] {
   const merged = new Map<string, RequirementStatus[]>()
   for (const s of statuses) {
     const category = groupCategory(s.group_id, s.label)
@@ -50,6 +50,17 @@ function rowsFor(statuses: RequirementStatus[]): ChecklistRow[] {
   }
   return [...merged.entries()].map(([key, group]) => {
     const category = key.startsWith('label:') ? 'Requirement' : key
+    return {
+      name: category === 'Requirement' ? key.slice('label:'.length) : (ROW_NAMES[category] ?? category),
+      category: categoryOf(category),
+      group,
+    }
+  })
+}
+
+/** One row per kind of requirement (Core, Free electives, ...), merging groups of the same kind, per program. */
+function rowsFor(statuses: RequirementStatus[]): ChecklistRow[] {
+  return mergeByKind(statuses).map(({ name, category, group }) => {
     const met = group.every((s) => s.met)
     const required = group.reduce((sum, s) => sum + (s.kind === 'choose_credits' ? (s.credits_required ?? 0) : 0), 0)
     const earned = group.reduce((sum, s) => sum + (s.kind === 'choose_credits' ? (s.credits_earned ?? 0) : 0), 0)
@@ -57,13 +68,38 @@ function rowsFor(statuses: RequirementStatus[]): ChecklistRow[] {
     let detail = ''
     if (required > 0) detail = `${formatCredits(Math.min(earned, required))}/${formatCredits(required)} credits`
     else if (!met && missing > 0) detail = `${missing} ${missing === 1 ? 'course' : 'courses'} missing`
-    return {
-      name: category === 'Requirement' ? key.slice('label:'.length) : (ROW_NAMES[category] ?? category),
-      category: categoryOf(category),
-      met,
-      detail,
-    }
+    return { name, category, met, detail }
   })
+}
+
+/**
+ * What the completed courses already cover, from the validator's check of the completed courses on their own
+ * (`donePlan`): each kind of requirement they count toward, ticked when they fill it completely. Kinds they do not
+ * touch are left out.
+ */
+export function buildCompletedChecklist(donePlan: Plan): ChecklistSection[] {
+  const byProgram = new Map<string, RequirementStatus[]>()
+  for (const s of donePlan.requirement_status ?? []) byProgram.set(s.program_id, [...(byProgram.get(s.program_id) ?? []), s])
+  const sections: ChecklistSection[] = []
+  for (const [programId, statuses] of byProgram) {
+    const rows: ChecklistRow[] = []
+    for (const { name, category, group } of mergeByKind(statuses)) {
+      const earned = group.reduce((sum, s) => sum + (s.credits_earned ?? 0), 0)
+      const met = group.every((s) => s.met)
+      if (!met && earned <= 0) continue
+      // "x/y credits" only when every merged group is a credit count; a fixed list of courses has no credit target
+      const allCredits = group.every((s) => s.kind === 'choose_credits')
+      const required = group.reduce((sum, s) => sum + (s.credits_required ?? 0), 0)
+      const detail = met
+        ? 'already met'
+        : allCredits && required > 0
+          ? `${formatCredits(Math.min(earned, required))}/${formatCredits(required)} credits done`
+          : `${formatCredits(earned)} credits done`
+      rows.push({ name, category, met, detail })
+    }
+    if (rows.length) sections.push({ title: programTitle(programId), rows })
+  }
+  return sections
 }
 
 /** The requirement checklist: each program's groups, then the plan-wide checks (credits, prerequisites). */

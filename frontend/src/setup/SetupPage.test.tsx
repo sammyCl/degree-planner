@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { SetupPage } from './SetupPage.tsx'
 
-const NOV_2026 = new Date(2026, 10, 22) // defaults to Spring 2027
+const NOV_2026 = new Date(2026, 10, 22) // defaults to Fall 2027
 
 function setup() {
   const onSubmit = vi.fn()
@@ -24,11 +24,11 @@ describe('SetupPage', () => {
   it('starts on a bachelor\'s with a sensible default term and semester count', () => {
     setup()
     expect(screen.getByRole('button', { name: "Bachelor's" })).toHaveAttribute('aria-pressed', 'true')
-    expect(screen.getByLabelText('Starting season')).toHaveValue('Spring')
+    expect(screen.getByLabelText('Starting season')).toHaveValue('Fall')
     expect(screen.getByLabelText('Starting year')).toHaveValue('2027')
     expect(semesters()).toHaveValue(8)
-    // 8 semesters from Spring 2027 without summers ends in Fall 2030
-    expect(screen.getByText('Fall 2030')).toBeInTheDocument()
+    // 8 semesters from Fall 2027 without summers ends in Spring 2031
+    expect(screen.getByText('Spring 2031')).toBeInTheDocument()
   })
 
   it('does not submit without a program and shows the error', () => {
@@ -134,9 +134,18 @@ describe('SetupPage', () => {
     expect(screen.getAllByRole('option').some((o) => o.textContent?.includes('2025-2026'))).toBe(false)
   })
 
+  it('hides completed courses until the student says they have some', () => {
+    setup()
+    expect(screen.queryByRole('button', { name: 'Upload transcript' })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByLabelText(/I have already completed some courses/))
+    expect(screen.getByRole('button', { name: 'Upload transcript' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '+ Add a course by hand' })).toBeInTheDocument()
+  })
+
   it('sends the courses the student listed as completed courses, and shows them in the summary', () => {
     const onSubmit = setup()
     pick(program(), CS)
+    fireEvent.click(screen.getByLabelText(/I have already completed some courses/))
     fireEvent.click(screen.getByRole('button', { name: '+ Add a course by hand' }))
     fireEvent.change(screen.getByLabelText('Course code'), { target: { value: 'MATH111' } })
     fireEvent.change(screen.getByLabelText('Credits'), { target: { value: '4' } })
@@ -150,12 +159,29 @@ describe('SetupPage', () => {
     ])
   })
 
+  it('sends no completed courses once the box is unticked, but keeps the list in case it is ticked again', () => {
+    const onSubmit = setup()
+    pick(program(), CS)
+    fireEvent.click(screen.getByLabelText(/I have already completed some courses/))
+    fireEvent.click(screen.getByRole('button', { name: '+ Add a course by hand' }))
+    fireEvent.change(screen.getByLabelText('Course code'), { target: { value: 'MATH111' } })
+    fireEvent.click(screen.getByRole('combobox', { name: 'When you took it' }))
+    fireEvent.mouseDown(screen.getByRole('option', { name: 'Transfer credit' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add course' }))
+    fireEvent.click(screen.getByLabelText(/I have already completed some courses/))
+    expect(screen.getByLabelText('Your plan at a glance')).not.toHaveTextContent('1 course')
+    fireEvent.click(screen.getByRole('button', { name: /Build my plan/ }))
+    expect(onSubmit.mock.calls[0][0].student.completed_courses).toEqual([])
+    fireEvent.click(screen.getByLabelText(/I have already completed some courses/))
+    expect(screen.getByRole('list', { name: 'Completed courses' })).toHaveTextContent('MATH111')
+  })
+
   it('shows summer terms in the projected graduation when summers are included', () => {
     setup()
     fireEvent.change(semesters(), { target: { value: '3' } })
     fireEvent.click(screen.getByLabelText('Include summer terms'))
-    // Spring 2027, Summer 2027, Fall 2027
-    expect(screen.getByText('Fall 2027')).toBeInTheDocument()
+    // Fall 2027, Spring 2028, Summer 2028
+    expect(screen.getByText('Summer 2028')).toBeInTheDocument()
   })
 
   it('submits the request in the backend format', () => {
@@ -166,7 +192,7 @@ describe('SetupPage', () => {
     expect(onSubmit.mock.calls[0][0]).toEqual({
       student: { degree_level: 'bachelor', programs: ['cs-bs-general-track'], catalog_year: '2026-2027', completed_courses: [] },
       semesters: 8,
-      start_term: 'Spring 2027',
+      start_term: 'Fall 2027',
       include_summers: false,
       overrides: [],
     })
@@ -175,7 +201,7 @@ describe('SetupPage', () => {
   })
 
   it('starts from the earlier choices when given them', () => {
-    const initial = { level: 'master' as const, programId: '', addOnIds: [], season: 'Fall' as const, year: 2028, semesters: 5, includeSummers: true, completed: [] }
+    const initial = { level: 'master' as const, programId: '', addOnIds: [], season: 'Fall' as const, year: 2028, semesters: 5, includeSummers: true, hasCompleted: false, completed: [], files: [] }
     render(<SetupPage onSubmit={vi.fn()} initial={initial} today={NOV_2026} />)
     expect(screen.getByRole('button', { name: "Master's" })).toHaveAttribute('aria-pressed', 'true')
     expect(screen.getByLabelText('Starting season')).toHaveValue('Fall')

@@ -1,6 +1,28 @@
 // Small, pure helpers for the "Completed courses" part of the setup page: checking a file before it is sent,
 // merging what was read with what the student typed, and wording a term the way a student would say it.
+import catalog from '../courseCatalog.json'
 import type { CompletedCourse } from '../types.ts'
+
+/** A transcript file that was read: its name and kind for the chip, and the courses it added to the list. */
+export interface UploadedFile {
+  name: string
+  kind: 'pdf' | 'csv'
+  /** how many courses were found in it */
+  found: number
+  /** the codes this file added (not ones already in the list), so removing the file removes only those */
+  added: string[]
+}
+
+export const fileKind = (name: string): 'pdf' | 'csv' => (name.toLowerCase().endsWith('.pdf') ? 'pdf' : 'csv')
+
+/** Every catalog course: code to [title, credits] (data/json/courses.json, built by data/tools/build_frontend_options.py). */
+export const CATALOG = catalog as unknown as Record<string, [string, number]>
+
+/** A course's catalog title and credits, or null for a code the catalog does not have. */
+export function catalogCourse(code: string): { title: string; credits: number } | null {
+  const entry = CATALOG[normalizeCode(code)]
+  return entry ? { title: entry[0], credits: entry[1] } : null
+}
 
 export const MAX_FILE_BYTES = 5 * 1024 * 1024
 const COURSE_CODE = /^[A-Z]{2,5}\d{3}[A-Z]?$/

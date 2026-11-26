@@ -1,12 +1,16 @@
 import { useMemo, useState } from 'react'
 import type { Plan } from '../types.ts'
 import { Markdown } from './markdown.tsx'
-import { buildChecklist, buildChecks, readExplanation } from './summary.ts'
+import { completedCredits } from './completed.ts'
+import { formatCredits } from './graph.ts'
+import { buildChecklist, buildChecks, buildCompletedChecklist, readExplanation } from './summary.ts'
 
 interface Props {
   plan: Plan
   /** what the planning assistant wrote about the plan */
   explanation?: string
+  /** the validator's check of the completed courses on their own, for "Already completed"; null until it answers */
+  donePlan?: Plan | null
 }
 
 const Tick = ({ ok }: { ok: boolean }) => (
@@ -16,13 +20,16 @@ const Tick = ({ ok }: { ok: boolean }) => (
 )
 
 /** A short summary of the plan under the board: what is met, what to look at, and what the assistant chose. */
-export function PlanSummary({ plan, explanation }: Props) {
+export function PlanSummary({ plan, explanation, donePlan }: Props) {
   // starts closed under the board so the flowchart comes first, but the top few lines stay visible as a peek
   const [open, setOpen] = useState(false)
   const checklist = useMemo(() => buildChecklist(plan), [plan])
   const checks = useMemo(() => buildChecks(plan), [plan])
   const notes = useMemo(() => (explanation ? readExplanation(explanation, plan) : { choices: [], checks: [] }), [explanation, plan])
   const choices = notes.choices
+  const completed = plan.student.completed_courses
+  const doneChecklist = useMemo(() => (donePlan ? buildCompletedChecklist(donePlan) : []), [donePlan])
+  const transfer = completed.filter((c) => c.term === 'transfer' || c.term === 'aplcredit').length
 
   return (
     <section className="about" aria-label="About this plan">
@@ -52,6 +59,36 @@ export function PlanSummary({ plan, explanation }: Props) {
               </div>
             ))}
           </div>
+
+          {completed.length > 0 && (
+            <div className="about-card c-done">
+              <h3>Already completed</h3>
+              <p className="done-total">
+                <b>{formatCredits(completedCredits(plan))}</b> of {formatCredits(plan.summary.total_credits_required)} credits from{' '}
+                {completed.length} {completed.length === 1 ? 'course' : 'courses'}
+                {transfer > 0 ? ` (${transfer} transfer or AP)` : ''}
+              </p>
+              {!donePlan && <p className="about-none">Checking which requirements they meet...</p>}
+              {doneChecklist.map((section) => (
+                <div className="req-section" key={section.title}>
+                  <div className="req-title">{section.title}</div>
+                  <ul className="req-list">
+                    {section.rows.map((row) => (
+                      <li key={row.name} className={`req-row ${row.met ? 'met' : 'part'}`}>
+                        {row.met ? <Tick ok /> : <span className="req-icon part" aria-hidden="true" />}
+                        <span className={`req-dot cat-${row.category}`} aria-hidden="true" />
+                        <span className="req-name">{row.name}</span>
+                        <span className="req-detail">{row.detail}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+              {donePlan && doneChecklist.length === 0 && (
+                <p className="about-none">None of them count toward a requirement of this degree; they add to the credit total only.</p>
+              )}
+            </div>
+          )}
 
           <div className="about-card c-check">
             <h3>Things to check</h3>

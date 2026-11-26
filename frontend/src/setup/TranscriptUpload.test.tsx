@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor, within } from '@testing-library/rea
 import { useState } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { CompletedCourse } from '../types.ts'
+import type { UploadedFile } from './transcript.ts'
 import { TranscriptUpload } from './TranscriptUpload.tsx'
 
 afterEach(() => vi.unstubAllGlobals())
@@ -17,8 +18,19 @@ function setup(initial: CompletedCourse[] = []) {
   const latest = { current: initial }
   function Host() {
     const [courses, setCourses] = useState(initial)
+    const [files, setFiles] = useState<UploadedFile[]>([])
     latest.current = courses
-    return <TranscriptUpload courses={courses} onChange={setCourses} thisYear={2026} />
+    return (
+      <TranscriptUpload
+        courses={courses}
+        files={files}
+        onChange={(next, nextFiles) => {
+          setCourses(next)
+          setFiles(nextFiles)
+        }}
+        thisYear={2026}
+      />
+    )
   }
   render(<Host />)
   return latest
@@ -109,6 +121,31 @@ describe('TranscriptUpload', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Add course' }))
     expect(latest.current).toEqual([{ code: 'CSCI128', credits: 3, term: 'Spring 2026', transfer_from: null }])
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
+  it('shows the uploaded file by name with a PDF icon, and removing it removes only the courses it added', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(reply(200, found)))
+    const mine = { code: 'CSCI101', credits: 3, term: 'Fall 2025', transfer_from: null }
+    const latest = setup([mine])
+    upload('my-transcript.pdf')
+    const files = within(await screen.findByRole('list', { name: 'Uploaded files' }))
+    expect(files.getByText('my-transcript.pdf')).toBeInTheDocument()
+    expect(files.getByText('PDF')).toBeInTheDocument()
+    expect(files.getByText(/2 courses found/)).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Remove my-transcript.pdf' }))
+    expect(latest.current).toEqual([mine])
+    expect(screen.queryByRole('list', { name: 'Uploaded files' })).not.toBeInTheDocument()
+  })
+
+  it('fills in the title and credits of a catalog course typed by hand', () => {
+    setup()
+    fireEvent.click(screen.getByRole('button', { name: '+ Add a course by hand' }))
+    fireEvent.change(screen.getByLabelText('Course code'), { target: { value: 'math111' } })
+    expect(screen.getByLabelText('Credits')).toHaveValue('4')
+    expect(screen.getByText(/Calculus/, { selector: '.tu-title' })).toBeInTheDocument()
+    fireEvent.change(screen.getByLabelText('Course code'), { target: { value: 'ENGL101' } })
+    expect(screen.getByLabelText('Credits')).toHaveValue('') // the catalog's credits go when the code stops matching
+    expect(screen.getByText(/Not in the Mines catalog/)).toBeInTheDocument()
   })
 
   it('downloads a CSV template in the format the backend reads', () => {

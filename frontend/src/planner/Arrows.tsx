@@ -11,6 +11,8 @@ interface Props {
   hotEdges: Set<number>
   /** edges whose target has an open broken-prerequisite flag are drawn red and dashed */
   brokenTargets: Set<string>
+  /** changes when something moves the cards without changing the plan (completed courses shown or hidden) */
+  layoutKey?: unknown
 }
 
 interface Path {
@@ -20,7 +22,7 @@ interface Path {
 }
 
 /** Curved arrows between prerequisite and dependent course, measured from where the cards actually are. */
-export function Arrows({ plan, index, container, cardEls, hotEdges, brokenTargets }: Props) {
+export function Arrows({ plan, index, container, cardEls, hotEdges, brokenTargets, layoutKey }: Props) {
   const [paths, setPaths] = useState<Path[]>([])
   const [size, setSize] = useState({ w: 0, h: 0 })
 
@@ -76,7 +78,7 @@ export function Arrows({ plan, index, container, cardEls, hotEdges, brokenTarget
       window.removeEventListener('resize', onResize)
       observer?.disconnect()
     }
-  }, [measure, container])
+  }, [measure, container, layoutKey])
 
   return (
     <svg className="arrows" width={size.w} height={size.h} aria-hidden="true">

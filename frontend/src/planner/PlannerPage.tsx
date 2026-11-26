@@ -3,6 +3,8 @@ import { ApiError, checkPlan } from '../api.ts'
 import { ADD_ON_NAMES, LEVELS, PROGRAMS, staleInPlan } from '../setup/validate.ts'
 import type { Flag, Plan, PlannedCourse } from '../types.ts'
 import { Arrows } from './Arrows.tsx'
+import { CompletedColumns } from './CompletedColumns.tsx'
+import { completedColumns, completedOnlyPlan, startsCollapsed } from './completed.ts'
 import { CourseCard, type CardState } from './CourseCard.tsx'
 import { CoursePopover } from './CoursePopover.tsx'
 import { PlanSummary } from './PlanSummary.tsx'
@@ -56,6 +58,24 @@ export function PlannerPage({ plan: initialPlan, explanation, problems, onBack }
   const latest = useRef(0) // numbers the checks, so an old answer cannot overwrite a newer edit
   const [checking, setChecking] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
+
+  // Completed courses: columns of their own on the left. More than a semester's worth starts folded into a rail.
+  const doneColumns = useMemo(() => completedColumns(plan.student.completed_courses), [plan.student.completed_courses])
+  const doneCollapsible = useMemo(
+    () => startsCollapsed(plan.student.completed_courses, plan.student.degree_level),
+    [plan.student.completed_courses, plan.student.degree_level],
+  )
+  const [showDone, setShowDone] = useState(!doneCollapsible)
+  // the validator's answer for the completed courses alone: their labels, and the requirements they already meet
+  const [donePlan, setDonePlan] = useState<Plan | null>(null)
+  useEffect(() => {
+    if (doneColumns.length === 0) return
+    const abort = new AbortController()
+    checkPlan(completedOnlyPlan(initialPlan, doneColumns), abort.signal)
+      .then(setDonePlan)
+      .catch(() => {}) // without it the completed cards just have no labels
+    return () => abort.abort()
+  }, [initialPlan, doneColumns])
 
   const index = useMemo(() => indexPlan(plan), [plan])
   const stale = useMemo(() => staleInPlan(plan.student.programs, plan.student.catalog_year), [plan.student])
@@ -186,7 +206,8 @@ export function PlannerPage({ plan: initialPlan, explanation, problems, onBack }
       <div className="planner-notice">
         <span>
           {LEVELS.find((l) => l.value === plan.student.degree_level)?.label ?? plan.student.degree_level} plan,{' '}
-          {plan.semesters.length} semesters, starting {plan.semesters[0]?.label}. Drag a course to another semester to move it.
+          {plan.semesters.length} semesters, starting {plan.semesters[0]?.label}
+          {doneColumns.length > 0 ? ', with your completed courses on the left' : ''}. Drag a course to another semester to move it.
         </span>
         <button type="button" className="edit-setup" onClick={onBack}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -211,6 +232,15 @@ export function PlannerPage({ plan: initialPlan, explanation, problems, onBack }
       <div className="board">
         <div className="board-inner">
           <div className={`cols${chain ? ' chain-mode' : ''}${dragId ? ' dragging-any' : ''}`} ref={setCols} data-testid="board">
+            {doneColumns.length > 0 && (
+              <CompletedColumns
+                columns={doneColumns}
+                donePlan={donePlan}
+                collapsible={doneCollapsible}
+                open={showDone}
+                onToggle={() => setShowDone((v) => !v)}
+              />
+            )}
             {plan.semesters.map((s, i) => {
               const [term, year] = s.label.split(' ')
               const credits = s.courses.reduce((sum, c) => sum + c.credits, 0)
@@ -323,6 +353,7 @@ export function PlannerPage({ plan: initialPlan, explanation, problems, onBack }
               cardEls={cardEls}
               hotEdges={chain?.edges ?? new Set()}
               brokenTargets={brokenTargets}
+              layoutKey={showDone}
             />
           </div>
           {(past.length > 0 || future.length > 0) && (
@@ -345,7 +376,7 @@ export function PlannerPage({ plan: initialPlan, explanation, problems, onBack }
           )}
         </div>
       </div>
-      <PlanSummary plan={plan} explanation={explanation} />
+      <PlanSummary plan={plan} explanation={explanation} donePlan={donePlan} />
       {notice && (
         <div className="planner-toast" role="alert">
           <span>{notice}</span>

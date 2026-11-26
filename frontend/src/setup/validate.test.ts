@@ -21,7 +21,9 @@ const form = (over: Partial<SetupForm> = {}): SetupForm => ({
   year: 2026,
   semesters: 8,
   includeSummers: false,
+  hasCompleted: false,
   completed: [],
+  files: [],
   ...over,
 })
 
@@ -38,8 +40,8 @@ describe('semesterLabels (same examples as docs/agent-request-format.md)', () =>
 })
 
 describe('defaultStart', () => {
-  it('starts next Spring when today is in the fall', () => {
-    expect(defaultStart(new Date(2026, 10, 22))).toEqual({ season: 'Spring', year: 2027 })
+  it('starts next Fall when today is in the fall', () => {
+    expect(defaultStart(new Date(2026, 10, 22))).toEqual({ season: 'Fall', year: 2027 })
   })
   it('starts this Fall when today is in the spring or summer', () => {
     expect(defaultStart(new Date(2027, 2, 1))).toEqual({ season: 'Fall', year: 2027 })
@@ -75,8 +77,12 @@ describe('program options', () => {
 describe('completed courses in the request', () => {
   it('sends the reviewed list as the student\'s completed courses', () => {
     const completed = [{ code: 'MATH111', credits: 4, term: 'Fall 2025', transfer_from: null }]
-    expect(buildRequest(form({ completed })).student.completed_courses).toEqual(completed)
+    expect(buildRequest(form({ hasCompleted: true, completed })).student.completed_courses).toEqual(completed)
     expect(buildRequest(form()).student.completed_courses).toEqual([])
+  })
+  it('sends none when the student unticked "I have completed courses", even if a list was made', () => {
+    const completed = [{ code: 'MATH111', credits: 4, term: 'Fall 2025', transfer_from: null }]
+    expect(buildRequest(form({ hasCompleted: false, completed })).student.completed_courses).toEqual([])
   })
 })
 
