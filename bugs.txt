@@ -1583,7 +1583,7 @@ BUG-051  No degree_level for standalone graduate certificates
              added (Abdallah's file, flagged to him).
 
 BUG-052  Confirm the minor/ASI 9-credit-unshared rule for 2026-2027
-  Status:    Open
+  Status:    Fixed
   Owner:     Midhat Sajad (validator) to confirm; source is department/
              registrar policy, not code
   Where:     backend/src/degree_planner_backend/validator.py
@@ -1599,12 +1599,27 @@ BUG-052  Confirm the minor/ASI 9-credit-unshared rule for 2026-2027
   Fix idea:  check the current catalog.mines.edu minor/ASI rules page (or
              an equivalent 2026-2027 PDF); update the comment and, if the
              number changed, ADD_ON_UNSHARED_MIN itself
-  Note:      2026-11-25: tried to confirm via catalog.mines.edu (both the
-             HTML minor/ASI rules page and its PDF export). Both fetches
-             failed at the network level (connection refused from this
-             environment, not a 404 or a page-content issue), so still
-             unconfirmed. Still Open; needs checking from a network where
-             the site actually loads.
+  Fixed in:  2026-11-25 (confirmed, no code change needed to the number
+             itself; backend: Midhat). catalog.mines.edu itself was
+             unreachable from this environment (three distinct URLs on
+             that host all failed with connection refused at the network
+             level, not a 404 or page-content issue). Confirmed instead
+             from two independent, currently-reachable sources that agree
+             exactly: (1) the 2025-2026 Undergraduate Catalog PDF (the
+             newest Mines has published; registrar.mines.edu/bulletins/
+             lists no 2026-2027 PDF yet), p. 24: Minors - "Minimum Credit
+             Hours - 18.0", "Minimum Hours Outside of Degree Requirements
+             - 9.0"; ASIs - "Minimum Credit Hours - 12.0", "Minimum Hours
+             Outside of Degree Requirements - 9.0", both stated as "at
+             least 9... must not be used for any part of the degree other
+             than free electives". (2) The live CASA advising FAQ
+             (casa.mines.edu/faqs, reachable and current as of Spring 2027
+             registration per its own navigation links) independently
+             states the same minor rule. The rule has also held unchanged
+             across at least the 2019-2020 through 2025-2026 catalogs
+             (several editions found and compared). ADD_ON_UNSHARED_MIN's
+             comment in validator.py updated to cite this properly
+             (previously cited a stale, unverifiable PDF path).
 
 BUG-053  Minors, ASIs and certificates not re-collected for the student's
          catalog year were silently dropped from the plan
