@@ -1450,72 +1450,121 @@
   font-size: 11.5px;
 }
 
-/* folded away: a slim rail on the left the student opens with one click */
-.done-rail {
+/* folded away: a card on the left, read left to right, that the student opens with one click */
+.done-fold {
   position: relative;
   z-index: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  width: 64px;
-  min-height: 260px;
-  padding: 14px 6px;
-  border: 1px dashed color-mix(in srgb, var(--ok) 45%, transparent);
-  border-radius: 16px;
-  background: color-mix(in srgb, var(--ok-bg) 70%, transparent);
-  color: var(--text);
-  cursor: pointer;
-  transition: background 160ms, border-color 160ms, transform 160ms var(--ease-out);
+  gap: 10px;
+  box-sizing: border-box;
+  width: 236px;
+  padding: 12px;
+  border: 1px dashed color-mix(in srgb, var(--ok) 50%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--ok-bg) 75%, var(--surface));
   animation: rise 300ms var(--ease-out) backwards;
 }
 
-.done-rail:hover,
-.done-rail:focus-visible {
-  border-color: var(--ok);
-  background: var(--ok-bg);
-  transform: translateX(2px);
+.done-fold-h {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.done-rail-ic {
+.done-fold-h b {
+  color: var(--ok);
+  font: 600 12px/1 Inter, sans-serif;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.done-fold-ic {
   display: grid;
   place-items: center;
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: var(--ok);
   color: #fff;
 }
 
-.done-rail-text,
-.done-rail-cta {
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-}
-
-.done-rail-text {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
-
-.done-rail-text b {
-  color: var(--ok);
-  font-size: 13px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.done-rail-text small {
+.done-fold-total {
   color: var(--mut);
+  font-size: 13px;
+}
+
+.done-fold-total b {
+  color: var(--text);
+  font: 600 22px/1.1 'Inter Tight', Inter, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.done-fold-total small {
+  display: block;
   font-size: 12px;
 }
 
-.done-rail-cta {
-  margin-top: auto;
+.done-fold-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr); /* a long school name shortens with "..." instead of widening the card */
+  gap: 4px;
+  margin: 0;
+  padding: 8px 0 0;
+  border-top: 1px solid color-mix(in srgb, var(--ok) 25%, transparent);
+  list-style: none;
+  font-size: 12.5px;
+}
+
+.done-fold-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.done-fold-list span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.done-fold-list span.ip {
   color: var(--acc);
-  font-size: 12px;
+}
+
+.done-fold-list em {
+  flex: none;
+  color: var(--mut);
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+}
+
+.done-fold-list .more {
+  color: var(--mut);
+}
+
+.done-fold-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in srgb, var(--ok) 45%, transparent);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--ok);
   font-weight: 600;
+  font-size: 13px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 160ms, border-color 160ms;
+}
+
+.done-fold-btn:hover,
+.done-fold-btn:focus-visible {
+  border-color: var(--ok);
+  background: var(--ok-bg);
 }
 
 /* credits: completed is the green part of the ring, the rest is what is planned */

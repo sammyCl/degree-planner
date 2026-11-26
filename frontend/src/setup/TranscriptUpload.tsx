@@ -183,7 +183,7 @@ export function TranscriptUpload({ courses, files = [], onChange, thisYear }: Pr
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3" />
           </svg>
-          {reading ? 'Reading...' : 'Upload transcript'}
+          {reading ? 'Reading your transcript...' : 'Upload transcript'}
         </button>
         <span className="tu-or">or drop a .csv or .pdf here</span>
         <input
@@ -209,7 +209,7 @@ export function TranscriptUpload({ courses, files = [], onChange, thisYear }: Pr
       </p>
       {(files.length > 0 || readingName) && (
         <ul className="tu-files" aria-label="Uploaded files">
-          {files.map((f) => (
+          {files.filter((f) => f.name !== readingName).map((f) => (
             <li key={f.name} className="tu-file">
               <FileIcon kind={f.kind} />
               <span className="tu-file-text">
@@ -251,15 +251,7 @@ export function TranscriptUpload({ courses, files = [], onChange, thisYear }: Pr
               </button>
             </li>
           ))}
-          {readingName && !files.some((f) => f.name === readingName) && (
-            <li className="tu-file reading">
-              <FileIcon kind={fileKind(readingName)} />
-              <span className="tu-file-text">
-                <b title={readingName}>{readingName}</b>
-                <small>Reading...</small>
-              </span>
-            </li>
-          )}
+          {readingName && <ReadingChip name={readingName} />}
         </ul>
       )}
       {files.map((f) => {
@@ -313,11 +305,6 @@ export function TranscriptUpload({ courses, files = [], onChange, thisYear }: Pr
           </div>
         )
       })}
-      {reading && (
-        <p className="tu-note" role="status">
-          Reading your file...
-        </p>
-      )}
       {problem && (
         <p className="err" role="alert">
           {problem}
@@ -544,5 +531,39 @@ function UnmatchedList({ file, courses, onResolve }: { file: UploadedFile; cours
         </button>
       )}
     </div>
+  )
+}
+
+const READING_STEPS = ['Opening your file', 'Finding your courses', 'Working out the layout', 'Matching courses to Mines']
+
+/** The file being read: a scanning line over its icon, a moving bar, and what is happening now. */
+function ReadingChip({ name }: { name: string }) {
+  const [step, setStep] = useState(0)
+  const [slow, setSlow] = useState(false)
+  useEffect(() => {
+    const steps = setInterval(() => setStep((n) => Math.min(n + 1, READING_STEPS.length - 1)), 1800)
+    const late = setTimeout(() => setSlow(true), 7000)
+    return () => {
+      clearInterval(steps)
+      clearTimeout(late)
+    }
+  }, [])
+  return (
+    <li className="tu-file reading" aria-busy="true">
+      <span className="tu-scan">
+        <FileIcon kind={fileKind(name)} />
+        <i aria-hidden="true" />
+      </span>
+      <span className="tu-file-text">
+        <b title={name}>{name}</b>
+        <small role="status" key={step} className="tu-step">
+          {READING_STEPS[step]}...
+        </small>
+        {slow && <small className="tu-slow">An unfamiliar layout can take up to 20 seconds.</small>}
+        <span className="tu-bar" aria-hidden="true">
+          <i />
+        </span>
+      </span>
+    </li>
   )
 }

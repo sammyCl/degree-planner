@@ -41,11 +41,16 @@ describe('completed courses on the planner page', () => {
     await waitFor(() => expect(within(group).getAllByText('Core', { selector: '.card-tag' })).toHaveLength(2))
   })
 
-  it('folds more than a semester of completed courses into a rail that opens and closes', () => {
+  it('folds more than a semester of completed courses into a card that opens and closes', () => {
     stubCompletedCheck()
     const many = [c('MATH111', 4, 'Fall 2025'), c('CHGN121', 4, 'Fall 2025'), c('CSCI128', 3, 'Fall 2025'), c('MATH112', 4, 'Spring 2026'), c('PHGN100', 4, 'Spring 2026'), c('CSCI101', 3, 'Spring 2026')]
     render(<PlannerPage plan={withCompleted(many)} onBack={vi.fn()} />)
     expect(screen.queryByRole('group', { name: /Completed courses/ })).not.toBeInTheDocument()
+    // folded: a card read left to right, with the total and each term
+    const folded = screen.getByRole('region', { name: 'Completed courses: 6 courses, 22 cr' })
+    expect(folded).toHaveTextContent('22 credits')
+    expect(within(folded).getByText('Fall 2025')).toBeInTheDocument()
+    expect(within(folded).getAllByText('11 cr')).toHaveLength(2) // Fall 2025 and Spring 2026
     fireEvent.click(screen.getByRole('button', { name: /Show completed courses \(6 courses, 22 cr\)/ }))
     const group = screen.getByRole('group', { name: /Completed courses/ })
     expect(within(group).getAllByRole('region').map((r) => r.getAttribute('aria-label'))).toEqual(['Fall 2025, completed', 'Spring 2026, completed'])

@@ -3,6 +3,7 @@
 Every transcript here is synthetic (made-up student, made-up rows in the real layouts). Never commit a real one.
 """
 
+import pytest
 from fastapi.testclient import TestClient
 
 from degree_planner_backend import transfer_credit
@@ -210,4 +211,39 @@ def test_read_endpoint_reads_our_csv_and_rejects_other_files() -> None:
 
 def test_the_reading_lists_the_schools_the_student_can_pick() -> None:
     schools = read_transcript(["Transcript"]).known_schools
-    assert schools[0] == MINES and "Front Range Community College" in schools and len(schools) == 16
+    assert schools[0] == MINES and len(schools) == 36  # Mines, 15 CCCS colleges, 20 other Colorado schools
+    assert {"Front Range Community College", "University of Colorado Boulder", "University of Colorado Denver", "University of Denver"} <= set(schools)
+
+
+def test_a_colorado_university_is_recognised_and_its_courses_go_to_tes() -> None:
+    reading = read_transcript(["UNIVERSITY OF COLORADO BOULDER", "Unofficial Transcript", "Fall 2022", "MATH 1300 Calculus 1 A 5.000"])
+    assert reading.school == "University of Colorado Boulder" and reading.system is None
+    assert [(u.code, u.suggestion) for u in reading.unmatched] == [("MATH 1300", None)]
+
+
+@pytest.mark.parametrize(
+    "written, school",
+    [
+        ("University Of Colorado-Denver", "University of Colorado Denver"),
+        ("CU Denver | Anschutz", "University of Colorado Denver"),
+        ("Colorado State University-Pueblo", "Colorado State University Pueblo"),  # the longer name wins
+        ("Colorado State University", "Colorado State University"),
+        ("Pikes Peak Community College", "Pikes Peak State College"),  # its older name
+        ("MSU Denver Office of the Registrar", "Metropolitan State University of Denver"),
+        ("Rocky Mountain College of Art + Design", "Rocky Mountain College of Art and Design"),
+        ("Some Other College", None),
+    ],
+)
+def test_school_names_are_matched_however_a_transcript_writes_them(written: str, school: str | None) -> None:
+    assert transfer_credit._known_name(written, DATA) == school
+
+
+def test_a_mines_transcript_names_its_transfer_schools_properly() -> None:
+    lines = [line.replace("Example State University", "University Of Colorado-Denver") for line in MINES_TRANSCRIPT]
+    sources = {c.transfer_from for c in read_transcript(lines).courses}
+    assert "University of Colorado Denver" in sources
+
+
+def test_a_community_college_transcript_naming_a_university_lower_down_is_still_the_college() -> None:
+    lines = ["Red Rocks Community College", "Official Transcript", "Transfer credit from University of Colorado Denver", "Fall 2023", "MAT 2410 Calculus I A 5.000"]
+    assert read_transcript(lines).school == "Red Rocks Community College"

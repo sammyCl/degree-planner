@@ -81,31 +81,40 @@ def load_equivalencies(path: Path = EQUIVALENCIES_PATH) -> dict[str, Any]:
     return json.loads(path.read_text())
 
 
-def known_schools(data: dict[str, Any]) -> list[tuple[str, str]]:
-    """(school, system id) for every school the equivalency file covers."""
-    return [(school, system_id) for system_id, system in data["systems"].items() for school in system["schools"]]
+def known_schools(data: dict[str, Any]) -> list[tuple[str, str | None]]:
+    """(school, saved list id or None) for every school the reader recognises, Mines first."""
+    return [(school["name"], school["system"]) for school in data["schools"]]
+
+
+def _normal(text: str) -> str:
+    """Lowercase words only: "University Of Colorado-Denver" and "university of colorado denver" read the same."""
+    text = text.lower().replace("&", " and ").replace("+", " and ")
+    return " ".join(re.sub(r"[^a-z0-9]+", " ", text).split())
 
 
 def _known_name(name: str, data: dict[str, Any]) -> str | None:
-    """Mines or a school with a saved list, when `name` is one of them written a little differently
-    ("Front Range Community College - Westminster Campus")."""
-    lowered = name.lower()
-    for known in [MINES] + [school for school, _ in known_schools(data)]:
-        if known.lower() in lowered:
-            return known
-    return None
+    """The school `name` refers to, written as the school's own name: "CU Denver" and "University Of Colorado-Denver"
+    are both "University of Colorado Denver". The longest name or alias that fits wins, so "Colorado State University
+    Pueblo" is not taken for "Colorado State University"."""
+    padded = f" {_normal(name)} "
+    best: tuple[int, str] | None = None
+    for school in data["schools"]:
+        for candidate in [school["name"], *school["aliases"]]:
+            words = _normal(candidate)
+            if words and f" {words} " in padded and (best is None or len(words) > best[0]):
+                best = (len(words), school["name"])
+    return best[1] if best else None
 
 
 def detect_school(lines: list[str], data: dict[str, Any]) -> str | None:
-    """The school a transcript is from: Mines or a known school named near the top, else the first line that looks
-    like a school's name, else None."""
+    """The school a transcript is from: the highest line near the top that names a school the reader knows (Mines
+    only in the first few lines, since a transcript from elsewhere may mention Mines lower down), else the first line
+    that looks like a school's name, else None."""
     top = [" ".join(line.split()) for line in lines[:20] if line.strip()]
-    text = "\n".join(top).lower()
-    if MINES.lower() in "\n".join(top[:6]).lower():
-        return MINES
-    for school, _ in known_schools(data):
-        if school.lower() in text:
-            return school
+    for index, line in enumerate(top):
+        known = _known_name(line, data)
+        if known and (known != MINES or index < 6):
+            return known
     return next((line for line in top[:6] if _SCHOOL_WORDS.search(line) and len(line) <= 80), None)
 
 
@@ -128,7 +137,7 @@ def read_transcript(
         school=school,
         from_mines=school == MINES,
         tes_url=data["tes_url"],
-        known_schools=[MINES] + sorted(name for name, _ in known_schools(data)),
+        known_schools=[MINES] + sorted(name for name, _ in known_schools(data) if name != MINES),
     )
     if not any(line.strip() for line in lines):
         reading.notice = "This PDF has no text in it (it looks like a scanned image), so it could not be read. Add your courses by hand, or download a text PDF from your school's student portal."
@@ -148,6 +157,8 @@ def read_transcript(
 
     if reading.from_mines:
         for row in rows:
+            if row.source and row.source != "IB credit":
+                row.source = _known_name(row.source, data) or row.source  # "University Of Colorado-Denver"
             if row.earns_credit():
                 reading.courses.append(row.as_completed())
             else:
@@ -155,7 +166,7 @@ def read_transcript(
         return reading
 
     canonical = _known_name(school, data) if school else None
-    system_id = next((sid for name, sid in known_schools(data) if name == canonical), None)
+    system_id = next((sid for name, sid in known_schools(data) if name == canonical and sid), None)
     if canonical:
         school = canonical
     system = data["systems"].get(system_id) if system_id else None

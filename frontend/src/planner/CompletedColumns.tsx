@@ -36,17 +36,40 @@ export function CompletedColumns({ columns, inProgress, donePlan, collapsible, o
   const summary = `${courses.length} ${courses.length === 1 ? 'course' : 'courses'}, ${formatCredits(credits)} cr`
 
   if (collapsible && !open) {
+    // folded: a card the width of a narrow column, read left to right
     return (
-      <button type="button" className="done-rail" onClick={onToggle} aria-expanded={false} aria-label={`Show completed courses (${summary})`}>
-        <span className="done-rail-ic">
-          <Check size={14} />
-        </span>
-        <span className="done-rail-text">
+      <section className="done-fold" aria-label={`Completed courses: ${summary}`}>
+        <div className="done-fold-h">
+          <span className="done-fold-ic">
+            <Check size={14} />
+          </span>
           <b>Completed</b>
-          <small>{summary}</small>
-        </span>
-        <span className="done-rail-cta">Show completed courses</span>
-      </button>
+        </div>
+        <div className="done-fold-total">
+          <b>{formatCredits(credits)}</b> credits
+          <small>
+            {courses.length} {courses.length === 1 ? 'course' : 'courses'}
+          </small>
+        </div>
+        <ul className="done-fold-list">
+          {columns.slice(0, 6).map((col) => (
+            <li key={col.key}>
+              <span className={col.inProgress ? 'ip' : ''} title={col.from ? `${col.label} from ${col.from}` : col.label}>
+                {col.from ?? col.label}
+                {col.inProgress ? ' (in progress)' : ''}
+              </span>
+              <em>{formatCredits(col.credits)} cr</em>
+            </li>
+          ))}
+          {columns.length > 6 && <li className="more">and {columns.length - 6} more</li>}
+        </ul>
+        <button type="button" className="done-fold-btn" onClick={onToggle} aria-expanded={false} aria-label={`Show completed courses (${summary})`}>
+          Show completed courses
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M5 12h14m-6-6l6 6-6 6" />
+          </svg>
+        </button>
+      </section>
     )
   }
 

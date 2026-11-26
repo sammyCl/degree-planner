@@ -255,6 +255,20 @@ describe('TranscriptUpload', () => {
     expect(await screen.findByRole('note')).toHaveTextContent('looks like a scanned image')
   })
 
+  it('shows the file being read, with what is happening, until the answer comes', async () => {
+    let answer: (value: unknown) => void = () => {}
+    vi.stubGlobal('fetch', vi.fn().mockReturnValue(new Promise((resolve) => (answer = resolve))))
+    setup()
+    upload('slow.pdf')
+    const chip = screen.getByText('slow.pdf').closest('li')!
+    expect(chip).toHaveAttribute('aria-busy', 'true')
+    expect(within(chip).getByRole('status')).toHaveTextContent('Opening your file...')
+    expect(screen.getByRole('button', { name: 'Reading your transcript...' })).toBeDisabled()
+    answer(reply(200, reading([found[0]])))
+    expect(await screen.findByText(/Uploaded/)).toBeInTheDocument()
+    expect(screen.queryByText('Opening your file...')).not.toBeInTheDocument()
+  })
+
   it('downloads a CSV template in the format the backend reads', () => {
     const create = vi.fn().mockReturnValue('blob:x')
     vi.stubGlobal('URL', { createObjectURL: create, revokeObjectURL: vi.fn() })

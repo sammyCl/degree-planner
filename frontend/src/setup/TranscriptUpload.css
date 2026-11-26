@@ -442,3 +442,79 @@
   font-size: 12.5px;
   line-height: 1.45;
 }
+
+/* While a file is read: a scanning line over the icon, a moving bar, and the current step */
+.tu-file.reading {
+  opacity: 1;
+  min-width: 280px;
+  border-color: color-mix(in srgb, var(--acc-bright) 45%, transparent);
+}
+
+.tu-scan {
+  position: relative;
+  display: inline-flex;
+  overflow: hidden;
+}
+
+.tu-scan i {
+  position: absolute;
+  left: 0;
+  right: 4px;
+  top: 0;
+  height: 6px;
+  background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--acc-bright) 70%, transparent), transparent);
+  animation: tu-scan 1.4s ease-in-out infinite;
+}
+
+@keyframes tu-scan {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(30px); }
+  100% { transform: translateY(0); }
+}
+
+.tu-step {
+  color: var(--acc) !important;
+  animation: tu-in 260ms var(--ease-out);
+}
+
+.tu-slow {
+  color: var(--mut) !important;
+}
+
+.tu-bar {
+  position: relative;
+  display: block;
+  height: 4px;
+  margin-top: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--acc-tint);
+}
+
+.tu-bar i {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40%;
+  border-radius: 999px;
+  background: var(--acc-bright);
+  animation: tu-bar 1.2s ease-in-out infinite;
+}
+
+@keyframes tu-bar {
+  from { left: -40%; }
+  to { left: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tu-scan i,
+  .tu-bar i {
+    animation: none;
+  }
+
+  .tu-bar i {
+    left: 0;
+    width: 100%;
+    opacity: 0.5;
+  }
+}

@@ -32,6 +32,287 @@
    "unlisted": "Academic courses not on the lists transfer as free electives (FREE1XX), up to the hours the degree needs. No credit for vocational or developmental courses (pre-calculus, introductory chemistry)."
   }
  },
+ "schools": [
+  {
+   "name": "Colorado School of Mines",
+   "aliases": [],
+   "system": null,
+   "kind": "mines"
+  },
+  {
+   "name": "Red Rocks Community College",
+   "aliases": [
+    "RRCC",
+    "Red Rocks CC"
+   ],
+   "system": "cccs",
+   "kind": "community college"
+  },
+  {
+   "name": "Front Range Community College",
+   "aliases": [
+    "FRCC",
+    "Front Range CC"
+   ],
+   "system": "cccs",
+   "kind": "community college"
+  },
+  {
+   "name": "Arapahoe Community College",
+   "aliases": [
+    "Arapahoe CC"
+   ],
+   "system": "cccs",
+   "kind": "community college"
+  },
+  {
+   "name": "Pikes Peak State College",
+   "aliases": [
+    "Pikes Peak Community College",
+    "PPSC",
+    "PPCC"
+   ],
+   "system": "cccs",
+   "kind": "community college"
+  },
+  {
+   "name": "Community College of Denver",
+   "aliases": [
+    "CC of Denver"
+   ],
+   "system": "cccs",
+   "kind": "community college"
+  },
+  {
+   "name": "Community College of Aurora",
+   "aliases": [
+    "CC Aurora",
+    "CC of Aurora"
+   ],
+   "system": "cccs",
+   "kind": "community college"
+  },
+  {
+   "name": "Colorado Mountain College",
+   "aliases": [],
+   "system": "cccs",
+   "kind": "community college"
+  },
+  {
+   "name": "Aims Community College",
+   "aliases": [
+    "Aims CC"
+   ],
+   "system": "cccs",
+   "kind": "community college"
+  },
+  {
+   "name": "Pueblo Community College",
+   "aliases": [
+    "Pueblo CC"
+   ],
+   "system": "cccs",
+   "kind": "community college"
+  },
+  {
+   "name": "Lamar Community College",
+   "aliases": [],
+   "system": "cccs",
+   "kind": "community college"
+  },
+  {
+   "name": "Morgan Community College",
+   "aliases": [],
+   "system": "cccs",
+   "kind": "community college"
+  },
+  {
+   "name": "Northeastern Community College",
+   "aliases": [
+    "Northeastern Junior College"
+   ],
+   "system": "cccs",
+   "kind": "community college"
+  },
+  {
+   "name": "Colorado Northwestern Community College",
+   "aliases": [],
+   "system": "cccs",
+   "kind": "community college"
+  },
+  {
+   "name": "Otero Junior College",
+   "aliases": [
+    "Otero College"
+   ],
+   "system": "cccs",
+   "kind": "community college"
+  },
+  {
+   "name": "Trinidad State Junior College",
+   "aliases": [
+    "Trinidad State College"
+   ],
+   "system": "cccs",
+   "kind": "community college"
+  },
+  {
+   "name": "University of Colorado Boulder",
+   "aliases": [
+    "CU Boulder",
+    "University of Colorado at Boulder"
+   ],
+   "system": null,
+   "kind": "university"
+  },
+  {
+   "name": "University of Colorado Denver",
+   "aliases": [
+    "CU Denver",
+    "University of Colorado at Denver",
+    "University of Colorado Denver Anschutz Medical Campus",
+    "UC Denver"
+   ],
+   "system": null,
+   "kind": "university"
+  },
+  {
+   "name": "University of Colorado Colorado Springs",
+   "aliases": [
+    "UCCS",
+    "CU Colorado Springs",
+    "University of Colorado at Colorado Springs"
+   ],
+   "system": null,
+   "kind": "university"
+  },
+  {
+   "name": "University of Denver",
+   "aliases": [],
+   "system": null,
+   "kind": "university"
+  },
+  {
+   "name": "Colorado State University",
+   "aliases": [
+    "Colorado State University Fort Collins",
+    "CSU Fort Collins"
+   ],
+   "system": null,
+   "kind": "university"
+  },
+  {
+   "name": "Colorado State University Pueblo",
+   "aliases": [
+    "CSU Pueblo"
+   ],
+   "system": null,
+   "kind": "university"
+  },
+  {
+   "name": "Colorado State University Global",
+   "aliases": [
+    "CSU Global"
+   ],
+   "system": null,
+   "kind": "university"
+  },
+  {
+   "name": "Metropolitan State University of Denver",
+   "aliases": [
+    "MSU Denver",
+    "Metropolitan State College of Denver",
+    "Metro State"
+   ],
+   "system": null,
+   "kind": "university"
+  },
+  {
+   "name": "University of Northern Colorado",
+   "aliases": [],
+   "system": null,
+   "kind": "university"
+  },
+  {
+   "name": "Colorado Mesa University",
+   "aliases": [
+    "Mesa State College"
+   ],
+   "system": null,
+   "kind": "university"
+  },
+  {
+   "name": "Fort Lewis College",
+   "aliases": [],
+   "system": null,
+   "kind": "university"
+  },
+  {
+   "name": "Western Colorado University",
+   "aliases": [
+    "Western State Colorado University",
+    "Western State College"
+   ],
+   "system": null,
+   "kind": "university"
+  },
+  {
+   "name": "Adams State University",
+   "aliases": [
+    "Adams State College"
+   ],
+   "system": null,
+   "kind": "university"
+  },
+  {
+   "name": "Colorado College",
+   "aliases": [],
+   "system": null,
+   "kind": "university"
+  },
+  {
+   "name": "Regis University",
+   "aliases": [],
+   "system": null,
+   "kind": "university"
+  },
+  {
+   "name": "Colorado Christian University",
+   "aliases": [],
+   "system": null,
+   "kind": "university"
+  },
+  {
+   "name": "Naropa University",
+   "aliases": [],
+   "system": null,
+   "kind": "university"
+  },
+  {
+   "name": "Rocky Mountain College of Art and Design",
+   "aliases": [
+    "RMCAD",
+    "Rocky Mountain College of Art + Design"
+   ],
+   "system": null,
+   "kind": "university"
+  },
+  {
+   "name": "United States Air Force Academy",
+   "aliases": [
+    "USAFA",
+    "U.S. Air Force Academy"
+   ],
+   "system": null,
+   "kind": "university"
+  },
+  {
+   "name": "Colorado Technical University",
+   "aliases": [],
+   "system": null,
+   "kind": "university"
+  }
+ ],
  "equivalencies": [
   {
    "system": "cccs",

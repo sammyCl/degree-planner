@@ -48,6 +48,50 @@ CCCS_SCHOOLS = [
     "Otero Junior College",
     "Trinidad State Junior College",
 ]
+# Short or older names each CCCS college goes by on transcripts.
+CCCS_ALIASES = {
+    "Red Rocks Community College": ["RRCC", "Red Rocks CC"],
+    "Front Range Community College": ["FRCC", "Front Range CC"],
+    "Arapahoe Community College": ["Arapahoe CC"],
+    "Pikes Peak State College": ["Pikes Peak Community College", "PPSC", "PPCC"],
+    "Community College of Denver": ["CC of Denver"],
+    "Community College of Aurora": ["CC Aurora", "CC of Aurora"],
+    "Colorado Mountain College": [],
+    "Aims Community College": ["Aims CC"],
+    "Pueblo Community College": ["Pueblo CC"],
+    "Lamar Community College": [],
+    "Morgan Community College": [],
+    "Northeastern Community College": ["Northeastern Junior College"],
+    "Colorado Northwestern Community College": [],
+    "Otero Junior College": ["Otero College"],
+    "Trinidad State Junior College": ["Trinidad State College"],
+}
+# Colorado's four-year colleges and universities. Mines has no published preapproved list for them, so their courses
+# are looked up in TES; listing them lets the page recognise and name the school. Compiled by hand (2026-11-26) from
+# the schools' own names; aliases are the short and older names that appear on transcripts. Check before relying on it.
+COLORADO_UNIVERSITIES = {
+    "University of Colorado Boulder": ["CU Boulder", "University of Colorado at Boulder"],
+    "University of Colorado Denver": ["CU Denver", "University of Colorado at Denver", "University of Colorado Denver Anschutz Medical Campus", "UC Denver"],
+    "University of Colorado Colorado Springs": ["UCCS", "CU Colorado Springs", "University of Colorado at Colorado Springs"],
+    "University of Denver": [],
+    "Colorado State University": ["Colorado State University Fort Collins", "CSU Fort Collins"],
+    "Colorado State University Pueblo": ["CSU Pueblo"],
+    "Colorado State University Global": ["CSU Global"],
+    "Metropolitan State University of Denver": ["MSU Denver", "Metropolitan State College of Denver", "Metro State"],
+    "University of Northern Colorado": [],
+    "Colorado Mesa University": ["Mesa State College"],
+    "Fort Lewis College": [],
+    "Western Colorado University": ["Western State Colorado University", "Western State College"],
+    "Adams State University": ["Adams State College"],
+    "Colorado College": [],
+    "Regis University": [],
+    "Colorado Christian University": [],
+    "Naropa University": [],
+    "Rocky Mountain College of Art and Design": ["RMCAD", "Rocky Mountain College of Art + Design"],
+    "United States Air Force Academy": ["USAFA", "U.S. Air Force Academy"],
+    "Colorado Technical University": [],
+}
+
 # The colleges the registrar names for EGG 1040 as EDNS151 ("CC Aurora, Front Range CC, Pikes Peak, Arapahoe CC &
 # Red Rocks CC"), with their full names.
 EDNS151_ONLY_AT = [
@@ -193,6 +237,12 @@ def main() -> None:
                         "introductory chemistry).",
                     }
                 },
+                # every school the transcript reader recognises: name, other names, and its saved list (or none)
+                "schools": [
+                    {"name": "Colorado School of Mines", "aliases": [], "system": None, "kind": "mines"}
+                ]
+                + [{"name": n, "aliases": CCCS_ALIASES[n], "system": "cccs", "kind": "community college"} for n in CCCS_SCHOOLS]
+                + [{"name": n, "aliases": a, "system": None, "kind": "university"} for n, a in COLORADO_UNIVERSITIES.items()],
                 "equivalencies": entries,
             },
             indent=1,
@@ -200,7 +250,9 @@ def main() -> None:
         )
         + "\n"
     )
-    print(f"wrote {OUT.relative_to(ROOT)}: {len(entries)} equivalencies for {len(CCCS_SCHOOLS)} CCCS colleges")
+    assert set(CCCS_ALIASES) == set(CCCS_SCHOOLS)
+    print(f"wrote {OUT.relative_to(ROOT)}: {len(entries)} equivalencies for {len(CCCS_SCHOOLS)} CCCS colleges; "
+          f"{len(COLORADO_UNIVERSITIES)} Colorado universities recognised (TES)")
 
 
 if __name__ == "__main__":
