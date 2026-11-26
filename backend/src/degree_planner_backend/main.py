@@ -12,6 +12,7 @@ from degree_planner_backend.agent.chat_loop import run_chat
 from degree_planner_backend.agent.chat_models import ChatRequest, ChatResponse
 from degree_planner_backend.agent.loop import ClaudeCodeError, run_agent
 from degree_planner_backend.agent.request_models import AgentRequest, AgentResponse
+from degree_planner_backend.agent.transcript_reader import read_redacted
 from degree_planner_backend.db import get_db
 from degree_planner_backend.lookups import get_course
 from degree_planner_backend.plan_models import CompletedCourse, Plan
@@ -158,7 +159,8 @@ def read_transcript_file(
             with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp:
                 tmp.write(contents)
                 tmp.flush()
-                return read_transcript(pdf_lines(Path(tmp.name)), school=school, credits_of=credits_of)
+                # a layout the rules do not know is read by Claude, after personal details are removed
+                return read_transcript(pdf_lines(Path(tmp.name)), school=school, credits_of=credits_of, claude=read_redacted)
         raise HTTPException(status_code=400, detail="Transcript must be a .csv or .pdf file")
     except TranscriptParseError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc

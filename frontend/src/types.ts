@@ -33,6 +33,10 @@ export interface TranscriptReading {
   skipped: string[]
   tes_url: string
   known_schools: string[]
+  /** "claude" when the layout was not one the built-in reader knows, so Claude read it (personal details removed) */
+  read_by?: 'rules' | 'claude'
+  /** something the student should know about how the file was read */
+  notice?: string | null
 }
 
 export interface PlannedCourse {

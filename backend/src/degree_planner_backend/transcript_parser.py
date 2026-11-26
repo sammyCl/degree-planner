@@ -157,16 +157,12 @@ def read_rows(lines: list[str]) -> list[TranscriptRow]:
     in_progress = False
     buffer: list[str] = []
     buffer_term: tuple[str, str | None, bool] | None = None
-    placeholder_count: dict[str, int] = {}
 
     def flush() -> None:
         nonlocal buffer, buffer_term
         if buffer and buffer_term:
             row = _read_row(" ".join(buffer), *buffer_term)
             if row is not None:
-                if row.is_placeholder:
-                    placeholder_count[row.code] = placeholder_count.get(row.code, 0) + 1
-                    row.code = f"{row.code}-{placeholder_count[row.code]}"
                 rows.append(row)
         buffer, buffer_term = [], None
 
@@ -211,6 +207,17 @@ def read_rows(lines: list[str]) -> list[TranscriptRow]:
             if _CREDITS.search(line):
                 flush()
     flush()
+    return number_placeholders(rows)
+
+
+def number_placeholders(rows: list[TranscriptRow]) -> list[TranscriptRow]:
+    """Placeholder credit gets a number per row ("FREE1XX-1", "FREE1XX-2"), so each row stays its own course."""
+    count: dict[str, int] = {}
+    for row in rows:
+        if row.is_placeholder:
+            base = f"{row.subject}{row.number}"
+            count[base] = count.get(base, 0) + 1
+            row.code = f"{base}-{count[base]}"
     return rows
 
 

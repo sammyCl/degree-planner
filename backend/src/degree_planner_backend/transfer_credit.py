@@ -19,12 +19,12 @@ import re
 from collections.abc import Callable
 from functools import cache
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal, Protocol
 
 from pydantic import BaseModel, Field
 
 from degree_planner_backend.plan_models import CompletedCourse
-from degree_planner_backend.transcript_parser import TranscriptRow, read_rows
+from degree_planner_backend.transcript_parser import TranscriptRow, number_placeholders, read_rows
 
 EQUIVALENCIES_PATH = Path(__file__).resolve().parents[3] / "data" / "json" / "transfer-equivalencies.json"
 MINES = "Colorado School of Mines"
@@ -58,6 +58,22 @@ class TranscriptReading(BaseModel):
     tes_url: str
     # Mines and every school with a saved list, for the page to offer when it could not tell the school
     known_schools: list[str] = Field(default_factory=list)
+    # "rules" (read on this machine) or "claude" (read by Claude after personal details were removed)
+    read_by: Literal["rules", "claude"] = "rules"
+    # something the student should know about how the file was read, or null
+    notice: str | None = None
+
+
+class ClaudeRows(Protocol):
+    """What the Claude reader returns (agent/transcript_reader.py's ClaudeReading)."""
+
+    school: str | None
+    rows: list[TranscriptRow]
+    dropped: list[str]
+
+
+# Reads a transcript's lines with Claude (removing personal details first); raises when it cannot.
+ClaudeReader = Callable[[list[str]], ClaudeRows]
 
 
 @cache
@@ -68,6 +84,16 @@ def load_equivalencies(path: Path = EQUIVALENCIES_PATH) -> dict[str, Any]:
 def known_schools(data: dict[str, Any]) -> list[tuple[str, str]]:
     """(school, system id) for every school the equivalency file covers."""
     return [(school, system_id) for system_id, system in data["systems"].items() for school in system["schools"]]
+
+
+def _known_name(name: str, data: dict[str, Any]) -> str | None:
+    """Mines or a school with a saved list, when `name` is one of them written a little differently
+    ("Front Range Community College - Westminster Campus")."""
+    lowered = name.lower()
+    for known in [MINES] + [school for school, _ in known_schools(data)]:
+        if known.lower() in lowered:
+            return known
+    return None
 
 
 def detect_school(lines: list[str], data: dict[str, Any]) -> str | None:
@@ -88,11 +114,15 @@ def read_transcript(
     school: str | None = None,
     credits_of: Callable[[str], float | None] = lambda _code: None,
     data: dict[str, Any] | None = None,
+    claude: ClaudeReader | None = None,
 ) -> TranscriptReading:
     """Read a transcript's lines. `school` overrides the detected school (the student said which it is).
-    `credits_of` gives a Mines course's catalog credits, to split one outside course that becomes two Mines courses."""
+    `credits_of` gives a Mines course's catalog credits, to split one outside course that becomes two Mines courses.
+    `claude` reads layouts the rules do not know: used for any transcript that is not from Mines, and for a Mines one
+    the rules found almost nothing in. When it fails, what the rules found is kept and the reading says why."""
     data = data or load_equivalencies()
-    school = (school or "").strip() or detect_school(lines, data)
+    named = (school or "").strip()
+    school = named or detect_school(lines, data)
     rows = read_rows(lines)
     reading = TranscriptReading(
         school=school,
@@ -100,6 +130,21 @@ def read_transcript(
         tes_url=data["tes_url"],
         known_schools=[MINES] + sorted(name for name, _ in known_schools(data)),
     )
+    if not any(line.strip() for line in lines):
+        reading.notice = "This PDF has no text in it (it looks like a scanned image), so it could not be read. Add your courses by hand, or download a text PDF from your school's student portal."
+        return reading
+    if claude is not None and not (reading.from_mines and len(rows) >= 3):
+        try:
+            answer = claude(lines)
+        except Exception as exc:  # the reader raises TranscriptReaderError; anything else is treated the same
+            reading.notice = f"Claude could not read this transcript ({exc}). Showing what the built-in reader found; check it carefully."
+        else:
+            rows = number_placeholders(answer.rows)
+            reading.read_by = "claude"
+            reading.skipped.extend(f"{d} (left out)" for d in answer.dropped)
+            if not named and answer.school:
+                school = _known_name(answer.school, data) or answer.school
+                reading.school, reading.from_mines = school, school == MINES
 
     if reading.from_mines:
         for row in rows:
@@ -109,7 +154,10 @@ def read_transcript(
                 reading.skipped.append(f"{row.subject} {row.number} {row.title}: grade {row.grade}, no credit")
         return reading
 
-    system_id = next((sid for name, sid in known_schools(data) if school and name.lower() == school.lower()), None)
+    canonical = _known_name(school, data) if school else None
+    system_id = next((sid for name, sid in known_schools(data) if name == canonical), None)
+    if canonical:
+        school = canonical
     system = data["systems"].get(system_id) if system_id else None
     reading.system = system["name"] if system else None
     entries = [e for e in data["equivalencies"] if e["system"] == system_id] if system_id else []

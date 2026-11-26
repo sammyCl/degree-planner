@@ -236,6 +236,25 @@ describe('TranscriptUpload', () => {
     await waitFor(() => expect(latest.current.map((c) => c.code)).toEqual(['FREE1XX-1', 'FREE1XX-2']))
   })
 
+  it('says when Claude read a transcript, and tells the student before they upload', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(reply(200, reading([], { school: 'Example State University', from_mines: false, read_by: 'claude', unmatched: [] }))),
+    )
+    setup()
+    expect(screen.getByText(/read by Claude \(Anthropic's AI\) after\s+your name, student ID, birth date/)).toBeInTheDocument()
+    upload('esu.pdf')
+    expect(await screen.findByText(/read by Claude/, { selector: '.tu-claude' })).toBeInTheDocument()
+  })
+
+  it('shows the reader\'s notice, for example for a scanned PDF', async () => {
+    const notice = 'This PDF has no text in it (it looks like a scanned image), so it could not be read.'
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(reply(200, reading([], { school: null, from_mines: false, notice }))))
+    setup()
+    upload('scan.pdf')
+    expect(await screen.findByRole('note')).toHaveTextContent('looks like a scanned image')
+  })
+
   it('downloads a CSV template in the format the backend reads', () => {
     const create = vi.fn().mockReturnValue('blob:x')
     vi.stubGlobal('URL', { createObjectURL: create, revokeObjectURL: vi.fn() })

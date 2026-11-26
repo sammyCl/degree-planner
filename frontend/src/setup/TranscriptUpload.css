@@ -427,3 +427,18 @@
     grid-column: 1 / -1;
   }
 }
+
+.tu-claude {
+  color: var(--acc);
+}
+
+.tu-notice {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent);
+  background: var(--raised);
+  color: var(--text);
+  font-size: 12.5px;
+  line-height: 1.45;
+}

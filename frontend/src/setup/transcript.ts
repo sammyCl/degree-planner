@@ -24,6 +24,10 @@ export interface UploadedFile {
   tesUrl?: string
   /** schools the student can say the transcript is from (Mines, and every school with a saved list) */
   knownSchools?: string[]
+  /** Claude read it (a layout the built-in reader does not know) */
+  readByClaude?: boolean
+  /** what the reader wants the student to know (for example, a scanned PDF it could not read) */
+  notice?: string | null
 }
 
 /** Placeholder credit: "FREE1XX-3" or "HASS2XX" (a level of a subject, not a named course). */

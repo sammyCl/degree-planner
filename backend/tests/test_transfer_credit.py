@@ -187,6 +187,9 @@ def test_read_endpoint_returns_the_reading(monkeypatch) -> None:  # type: ignore
 
 def test_read_endpoint_takes_the_school_the_student_names(monkeypatch) -> None:  # type: ignore[no-untyped-def]
     monkeypatch.setattr("degree_planner_backend.main.pdf_lines", lambda _path: ["Transcript", "Fall 2023", "MAT 2410 Calculus I A 5.000"])
+    def no_claude(_lines):  # type: ignore[no-untyped-def]
+        raise RuntimeError("not in tests")
+    monkeypatch.setattr("degree_planner_backend.main.read_redacted", no_claude)
     client = TestClient(app)
     response = client.post(
         "/transcripts/read",

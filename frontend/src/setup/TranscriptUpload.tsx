@@ -92,6 +92,8 @@ export function TranscriptUpload({ courses, files = [], onChange, thisYear }: Pr
           skipped: result.skipped,
           tesUrl: result.tes_url,
           knownSchools: result.known_schools,
+          readByClaude: result.read_by === 'claude',
+          notice: result.notice ?? null,
         },
       ])
       setNote(
@@ -198,7 +200,9 @@ export function TranscriptUpload({ courses, files = [], onChange, thisYear }: Pr
         />
       </div>
       <p className="tu-hint">
-        We read course codes, credits and terms. The file itself is not saved; only the courses in the list below are sent to the planner.{' '}
+        We read course codes, credits and terms. The file itself is not saved; only the courses in the list below are sent to the planner.
+        A Mines transcript is read on our server. A transcript in another layout is read by Claude (Anthropic&apos;s AI) after
+        your name, student ID, birth date and contact details are removed.{' '}
         <button type="button" className="link" onClick={downloadTemplate}>
           Download a CSV template
         </button>
@@ -216,6 +220,7 @@ export function TranscriptUpload({ courses, files = [], onChange, thisYear }: Pr
                 {f.kind === 'pdf' && (
                   <small className={f.school ? 'tu-school' : 'tu-school unknown'}>
                     {f.school ? `${f.fromMines ? 'Mines transcript' : `From ${f.school}`}` : 'School not recognised'}
+                    {f.readByClaude && <span className="tu-claude"> &middot; read by Claude</span>}
                     {fileObjects.has(f.name) && (
                       <>
                         {' '}
@@ -261,9 +266,14 @@ export function TranscriptUpload({ courses, files = [], onChange, thisYear }: Pr
         const file = fileObjects.get(f.name)
         const pickSchool = file && (changingSchool === f.name || (!f.school && f.kind === 'pdf'))
         const unmatched = f.unmatched ?? []
-        if (!pickSchool && unmatched.length === 0 && !(f.skipped ?? []).length) return null
+        if (!pickSchool && unmatched.length === 0 && !(f.skipped ?? []).length && !f.notice) return null
         return (
           <div className="tu-review" key={`review-${f.name}`}>
+            {f.notice && (
+              <p className="tu-notice" role="note">
+                {f.notice}
+              </p>
+            )}
             {pickSchool && (
               <div className="tu-school-pick">
                 <span>Which school is {f.name} from?</span>
