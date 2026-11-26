@@ -44,6 +44,12 @@ class UnmatchedCourse(BaseModel):
     # the Mines course to offer first, e.g. "FREE1XX" for an unlisted academic CCCS course; null when unknown
     suggestion: str | None = None
     reason: str
+    # about the suggestion: the Mines title, who made it ("rule": the registrar's free-elective rule for CCCS
+    # colleges; "claude": a guess from the course title, to confirm in TES), how sure, and why
+    suggestion_title: str | None = None
+    suggested_by: Literal["rule", "claude"] | None = None
+    confidence: Literal["high", "medium", "low"] | None = None
+    suggestion_reason: str | None = None
 
 
 class TranscriptReading(BaseModel):
@@ -74,6 +80,17 @@ class ClaudeRows(Protocol):
 
 # Reads a transcript's lines with Claude (removing personal details first); raises when it cannot.
 ClaudeReader = Callable[[list[str]], ClaudeRows]
+
+
+class SuggestionLike(Protocol):
+    mines_code: str
+    title: str
+    confidence: str
+    reason: str
+
+
+# Suggests a Mines course for each unmatched course (code, title, credits) from a school; raises when it cannot.
+Suggester = Callable[[list[UnmatchedCourse], str | None], list[SuggestionLike | None]]
 
 
 @cache
@@ -124,11 +141,13 @@ def read_transcript(
     credits_of: Callable[[str], float | None] = lambda _code: None,
     data: dict[str, Any] | None = None,
     claude: ClaudeReader | None = None,
+    suggest: Suggester | None = None,
 ) -> TranscriptReading:
     """Read a transcript's lines. `school` overrides the detected school (the student said which it is).
     `credits_of` gives a Mines course's catalog credits, to split one outside course that becomes two Mines courses.
     `claude` reads layouts the rules do not know: used for any transcript that is not from Mines, and for a Mines one
-    the rules found almost nothing in. When it fails, what the rules found is kept and the reading says why."""
+    the rules found almost nothing in. When it fails, what the rules found is kept and the reading says why.
+    `suggest` proposes a Mines course for every course left unmatched (a guess the student confirms in TES)."""
     data = data or load_equivalencies()
     named = (school or "").strip()
     school = named or detect_school(lines, data)
@@ -200,11 +219,39 @@ def read_transcript(
             reading.courses.append(
                 CompletedCourse(code=code, credits=credits, term=term, transfer_from=school, title=f"{label} {row.title}".strip(), in_progress=row.in_progress)
             )
+    if suggest is not None and reading.unmatched:
+        _add_suggestions(reading, suggest, school)
     return reading
 
 
+def _add_suggestions(reading: TranscriptReading, suggest: Suggester, school: str | None) -> None:
+    """Claude's guesses replace the plain free-elective suggestion where it found something better; when it fails,
+    the courses keep whatever they had and the student looks them up in TES."""
+    try:
+        guesses = suggest(reading.unmatched, school)
+    except Exception:  # noqa: BLE001 - suggestions are a convenience; the list still works without them
+        if not reading.notice:
+            reading.notice = "Suggested Mines courses could not be made this time. Look the courses up in TES."
+        return
+    for course, guess in zip(reading.unmatched, guesses):
+        if guess is None:
+            if course.suggestion:
+                course.suggested_by = "rule"
+            continue
+        course.suggestion = guess.mines_code
+        course.suggestion_title = guess.title
+        course.suggested_by = "claude"
+        course.confidence = guess.confidence  # type: ignore[assignment]
+        course.suggestion_reason = guess.reason or None
+
+
 def _unmatched(row: TranscriptRow, label: str, suggestion: str | None, reason: str) -> UnmatchedCourse:
-    return UnmatchedCourse(code=label, title=row.title, credits=row.credits, term="transfer", in_progress=row.in_progress, suggestion=suggestion, reason=reason)
+    return UnmatchedCourse(
+        code=label, title=row.title, credits=row.credits, term="transfer", in_progress=row.in_progress,
+        suggestion=suggestion, reason=reason,
+        suggestion_title="Free elective" if suggestion == "FREE1XX" else None,
+        suggested_by="rule" if suggestion else None,
+    )
 
 
 def _match(row: TranscriptRow, entries: list[dict[str, Any]], school: str, used: set[str], present: set[tuple[str, str]]) -> list[str] | None:

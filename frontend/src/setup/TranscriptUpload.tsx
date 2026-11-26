@@ -462,11 +462,22 @@ function FileIcon({ kind }: { kind: 'pdf' | 'csv' }) {
   )
 }
 
-/** Courses from another school with no Mines equivalent yet: the student picks one (after a TES look-up) or skips it. */
+const CONFIDENCE = { high: 'Strong match', medium: 'Likely match', low: 'A guess' } as const
+
+/** A Mines code the page can add: a catalog course, or placeholder credit such as FREE1XX. */
+const addable = (value: string): boolean => !!value.trim() && (!!catalogCourse(value) || /^[A-Z]{2,5}\dXX$/.test(normalizeCode(value)))
+
+/**
+ * Courses from another school with no saved Mines equivalent. Each box is pre-filled with a suggestion (a guess from
+ * the course title, or the free-elective rule); the student checks it in TES and adds it, changes it, or skips it.
+ */
 function UnmatchedList({ file, courses, onResolve }: { file: UploadedFile; courses: UnmatchedCourse[]; onResolve: (picks: { course: UnmatchedCourse; mines: string | null }[]) => void }) {
   const listId = useId()
   const [typed, setTyped] = useState<Record<string, string>>({})
-  const suggested = courses.filter((c) => c.suggestion)
+  const keyOf = (c: UnmatchedCourse) => `${c.code}|${c.title}`
+  const valueOf = (c: UnmatchedCourse) => typed[keyOf(c)] ?? c.suggestion ?? ''
+  const ready = courses.filter((c) => addable(valueOf(c)))
+  const guessed = courses.some((c) => c.suggested_by === 'claude')
   return (
     <div className="tu-unmatched" role="group" aria-label={`Courses that need a Mines equivalent from ${file.name}`}>
       <div className="tu-unmatched-head">
@@ -484,9 +495,12 @@ function UnmatchedList({ file, courses, onResolve }: { file: UploadedFile; cours
       </div>
       <p className="tu-unmatched-help">
         {file.system
-          ? `${file.school} is a ${file.system} college. These courses are not on Mines' preapproved list; an academic course usually transfers as a free elective.`
-          : `Mines has no saved list for ${file.school ?? 'this school'}. Search for the school in Mines' Transfer Evaluation System (TES), find each course, and enter the Mines course it became.`}{' '}
-        TES results are unofficial; the registrar decides when your official transcript arrives.
+          ? `${file.school} is a ${file.system} college. These courses are not on Mines' preapproved list.`
+          : `Mines has no saved list for ${file.school ?? 'this school'}.`}{' '}
+        {guessed
+          ? 'We filled in a suggested Mines course for each one from its title. Suggestions are guesses: check them in TES, change any that are wrong, then add them.'
+          : 'Search for the school in TES, find each course, and enter the Mines course it became.'}{' '}
+        The registrar decides when your official transcript arrives.
       </p>
       <datalist id={listId}>
         <option value="FREE1XX">Free elective</option>
@@ -495,9 +509,9 @@ function UnmatchedList({ file, courses, onResolve }: { file: UploadedFile; cours
       </datalist>
       <ul>
         {courses.map((c) => {
-          const key = `${c.code}|${c.title}`
-          const value = typed[key] ?? ''
-          const known = value.trim() && (catalogCourse(value) || /^[A-Z]{2,5}\dXX$/i.test(value.replace(/\s+/g, '')))
+          const key = keyOf(c)
+          const value = valueOf(c)
+          const changed = typed[key] !== undefined && typed[key] !== (c.suggestion ?? '')
           return (
             <li key={key}>
               <span className="tu-their">
@@ -510,24 +524,34 @@ function UnmatchedList({ file, courses, onResolve }: { file: UploadedFile; cours
                 value={value}
                 onChange={(e) => setTyped({ ...typed, [key]: e.target.value })}
               />
-              <button type="button" className="tu-pick small" disabled={!known} onClick={() => onResolve([{ course: c, mines: value }])}>
+              <button type="button" className="tu-pick small" disabled={!addable(value)} onClick={() => onResolve([{ course: c, mines: value }])}>
                 Add
               </button>
-              {c.suggestion && (
-                <button type="button" className="link" onClick={() => onResolve([{ course: c, mines: c.suggestion }])}>
-                  {c.suggestion === 'FREE1XX' ? 'Free elective' : c.suggestion}
+              {c.suggestion !== 'FREE1XX' ? (
+                <button type="button" className="link" onClick={() => onResolve([{ course: c, mines: 'FREE1XX' }])}>
+                  Free elective
                 </button>
+              ) : (
+                <span />
               )}
               <button type="button" className="tu-x" aria-label={`Skip ${c.code}`} title="No Mines credit for this course" onClick={() => onResolve([{ course: c, mines: null }])}>
                 &times;
               </button>
+              {c.suggestion && !changed && (
+                <span className="tu-suggest">
+                  {c.suggested_by === 'claude' && c.confidence && <em className={`conf ${c.confidence}`}>{CONFIDENCE[c.confidence]}</em>}
+                  Suggested: <b>{displayCode(c.suggestion)}</b> {c.suggestion_title ?? catalogCourse(c.suggestion)?.title ?? ''}
+                  {c.suggested_by === 'rule' ? ' (Mines treats unlisted academic courses as free electives)' : ''}
+                  {c.suggestion_reason ? `. ${c.suggestion_reason}` : ''}
+                </span>
+              )}
             </li>
           )
         })}
       </ul>
-      {suggested.length > 1 && (
-        <button type="button" className="link" onClick={() => onResolve(suggested.map((c) => ({ course: c, mines: c.suggestion })))}>
-          Count all {suggested.length} as free electives
+      {ready.length > 1 && (
+        <button type="button" className="tu-pick small tu-accept" onClick={() => onResolve(ready.map((c) => ({ course: c, mines: valueOf(c) })))}>
+          Accept all {ready.length} suggestions
         </button>
       )}
     </div>

@@ -373,7 +373,7 @@
 
 .tu-unmatched li {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 160px auto auto auto;
+  grid-template-columns: minmax(0, 1fr) 150px 52px 92px 24px; /* fixed, so every row lines up */
   align-items: center;
   gap: 8px;
   font-size: 13px;
@@ -517,4 +517,42 @@
     width: 100%;
     opacity: 0.5;
   }
+}
+
+/* The suggestion under each course: what was filled in, how sure, and why */
+.tu-suggest {
+  grid-column: 1 / -1;
+  margin: -2px 0 4px;
+  color: var(--mut);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.tu-suggest b {
+  color: var(--text);
+  font: 600 12px 'JetBrains Mono', ui-monospace, monospace;
+}
+
+.tu-suggest .conf {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 0 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.tu-suggest .conf.high { background: var(--ok-bg); color: var(--ok); }
+.tu-suggest .conf.medium { background: var(--acc-tint); color: var(--acc); }
+.tu-suggest .conf.low { background: var(--raised); color: var(--warn); border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent); }
+
+.tu-unmatched li {
+  row-gap: 2px;
+}
+
+.tu-accept {
+  margin-top: 6px;
+  border-color: var(--ok);
+  color: var(--ok);
 }

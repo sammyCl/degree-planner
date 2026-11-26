@@ -1,3 +1,4 @@
+import json
 import logging
 import sqlite3
 import tempfile
@@ -12,6 +13,8 @@ from degree_planner_backend.agent.chat_loop import run_chat
 from degree_planner_backend.agent.chat_models import ChatRequest, ChatResponse
 from degree_planner_backend.agent.loop import ClaudeCodeError, run_agent
 from degree_planner_backend.agent.request_models import AgentRequest, AgentResponse
+from degree_planner_backend.agent.transcript_matcher import CatalogCourse, OutsideCourse
+from degree_planner_backend.agent.transcript_matcher import suggest as suggest_equivalents
 from degree_planner_backend.agent.transcript_reader import read_redacted
 from degree_planner_backend.db import get_db
 from degree_planner_backend.lookups import get_course
@@ -159,8 +162,23 @@ def read_transcript_file(
             with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp:
                 tmp.write(contents)
                 tmp.flush()
-                # a layout the rules do not know is read by Claude, after personal details are removed
-                return read_transcript(pdf_lines(Path(tmp.name)), school=school, credits_of=credits_of, claude=read_redacted)
+                # a layout the rules do not know is read by Claude, after personal details are removed; courses with
+                # no saved match get a suggested Mines course (only codes, titles and credits are sent)
+                return read_transcript(
+                    pdf_lines(Path(tmp.name)), school=school, credits_of=credits_of, claude=read_redacted,
+                    suggest=lambda courses, from_school: suggest_equivalents(
+                        [OutsideCourse(c.code, c.title, c.credits) for c in courses], from_school, _catalog(connection)
+                    ),
+                )
         raise HTTPException(status_code=400, detail="Transcript must be a .csv or .pdf file")
     except TranscriptParseError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+def _catalog(connection: sqlite3.Connection) -> list[CatalogCourse]:
+    """Every catalog course's code, title and credits, for suggesting transfer equivalents."""
+    out: list[CatalogCourse] = []
+    for code, data in connection.execute("SELECT code, data FROM courses"):
+        course = json.loads(data)
+        out.append(CatalogCourse(code, course.get("title", ""), float(course.get("credits") or 0)))
+    return out

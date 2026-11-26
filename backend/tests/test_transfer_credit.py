@@ -191,6 +191,7 @@ def test_read_endpoint_takes_the_school_the_student_names(monkeypatch) -> None: 
     def no_claude(_lines):  # type: ignore[no-untyped-def]
         raise RuntimeError("not in tests")
     monkeypatch.setattr("degree_planner_backend.main.read_redacted", no_claude)
+    monkeypatch.setattr("degree_planner_backend.main.suggest_equivalents", lambda *_a: (_ for _ in ()).throw(RuntimeError("not in tests")))
     client = TestClient(app)
     response = client.post(
         "/transcripts/read",

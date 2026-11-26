@@ -203,8 +203,8 @@ describe('TranscriptUpload', () => {
     expect(body.get('school')).toBe('Front Range Community College')
   })
 
-  it('lets the student give each unmatched course its Mines equivalent, take the suggestion, or skip it', async () => {
-    const u = (code: string, suggestion: string | null) => ({ code, title: `Course ${code}`, credits: 3, term: 'transfer', in_progress: false, suggestion, reason: 'Look it up in TES' })
+  it('lets the student give each unmatched course its Mines equivalent, take the pre-filled suggestion, or skip it', async () => {
+    const u = (code: string, suggestion: string | null) => ({ code, title: `Course ${code}`, credits: 3, term: 'transfer', in_progress: false, suggestion, reason: 'Look it up in TES', suggested_by: suggestion ? ('rule' as const) : null })
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue(
@@ -215,17 +215,50 @@ describe('TranscriptUpload', () => {
     upload('esu.pdf')
     const group = await screen.findByRole('group', { name: /need a Mines equivalent/ })
     expect(within(group).getByRole('link', { name: /Look them up in TES/ })).toHaveAttribute('href', 'https://tes.collegesource.com/publicview/x')
-    const add = within(group).getAllByRole('button', { name: 'Add' })[0]
-    expect(add).toBeDisabled()
+    expect(within(group).getByLabelText('Mines course for ENG 1021')).toHaveValue('FREE1XX') // pre-filled
+    const adds = within(group).getAllByRole('button', { name: 'Add' })
+    expect(adds[0]).toBeDisabled() // MATH 1401 has no suggestion and nothing typed yet
     fireEvent.change(within(group).getByLabelText('Mines course for MATH 1401'), { target: { value: 'math111' } })
-    fireEvent.click(add)
-    fireEvent.click(within(group).getByRole('button', { name: 'Free elective' }))
+    fireEvent.click(adds[0])
+    fireEvent.click(within(group).getAllByRole('button', { name: 'Add' })[0]) // ENG 1021, now first
     fireEvent.click(within(group).getByRole('button', { name: 'Skip ART 1000' }))
     expect(latest.current).toEqual([
       { code: 'MATH111', credits: 3, term: 'transfer', transfer_from: 'Example State University', title: 'MATH 1401 Course MATH 1401', in_progress: false },
       { code: 'FREE1XX-1', credits: 3, term: 'transfer', transfer_from: 'Example State University', title: 'ENG 1021 Course ENG 1021', in_progress: false },
     ])
     expect(screen.queryByRole('group', { name: /need a Mines equivalent/ })).not.toBeInTheDocument()
+  })
+
+  it('shows each suggestion with how sure it is and why, and accepts them all at once', async () => {
+    const s = (code: string, title: string, suggestion: string | null, extra = {}) => ({ code, title, credits: 4, term: 'transfer', in_progress: false, suggestion, reason: 'TES', suggested_by: suggestion ? ('claude' as const) : null, ...extra })
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        reply(
+          200,
+          reading([], {
+            school: 'University of Colorado Denver',
+            from_mines: false,
+            unmatched: [
+              s('MATH 1401', 'Calculus I', 'MATH111', { suggestion_title: 'Calculus for Scientists and Engineers I', confidence: 'high', suggestion_reason: 'Both are first-semester calculus.' }),
+              s('CSCI 1410', 'Fundamentals of Computing', 'CSCI128', { suggestion_title: 'Computer Science for STEM', confidence: 'medium' }),
+              s('ART 1000', 'Drawing', null),
+            ],
+          }),
+        ),
+      ),
+    )
+    const latest = setup()
+    upload('cud.pdf')
+    const group = await screen.findByRole('group', { name: /need a Mines equivalent/ })
+    expect(group).toHaveTextContent('Strong match')
+    expect(group).toHaveTextContent('Suggested: MATH111 Calculus for Scientists and Engineers I. Both are first-semester calculus.')
+    expect(group).toHaveTextContent('Likely match')
+    expect(group).toHaveTextContent('Suggestions are guesses: check them in TES')
+    fireEvent.click(within(group).getByRole('button', { name: 'Accept all 2 suggestions' }))
+    expect(latest.current.map((c) => c.code)).toEqual(['MATH111', 'CSCI128'])
+    // the one with no suggestion is still there to look up
+    expect(within(screen.getByRole('group', { name: /need a Mines equivalent/ })).getByText('ART 1000')).toBeInTheDocument()
   })
 
   it('renumbers placeholder credit from a second transcript instead of dropping it', async () => {

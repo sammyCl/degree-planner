@@ -18,9 +18,15 @@ export interface UnmatchedCourse {
   credits: number
   term: string
   in_progress: boolean
-  /** the Mines course to offer first ("FREE1XX"), or null */
+  /** the Mines course to offer first ("FREE1XX", "MATH111"), or null */
   suggestion: string | null
   reason: string
+  /** the suggested Mines course's title */
+  suggestion_title?: string | null
+  /** "rule": the registrar's free-elective rule; "claude": a guess from the title, to confirm in TES */
+  suggested_by?: 'rule' | 'claude' | null
+  confidence?: 'high' | 'medium' | 'low' | null
+  suggestion_reason?: string | null
 }
 
 /** What POST /transcripts/read returns (backend transfer_credit.py). */
