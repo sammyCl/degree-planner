@@ -3,6 +3,7 @@ import { ApiError, checkPlan } from '../api.ts'
 import { ADD_ON_NAMES, LEVELS, PROGRAMS, staleInPlan } from '../setup/validate.ts'
 import type { Flag, Plan, PlannedCourse } from '../types.ts'
 import { Arrows } from './Arrows.tsx'
+import { ChatPanel } from './ChatPanel.tsx'
 import { CompletedColumns } from './CompletedColumns.tsx'
 import { completedColumns, completedOnlyPlan, startsCollapsed } from './completed.ts'
 import { CourseCard, type CardState } from './CourseCard.tsx'
@@ -414,6 +415,12 @@ export function PlannerPage({ plan: initialPlan, explanation, choices, checks, p
         </div>
       </div>
       <PlanSummary plan={plan} explanation={explanation} choices={choices} checks={checks} donePlan={donePlan} doneState={doneState} />
+      <ChatPanel
+        plan={plan}
+        busy={checking}
+        // a suggestion goes on the board like any other edit: checked by the backend, and undoable
+        onApply={applyEdit}
+      />
       {notice && (
         <div className="planner-toast" role="alert">
           <span>{notice}</span>

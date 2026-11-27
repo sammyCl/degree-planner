@@ -1951,3 +1951,8 @@
   color: var(--acc);
   font: 700 11px/1 Inter, sans-serif;
 }
+
+/* room under the page so the assistant button never covers the last line */
+.planner {
+  padding-bottom: 76px;
+}

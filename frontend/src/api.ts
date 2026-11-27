@@ -1,6 +1,6 @@
 // All backend calls go through /api. In development Vite proxies /api to the FastAPI server
 // (see vite.config.ts), so the browser never needs the backend's address or CORS settings.
-import type { AgentRequest, AgentResponse, CompletedCourse, Plan, TranscriptReading } from './types.ts'
+import type { AgentRequest, AgentResponse, ChatRequest, ChatResponse, CompletedCourse, Plan, TranscriptReading } from './types.ts'
 
 export async function getHealth(): Promise<{ status: string; database: string }> {
   const response = await fetch('/api/health')
@@ -154,6 +154,24 @@ async function withTimeout<T>(ms: number, signal: AbortSignal | undefined, reque
  */
 export async function submitSetup(request: AgentRequest, signal?: AbortSignal): Promise<AgentResponse> {
   return readAgentResponse(await postJson('/api/plans/submit-setup', request, signal))
+}
+
+function readChatResponse(value: unknown): ChatResponse {
+  if (!isObject(value) || typeof value.reply !== 'string' || value.proposed_plan === undefined) throw unreadable()
+  return {
+    reply: value.reply,
+    proposed_plan: value.proposed_plan === null ? null : readPlan(value.proposed_plan),
+    changes: isListOfObjects(value.changes) ? (value.changes as unknown as ChatResponse['changes']) : [],
+    accepted_overrides: isListOfObjects(value.accepted_overrides) ? (value.accepted_overrides as unknown as ChatResponse['accepted_overrides']) : [],
+    still_open: textList(value.still_open),
+    open_exceptions: textList(value.open_exceptions),
+    problems: textList(value.problems),
+  }
+}
+
+/** One chat message. Like building a plan it can take minutes, so the student can stop it instead of a timeout. */
+export async function sendChat(request: ChatRequest, signal?: AbortSignal): Promise<ChatResponse> {
+  return readChatResponse(await postJson('/api/plans/chat', request, signal))
 }
 
 /** Re-run the validator on a plan after the student changed it (docs/plan-format.md, "What drag-and-drop does"). */
