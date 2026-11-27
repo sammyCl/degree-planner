@@ -85,6 +85,7 @@ export type FlagType =
   | 'stale_program_year'
   | 'assumed_equivalent'
   | 'unlisted_course'
+  | 'undergraduate_prerequisite'
 
 export interface Flag {
   flag_id: string

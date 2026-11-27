@@ -25672,7 +25672,7 @@
    "credits": 3.0,
    "description": "Same topics as those covered in MATH332 but with additional material and problems as well as a more rigorous presentation. 3 hours lecture; 3 semester hours.",
    "prerequisites": {
-    "type": "AND",
+    "type": "OR",
     "of": [
      {
       "type": "course",
@@ -38586,12 +38586,17 @@
       "code": "PHGN310"
      },
      {
-      "type": "course",
-      "code": "MATH332"
-     },
-     {
-      "type": "course",
-      "code": "MATH342"
+      "type": "OR",
+      "of": [
+       {
+        "type": "course",
+        "code": "MATH332"
+       },
+       {
+        "type": "course",
+        "code": "MATH342"
+       }
+      ]
      }
     ]
    },

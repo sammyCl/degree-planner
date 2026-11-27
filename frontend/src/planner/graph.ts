@@ -68,7 +68,7 @@ export type FlagKind = 'error' | 'warning' | 'confirm'
 
 export function flagKind(flag: Flag): FlagKind {
   if (flag.severity === 'error') return 'error'
-  return ['exception_claimed', 'assumed_equivalent', 'unlisted_course'].includes(flag.type) ? 'confirm' : 'warning'
+  return ['exception_claimed', 'assumed_equivalent', 'unlisted_course', 'undergraduate_prerequisite'].includes(flag.type) ? 'confirm' : 'warning'
 }
 
 export function flagCounts(flags: Flag[]): { errors: number; warnings: number; confirm: number } {

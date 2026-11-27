@@ -301,6 +301,20 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
             out.update(equivalent[code])
         return out
 
+    def assumed_background(requirement: Requirement | None, satisfied: set[str]) -> bool:
+        """Whether a master's or PhD student's unmet rule needs only undergraduate (below 500) courses that the plan
+        does not hold: their bachelor's degree is where those come from, and the plan has no record of it. A course
+        the plan does hold, but too late, is still out of order. Combined students are not covered: their
+        undergraduate courses are in the plan."""
+        if requirement is None or student.degree_level not in _GRADUATE_LEVELS:
+            return False
+        assumed = {
+            code
+            for code in _course_codes(requirement)
+            if code not in code_to_course_ids and (_course_number(code) or 500) < 500
+        }
+        return bool(assumed) and _resolve(requirement, satisfied | assumed)
+
     satisfied_before = with_equivalents({completed.code for completed in student.completed_courses})
     for semester in semesters:
         # BUG-049: a corequisite, unlike a prerequisite, is met by the same semester as well as an
@@ -330,24 +344,42 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                     True,
                 )
 
+            assumed = []
             if course.status == "planned" and not _resolve(requirement, satisfied_before):
                 assert requirement is not None  # _resolve(None, ...) is always True
-                add_flag(
-                    "broken_prerequisite",
-                    "error",
-                    course.course_id,
-                    f"{course.code} requires {_describe(requirement)} to be completed in an earlier semester.",
-                    False,
-                )
+                if assumed_background(requirement, satisfied_before):
+                    assumed.append(requirement)
+                else:
+                    add_flag(
+                        "broken_prerequisite",
+                        "error",
+                        course.course_id,
+                        f"{course.code} requires {_describe(requirement)} to be completed in an earlier semester.",
+                        False,
+                    )
 
             if course.status == "planned" and not _resolve(coreq, satisfied_with_semester):
                 assert coreq is not None  # _resolve(None, ...) is always True
+                if assumed_background(coreq, satisfied_with_semester):
+                    assumed.append(coreq)
+                else:
+                    add_flag(
+                        "broken_prerequisite",
+                        "error",
+                        course.course_id,
+                        f"{course.code} needs {_describe(coreq)} as a corequisite, in the same semester "
+                        "or an earlier one.",
+                        False,
+                    )
+
+            if assumed:
                 add_flag(
-                    "broken_prerequisite",
-                    "error",
+                    "undergraduate_prerequisite",
+                    "warning",
                     course.course_id,
-                    f"{course.code} needs {_describe(coreq)} as a corequisite, in the same semester "
-                    "or an earlier one.",
+                    f"{course.code} builds on {' and '.join(_describe(rule) for rule in assumed)}: undergraduate "
+                    "coursework this plan assumes from your bachelor's degree. Confirm with your advisor that you "
+                    "have it.",
                     False,
                 )
 

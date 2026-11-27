@@ -82,6 +82,8 @@ FlagType = Literal[
     # a requirement the course data cannot fill (a required course missing from the catalog, or a course that
     # would have to be repeated): the student confirms it with their advisor instead of the plan failing
     "unlisted_course",
+    # a master's or PhD course whose prerequisite is undergraduate coursework, assumed from the bachelor's degree
+    "undergraduate_prerequisite",
 ]
 FlagSeverity = Literal["error", "warning"]
 

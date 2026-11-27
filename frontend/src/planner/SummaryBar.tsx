@@ -197,5 +197,6 @@ const TITLES: Record<Flag['type'], string> = {
   stale_program_year: 'Older catalog data',
   assumed_equivalent: 'Confirm equivalent course',
   unlisted_course: 'Confirm with your advisor',
+  undergraduate_prerequisite: 'Confirm your background',
 }
 const flagTitle = (f: Flag): string => TITLES[f.type] ?? 'Needs attention'
