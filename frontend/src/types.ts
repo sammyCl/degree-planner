@@ -51,7 +51,16 @@ export interface PlannedCourse {
   title: string
   credits: number
   status: 'planned' | 'completed'
+  /** the catalog description; absent or empty on older plans */
+  description?: string
+  corequisites?: Requirement | null
 }
+
+/** A prerequisite or corequisite rule (docs/data-format.md, "Requirement expressions"). */
+export type Requirement =
+  | { type: 'course'; code: string }
+  | { type: 'exception'; label: string }
+  | { type: 'AND' | 'OR'; of: Requirement[] }
 
 export interface Semester {
   semester_id: string
@@ -73,6 +82,8 @@ export type FlagType =
   | 'exception_claimed'
   | 'ineligible_course'
   | 'semester_overload'
+  | 'stale_program_year'
+  | 'assumed_equivalent'
 
 export interface Flag {
   flag_id: string

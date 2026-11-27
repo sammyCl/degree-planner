@@ -186,7 +186,7 @@ export function SummaryBar({ plan, programName, onSelectFlag, checking }: Props)
   )
 }
 
-const TITLES: Record<string, string> = {
+const TITLES: Record<Flag['type'], string> = {
   broken_prerequisite: 'Prerequisite out of order',
   credit_shortfall: 'Credit load',
   requirement_unmet: 'Requirement not met',
@@ -194,5 +194,7 @@ const TITLES: Record<string, string> = {
   exception_claimed: 'To confirm',
   ineligible_course: 'Course not allowed here',
   semester_overload: 'Too many credits in a semester',
+  stale_program_year: 'Older catalog data',
+  assumed_equivalent: 'Confirm equivalent course',
 }
 const flagTitle = (f: Flag): string => TITLES[f.type] ?? 'Needs attention'

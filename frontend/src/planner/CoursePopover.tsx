@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Dropdown } from '../setup/Dropdown.tsx'
 import type { Flag, Plan } from '../types.ts'
 import { flagKind, formatCredits, togetherWith, type PlanIndex } from './graph.ts'
+import { describeRequirement } from './requirement.ts'
 
 interface Props {
   plan: Plan
@@ -14,12 +15,21 @@ interface Props {
   onClose: () => void
 }
 
-/** Details for one course: its flags, what it needs and what it unlocks. Placed beside the card that was clicked. */
+/** A description longer than this starts shortened, with a button for the rest. */
+const SHORT = 220
+
+/** The start of a long description, cut at a word. */
+const shorten = (text: string): string => `${text.slice(0, SHORT).replace(/\s+\S*$/, '')}...`
+
+/** Details for one course: its description, flags, corequisites, what it needs and what it unlocks. Placed beside the card that was clicked. */
 export function CoursePopover({ plan, index, courseId, anchor, flags, onMove, onClose }: Props) {
   const ref = useRef<HTMLDivElement>(null)
   const course = index.courses.get(courseId)!
   const here = index.semesterOf.get(courseId) ?? 0
   const [target, setTarget] = useState(String(here))
+  const [full, setFull] = useState(false)
+  const description = course.description?.trim() ?? ''
+  const long = description.length > SHORT
 
   // Place next to the card, on whichever side has room.
   useEffect(() => {
@@ -34,8 +44,10 @@ export function CoursePopover({ plan, index, courseId, anchor, flags, onMove, on
     const y = Math.min(Math.max(10, r.top - 8), Math.max(10, window.innerHeight - h - 10))
     el.style.left = `${x}px`
     el.style.top = `${y}px`
-    el.focus()
-  }, [anchor])
+  }, [anchor, full])
+
+  // move keyboard focus into the popover when it opens (not again when the description is expanded)
+  useEffect(() => ref.current?.focus(), [anchor])
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
@@ -81,6 +93,16 @@ export function CoursePopover({ plan, index, courseId, anchor, flags, onMove, on
           {f.message}
         </div>
       ))}
+      {description && (
+        <p className="pop-desc">
+          {long && !full ? shorten(description) : description}
+          {long && (
+            <button type="button" className="link" aria-expanded={full} onClick={() => setFull((f) => !f)}>
+              {full ? 'Less' : 'Read more'}
+            </button>
+          )}
+        </p>
+      )}
       {partners.length > 0 && onMove && (
         <div className="pop-note">
           Taken together with {partners.map((id) => index.courses.get(id)?.code).join(', ')}, so they move as one.
@@ -90,6 +112,12 @@ export function CoursePopover({ plan, index, courseId, anchor, flags, onMove, on
       <div className="pop-list">
         {needs.length ? needs.map((id) => tag(id, (index.semesterOf.get(id) ?? 0) >= here)) : <span className="tag">Nothing in this plan</span>}
       </div>
+      {course.corequisites && (
+        <>
+          <div className="pop-sec">Take with, or before</div>
+          <div className="pop-coreq">{describeRequirement(course.corequisites)}</div>
+        </>
+      )}
       <div className="pop-sec">Unlocks</div>
       <div className="pop-list">
         {unlocks.length ? unlocks.map((id) => tag(id, (index.semesterOf.get(id) ?? 0) <= here)) : <span className="tag">Nothing in this plan</span>}

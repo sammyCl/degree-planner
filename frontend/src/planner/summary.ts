@@ -184,18 +184,21 @@ export interface CheckItem {
   kind: 'confirm' | 'warning' | 'info'
 }
 
-/** What the student should look at: claimed exceptions to confirm, and warnings. Errors are shown on the board itself. */
+/**
+ * What the student should look at: claimed exceptions to confirm, and warnings. Errors are shown on the board itself,
+ * and an older catalog year in the banner above it, so neither is repeated here.
+ */
 export function buildChecks(plan: Plan): CheckItem[] {
   const index = indexPlan(plan)
   const items: CheckItem[] = []
   for (const f of plan.flags) {
     const kind = flagKind(f)
-    if (!isOpen(f) || kind === 'error') continue
+    if (!isOpen(f) || kind === 'error' || f.type === 'stale_program_year') continue
     const title = f.course_id ? (index.courses.get(f.course_id)?.title ?? '') : ''
     const reason = /\(([^)]+)\)/.exec(f.message)?.[1]
     items.push({
       title,
-      text: kind === 'confirm' && reason ? `needs ${reason}; confirm it still applies` : f.message,
+      text: f.type === 'exception_claimed' && reason ? `needs ${reason}; confirm it still applies` : f.message,
       kind,
     })
   }
@@ -203,13 +206,18 @@ export function buildChecks(plan: Plan): CheckItem[] {
   return items
 }
 
-/** Courses the data treats as the same course although the catalog does not say so: the student confirms them. */
+/**
+ * Courses the data treats as the same course although the catalog does not say so: the student confirms them. A course
+ * the validator already flagged for this (assumed_equivalent) is left to that flag.
+ */
 function inferredEquivalentChecks(plan: Plan): CheckItem[] {
   const inPlan = new Map(plan.semesters.flatMap((s) => s.courses.map((c) => [c.code, c] as const)))
   const items: CheckItem[] = []
   for (const group of inferredEquivalents as { codes: string[] }[]) {
     const mine = group.codes.find((code) => inPlan.has(code))
     if (!mine) continue
+    const id = inPlan.get(mine)!.course_id
+    if (plan.flags.some((f) => f.type === 'assumed_equivalent' && f.course_id === id)) continue
     const others = group.codes.filter((code) => code !== mine)
     items.push({
       title: inPlan.get(mine)!.title,
@@ -229,7 +237,7 @@ function addOnCreditNote(plan: Plan): CheckItem[] {
   return [
     {
       title: 'Credits',
-      text: `A ${addOn} adds about 9 credits beyond your degree: at least 9 of its credits cannot also count toward the degree, and only free electives can overlap. This plan has ${formatCredits(total)} credits and the degree needs ${formatCredits(required)}.`,
+      text: `${addOn === 'ASI' ? 'An' : 'A'} ${addOn} adds about 9 credits beyond your degree: at least 9 of its credits cannot also count toward the degree, and only free electives can overlap. This plan has ${formatCredits(total)} credits and the degree needs ${formatCredits(required)}.`,
       kind: 'info',
     },
   ]

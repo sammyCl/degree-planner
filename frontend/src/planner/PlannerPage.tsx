@@ -399,6 +399,7 @@ export function PlannerPage({ plan: initialPlan, explanation, choices, checks, p
       )}
       {openCard && (
         <CoursePopover
+          key={openCard.id}
           plan={plan}
           index={index}
           courseId={openCard.id}
