@@ -8,8 +8,11 @@ by the agent's `check_plan` tool.
 
 from __future__ import annotations
 
+import json
 import re
 import sqlite3
+from functools import cache
+from pathlib import Path
 
 from degree_planner_backend.lookups import NotFoundError, get_course, get_program, program_years
 from degree_planner_backend.models import Program, Requirement, RequirementGroup
@@ -109,6 +112,17 @@ def _exception_labels(requirement: Requirement | None) -> list[str]:
     if requirement.type == "exception":
         return [requirement.label]
     return [label for sub in requirement.of for label in _exception_labels(sub)]
+
+
+SUMMER_COURSES_PATH = Path(__file__).resolve().parents[3] / "data" / "json" / "summer-courses.json"
+
+
+@cache
+def _summer_courses() -> frozenset[str]:
+    """Courses taken in a summer term (data/json/summer-courses.json): the course data does not record terms."""
+    if not SUMMER_COURSES_PATH.exists():
+        return frozenset()
+    return frozenset(json.loads(SUMMER_COURSES_PATH.read_text())["summer_courses"])
 
 
 _ADD_ON_LEVELS = ("minor", "asi", "certificate")
@@ -384,6 +398,25 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                 )
 
         satisfied_before |= with_equivalents({course.code for course in semester.courses})
+
+    has_summer = any(semester.label.startswith("Summer") for semester in semesters)
+    for semester in semesters:
+        if semester.label.startswith("Summer"):
+            continue
+        for course in semester.courses:
+            if course.status == "planned" and course.code in _summer_courses():
+                advice = (
+                    "Move it to a summer semester."
+                    if has_summer
+                    else "This plan has no summer term there: include summer terms, or confirm with your advisor."
+                )
+                add_flag(
+                    "summer_course",
+                    "warning",
+                    course.course_id,
+                    f"{course.code} is taken in summer, but is planned in {semester.label}. {advice}",
+                    False,
+                )
 
     code_credits: dict[str, float] = {completed.code: completed.credits for completed in student.completed_courses}
     for semester in semesters:

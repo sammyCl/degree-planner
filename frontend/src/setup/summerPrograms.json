@@ -1,0 +1,107 @@
+{
+ "biochemistry-bs": [
+  "CHGN490"
+ ],
+ "ceramic-engineering-bs": [
+  "MTGN272"
+ ],
+ "chemical-engineering-bs": [
+  "CBEN312",
+  "CBEN313"
+ ],
+ "chemical-engineering-bs-biological": [
+  "CBEN312",
+  "CBEN313"
+ ],
+ "chemical-engineering-bs-honors-research": [
+  "CBEN312",
+  "CBEN313"
+ ],
+ "chemical-engineering-bs-process": [
+  "CBEN312",
+  "CBEN313"
+ ],
+ "chemistry-bs-biochemistry": [
+  "CHGN490"
+ ],
+ "chemistry-bs-chemistry": [
+  "CHGN490"
+ ],
+ "chemistry-bs-environmental": [
+  "CHGN490"
+ ],
+ "civil-engineering-bs": [
+  "CEEN331"
+ ],
+ "construction-engineering-bs": [
+  "CEEN331"
+ ],
+ "cs-bs-business": [
+  "CSCI370"
+ ],
+ "cs-bs-computer-engineering": [
+  "CSCI370"
+ ],
+ "cs-bs-data-science": [
+  "CSCI370"
+ ],
+ "cs-bs-entrepreneurship": [
+  "CSCI370"
+ ],
+ "cs-bs-general-track": [
+  "CSCI370"
+ ],
+ "cs-bs-ms-combined": [
+  "CSCI370"
+ ],
+ "cs-bs-robotics": [
+  "CSCI370"
+ ],
+ "cs-bs-space": [
+  "CSCI370"
+ ],
+ "engineering-physics-bs": [
+  "PHGN384"
+ ],
+ "environmental-engineering-bs": [
+  "CEEN330"
+ ],
+ "geological-engineering-bs-engineering-geology": [
+  "GEGN316"
+ ],
+ "geological-engineering-bs-environmental-geosciences": [
+  "GEGN316"
+ ],
+ "geological-engineering-bs-mineral-energy": [
+  "GEGN316"
+ ],
+ "geophysical-engineering-bs": [
+  "GPGN486"
+ ],
+ "mining-bs": [
+  "MNGN203",
+  "MNGN301",
+  "MNGN308"
+ ],
+ "mining-bs-ms-combined": [
+  "MNGN203",
+  "MNGN301",
+  "MNGN308"
+ ],
+ "mme-bs": [
+  "MTGN272"
+ ],
+ "petroleum-engineering-bs": [
+  "PEGN315",
+  "PEGN316"
+ ],
+ "qbe-bs-general": [
+  "BIOL415"
+ ],
+ "qbe-bs-honors": [
+  "BIOL415"
+ ],
+ "quantum-systems-engineering-bs": [
+  "PHGN384"
+ ]
+}

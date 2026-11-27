@@ -49,7 +49,7 @@ function stubSubmit(answer: () => unknown) {
 
 function build() {
   fireEvent.click(screen.getByRole('combobox', { name: 'Program' }))
-  fireEvent.mouseDown(screen.getByRole('option', { name: /Computer Science \(General Track\)/ }))
+  fireEvent.mouseDown(screen.getByRole('option', { name: /^Bachelor of Science in Computer Science/ }))
   fireEvent.click(screen.getByRole('button', { name: /Build my plan/ }))
 }
 
@@ -113,7 +113,7 @@ describe('a page that fails to draw', () => {
     expect(await screen.findByRole('heading', { name: 'This page ran into a problem' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Degree Planner' })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Back to setup' }))
-    expect(screen.getByRole('combobox', { name: 'Program' })).toHaveValue('Bachelor of Science in Computer Science (General Track)')
+    expect(screen.getByRole('combobox', { name: 'Program' })).toHaveValue('Bachelor of Science in Computer Science')
   })
 })
 

@@ -3,6 +3,7 @@ import { ApiError, getHealth, submitSetup } from './api.ts'
 import { BuildingScreen } from './building/BuildingScreen.tsx'
 import { ProblemScreen } from './building/ProblemScreen.tsx'
 import { ErrorBoundary } from './ErrorBoundary.tsx'
+import { withoutEmptySummers } from './planner/graph.ts'
 import { PlannerPage } from './planner/PlannerPage.tsx'
 import { SetupPage } from './setup/SetupPage.tsx'
 import type { SetupForm } from './setup/validate.ts'
@@ -111,7 +112,7 @@ function App() {
             canRetry: true,
           })
         } else {
-          setScreen({ name: 'planner', response })
+          setScreen({ name: 'planner', response: { ...response, plan: withoutEmptySummers(response.plan) } })
         }
       })
       .catch((error) => {

@@ -84,6 +84,8 @@ FlagType = Literal[
     "unlisted_course",
     # a master's or PhD course whose prerequisite is undergraduate coursework, assumed from the bachelor's degree
     "undergraduate_prerequisite",
+    # a summer course (a field session) planned in a fall or spring term
+    "summer_course",
 ]
 FlagSeverity = Literal["error", "warning"]
 

@@ -230,11 +230,6 @@ export function PlannerPage({ plan: initialPlan, explanation, choices, checks, p
         </div>
       )}
       <div className="planner-notice">
-        <span>
-          {LEVELS.find((l) => l.value === plan.student.degree_level)?.label ?? plan.student.degree_level} plan,{' '}
-          {plan.semesters.length} semesters, starting {plan.semesters[0]?.label}
-          {doneColumns.length > 0 ? ', with your completed courses on the left' : ''}. Drag a course to another semester to move it.
-        </span>
         <button type="button" className="edit-setup" onClick={onBack}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0" />
@@ -244,6 +239,11 @@ export function PlannerPage({ plan: initialPlan, explanation, choices, checks, p
           </svg>
           Edit setup
         </button>
+        <span>
+          {LEVELS.find((l) => l.value === plan.student.degree_level)?.label ?? plan.student.degree_level} plan,{' '}
+          {plan.semesters.length} semesters, starting {plan.semesters[0]?.label}
+          {doneColumns.length > 0 ? ', with your completed courses on the left' : ''}. Drag a course to another semester to move it.
+        </span>
       </div>
       {problems && problems.length > 0 && (
         <div className="note-problems planner-problems" role="alert">

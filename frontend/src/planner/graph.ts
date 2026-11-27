@@ -68,7 +68,7 @@ export type FlagKind = 'error' | 'warning' | 'confirm'
 
 export function flagKind(flag: Flag): FlagKind {
   if (flag.severity === 'error') return 'error'
-  return ['exception_claimed', 'assumed_equivalent', 'unlisted_course', 'undergraduate_prerequisite'].includes(flag.type) ? 'confirm' : 'warning'
+  return ['exception_claimed', 'assumed_equivalent', 'unlisted_course', 'undergraduate_prerequisite', 'summer_course'].includes(flag.type) ? 'confirm' : 'warning'
 }
 
 export function flagCounts(flags: Flag[]): { errors: number; warnings: number; confirm: number } {
@@ -109,6 +109,15 @@ export function creditLevel(credits: number, label = '', overloaded = false, ful
   if (overloaded) return 'high'
   if (credits > 0 && credits < fullTime && !label.startsWith('Summer')) return 'low'
   return 'ok'
+}
+
+/**
+ * A summer with nothing in it is not shown: summer terms are only there for the courses that need them (a summer field
+ * session). The student can still add a summer back with the + between two semesters.
+ */
+export function withoutEmptySummers(plan: Plan): Plan {
+  const semesters = plan.semesters.filter((s) => s.courses.length > 0 || !s.label.startsWith('Summer'))
+  return semesters.length === plan.semesters.length ? plan : { ...plan, semesters }
 }
 
 export const formatCredits = (n: number): string => String(Math.round(n * 10) / 10)

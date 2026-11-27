@@ -86,6 +86,7 @@ export type FlagType =
   | 'assumed_equivalent'
   | 'unlisted_course'
   | 'undergraduate_prerequisite'
+  | 'summer_course'
 
 export interface Flag {
   flag_id: string
