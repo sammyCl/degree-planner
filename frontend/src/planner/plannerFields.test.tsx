@@ -38,10 +38,10 @@ describe('the newer flags', () => {
     expect(flagKind(equivalent)).toBe('confirm')
     expect(flagKind(stale)).toBe('warning')
     render(<PlannerPage plan={{ ...samplePlan, flags: [equivalent, stale] }} onBack={vi.fn()} />)
-    fireEvent.click(screen.getByRole('button', { name: '1 to confirm' }))
-    expect(screen.getByRole('menu')).toHaveTextContent('Confirm equivalent course')
+    fireEvent.click(screen.getByRole('button', { name: '1 to check' }))
+    expect(screen.getByRole('menu')).toHaveTextContent('Check this course swap')
     fireEvent.click(screen.getByRole('button', { name: '1 warning' }))
-    expect(screen.getByRole('menu')).toHaveTextContent('Older catalog data')
+    expect(screen.getByRole('menu')).toHaveTextContent('Older rules')
   })
 
   it('does not repeat the older-catalog warning in Things to check, or note an equivalent the validator flagged', () => {
@@ -50,7 +50,7 @@ describe('the newer flags', () => {
     expect(notes([stale]).some((n) => n.text.includes('2025-2026'))).toBe(false)
     expect(notes([]).filter((n) => n.title === course.title)).toHaveLength(1) // the page's own note
     const flagged = notes([flag('assumed_equivalent', course.course_id, 'CSCI303 stands in for DSCI403 here.')])
-    expect(flagged.filter((n) => n.title === course.title).map((n) => n.text)).toEqual(['CSCI303 stands in for DSCI403 here.'])
+    expect(flagged.filter((n) => n.title === course.title).map((n) => n.text)).toEqual(["We counted CSCI303 in place of DSCI403. Ask your advisor if that's OK."])
   })
 })
 
@@ -113,6 +113,6 @@ describe('a requirement the data cannot fill', () => {
     const card = screen.getByRole('heading', { name: 'Degree requirements' }).closest('.about-card') as HTMLElement
     expect(within(card).getByRole('img', { name: 'Confirm with your advisor' })).toBeInTheDocument()
     expect(card).toHaveTextContent('confirm with advisor')
-    expect(screen.getByRole('button', { name: '1 to confirm' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '1 to check' })).toBeInTheDocument()
   })
 })

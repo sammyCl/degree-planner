@@ -1,11 +1,12 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { samplePlan } from '../samplePlan.ts'
-import type { Plan } from '../types.ts'
+import type { FlagType, Plan } from '../types.ts'
 import { fixArrowStyles, headingLines, isPartOfPicture, sharpness } from './boardImage.ts'
 import { buildPdfDocument } from './pdfContent.ts'
 import { printable, renderPdf } from './pdfFile.ts'
 import { PlannerPage } from './PlannerPage.tsx'
+import { plainAlert } from './plainFlags.ts'
 
 const saved = vi.hoisted(() => vi.fn())
 vi.mock('./pdfFile.ts', async (original) => {
@@ -155,4 +156,27 @@ describe('flowchart image', () => {
     expect(screen.getByTestId('board')).not.toHaveClass('exporting')
     vi.unstubAllGlobals()
   }, 15000)
+})
+
+describe('plain alerts', () => {
+  const say = (type: FlagType, message: string) => plainAlert({ type, message })
+
+  it.each<[FlagType, string, string]>([
+    ['exception_claimed', 'PHGN511 relies on a claimed exception (equivalent course); confirm it still applies.', 'Make sure you took the course PHGN511 requires, or a similar one. Not sure? Ask your advisor.'],
+    ['broken_prerequisite', 'CSCI306 requires (CSCI210 or CSCI220) to be completed in an earlier semester.', 'Take CSCI210 or CSCI220 before CSCI306. Move one of them to another semester.'],
+    ['broken_prerequisite', 'PHGN350 needs PHGN311 as a corequisite, in the same semester or an earlier one.', 'Take PHGN311 before PHGN350, or in the same semester.'],
+    ['credit_shortfall', 'Plan has 114.0 credits; needs 130.0.', 'Add 16 credits. This plan needs 130 in total.'],
+    ['credit_shortfall', 'BS in X: Free electives (3 courses) needs 9.0 credits, only 6.0 completed or planned.', 'Add 3 credits of Free electives.'],
+    ['requirement_unmet', 'BS in X: Core is missing CSCI306, CSCI400.', 'Add CSCI306, CSCI400 to your plan. Needed for: Core.'],
+    ['requirement_unmet', 'BS in X: Linear Algebra: MATH332 or MATH342 needs (MATH332 or MATH342).', 'Add MATH332 or MATH342 to your plan. Needed for: Linear Algebra: MATH332 or MATH342.'],
+    ['semester_overload', 'Fall 2027 has 20 credits, over the 18-credit limit for an undergraduate semester.', 'Fall 2027 has 20 credits, but the most allowed is 18. Move a course to another semester.'],
+    ['summer_course', 'CSCI370 is taken in summer, but is planned in Fall 2028. Move it to a summer semester.', 'CSCI370 is usually a summer course. Move it to a summer, or ask your advisor.'],
+    ['assumed_equivalent', 'GEOL310 stands in for MNGN310 here, but the catalog never states they are equivalent.', "We counted GEOL310 in place of MNGN310. Ask your advisor if that's OK."],
+  ])('says what to do for %s', (type, message, expected) => {
+    expect(say(type, message).text).toBe(expected)
+  })
+
+  it('shows a message it does not know as written', () => {
+    expect(say('credit_shortfall', 'Something new.')).toEqual({ title: 'Not enough credits', text: 'Something new.' })
+  })
 })

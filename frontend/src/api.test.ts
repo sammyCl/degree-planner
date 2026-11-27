@@ -47,7 +47,7 @@ describe('submitSetup', () => {
 
   it('treats other failures as server errors, even when the body is not JSON', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 500, json: async () => Promise.reject(new Error('not json')) }))
-    await expect(submitSetup(request)).rejects.toMatchObject({ kind: 'server', status: 500, message: 'The backend returned 500.' })
+    await expect(submitSetup(request)).rejects.toMatchObject({ kind: 'server', status: 500, message: 'Something went wrong (error 500). Try again.' })
   })
 
   it('reports a cancelled request', async () => {

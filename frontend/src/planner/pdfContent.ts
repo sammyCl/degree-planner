@@ -5,7 +5,8 @@ import { ADD_ON_NAMES, LEVELS, PROGRAMS, staleInPlan } from '../setup/validate.t
 import type { Plan } from '../types.ts'
 import { completedColumns, completedCredits, completedId, remainingCredits } from './completed.ts'
 import { courseLabel } from './courseLabel.ts'
-import { flagKind, flagTitle, formatCredits, indexPlan, isOpen } from './graph.ts'
+import { flagKind, formatCredits, isOpen } from './graph.ts'
+import { plainAlert } from './plainFlags.ts'
 import { buildChecklist, buildChecks, readExplanation } from './summary.ts'
 
 export interface PdfInput {
@@ -61,22 +62,18 @@ export function buildPdfDocument({ plan, donePlan, explanation, checks, choices 
   const start = plan.semesters[0]?.label
 
   const alerts: PdfNotes[] = []
-  const index = indexPlan(plan)
   const errors = plan.flags.filter((f) => isOpen(f) && flagKind(f) === 'error')
   if (errors.length) {
     alerts.push({
       heading: `This plan still has ${errors.length} ${errors.length === 1 ? 'problem' : 'problems'} to fix`,
-      items: errors.map((f) => {
-        const code = f.course_id ? index.courses.get(f.course_id)?.code : undefined
-        return `${flagTitle(f)}${code ? ` (${displayCode(code)})` : ''}: ${f.message}`
-      }),
+      items: errors.map((f) => `${plainAlert(f).title}: ${plainAlert(f).text}`),
     })
   }
   const stale = staleInPlan(plan.student.programs, plan.student.catalog_year)
   if (stale.length) {
     alerts.push({
-      heading: 'Check against the current Mines catalog',
-      items: stale.map((s) => `${s.name} (${ADD_ON_NAMES[s.kind].one}) is from the ${s.year} catalog, not ${plan.student.catalog_year}.`),
+      heading: 'Some rules may be out of date',
+      items: stale.map((s) => `${s.name} (${ADD_ON_NAMES[s.kind].one}) uses ${s.year} rules. Check them with your advisor.`),
     })
   }
 

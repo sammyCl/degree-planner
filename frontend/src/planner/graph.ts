@@ -71,22 +71,6 @@ export function flagKind(flag: Flag): FlagKind {
   return ['exception_claimed', 'assumed_equivalent', 'unlisted_course', 'undergraduate_prerequisite', 'summer_course'].includes(flag.type) ? 'confirm' : 'warning'
 }
 
-const TITLES: Record<Flag['type'], string> = {
-  broken_prerequisite: 'Prerequisite out of order',
-  credit_shortfall: 'Credit load',
-  requirement_unmet: 'Requirement not met',
-  double_count_exceeded: 'Too many shared courses',
-  exception_claimed: 'To confirm',
-  ineligible_course: 'Course not allowed here',
-  semester_overload: 'Too many credits in a semester',
-  stale_program_year: 'Older catalog data',
-  assumed_equivalent: 'Confirm equivalent course',
-  unlisted_course: 'Confirm with your advisor',
-  undergraduate_prerequisite: 'Confirm your background',
-  summer_course: 'Summer course',
-}
-export const flagTitle = (f: Flag): string => TITLES[f.type] ?? 'Needs attention'
-
 export function flagCounts(flags: Flag[]): { errors: number; warnings: number; confirm: number } {
   const kinds = flags.filter(isOpen).map(flagKind)
   return {

@@ -299,8 +299,7 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
             )}
             {needsSummer && (
               <p className="summer-hint" role="alert">
-                This degree takes {summerCodes} in summer. Without enough semesters that include summers, those courses may
-                land in a fall or spring term, or not fit, unless you have already completed them.{' '}
+                {summerCodes} is a summer course. Include summers so it fits, unless you already took it.{' '}
                 <button type="button" className="link" onClick={() => patch({ includeSummers: true, semesters: summerCount })}>
                   Include summers and plan {summerCount} semesters
                 </button>

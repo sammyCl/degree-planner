@@ -7,6 +7,7 @@ import type { Plan, RequirementStatus } from '../types.ts'
 import { categoryOf, groupCategory, type Category } from './courseLabel.ts'
 import { flagKind, formatCredits, indexPlan, isOpen } from './graph.ts'
 import { parseBlocks, type Block } from './parseMarkdown.ts'
+import { plainAlert } from './plainFlags.ts'
 
 export interface ChecklistRow {
   name: string
@@ -134,7 +135,7 @@ export function buildChecklist(plan: Plan): ChecklistSection[] {
         name: 'Prerequisites in order',
         category: 'other',
         met: outOfOrder === 0,
-        detail: outOfOrder ? `${outOfOrder} ${outOfOrder === 1 ? 'course' : 'courses'} out of order` : '',
+        detail: outOfOrder ? `${outOfOrder} ${outOfOrder === 1 ? 'course' : 'courses'} taken too early` : '',
       },
     ],
   })
@@ -199,12 +200,7 @@ export function buildChecks(plan: Plan): CheckItem[] {
     const kind = flagKind(f)
     if (!isOpen(f) || kind === 'error' || f.type === 'stale_program_year') continue
     const title = f.course_id ? (index.courses.get(f.course_id)?.title ?? '') : ''
-    const reason = /\(([^)]+)\)/.exec(f.message)?.[1]
-    items.push({
-      title,
-      text: f.type === 'exception_claimed' && reason ? `needs ${reason}; confirm it still applies` : f.message,
-      kind,
-    })
+    items.push({ title, text: plainAlert(f).text, kind })
   }
   items.push(...inferredEquivalentChecks(plan), ...addOnCreditNote(plan))
   return items
@@ -225,7 +221,7 @@ function inferredEquivalentChecks(plan: Plan): CheckItem[] {
     const others = group.codes.filter((code) => code !== mine)
     items.push({
       title: inPlan.get(mine)!.title,
-      text: `Counted as the same course as ${others.join(' and ')}; confirm with your advisor. The catalog does not say so (${mine}); the data assumes it because the catalog names both as prerequisites of other courses.`,
+      text: `We counted ${mine} as the same course as ${others.join(' and ')}. Ask your advisor if that's OK.`,
       kind: 'confirm',
     })
   }
@@ -241,7 +237,7 @@ function addOnCreditNote(plan: Plan): CheckItem[] {
   return [
     {
       title: 'Credits',
-      text: `${addOn === 'ASI' ? 'An' : 'A'} ${addOn} adds about 9 credits beyond your degree: at least 9 of its credits cannot also count toward the degree, and only free electives can overlap. This plan has ${formatCredits(total)} credits and the degree needs ${formatCredits(required)}.`,
+      text: `${addOn === 'ASI' ? 'An' : 'A'} ${addOn} adds about 9 extra credits. This plan has ${formatCredits(total)} credits; your degree alone needs ${formatCredits(required)}.`,
       kind: 'info',
     },
   ]

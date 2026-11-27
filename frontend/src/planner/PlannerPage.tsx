@@ -51,8 +51,8 @@ const programName = (plan: Plan): string => {
 
 const undoMessage = (error: unknown): string =>
   error instanceof ApiError && error.kind === 'network'
-    ? 'Could not reach the backend, so your change was undone.'
-    : `The backend could not re-check the plan, so your change was undone.${error instanceof ApiError ? ` ${error.message}` : ''}`
+    ? "Can't reach the server, so we undid your change. Try again."
+    : "We couldn't check your change, so we undid it. Try again."
 
 export function PlannerPage({ plan: initialPlan, explanation, choices, checks, problems, onBack }: Props) {
   // The plan on screen. After every change the backend re-checks it and its answer replaces this, so the flags,
@@ -224,10 +224,9 @@ export function PlannerPage({ plan: initialPlan, explanation, choices, checks, p
       <SummaryBar plan={plan} programName={programName(plan)} onSelectFlag={selectFlag} checking={checking} />
       {stale.length > 0 && (
         <div className="stale-warning" role="note">
-          <b>Minor, ASI and certification data may not be up to date.</b>{' '}
-          {stale.map((s) => `${s.name} (${ADD_ON_NAMES[s.kind].one}) is from the ${s.year} catalog`).join('; ')}, not{' '}
-          {plan.student.catalog_year}. Check {stale.length === 1 ? 'it' : 'each one'} against the current Mines catalog before you rely on{' '}
-          {stale.length === 1 ? 'it' : 'them'}.
+          <b>Some rules may be out of date.</b>{' '}
+          {stale.map((s) => `${s.name} (${ADD_ON_NAMES[s.kind].one}) uses ${s.year} rules`).join('; ')}. Check{' '}
+          {stale.length === 1 ? 'it' : 'them'} with your advisor.
         </div>
       )}
       <div className="planner-notice">
@@ -258,7 +257,7 @@ export function PlannerPage({ plan: initialPlan, explanation, choices, checks, p
       </div>
       {problems && problems.length > 0 && (
         <div className="note-problems planner-problems" role="alert">
-          <b>The assistant could not build a plan that passes every rule.</b> It tried several times and this is its best attempt. The courses marked in red still break a rule, and the reasons are listed below.
+          <b>This plan still has problems.</b> Fix the courses in red by moving or replacing them. The reasons are below.
           <ul>
             {problems.map((p, i) => (
               <li key={i}>{p}</li>

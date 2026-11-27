@@ -144,12 +144,12 @@ function Checklist({ sections, plan, partial }: { sections: ChecklistSection[]; 
   )
 }
 
-const TAGS = { confirm: 'Confirm', warning: 'Warning', info: 'Note', advisor: 'Ask your advisor' } as const
+const TAGS = { confirm: 'Check', warning: 'Warning', info: 'Note', advisor: 'Ask your advisor' } as const
 
-/** One note: its first sentence, and the rest behind "more". */
+/** One note. The assistant's longer ones show their first sentence and the rest behind "more"; ours are short and say what to do, so they show whole. */
 function Note({ tag, title, text }: { tag: keyof typeof TAGS; title?: string; text: string }) {
   const [open, setOpen] = useState(false)
-  const { head, rest } = firstSentence(text)
+  const { head, rest } = tag === 'advisor' ? firstSentence(text) : { head: text, rest: '' }
   return (
     <li className={`check-item ${tag}`}>
       <span className="check-tag">{TAGS[tag]}</span>

@@ -97,7 +97,7 @@ describe('TranscriptUpload', () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')))
     setup()
     upload()
-    expect(await screen.findByRole('alert')).toHaveTextContent('Could not reach the backend')
+    expect(await screen.findByRole('alert')).toHaveTextContent("Can't reach the server")
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(reply(200, reading([]))))
     upload()
     expect(await screen.findByText(/No courses were found in that file/)).toBeInTheDocument()
