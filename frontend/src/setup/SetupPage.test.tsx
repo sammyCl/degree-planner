@@ -200,16 +200,29 @@ describe('SetupPage', () => {
     expect(onSubmit.mock.calls[0][1]).toMatchObject({ level: 'bachelor', programId: 'cs-bs-general-track', semesters: 8 })
   })
 
-  it('offers summer terms for a degree with a summer field session, and not for others', () => {
+  it('switches summer terms on for a degree with a summer field session, and back off for another', () => {
     const onSubmit = setup()
-    pick(program(), CS)
-    expect(screen.queryByText(/summer field session/)).not.toBeInTheDocument()
     pick(program(), /Petroleum Engineering/)
-    expect(screen.getByText(/summer field session/)).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Include summers and plan 11 semesters' }))
+    expect(screen.getByLabelText('Include summer terms')).toBeChecked()
+    expect(semesters()).toHaveValue(11)
+    expect(screen.getByRole('note')).toHaveTextContent('Summer terms are on')
+    pick(program(), CS)
+    expect(screen.getByLabelText('Include summer terms')).not.toBeChecked()
+    expect(semesters()).toHaveValue(8)
     expect(screen.queryByText(/summer field session/)).not.toBeInTheDocument()
+    pick(program(), /Engineering Physics/)
     fireEvent.click(screen.getByRole('button', { name: /Build my plan/ }))
     expect(onSubmit.mock.calls[0][0]).toMatchObject({ include_summers: true, semesters: 11 })
+  })
+
+  it('warns when summer terms are taken away from such a degree, and can put them back', () => {
+    setup()
+    pick(program(), /Petroleum Engineering/)
+    fireEvent.click(screen.getByLabelText('Include summer terms'))
+    expect(screen.getByRole('alert')).toHaveTextContent('will not fit')
+    fireEvent.click(screen.getByRole('button', { name: 'Include summers and plan 11 semesters' }))
+    expect(screen.getByLabelText('Include summer terms')).toBeChecked()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
 
   it('starts from the earlier choices when given them', () => {
