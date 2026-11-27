@@ -259,8 +259,9 @@ export function TranscriptUpload({ courses, files = [], onChange, thisYear, onRe
       </div>
       <p className="tu-hint">
         We read course codes, credits and terms. The file itself is not saved; only the courses in the list below are sent to the planner.
-        A Mines transcript is read on our server. A transcript in another layout is read by Claude (Anthropic&apos;s AI) after
-        your name, student ID, birth date and contact details are removed.{' '}
+        A Mines transcript is read on our server. A transcript in another layout is read by Claude (Anthropic&apos;s AI). We
+        first try to remove your name, student ID, birth date and contact details, but this is automatic and can miss
+        some.{' '}
         <button type="button" className="link" onClick={downloadTemplate}>
           Download a CSV template
         </button>
