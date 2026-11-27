@@ -96,7 +96,7 @@
 
 .row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -524,7 +524,8 @@
 
 @media (max-width: 980px) {
   .setup-wrap {
-    grid-template-columns: 1fr;
+    /* not plain 1fr, which grows to its widest content and pushes the form off a phone screen */
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .preview {
@@ -562,6 +563,16 @@
 .completed-help {
   margin: 0 0 10px;
   color: var(--mut);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.summer-hint {
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent);
+  border-radius: 10px;
+  background: var(--raised);
   font-size: 13px;
   line-height: 1.45;
 }

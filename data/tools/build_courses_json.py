@@ -307,11 +307,11 @@ def build() -> tuple[list[dict], dict[str, list[str]], Counter]:
             stats["credit ranges (upper bound used)"] += 1
             notes["credit ranges"].append(f"{code}: {r['credits']} -> {cr:g}")
         pre = parse_prerequisites(r["prerequisites"])
+        original = " ".join(r["prerequisites"].split())
         if pre.fallback:
             whole = pre.requirement["type"] == "exception"
             stats["prerequisites kept as one exception (free text)" if whole else "prerequisites partly free text (mixed)"] += 1
             notes["free-text prerequisites"].append(f"{code}{'' if whole else ' (mixed)'}: {original}")
-        original = " ".join(r["prerequisites"].split())
         if pre.grade_dropped:
             stats["prerequisites with a grade minimum (grade dropped)"] += 1
             dropped.append({"code": code, "kind": "grade minimum", "detail": "; ".join(pre.grade_texts), "original_prerequisites": original})

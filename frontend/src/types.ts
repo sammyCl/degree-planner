@@ -51,7 +51,16 @@ export interface PlannedCourse {
   title: string
   credits: number
   status: 'planned' | 'completed'
+  /** the catalog description; absent or empty on older plans */
+  description?: string
+  corequisites?: Requirement | null
 }
+
+/** A prerequisite or corequisite rule (docs/data-format.md, "Requirement expressions"). */
+export type Requirement =
+  | { type: 'course'; code: string }
+  | { type: 'exception'; label: string }
+  | { type: 'AND' | 'OR'; of: Requirement[] }
 
 export interface Semester {
   semester_id: string
@@ -73,6 +82,10 @@ export type FlagType =
   | 'exception_claimed'
   | 'ineligible_course'
   | 'semester_overload'
+  | 'stale_program_year'
+  | 'assumed_equivalent'
+  | 'unlisted_course'
+  | 'undergraduate_prerequisite'
 
 export interface Flag {
   flag_id: string
@@ -94,6 +107,8 @@ export interface RequirementStatus {
   credits_required: number | null
   credits_earned: number | null
   missing_count: number
+  /** not met only because the course data cannot fill it: confirm with an advisor (absent on older plans) */
+  confirm?: boolean
 }
 
 /** One requirement group a planned course fills (computed by the backend's validator). */

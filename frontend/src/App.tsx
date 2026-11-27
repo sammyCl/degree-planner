@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { ApiError, getHealth, submitSetup } from './api.ts'
 import { BuildingScreen } from './building/BuildingScreen.tsx'
 import { ProblemScreen } from './building/ProblemScreen.tsx'
+import { ErrorBoundary } from './ErrorBoundary.tsx'
 import { PlannerPage } from './planner/PlannerPage.tsx'
 import { SetupPage } from './setup/SetupPage.tsx'
 import type { SetupForm } from './setup/validate.ts'
@@ -64,6 +65,7 @@ function App() {
   const run = useRef(0)
   const controller = useRef<AbortController | null>(null)
 
+  // asked again on every new screen, so the header does not keep saying "not running" after the backend is started
   useEffect(() => {
     let cancelled = false
     getHealth()
@@ -71,6 +73,22 @@ function App() {
       .catch(() => !cancelled && setBackend('down'))
     return () => {
       cancelled = true
+    }
+  }, [screen.name])
+
+  // A file dropped beside the upload box would be opened by the browser, replacing the page and losing the setup.
+  useEffect(() => {
+    const keep = (e: DragEvent) => {
+      if (!e.dataTransfer?.types.includes('Files')) return
+      // over the upload box, its own handlers have already claimed the drag
+      if (!e.defaultPrevented) e.dataTransfer.dropEffect = 'none'
+      e.preventDefault()
+    }
+    window.addEventListener('dragover', keep)
+    window.addEventListener('drop', keep)
+    return () => {
+      window.removeEventListener('dragover', keep)
+      window.removeEventListener('drop', keep)
     }
   }, [])
 
@@ -132,35 +150,37 @@ function App() {
         </button>
       </header>
 
-      {screen.name === 'setup' && (
-        <SetupPage
-          initial={form}
-          onSubmit={(request, submitted) => {
-            setForm(submitted)
-            build(request)
-          }}
-        />
-      )}
-      {screen.name === 'building' && <BuildingScreen request={screen.request} onCancel={cancel} />}
-      {screen.name === 'planner' && (
-        <PlannerPage
-          plan={screen.response.plan!}
-          explanation={screen.response.explanation}
-          choices={screen.response.choices}
-          checks={screen.response.checks}
-          problems={screen.response.status === 'cannot_work' ? screen.response.problems : []}
-          onBack={() => setScreen({ name: 'setup' })}
-        />
-      )}
-      {screen.name === 'problem' && (
-        <ProblemScreen
-          title={screen.title}
-          message={screen.message}
-          problems={screen.problems}
-          onRetry={screen.canRetry ? () => build(screen.request) : undefined}
-          onBack={() => setScreen({ name: 'setup' })}
-        />
-      )}
+      <ErrorBoundary key={screen.name} onReset={() => setScreen({ name: 'setup' })}>
+        {screen.name === 'setup' && (
+          <SetupPage
+            initial={form}
+            onSubmit={(request, submitted) => {
+              setForm(submitted)
+              build(request)
+            }}
+          />
+        )}
+        {screen.name === 'building' && <BuildingScreen request={screen.request} onCancel={cancel} />}
+        {screen.name === 'planner' && (
+          <PlannerPage
+            plan={screen.response.plan!}
+            explanation={screen.response.explanation}
+            choices={screen.response.choices}
+            checks={screen.response.checks}
+            problems={screen.response.status === 'cannot_work' ? screen.response.problems : []}
+            onBack={() => setScreen({ name: 'setup' })}
+          />
+        )}
+        {screen.name === 'problem' && (
+          <ProblemScreen
+            title={screen.title}
+            message={screen.message}
+            problems={screen.problems}
+            onRetry={screen.canRetry ? () => build(screen.request) : undefined}
+            onBack={() => setScreen({ name: 'setup' })}
+          />
+        )}
+      </ErrorBoundary>
     </>
   )
 }

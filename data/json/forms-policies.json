@@ -43,6 +43,15 @@
       "notes": "Courses more than 10 years old before the start of the Mines program cannot transfer unless the academic department reviews and approves them. One form per Mines department."
     },
     {
+      "form_id": "course-substitution",
+      "name": "Course Substitution Form",
+      "applies_to": [
+        "any"
+      ],
+      "requires": "approval of the Registrar, the heads of departments of the two courses, and the head of the student's option department",
+      "notes": "For counting one course in place of another course that the approved curriculum in the catalog requires. The forms are available in the Registrar's Office; there will be a periodic review by the Office of the Executive Vice President for Academic Affairs. No PDF or link was collected, and the catalog text prints no form title (the name here describes it). Source: catalog page 'Academic Regulations and Standards', section 'Course Substitutions'."
+    },
+    {
       "form_id": "decline-ap-ib-transfer-credit",
       "name": "Decline Credit Form (AP, IB, or Transfer Credit)",
       "applies_to": [

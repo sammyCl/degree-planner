@@ -68,7 +68,7 @@ What the validator found wrong, attached to a specific course placement so the f
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | `flag_id` | string | yes | |
-| `type` | string | yes | `broken_prerequisite`, `credit_shortfall`, `requirement_unmet`, `double_count_exceeded`, `exception_claimed`, `ineligible_course`, `semester_overload`, `stale_program_year`, `assumed_equivalent` |
+| `type` | string | yes | `broken_prerequisite`, `credit_shortfall`, `requirement_unmet`, `double_count_exceeded`, `exception_claimed`, `ineligible_course`, `semester_overload`, `stale_program_year`, `assumed_equivalent`, `undergraduate_prerequisite` (a warning, master's and PhD students only: the unmet prerequisite is undergraduate coursework the plan does not hold, assumed from the bachelor's degree), `unlisted_course` (a warning: a requirement the course data cannot fill, because a required course is missing from the catalog or would have to be repeated; the student confirms it with an advisor, and its requirement_status entry has `confirm: true`) |
 | `severity` | string | yes | `error` (the plan is invalid) or `warning` (needs the student's attention but is not by itself invalid, e.g. a claimed exception) |
 | `course_id` | course_id \| null | yes | `null` for a plan-wide flag like `requirement_unmet` |
 | `message` | string | yes | shown to the student as-is |

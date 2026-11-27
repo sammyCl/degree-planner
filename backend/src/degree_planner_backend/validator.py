@@ -251,7 +251,7 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
     statuses: list[tuple[int, int, RequirementStatus]] = []
     program_rank = 0
 
-    def report(group: RequirementGroup, program: Program, met: bool, **fields: float | int | None) -> None:
+    def report(group: RequirementGroup, program: Program, met: bool, **fields: float | int | bool | None) -> None:
         order = [g.group_id for g in program.requirement_groups]
         statuses.append(
             (
@@ -271,6 +271,26 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
     equivalent: dict[str, list[str]] = {}
     inferred_equivalent: dict[str, list[str]] = {}
 
+    in_catalog: dict[str, float | None] = {}
+
+    def catalog_credits(code: str) -> float | None:
+        """The course's catalog credits, or None for a code the course data does not have."""
+        if code not in in_catalog:
+            try:
+                in_catalog[code] = get_course(connection, code, catalog_year).credits
+            except NotFoundError:
+                in_catalog[code] = None
+        return in_catalog[code]
+
+    def confirm_with_advisor(program: Program, group: RequirementGroup, why: str) -> None:
+        add_flag(
+            "unlisted_course",
+            "warning",
+            None,
+            f"{program.name}: {group.label} {why} Confirm with your advisor how to meet it.",
+            False,
+        )
+
     def with_equivalents(codes: set[str]) -> set[str]:
         """codes plus their equivalent courses: an equivalent course satisfies a prerequisite (BUG-041)."""
         out = set(codes)
@@ -280,6 +300,20 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                 inferred_equivalent[code] = _inferred_equivalents(connection, code, catalog_year)
             out.update(equivalent[code])
         return out
+
+    def assumed_background(requirement: Requirement | None, satisfied: set[str]) -> bool:
+        """Whether a master's or PhD student's unmet rule needs only undergraduate (below 500) courses that the plan
+        does not hold: their bachelor's degree is where those come from, and the plan has no record of it. A course
+        the plan does hold, but too late, is still out of order. Combined students are not covered: their
+        undergraduate courses are in the plan."""
+        if requirement is None or student.degree_level not in _GRADUATE_LEVELS:
+            return False
+        assumed = {
+            code
+            for code in _course_codes(requirement)
+            if code not in code_to_course_ids and (_course_number(code) or 500) < 500
+        }
+        return bool(assumed) and _resolve(requirement, satisfied | assumed)
 
     satisfied_before = with_equivalents({completed.code for completed in student.completed_courses})
     for semester in semesters:
@@ -310,24 +344,42 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                     True,
                 )
 
+            assumed = []
             if course.status == "planned" and not _resolve(requirement, satisfied_before):
                 assert requirement is not None  # _resolve(None, ...) is always True
-                add_flag(
-                    "broken_prerequisite",
-                    "error",
-                    course.course_id,
-                    f"{course.code} requires {_describe(requirement)} to be completed in an earlier semester.",
-                    False,
-                )
+                if assumed_background(requirement, satisfied_before):
+                    assumed.append(requirement)
+                else:
+                    add_flag(
+                        "broken_prerequisite",
+                        "error",
+                        course.course_id,
+                        f"{course.code} requires {_describe(requirement)} to be completed in an earlier semester.",
+                        False,
+                    )
 
             if course.status == "planned" and not _resolve(coreq, satisfied_with_semester):
                 assert coreq is not None  # _resolve(None, ...) is always True
+                if assumed_background(coreq, satisfied_with_semester):
+                    assumed.append(coreq)
+                else:
+                    add_flag(
+                        "broken_prerequisite",
+                        "error",
+                        course.course_id,
+                        f"{course.code} needs {_describe(coreq)} as a corequisite, in the same semester "
+                        "or an earlier one.",
+                        False,
+                    )
+
+            if assumed:
                 add_flag(
-                    "broken_prerequisite",
-                    "error",
+                    "undergraduate_prerequisite",
+                    "warning",
                     course.course_id,
-                    f"{course.code} needs {_describe(coreq)} as a corequisite, in the same semester "
-                    "or an earlier one.",
+                    f"{course.code} builds on {' and '.join(_describe(rule) for rule in assumed)}: undergraduate "
+                    "coursework this plan assumes from your bachelor's degree. Confirm with your advisor that you "
+                    "have it.",
                     False,
                 )
 
@@ -503,13 +555,22 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
             for group in all_groups:
                 listed = group.courses or []
                 missing = [code for code in listed if code not in plan_codes and code not in stand_in]
-                if missing:
+                # a required course the course data does not have cannot be planned: confirm it, not an error
+                unlisted = [code for code in missing if catalog_credits(code) is None]
+                plannable = [code for code in missing if code not in unlisted]
+                if plannable:
                     add_flag(
                         "requirement_unmet",
                         "error",
                         None,
-                        f"{req_program.name}: {group.label} is missing {', '.join(missing)}.",
+                        f"{req_program.name}: {group.label} is missing {', '.join(plannable)}.",
                         False,
+                    )
+                if unlisted:
+                    confirm_with_advisor(
+                        req_program,
+                        group,
+                        f"requires {', '.join(unlisted)}, which the course catalog data does not have.",
                     )
                 report(
                     group,
@@ -517,6 +578,7 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                     not missing,
                     credits_earned=sum(code_credits.get(code, 0.0) for code in listed if code in plan_codes),
                     missing_count=len(missing),
+                    confirm=bool(unlisted) and not plannable,
                 )
                 if group.every_semester:
                     # BUG-042: a 0-credit graduate seminar required every fall and spring
@@ -546,8 +608,18 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                 assert group.requirement is not None  # enforced by the model
                 satisfied_codes = plan_codes | set(stand_in.keys())
                 branch = _satisfied_branch(group.requirement, satisfied_codes)
-                report(group, req_program, branch is not None, credits_required=group.credits_required)
-                if branch is None:
+                unlisted = [c for c in _course_codes(group.requirement) if c not in satisfied_codes and catalog_credits(c) is None]
+                blocked_by_data = (
+                    branch is None
+                    and bool(unlisted)
+                    and _satisfied_branch(group.requirement, satisfied_codes | set(unlisted)) is not None
+                )
+                report(group, req_program, branch is not None, credits_required=group.credits_required, confirm=blocked_by_data)
+                if blocked_by_data:
+                    confirm_with_advisor(
+                        req_program, group, f"needs {', '.join(unlisted)}, which the course catalog data does not have."
+                    )
+                elif branch is None:
                     add_flag(
                         "requirement_unmet",
                         "error",
@@ -599,8 +671,26 @@ def check_plan(connection: sqlite3.Connection, plan: Plan) -> Plan:
                     earned += code_credits.get(code, 0.0)
                     claimed.add(code)
                     flag_if_assumed(listed_code, code)
-                report(group, req_program, earned >= credits_required, credits_required=credits_required, credits_earned=earned)
-                if earned < credits_required:
+                # The listed courses cannot add up to the requirement (one is missing from the data, or must be
+                # repeated, which a plan cannot hold), and the plan already has every one it can: confirm it.
+                blocked_by_data = False
+                if earned < credits_required and group.courses:
+                    available_credits = sum(catalog_credits(c) or 0.0 for c in group.courses)
+                    blocked_by_data = available_credits < credits_required and all(
+                        c in plan_codes or c in stand_in for c in group.courses if catalog_credits(c) is not None
+                    )
+                report(
+                    group, req_program, earned >= credits_required,
+                    credits_required=credits_required, credits_earned=earned, confirm=blocked_by_data,
+                )
+                if blocked_by_data:
+                    confirm_with_advisor(
+                        req_program,
+                        group,
+                        f"needs {credits_required:g} credits, but the courses in the data add up to only "
+                        f"{available_credits:g} (a course is missing or has to be repeated).",
+                    )
+                elif earned < credits_required:
                     add_flag(
                         "credit_shortfall",
                         "error",

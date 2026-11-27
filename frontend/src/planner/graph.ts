@@ -62,13 +62,13 @@ export const isOpen = (flag: Flag): boolean => !flag.overridden
 /**
  * How a flag is shown. An error is red and a warning is amber: those mean something is wrong or at risk. A claimed
  * exception (instructor consent, "or equivalent", class standing) is not a problem, only something for the student to
- * confirm, so it gets its own calm "confirm" style.
+ * confirm, so it gets its own calm "confirm" style; so does a course counted as another's equivalent by inference.
  */
 export type FlagKind = 'error' | 'warning' | 'confirm'
 
 export function flagKind(flag: Flag): FlagKind {
   if (flag.severity === 'error') return 'error'
-  return flag.type === 'exception_claimed' ? 'confirm' : 'warning'
+  return ['exception_claimed', 'assumed_equivalent', 'unlisted_course', 'undergraduate_prerequisite'].includes(flag.type) ? 'confirm' : 'warning'
 }
 
 export function flagCounts(flags: Flag[]): { errors: number; warnings: number; confirm: number } {

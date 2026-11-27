@@ -11,7 +11,11 @@ export interface CourseLabel {
 /** A program's level, from the options list, or from its id for one the setup page does not offer (the ASIs today). */
 const levelOf = (programId: string) =>
   PROGRAMS.find((p) => p.id === programId)?.level ??
-  (programId.endsWith('-asi') ? 'asi' : programId.endsWith('-minor') ? 'minor' : undefined)
+  (programId.endsWith('-asi') ? 'asi' : programId.endsWith('-minor') ? 'minor' : programId.endsWith('-certificate') ? 'certificate' : undefined)
+
+/** Programs added on top of a degree, with the name used in a course label. */
+const ADD_ON_LABELS: Record<string, string> = { minor: 'Minor', asi: 'ASI', certificate: 'Certificate' }
+const isAddOn = (programId: string) => (levelOf(programId) ?? '') in ADD_ON_LABELS
 
 /** Course codes written in a group's label, as in "Linear Algebra: MATH332 or MATH342". */
 const CODE_OR_CODE = /\b[A-Z]{3,4}\s?\d{3}[A-Z]?\b.*\bor\b|\bor\b.*\b[A-Z]{3,4}\s?\d{3}\b|^[A-Z]{3,4}\s?\d{3}\b/
@@ -41,7 +45,7 @@ export function groupCategory(groupId: string, label = ''): string {
 /**
  * The label for one planned course, or null when there is nothing to say.
  * - It fills a group of the student's degree: that group's category.
- * - It only fills a minor's or ASI's group: "Minor core" or "Minor elective" ("ASI core", "ASI elective").
+ * - It only fills a minor's, ASI's or certificate's group: "Minor core" or "Minor elective" ("ASI core", ...).
  * - It is core for the degree: just "Core", even when it is also core for the minor.
  * - It fills another group of the degree and also a minor or ASI group: the category, noting the minor or ASI.
  * - It fills no group at all (only said when the backend sent any assignments): "Extra".
@@ -52,9 +56,9 @@ export function courseLabel(plan: Plan, courseId: string): CourseLabel | null {
   const entries: CountsToward[] | undefined = map[courseId]
   if (!entries || entries.length === 0) return { primary: 'Extra' }
 
-  const degree = entries.find((e) => !['minor', 'asi'].includes(levelOf(e.program_id) ?? ''))
-  const addOn = entries.find((e) => ['minor', 'asi'].includes(levelOf(e.program_id) ?? ''))
-  const addOnName = addOn ? (levelOf(addOn.program_id) === 'asi' ? 'ASI' : 'Minor') : undefined
+  const degree = entries.find((e) => !isAddOn(e.program_id))
+  const addOn = entries.find((e) => isAddOn(e.program_id))
+  const addOnName = addOn ? ADD_ON_LABELS[levelOf(addOn.program_id)!] : undefined
   if (degree) {
     const primary = groupCategory(degree.group_id, degree.label)
     return { primary, also: primary === 'Core' ? undefined : addOnName }
@@ -67,7 +71,7 @@ export function courseLabel(plan: Plan, courseId: string): CourseLabel | null {
 export type Category = 'core' | 'elective' | 'free' | 'cas' | 'minor' | 'extra' | 'other'
 
 export function categoryOf(primary: string): Category {
-  if (primary.startsWith('Minor ') || primary.startsWith('ASI ')) return 'minor'
+  if (primary.startsWith('Minor ') || primary.startsWith('ASI ') || primary.startsWith('Certificate ')) return 'minor'
   switch (primary) {
     case 'Core':
       return 'core'

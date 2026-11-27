@@ -666,6 +666,8 @@
   box-shadow: var(--sh-3);
   animation: menuIn 180ms var(--ease-out);
   outline: none;
+  max-height: calc(100vh - 20px);
+  overflow-y: auto;
 }
 
 .pop h4 {
@@ -756,6 +758,11 @@
   .sep,
   .legend {
     display: none;
+  }
+
+  /* the Key button stays at the right, also on a line of its own, so its box opens inside the screen */
+  .bar > .key-wrap {
+    margin-left: auto;
   }
 }
 
@@ -1851,4 +1858,42 @@
 
 .done-courses {
   margin-top: 8px;
+}
+
+.pop-desc {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.pop-desc .link {
+  margin-left: 6px;
+  font-size: 12px;
+}
+
+.pop-coreq {
+  margin-top: 6px;
+  font: 500 12px/1.5 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* minor, ASI or certificate data from an older catalog than the student's */
+.stale-warning {
+  padding: 10px 20px;
+  border-bottom: 1px solid color-mix(in srgb, var(--warn) 30%, transparent);
+  background: var(--warn-bg);
+  color: var(--warn);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* a requirement the course data cannot fill: a question to take to the advisor, not a failure */
+.req-icon.ask {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--acc-tint);
+  color: var(--acc);
+  font: 700 11px/1 Inter, sans-serif;
 }
