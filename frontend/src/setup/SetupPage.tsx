@@ -15,6 +15,8 @@ import {
   buildRequest,
   CATALOG_YEAR,
   LEVELS,
+  majorList,
+  majorOf,
   majorsFor,
   SUMMER_PROGRAMS,
   SEMESTER_LIMITS,
@@ -67,12 +69,26 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
    * Choosing a degree that needs a summer field session switches summer terms on, with enough semesters to reach the
    * fourth spring; leaving it for another degree puts the level's usual choices back.
    */
-  const chooseProgram = (programId: string) => {
+  const chooseProgram = (programId: string, major = form.major) => {
     const count = summerSemesters(programId)
-    if (count !== undefined) patch({ programId, includeSummers: true, semesters: count })
+    if (count !== undefined) patch({ programId, major, includeSummers: true, semesters: count })
     else if (summerSemesters(form.programId) !== undefined)
-      patch({ programId, includeSummers: false, semesters: SEMESTER_LIMITS[form.level].default })
-    else patch({ programId })
+      patch({ programId, major, includeSummers: false, semesters: SEMESTER_LIMITS[form.level].default })
+    else patch({ programId, major })
+  }
+  // a major with tracks is one entry in the program list; its track is chosen under it
+  const entries = useMemo(() => majorList(form.level), [form.level])
+  const chosen = majorOf(form.level, form.programId || form.major || '')
+  const others = chosen?.tracks.filter((t) => t !== chosen.general && t.id !== chosen.general?.id) ?? []
+  // the checkbox stays ticked while a track other than the general one is chosen, or the student has opened the list
+  const [wantsTrack, setWantsTrack] = useState(false)
+  const showTracks = !!chosen && chosen.tracks.length > 0 && (!chosen.general || wantsTrack || form.programId !== chosen.general.id)
+  const chooseMajor = (key: string) => {
+    const entry = entries.find((m) => m.key === key)
+    if (!entry) return
+    setWantsTrack(false)
+    if (entry.tracks.length === 0) chooseProgram(entry.key, undefined)
+    else chooseProgram(entry.general?.id ?? '', entry.key)
   }
   const majorRef = useRef<HTMLInputElement>(null)
   const semestersRef = useRef<HTMLInputElement>(null)
@@ -82,6 +98,7 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
     patch({
       level,
       programId: '',
+      major: undefined,
       addOnIds: allowsAddOns(level) ? form.addOnIds : [],
       semesters: SEMESTER_LIMITS[level].default,
     })
@@ -147,12 +164,49 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
               ref={majorRef}
               searchable
               placeholder="Select your program..."
-              options={majors.map((m) => ({ value: m.id, label: m.name }))}
-              value={form.programId}
+              options={entries.map((m) => ({
+                value: m.key,
+                label: m.name,
+                note: m.tracks.length ? `${m.tracks.length} tracks` : undefined,
+                keywords: m.tracks.map((t) => t.name).join(' '),
+              }))}
+              value={chosen?.key ?? ''}
               invalid={!!shown.programId}
               describedBy={shown.programId ? `${ids.major}-err` : undefined}
-              onChange={chooseProgram}
+              onChange={chooseMajor}
             />
+            {chosen && chosen.general && chosen.tracks.length > 0 && (
+              <div className="track-pick">
+                <label className="check check-first">
+                  <input
+                    type="checkbox"
+                    checked={showTracks}
+                    onChange={(e) => {
+                      setWantsTrack(e.target.checked)
+                      if (!e.target.checked) chooseProgram(chosen.general!.id, chosen.key)
+                    }}
+                  />
+                  I am on a specific track
+                </label>
+                <p className="track-help">
+                  {showTracks ? 'Choose it below.' : `Planning the ${chosen.general.name}.`} Other tracks:{' '}
+                  {others.map((t) => t.name.replace(/ Track$/, '')).join(', ')}.
+                </p>
+              </div>
+            )}
+            {showTracks && chosen && (
+              <div className="track-list">
+                <div className="lbl">Track</div>
+                <Dropdown
+                  label="Track"
+                  placeholder="Select your track..."
+                  options={chosen.tracks.map((t) => ({ value: t.id, label: t.name }))}
+                  value={form.programId}
+                  invalid={!!shown.programId}
+                  onChange={(id) => chooseProgram(id, chosen.key)}
+                />
+              </div>
+            )}
             {shown.programId && (
               <p className="err" id={`${ids.major}-err`} role="alert">
                 {shown.programId}

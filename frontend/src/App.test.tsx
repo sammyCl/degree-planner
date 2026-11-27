@@ -29,7 +29,7 @@ function stubBackend(submit: (init: RequestInit) => unknown) {
 
 function chooseProgramAndBuild() {
   fireEvent.click(screen.getByRole('combobox', { name: 'Program' }))
-  fireEvent.mouseDown(screen.getByRole('option', { name: /Applied Mathematics and Statistics \(Data Science\)/ }))
+  fireEvent.mouseDown(screen.getByRole('option', { name: /^Bachelor of Science in Mechanical Engineering$/ }))
   fireEvent.click(screen.getByRole('button', { name: /Build my plan/ }))
 }
 
@@ -60,7 +60,7 @@ describe('building a plan', () => {
     expect(document.querySelectorAll('.fact-slide.on')).toHaveLength(1)
     expect(calls).toHaveLength(1)
     expect(JSON.parse(calls[0].body as string)).toMatchObject({
-      student: { degree_level: 'bachelor', programs: ['ams-bs-ds'] },
+      student: { degree_level: 'bachelor', programs: ['mechanical-engineering-bs'] },
       semesters: 8,
     })
 
@@ -128,7 +128,7 @@ describe('building a plan', () => {
     chooseProgramAndBuild()
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(screen.getByRole('form', { name: 'Plan setup' })).toBeInTheDocument()
-    expect(screen.getByRole('combobox', { name: 'Program' })).toHaveValue('Bachelor of Science in Applied Mathematics and Statistics (Data Science)')
+    expect(screen.getByRole('combobox', { name: 'Program' })).toHaveValue('Bachelor of Science in Mechanical Engineering')
 
     await act(async () => finish(ok(goodResponse))) // the cancelled run answers after all
     expect(screen.getByRole('form', { name: 'Plan setup' })).toBeInTheDocument()
@@ -141,6 +141,6 @@ describe('building a plan', () => {
     chooseProgramAndBuild()
     await screen.findByRole('region', { name: 'Fall 2026' })
     fireEvent.click(screen.getByRole('button', { name: 'Edit setup' }))
-    expect(screen.getByRole('combobox', { name: 'Program' })).toHaveValue('Bachelor of Science in Applied Mathematics and Statistics (Data Science)')
+    expect(screen.getByRole('combobox', { name: 'Program' })).toHaveValue('Bachelor of Science in Mechanical Engineering')
   })
 })

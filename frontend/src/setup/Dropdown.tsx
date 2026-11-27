@@ -3,6 +3,10 @@ import { useId, useMemo, useRef, useState } from 'react'
 export interface DropdownOption {
   value: string
   label: string
+  /** a short note shown beside the option, for example "7 tracks" */
+  note?: string
+  /** more words a search should find this option by */
+  keywords?: string
 }
 
 interface Props {
@@ -43,7 +47,7 @@ export function Dropdown({ options, value, onChange, label, id, placeholder, sea
   const selected = options.find((o) => o.value === value)
   const shown = useMemo(() => {
     const q = query.trim().toLowerCase()
-    return searchable && q ? options.filter((o) => o.label.toLowerCase().includes(q)) : options
+    return searchable && q ? options.filter((o) => `${o.label} ${o.keywords ?? ''}`.toLowerCase().includes(q)) : options
   }, [options, query, searchable])
   const active = Math.min(highlight, Math.max(0, shown.length - 1))
 
@@ -162,6 +166,7 @@ export function Dropdown({ options, value, onChange, label, id, placeholder, sea
               onMouseEnter={() => setHighlight(i)}
             >
               {o.label}
+              {o.note && <span className="menu-note">{o.note}</span>}
             </div>
           ))}
         </div>

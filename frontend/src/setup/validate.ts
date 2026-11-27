@@ -43,12 +43,52 @@ export const SUMMER_PROGRAMS = summerPrograms as Record<string, string[]>
 export const summerSemesters = (programId: string): number | undefined =>
   SUMMER_PROGRAMS[programId] ? (programId.includes('combined') ? 14 : 11) : undefined
 
+export interface Track {
+  id: string
+  /** "General Track", "CS + Space", "Data Science" */
+  name: string
+}
+
+/** One entry of the program list: a program, or a major whose tracks are chosen separately. */
+export interface Major {
+  /** the program id, or the shared name for a major with tracks */
+  key: string
+  name: string
+  /** empty for a major with one program */
+  tracks: Track[]
+  /** the track used unless the student picks another; undefined when there is no general one */
+  general?: Track
+}
+
+const TRACK = /^(.*?)\s*\(([^()]*)\)$/
+
+/** The programs of a level, with the tracks of one major gathered into a single entry (general track first). */
+export function majorList(level: Level): Major[] {
+  const programs = majorsFor(level)
+  const baseOf = (name: string) => TRACK.exec(name)?.[1] ?? name
+  const byBase = new Map<string, ProgramOption[]>()
+  for (const p of programs) byBase.set(baseOf(p.name), [...(byBase.get(baseOf(p.name)) ?? []), p])
+  return [...byBase.entries()].map(([base, group]) => {
+    if (group.length === 1) return { key: group[0].id, name: group[0].name, tracks: [] }
+    // a program named for the major alone is its general track
+    const tracks = group.map((p) => ({ id: p.id, name: TRACK.exec(p.name)?.[2] ?? 'General Track' }))
+    const general = tracks.find((t) => /^general/i.test(t.name))
+    return { key: base, name: base, general, tracks: general ? [general, ...tracks.filter((t) => t !== general)] : tracks }
+  })
+}
+
+/** The major a program id belongs to. */
+export const majorOf = (level: Level, programId: string): Major | undefined =>
+  majorList(level).find((m) => m.key === programId || m.tracks.some((t) => t.id === programId))
+
 /** Minors and ASIs are undergraduate programs, so the picker is shown for bachelor's and combined only. */
 export const allowsAddOns = (level: Level): boolean => level !== 'master'
 
 export interface SetupForm {
   level: Level
   programId: string
+  /** the major chosen while its track is still to be picked (a major with no general track) */
+  major?: string
   addOnIds: string[]
   season: Season
   year: number
@@ -67,7 +107,7 @@ export type SetupErrors = Partial<Record<'programId' | 'year' | 'semesters', str
 export function validateSetup(form: SetupForm): SetupErrors {
   const errors: SetupErrors = {}
   if (!majorsFor(form.level).some((p) => p.id === form.programId)) {
-    errors.programId = 'Choose your program.'
+    errors.programId = form.major ? 'Choose your track.' : 'Choose your program.'
   }
   if (!Number.isInteger(form.year) || form.year < 2000 || form.year > 2500) {
     errors.year = 'Enter a four-digit year.'

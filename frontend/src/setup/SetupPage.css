@@ -581,3 +581,30 @@
   border-color: var(--border);
   color: var(--mut);
 }
+
+/* a major with tracks: say that others exist, and let the student pick one */
+.track-pick {
+  margin-top: 10px;
+}
+
+.track-help {
+  margin: 4px 0 0 26px;
+  color: var(--mut);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.track-list {
+  margin-top: 12px;
+}
+
+.menu-note {
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--acc-tint);
+  color: var(--acc);
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
