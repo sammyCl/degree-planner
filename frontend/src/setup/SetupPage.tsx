@@ -16,9 +16,10 @@ import {
   CATALOG_YEAR,
   LEVELS,
   majorsFor,
-  NEEDS_SUMMER,
+  SUMMER_PROGRAMS,
   SEMESTER_LIMITS,
   shortName,
+  summerSemesters,
   validateSetup,
   type Level,
   type SetupForm,
@@ -67,9 +68,9 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
    * fourth spring; leaving it for another degree puts the level's usual choices back.
    */
   const chooseProgram = (programId: string) => {
-    const count = NEEDS_SUMMER[programId]
+    const count = summerSemesters(programId)
     if (count !== undefined) patch({ programId, includeSummers: true, semesters: count })
-    else if (NEEDS_SUMMER[form.programId] !== undefined)
+    else if (summerSemesters(form.programId) !== undefined)
       patch({ programId, includeSummers: false, semesters: SEMESTER_LIMITS[form.level].default })
     else patch({ programId })
   }
@@ -91,7 +92,8 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
     ? semesterLabels(form.season, form.year, form.semesters, form.includeSummers)
     : []
   const major = majors.find((m) => m.id === form.programId)
-  const summerCount = NEEDS_SUMMER[form.programId]
+  const summerCount = summerSemesters(form.programId)
+  const summerCodes = SUMMER_PROGRAMS[form.programId]?.join(', ')
   const needsSummer = summerCount !== undefined && (!form.includeSummers || form.semesters < summerCount)
   const allAddOns = useMemo(() => addOns(), [])
   const byId = new Map(allAddOns.map((a) => [a.id, a]))
@@ -237,14 +239,14 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
             </label>
             {summerCount !== undefined && !needsSummer && (
               <p className="summer-hint ok" role="note">
-                Summer terms are on because this degree has a summer field session. Your plan shows only the summers that
-                have a course in them.
+                Summer terms are on because this degree takes {summerCodes} in summer. Your plan shows only the summers
+                that have a course in them.
               </p>
             )}
             {needsSummer && (
               <p className="summer-hint" role="alert">
-                This degree has a summer field session. With these choices its courses will not fit unless you have already
-                completed some of them.{' '}
+                This degree takes {summerCodes} in summer. Without enough semesters that include summers, those courses may
+                land in a fall or spring term, or not fit, unless you have already completed them.{' '}
                 <button type="button" className="link" onClick={() => patch({ includeSummers: true, semesters: summerCount })}>
                   Include summers and plan {summerCount} semesters
                 </button>

@@ -11,7 +11,8 @@ function setup() {
 }
 
 const program = () => screen.getByRole('combobox', { name: 'Program' }) as HTMLInputElement
-const CS = /Computer Science \(General Track\)/
+// a bachelor's with no summer course, so choosing it keeps the usual 8 semesters
+const AMS = /Applied Mathematics and Statistics \(Data Science\)/
 
 /** Open a dropdown and click an option, the way a student does. */
 function pick(combo: HTMLElement, option: string | RegExp) {
@@ -42,9 +43,9 @@ describe('SetupPage', () => {
   it('lists programs for the chosen level and clears the choice when the level changes', () => {
     setup()
     fireEvent.click(program())
-    expect(screen.getByRole('option', { name: CS })).toBeInTheDocument()
-    fireEvent.mouseDown(screen.getByRole('option', { name: CS }))
-    expect(program()).toHaveValue('Bachelor of Science in Computer Science (General Track)')
+    expect(screen.getByRole('option', { name: AMS })).toBeInTheDocument()
+    fireEvent.mouseDown(screen.getByRole('option', { name: AMS }))
+    expect(program()).toHaveValue('Bachelor of Science in Applied Mathematics and Statistics (Data Science)')
     fireEvent.click(screen.getByRole('button', { name: "Master's" }))
     expect(program()).toHaveValue('')
     fireEvent.click(program())
@@ -57,7 +58,7 @@ describe('SetupPage', () => {
 
   it('rejects a semester count outside the level\'s limit', () => {
     const onSubmit = setup()
-    pick(program(), CS)
+    pick(program(), AMS)
     fireEvent.change(semesters(), { target: { value: '19' } })
     fireEvent.click(screen.getByRole('button', { name: /Build my plan/ }))
     expect(onSubmit).not.toHaveBeenCalled()
@@ -144,7 +145,7 @@ describe('SetupPage', () => {
 
   it('sends the courses the student listed as completed courses, and shows them in the summary', () => {
     const onSubmit = setup()
-    pick(program(), CS)
+    pick(program(), AMS)
     fireEvent.click(screen.getByLabelText(/I have already completed some courses/))
     fireEvent.click(screen.getByRole('button', { name: '+ Add a course by hand' }))
     fireEvent.change(screen.getByLabelText('Course code'), { target: { value: 'MATH111' } })
@@ -161,7 +162,7 @@ describe('SetupPage', () => {
 
   it('sends no completed courses once the box is unticked, but keeps the list in case it is ticked again', () => {
     const onSubmit = setup()
-    pick(program(), CS)
+    pick(program(), AMS)
     fireEvent.click(screen.getByLabelText(/I have already completed some courses/))
     fireEvent.click(screen.getByRole('button', { name: '+ Add a course by hand' }))
     fireEvent.change(screen.getByLabelText('Course code'), { target: { value: 'MATH111' } })
@@ -186,18 +187,18 @@ describe('SetupPage', () => {
 
   it('submits the request in the backend format', () => {
     const onSubmit = setup()
-    pick(program(), CS)
+    pick(program(), AMS)
     fireEvent.click(screen.getByRole('button', { name: /Build my plan/ }))
     expect(onSubmit).toHaveBeenCalledTimes(1)
     expect(onSubmit.mock.calls[0][0]).toEqual({
-      student: { degree_level: 'bachelor', programs: ['cs-bs-general-track'], catalog_year: '2026-2027', completed_courses: [] },
+      student: { degree_level: 'bachelor', programs: ['ams-bs-ds'], catalog_year: '2026-2027', completed_courses: [] },
       semesters: 8,
       start_term: 'Fall 2027',
       include_summers: false,
       overrides: [],
     })
     // the second argument is the form itself, so the page can restore it later
-    expect(onSubmit.mock.calls[0][1]).toMatchObject({ level: 'bachelor', programId: 'cs-bs-general-track', semesters: 8 })
+    expect(onSubmit.mock.calls[0][1]).toMatchObject({ level: 'bachelor', programId: 'ams-bs-ds', semesters: 8 })
   })
 
   it('switches summer terms on for a degree with a summer field session, and back off for another', () => {
@@ -205,21 +206,33 @@ describe('SetupPage', () => {
     pick(program(), /Petroleum Engineering/)
     expect(screen.getByLabelText('Include summer terms')).toBeChecked()
     expect(semesters()).toHaveValue(11)
-    expect(screen.getByRole('note')).toHaveTextContent('only the summers that')
-    pick(program(), CS)
+    expect(screen.getByRole('note')).toHaveTextContent('takes PEGN315, PEGN316 in summer')
+    pick(program(), AMS)
     expect(screen.getByLabelText('Include summer terms')).not.toBeChecked()
     expect(semesters()).toHaveValue(8)
-    expect(screen.queryByText(/summer field session/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/in summer\./)).not.toBeInTheDocument()
     pick(program(), /Engineering Physics/)
     fireEvent.click(screen.getByRole('button', { name: /Build my plan/ }))
     expect(onSubmit.mock.calls[0][0]).toMatchObject({ include_summers: true, semesters: 11 })
+  })
+
+  it('does the same for Computer Science, and for a combined degree plans five years', () => {
+    const onSubmit = setup()
+    pick(program(), /Computer Science \(General Track\)/)
+    expect(screen.getByRole('note')).toHaveTextContent('takes CSCI370 in summer')
+    expect(semesters()).toHaveValue(11)
+    fireEvent.click(screen.getByRole('button', { name: 'Combined BS+MS' }))
+    pick(program(), /Computer Science/)
+    expect(semesters()).toHaveValue(14)
+    fireEvent.click(screen.getByRole('button', { name: /Build my plan/ }))
+    expect(onSubmit.mock.calls[0][0]).toMatchObject({ include_summers: true, semesters: 14 })
   })
 
   it('warns when summer terms are taken away from such a degree, and can put them back', () => {
     setup()
     pick(program(), /Petroleum Engineering/)
     fireEvent.click(screen.getByLabelText('Include summer terms'))
-    expect(screen.getByRole('alert')).toHaveTextContent('will not fit')
+    expect(screen.getByRole('alert')).toHaveTextContent('not fit')
     fireEvent.click(screen.getByRole('button', { name: 'Include summers and plan 11 semesters' }))
     expect(screen.getByLabelText('Include summer terms')).toBeChecked()
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()

@@ -1,0 +1,21 @@
+{
+ "about": "Courses taken in a summer term. Built by data/tools/build_summer_courses.py.",
+ "summer_courses": {
+  "BIOL415": "Quantitative Biosciences and Engineering",
+  "CBEN312": "Chemical Engineering",
+  "CBEN313": "Chemical Engineering",
+  "CEEN330": "Environmental Engineering",
+  "CEEN331": "Civil Engineering",
+  "CHGN490": "Chemistry",
+  "CSCI370": "Computer Science",
+  "GEGN316": "Geological Engineering",
+  "GPGN486": "Geophysical Engineering",
+  "MNGN203": "Mining Engineering",
+  "MNGN301": "Mining Engineering",
+  "MNGN308": "Mining Engineering",
+  "MTGN272": "Metallurgical and Materials Engineering",
+  "PEGN315": "Petroleum Engineering",
+  "PEGN316": "Petroleum Engineering",
+  "PHGN384": "Engineering Physics"
+ }
+}

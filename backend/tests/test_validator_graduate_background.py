@@ -61,3 +61,26 @@ def test_a_graduate_prerequisite_is_never_assumed(connection: sqlite3.Connection
 def test_either_version_of_a_course_is_enough(connection: sqlite3.Connection, code: str, earlier: list[str]) -> None:
     result = flags(connection, "bachelor", "engineering-physics-bs", [earlier, [code]], code)
     assert result == []
+
+
+# ---------- summer courses ----------
+
+def _summer_flags(connection: sqlite3.Connection, terms: list[tuple[str, list[str]]]) -> list[str]:
+    plan = Plan(
+        student=Student(degree_level="bachelor", programs=["cs-bs-general-track"], catalog_year="2026-2027"),
+        semesters=[
+            Semester(semester_id=f"s{i}", label=label, courses=[
+                PlannedCourse(course_id=f"{i}-{c}", code=c, title=c, credits=3, status="planned") for c in codes])
+            for i, (label, codes) in enumerate(terms)
+        ],
+        summary=Summary(total_credits=0, total_credits_required=0, requirements_met=False),
+    )
+    return [f.message for f in check_plan(connection, plan).flags if f.type == "summer_course"]
+
+
+def test_a_field_session_in_fall_is_flagged_and_in_summer_is_not(connection: sqlite3.Connection) -> None:
+    assert _summer_flags(connection, [("Summer 2029", ["CSCI370"])]) == []
+    [moved] = _summer_flags(connection, [("Summer 2029", []), ("Fall 2029", ["CSCI370"])])
+    assert "CSCI370 is taken in summer" in moved and "Move it to a summer semester" in moved
+    [none] = _summer_flags(connection, [("Fall 2029", ["CSCI370"])])
+    assert "confirm with your advisor" in none

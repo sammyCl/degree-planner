@@ -1,5 +1,6 @@
 import type { AgentRequest, CompletedCourse } from '../types.ts'
 import options from './programOptions.json'
+import summerPrograms from './summerPrograms.json'
 import { startTerm, type Season } from './terms.ts'
 import type { UploadedFile } from './transcript.ts'
 
@@ -32,11 +33,15 @@ export const SEMESTER_LIMITS: Record<Level, { min: number; max: number; default:
 }
 
 export const majorsFor = (level: Level): ProgramOption[] => PROGRAMS.filter((p) => p.level === level)
+/** Degrees that require a summer course, with those courses (data/tools/build_summer_courses.py). */
+export const SUMMER_PROGRAMS = summerPrograms as Record<string, string[]>
+
 /**
- * Degrees whose required courses only fit by spring of the fourth year when a summer field session is planned
- * (found by building every bachelor's and master's plan, 2026-11-26): 11 semesters with summers, Fall to Spring.
+ * Semester count, summers included, for a degree that requires a summer course: Fall to the last Spring, which is four
+ * years for a bachelor's (11) and five for a combined degree (14). Undefined for every other degree.
  */
-export const NEEDS_SUMMER: Record<string, number> = { 'engineering-physics-bs': 11, 'petroleum-engineering-bs': 11 }
+export const summerSemesters = (programId: string): number | undefined =>
+  SUMMER_PROGRAMS[programId] ? (programId.includes('combined') ? 14 : 11) : undefined
 
 /** Minors and ASIs are undergraduate programs, so the picker is shown for bachelor's and combined only. */
 export const allowsAddOns = (level: Level): boolean => level !== 'master'

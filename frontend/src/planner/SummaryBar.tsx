@@ -198,5 +198,6 @@ const TITLES: Record<Flag['type'], string> = {
   assumed_equivalent: 'Confirm equivalent course',
   unlisted_course: 'Confirm with your advisor',
   undergraduate_prerequisite: 'Confirm your background',
+  summer_course: 'Summer course',
 }
 const flagTitle = (f: Flag): string => TITLES[f.type] ?? 'Needs attention'
