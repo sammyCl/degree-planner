@@ -30,12 +30,14 @@ interface Props {
   onChange: (courses: CompletedCourse[], files: UploadedFile[]) => void
   /** the current year, for the list of semesters to pick from */
   thisYear: number
+  /** told when a file starts and stops being read, so the form can wait for it */
+  onReadingChange?: (reading: boolean) => void
 }
 
 const EMPTY: ManualCourse = { code: '', credits: '', term: '', transferFrom: '' }
 
 /** Completed courses: read them from a transcript file, check the list, fix it, or type them in. */
-export function TranscriptUpload({ courses, files = [], onChange, thisYear }: Props) {
+export function TranscriptUpload({ courses, files = [], onChange, thisYear, onReadingChange }: Props) {
   const ids = { code: useId(), credits: useId(), from: useId(), codes: useId() }
   const fileInput = useRef<HTMLInputElement>(null)
   const controller = useRef<AbortController | null>(null)
@@ -53,11 +55,26 @@ export function TranscriptUpload({ courses, files = [], onChange, thisYear }: Pr
   const [fileObjects, setFileObjects] = useState<ReadonlyMap<string, File>>(() => new Map())
   const [changingSchool, setChangingSchool] = useState<string | null>(null)
   const terms = termOptions(thisYear)
+  // a read takes seconds, and the student may change the list meanwhile: its answer is added to the latest one
+  const latest = useRef({ courses, files, onReadingChange })
+  useEffect(() => {
+    latest.current = { courses, files, onReadingChange }
+  })
 
-  useEffect(() => () => controller.current?.abort(), [])
+  useEffect(
+    () => () => {
+      controller.current?.abort()
+      latest.current.onReadingChange?.(false)
+    },
+    [],
+  )
 
-  const read = async (file: File, school: string | null = null) => {
+  const read = async (file: File, school: string | null = null, ignored: string[] = []) => {
     setNote(null)
+    if (readingName) {
+      setProblem(`Still reading ${readingName}. Add the next file when it is done.`)
+      return
+    }
     const bad = fileProblem(file)
     if (bad) {
       setProblem(bad)
@@ -66,10 +83,13 @@ export function TranscriptUpload({ courses, files = [], onChange, thisYear }: Pr
     setProblem(null)
     setReading(true)
     setReadingName(file.name)
+    onReadingChange?.(true)
     setChangingSchool(null)
     controller.current = new AbortController()
     try {
       const result = await readTranscript(file, school, controller.current.signal)
+      const { courses, files } = latest.current
+      setProblem(null) // such as "still reading", which is no longer true
       setFileObjects((m) => new Map(m).set(file.name, file))
       // the same file read again replaces what it added before, and its chip
       const earlier = files.find((f) => f.name === file.name)
@@ -96,11 +116,11 @@ export function TranscriptUpload({ courses, files = [], onChange, thisYear }: Pr
           notice: result.notice ?? null,
         },
       ])
-      setNote(
+      const said =
         found === 0
           ? 'No courses were found in that file. Check it, or add your courses by hand.'
-          : `Found ${found} ${found === 1 ? 'course' : 'courses'}${added < result.courses.length ? `, ${added} new` : ''}.${result.unmatched.length ? ` ${result.unmatched.length} still need a Mines equivalent.` : ''} Check the list below.`,
-      )
+          : `Found ${found} ${found === 1 ? 'course' : 'courses'}${added < result.courses.length ? `, ${added} new` : ''}.${result.unmatched.length ? ` ${result.unmatched.length} still need a Mines equivalent.` : ''} Check the list below.`
+      setNote(ignored.length ? `${said} One file at a time: add ${ignored.join(', ')} next.` : said)
     } catch (error) {
       if (error instanceof ApiError && error.kind === 'aborted') return
       setProblem(
@@ -108,11 +128,12 @@ export function TranscriptUpload({ courses, files = [], onChange, thisYear }: Pr
           ? `We could not read that file: ${error.message}`
           : error instanceof ApiError && error.kind === 'network'
             ? error.message
-            : 'Something went wrong reading that file. You can add your courses by hand instead.',
+            : `Something went wrong reading that file.${error instanceof ApiError ? ` ${error.message}` : ''} You can add your courses by hand instead.`,
       )
     } finally {
       setReading(false)
       setReadingName(null)
+      latest.current.onReadingChange?.(false)
     }
   }
 
@@ -120,8 +141,12 @@ export function TranscriptUpload({ courses, files = [], onChange, thisYear }: Pr
   const resolve = (file: UploadedFile, picks: { course: UnmatchedCourse; mines: string | null }[]) => {
     const taken = new Set(courses.map((c) => c.code))
     const fresh: CompletedCourse[] = []
+    // a course that adds nothing because its Mines course is already listed stays, so the student can change it
+    const kept = new Set<UnmatchedCourse>()
+    const repeats: string[] = []
     for (const { course, mines } of picks) {
       if (!mines) continue
+      const before = fresh.length
       // "CHGN221+CHGN223" is a Mines lecture and its lab: both are added, the credits split by the catalog's credits
       const parts = mines.split('+').map((part) => normalizeCode(part)).filter(Boolean)
       const catalogCredits = parts.map((part) => catalogCourse(part)?.credits ?? 0)
@@ -141,8 +166,13 @@ export function TranscriptUpload({ courses, files = [], onChange, thisYear }: Pr
           in_progress: course.in_progress,
         })
       })
+      if (parts.length > 0 && fresh.length === before) {
+        kept.add(course)
+        repeats.push(`${parts.join(' + ')} is already in the list, so ${course.code} was not added. Enter a different Mines course or skip it.`)
+      }
     }
-    const done = new Set(picks.map((p) => p.course))
+    setProblem(repeats.length ? repeats.join(' ') : null)
+    const done = new Set(picks.map((p) => p.course).filter((c) => !kept.has(c)))
     onChange(
       [...courses, ...fresh],
       files.map((f) =>
@@ -170,6 +200,14 @@ export function TranscriptUpload({ courses, files = [], onChange, thisYear }: Pr
     URL.revokeObjectURL(url)
   }
 
+  // Enter in one of these fields means "add this course", never "submit the setup form"
+  const onEnter = (action: () => void) => (e: React.KeyboardEvent) => {
+    if (e.key !== 'Enter' || e.defaultPrevented) return // an open dropdown has already used the key
+    if (!(e.target instanceof HTMLInputElement)) return
+    e.preventDefault()
+    action()
+  }
+
   return (
     <div className="tu">
       <div
@@ -182,8 +220,13 @@ export function TranscriptUpload({ courses, files = [], onChange, thisYear }: Pr
         onDrop={(e) => {
           e.preventDefault()
           setOver(false)
-          const file = e.dataTransfer.files?.[0]
-          if (file) void read(file)
+          const [file, ...others] = Array.from(e.dataTransfer.files ?? [])
+          if (file)
+            void read(
+              file,
+              null,
+              others.map((f) => f.name),
+            )
         }}
       >
         <button type="button" className="tu-pick" disabled={reading} onClick={() => fileInput.current?.click()}>
@@ -355,7 +398,7 @@ export function TranscriptUpload({ courses, files = [], onChange, thisYear }: Pr
       )}
 
       {adding ? (
-        <div className="tu-add">
+        <div className="tu-add" onKeyDown={onEnter(addByHand)}>
           <div className="tu-add-row">
             <div>
               <label htmlFor={ids.code}>Course code</label>
@@ -532,6 +575,11 @@ function UnmatchedList({ file, courses, onResolve }: { file: UploadedFile; cours
                 list={listId}
                 value={value}
                 onChange={(e) => setTyped({ ...typed, [key]: e.target.value })}
+                onKeyDown={(e) => {
+                  if (e.key !== 'Enter') return
+                  e.preventDefault()
+                  if (addable(value)) onResolve([{ course: c, mines: value }])
+                }}
               />
               <button type="button" className="tu-pick small" disabled={!addable(value)} onClick={() => onResolve([{ course: c, mines: value }])}>
                 Add

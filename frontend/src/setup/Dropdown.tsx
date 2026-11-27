@@ -93,6 +93,7 @@ export function Dropdown({ options, value, onChange, label, id, placeholder, sea
       if (open && shown[active]) choose(shown[active])
       else openMenu()
     } else if (e.key === 'Escape') {
+      if (open) e.stopPropagation() // closes only the list, not a popover around it
       close()
     } else if (e.key === 'Tab') {
       close()
