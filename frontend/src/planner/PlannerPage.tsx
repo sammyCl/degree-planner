@@ -7,7 +7,7 @@ import { CompletedColumns } from './CompletedColumns.tsx'
 import { completedColumns, completedOnlyPlan, startsCollapsed } from './completed.ts'
 import { CourseCard, type CardState } from './CourseCard.tsx'
 import { CoursePopover } from './CoursePopover.tsx'
-import { DownloadPdf } from './DownloadPdf.tsx'
+import { Downloads } from './Downloads.tsx'
 import { PlanSummary } from './PlanSummary.tsx'
 import { courseLabel } from './courseLabel.ts'
 import {
@@ -245,7 +245,8 @@ export function PlannerPage({ plan: initialPlan, explanation, choices, checks, p
           {plan.semesters.length} semesters, starting {plan.semesters[0]?.label}
           {doneColumns.length > 0 ? ', with your completed courses on the left' : ''}. Drag a course to another semester to move it.
         </span>
-        <DownloadPdf
+        <Downloads
+          board={cols}
           plan={plan}
           donePlan={donePlan}
           explanation={explanation}

@@ -353,15 +353,22 @@
   flex: 1 1 260px;
 }
 
+/* while the flowchart is being copied into a picture, nothing moves */
+.cols.exporting * {
+  animation: none !important;
+  transition: none !important;
+}
+
 .download {
   display: inline-flex;
-  flex: none;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   align-items: center;
   gap: 10px;
   margin-left: auto;
 }
 
-.download-pdf {
+.download-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -376,16 +383,16 @@
   cursor: pointer;
 }
 
-.download-pdf:hover:not(:disabled) {
+.download-btn:hover:not(:disabled) {
   background: var(--acc-tint);
 }
 
-.download-pdf:disabled {
+.download-btn:disabled {
   opacity: 0.5;
   cursor: default;
 }
 
-.download-pdf:focus-visible {
+.download-btn:focus-visible {
   outline: 3px solid var(--acc-tint);
   outline-offset: 2px;
 }

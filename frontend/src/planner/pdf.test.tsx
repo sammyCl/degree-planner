@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { samplePlan } from '../samplePlan.ts'
 import type { Plan } from '../types.ts'
+import { fixArrowStyles, headingLines, isPartOfPicture, sharpness } from './boardImage.ts'
 import { buildPdfDocument } from './pdfContent.ts'
 import { printable, renderPdf } from './pdfFile.ts'
 import { PlannerPage } from './PlannerPage.tsx'
@@ -18,6 +19,9 @@ vi.mock('./pdfFile.ts', async (original) => {
     }),
   }
 })
+
+const pictured = vi.hoisted(() => ({ toCanvas: vi.fn() }))
+vi.mock('html-to-image', () => pictured)
 
 const day = new Date(2026, 10, 27)
 const withDone: Plan = {
@@ -107,5 +111,48 @@ describe('Download PDF button', () => {
     })
     await clickDownload()
     expect(await screen.findByText('The PDF could not be made. Try again.', {}, slow)).toHaveAttribute('role', 'alert')
+  }, 15000)
+})
+
+describe('flowchart image', () => {
+  it('heads the picture with the program, the credits and any open problems', () => {
+    const lines = headingLines(buildPdfDocument({ plan: samplePlan }, day))
+    expect(lines[0].text).toBe('Bachelor of Science in Computer Science (General Track)')
+    expect(lines.at(-1)).toMatchObject({ text: 'This plan still has 2 problems to fix', tone: 'error' })
+  })
+
+  it('leaves the edit buttons out', () => {
+    const el = (name: string) => Object.assign(document.createElement('div'), { className: name })
+    expect(isPartOfPicture(el('add-between'))).toBe(false)
+    expect(isPartOfPicture(el('sem add-end'))).toBe(false)
+    expect(isPartOfPicture(el('sem'))).toBe(true)
+  })
+
+  it('keeps a very long plan within what a browser can draw', () => {
+    expect(sharpness(3000, 900)).toBe(2)
+    expect(sharpness(20000, 900)).toBeLessThanOrEqual(0.8)
+  })
+
+  it('styles the arrows for the copy, then puts the page back', () => {
+    const board = document.createElement('div')
+    board.innerHTML = '<svg class="arrows"><path style="opacity: 0.5" /><path /></svg>'
+    const [first, second] = Array.from(board.querySelectorAll('path'))
+    const restore = fixArrowStyles(board)
+    restore()
+    expect(first.getAttribute('style')).toBe('opacity: 0.5')
+    expect(second.hasAttribute('style')).toBe(false)
+  })
+
+  it('has its own button, and says so when the picture cannot be made', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('no backend')))
+    pictured.toCanvas.mockRejectedValue(new Error('blocked'))
+    render(<PlannerPage plan={samplePlan} onBack={() => {}} />)
+    const button = screen.getByRole('button', { name: 'Download flowchart' })
+    await waitFor(() => expect(button).toBeEnabled())
+    fireEvent.click(button)
+    expect(await screen.findByText('The image could not be made. Try again.', {}, { timeout: 10000 })).toHaveAttribute('role', 'alert')
+    expect(pictured.toCanvas).toHaveBeenCalledWith(screen.getByTestId('board'), expect.anything())
+    expect(screen.getByTestId('board')).not.toHaveClass('exporting')
+    vi.unstubAllGlobals()
   }, 15000)
 })
