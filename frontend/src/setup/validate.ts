@@ -32,6 +32,12 @@ export const SEMESTER_LIMITS: Record<Level, { min: number; max: number; default:
 }
 
 export const majorsFor = (level: Level): ProgramOption[] => PROGRAMS.filter((p) => p.level === level)
+/**
+ * Degrees whose required courses only fit by spring of the fourth year when a summer field session is planned
+ * (found by building every bachelor's and master's plan, 2026-11-26): 11 semesters with summers, Fall to Spring.
+ */
+export const NEEDS_SUMMER: Record<string, number> = { 'engineering-physics-bs': 11, 'petroleum-engineering-bs': 11 }
+
 /** Minors and ASIs are undergraduate programs, so the picker is shown for bachelor's and combined only. */
 export const allowsAddOns = (level: Level): boolean => level !== 'master'
 

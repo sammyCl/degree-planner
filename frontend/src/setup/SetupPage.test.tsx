@@ -200,6 +200,18 @@ describe('SetupPage', () => {
     expect(onSubmit.mock.calls[0][1]).toMatchObject({ level: 'bachelor', programId: 'cs-bs-general-track', semesters: 8 })
   })
 
+  it('offers summer terms for a degree with a summer field session, and not for others', () => {
+    const onSubmit = setup()
+    pick(program(), CS)
+    expect(screen.queryByText(/summer field session/)).not.toBeInTheDocument()
+    pick(program(), /Petroleum Engineering/)
+    expect(screen.getByText(/summer field session/)).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Include summers and plan 11 semesters' }))
+    expect(screen.queryByText(/summer field session/)).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /Build my plan/ }))
+    expect(onSubmit.mock.calls[0][0]).toMatchObject({ include_summers: true, semesters: 11 })
+  })
+
   it('starts from the earlier choices when given them', () => {
     const initial = { level: 'master' as const, programId: '', addOnIds: [], season: 'Fall' as const, year: 2028, semesters: 5, includeSummers: true, hasCompleted: false, completed: [], files: [] }
     render(<SetupPage onSubmit={vi.fn()} initial={initial} today={NOV_2026} />)

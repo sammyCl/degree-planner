@@ -566,3 +566,13 @@
   font-size: 13px;
   line-height: 1.45;
 }
+
+.summer-hint {
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent);
+  border-radius: 10px;
+  background: var(--raised);
+  font-size: 13px;
+  line-height: 1.45;
+}

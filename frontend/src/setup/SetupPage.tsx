@@ -16,6 +16,7 @@ import {
   CATALOG_YEAR,
   LEVELS,
   majorsFor,
+  NEEDS_SUMMER,
   SEMESTER_LIMITS,
   shortName,
   validateSetup,
@@ -79,6 +80,8 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
     ? semesterLabels(form.season, form.year, form.semesters, form.includeSummers)
     : []
   const major = majors.find((m) => m.id === form.programId)
+  const summerCount = NEEDS_SUMMER[form.programId]
+  const needsSummer = summerCount !== undefined && (!form.includeSummers || form.semesters < summerCount)
   const allAddOns = useMemo(() => addOns(), [])
   const byId = new Map(allAddOns.map((a) => [a.id, a]))
   // minors, ASIs and certifications each get their own picker (a kind with no data stored is not shown)
@@ -221,6 +224,14 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
               />
               Include summer terms
             </label>
+            {needsSummer && (
+              <p className="summer-hint" role="note">
+                This degree has a summer field session. Without summer terms its courses may not fit in four years.{' '}
+                <button type="button" className="link" onClick={() => patch({ includeSummers: true, semesters: summerCount })}>
+                  Include summers and plan {summerCount} semesters
+                </button>
+              </p>
+            )}
           </div>
 
           <div className="field">
