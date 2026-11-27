@@ -34,17 +34,18 @@ function chooseProgramAndBuild() {
 }
 
 describe('App', () => {
-  it('shows the title and reports the backend as connected', async () => {
+  it('shows the title, and no server status while the server answers', async () => {
     stubBackend(() => ok(goodResponse))
     render(<App />)
     expect(screen.getByRole('heading', { name: 'Degree Planner' })).toBeInTheDocument()
-    await waitFor(() => expect(screen.getByTestId('backend-status')).toHaveTextContent('connected'))
+    await waitFor(() => expect(fetch).toHaveBeenCalled())
+    expect(screen.queryByTestId('backend-status')).not.toBeInTheDocument()
   })
 
   it('does not crash when the backend is down', async () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('network')))
     render(<App />)
-    await waitFor(() => expect(screen.getByTestId('backend-status')).toHaveTextContent('not running'))
+    await waitFor(() => expect(screen.getByTestId('backend-status')).toHaveTextContent("Can't reach the server"))
   })
 })
 

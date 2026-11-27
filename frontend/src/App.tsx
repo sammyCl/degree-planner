@@ -149,9 +149,12 @@ function App() {
             <small>Colorado School of Mines</small>
           </div>
         </div>
-        <p className={`status status-${backend}`} data-testid="backend-status">
-          Backend: {backend === 'checking' ? 'checking...' : backend === 'up' ? 'connected' : 'not running'}
-        </p>
+        {/* only worth the student's attention when something is wrong */}
+        {backend === 'down' && (
+          <p className="status status-down" role="status" data-testid="backend-status">
+            Can&apos;t reach the server
+          </p>
+        )}
         <button className="icon-btn" type="button" aria-label="Toggle dark mode" onClick={toggleTheme}>
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z" />

@@ -42,6 +42,7 @@ React, TypeScript and Vite (`frontend/`). It draws what the backend decides: whe
 - **Planner page.** One column per semester with prerequisite arrows. Courses can be dragged (or moved from their details) to another semester, with undo and redo; every change is sent to `POST /plans/check` and the answer replaces the plan. Completed courses sit in their own columns, and "About this plan" shows the requirement checklist, things to check and the assistant's choices.
 - **Alerts.** Validator messages are reworded into short sentences that say what to do (`planner/plainFlags.ts`).
 - **Chat assistant.** Suggests changes through `POST /plans/chat`; the board changes only when the student clicks Apply, and Undo takes it back.
+- **Forms.** The forms the plan calls for (independent study, minor declaration) with what to do, and the other Registrar forms behind a click (`planner/forms.ts`, checked against the forms data).
 - **Downloads.** The plan as a PDF, or the flowchart as a PNG image. Both are made in the browser.
 - **Reloads.** The setup and plan are kept for the browser tab (`sessionStorage`) and gone when it is closed.
 - **Tests:** `npm test` from `frontend/`.
