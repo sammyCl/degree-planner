@@ -57,7 +57,8 @@ export function PlannerPage({ plan: initialPlan, explanation, choices, checks, p
   // The plan on screen. After every change the backend re-checks it and its answer replaces this, so the flags,
   // arrows and totals are always the validator's, never the page's own.
   const [plan, setPlan] = useState(initialPlan)
-  const confirmed = useRef(initialPlan) // the last plan the backend returned
+  // the last plan the backend returned, with the undo and redo history that goes with it
+  const confirmed = useRef({ plan: initialPlan, past: [] as Plan[], future: [] as Plan[] })
   const latest = useRef(0) // numbers the checks, so an old answer cannot overwrite a newer edit
   const [checking, setChecking] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
@@ -84,7 +85,9 @@ export function PlannerPage({ plan: initialPlan, explanation, choices, checks, p
         setDonePlan(result)
         setDoneState('ready')
       })
-      .catch(() => setDoneState('failed')) // without it the completed cards just have no labels
+      .catch(() => {
+        if (!abort.signal.aborted) setDoneState('failed') // without it the completed cards just have no labels
+      })
     return () => abort.abort()
   }, [initialPlan, doneColumns])
 
@@ -119,7 +122,20 @@ export function PlannerPage({ plan: initialPlan, explanation, choices, checks, p
   const [overIndex, setOverIndex] = useState<number | null>(null)
   // a lecture and its lab are dragged as one, so both look lifted
   const dragIds = useMemo(() => new Set(dragId ? togetherWith(plan, dragId) : []), [plan, dragId])
-  const closePopover = useCallback(() => setOpenCard(null), [setOpenCard])
+  const closePopover = useCallback(
+    (refocus?: boolean) => {
+      if (refocus) openCard?.el.focus({ preventScroll: true })
+      setOpenCard(null)
+    },
+    [openCard, setOpenCard],
+  )
+  // a course moved from its details is drawn anew in its new column: put the keyboard back on it
+  const refocus = useRef<string | null>(null)
+  useEffect(() => {
+    if (!refocus.current) return
+    cardEls.get(refocus.current)?.focus()
+    refocus.current = null
+  }, [plan, cardEls])
 
   useEffect(() => {
     if (!pulseId) return
@@ -133,7 +149,6 @@ export function PlannerPage({ plan: initialPlan, explanation, choices, checks, p
 
   /** Show a plan at once, then have the backend check it; its answer replaces the plan, or the change is undone. */
   const run = (next: Plan, nextPast: Plan[], nextFuture: Plan[]) => {
-    const before = { past, future }
     const mine = ++latest.current
     setPlan(next)
     setPast(nextPast)
@@ -144,15 +159,15 @@ export function PlannerPage({ plan: initialPlan, explanation, choices, checks, p
     checkPlan(next)
       .then((result) => {
         if (latest.current !== mine) return
-        confirmed.current = result
+        confirmed.current = { plan: result, past: nextPast, future: nextFuture }
         setPlan(result)
         setChecking(false)
       })
       .catch((error) => {
         if (latest.current !== mine) return
-        setPlan(confirmed.current)
-        setPast(before.past)
-        setFuture(before.future)
+        setPlan(confirmed.current.plan)
+        setPast(confirmed.current.past)
+        setFuture(confirmed.current.future)
         setChecking(false)
         setNotice(undoMessage(error))
       })
@@ -408,6 +423,7 @@ export function PlannerPage({ plan: initialPlan, explanation, choices, checks, p
           onMove={
             index.courses.get(openCard.id)?.status === 'planned'
               ? (to) => {
+                  refocus.current = openCard.id
                   move(openCard.id, to)
                   setOpenCard(null)
                 }

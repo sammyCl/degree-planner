@@ -759,6 +759,11 @@
   .legend {
     display: none;
   }
+
+  /* the Key button stays at the right, also on a line of its own, so its box opens inside the screen */
+  .bar > .key-wrap {
+    margin-left: auto;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

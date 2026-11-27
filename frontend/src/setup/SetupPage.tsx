@@ -56,6 +56,9 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
       },
   )
   const [submitted, setSubmitted] = useState(false)
+  // a transcript still being read: building now would leave its courses out of the plan
+  const [reading, setReading] = useState(false)
+  const [mustWait, setMustWait] = useState(false)
   const errors = validateSetup(form)
   const shown = submitted ? errors : {}
   const majorRef = useRef<HTMLInputElement>(null)
@@ -89,6 +92,10 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
     setSubmitted(true)
     if (Object.keys(errors).length > 0) {
       ;(errors.programId ? majorRef : semestersRef).current?.focus()
+      return
+    }
+    if (reading) {
+      setMustWait(true)
       return
     }
     onSubmit(buildRequest(form), form)
@@ -176,6 +183,10 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
                   files={form.files}
                   onChange={(completed, files) => patch({ completed, files })}
                   thisYear={thisYear}
+                  onReadingChange={(now) => {
+                    setReading(now)
+                    if (!now) setMustWait(false)
+                  }}
                 />
               </div>
             )}
@@ -249,6 +260,12 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
               </p>
             )}
           </div>
+
+          {mustWait && (
+            <p className="err" role="alert">
+              Wait for your transcript to finish reading, so its courses are in your plan.
+            </p>
+          )}
 
           <button className="cta" type="submit">
             Build my plan

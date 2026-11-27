@@ -12,7 +12,8 @@ interface Props {
   flags: Flag[]
   /** move the course to another semester (the keyboard-friendly way); left out for a completed course */
   onMove?: (toIndex: number) => void
-  onClose: () => void
+  /** `refocus` is set when the keyboard should go back to the card (Escape and the close button) */
+  onClose: (refocus?: boolean) => void
 }
 
 /** A description longer than this starts shortened, with a button for the rest. */
@@ -50,7 +51,7 @@ export function CoursePopover({ plan, index, courseId, anchor, flags, onMove, on
   useEffect(() => ref.current?.focus(), [anchor])
 
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose(true)
     const onDown = (e: MouseEvent) => {
       // composedPath is fixed when the click starts. A menu option that React removes while handling the
       // same click (choosing a semester) is no longer in the page, so contains() would call it "outside".
@@ -80,7 +81,7 @@ export function CoursePopover({ plan, index, courseId, anchor, flags, onMove, on
 
   return (
     <div className="pop" ref={ref} role="dialog" aria-label={`${course.code} details`} tabIndex={-1}>
-      <button className="pop-close" type="button" aria-label="Close" onClick={onClose}>
+      <button className="pop-close" type="button" aria-label="Close" onClick={() => onClose(true)}>
         &times;
       </button>
       <h4>{course.code}</h4>
