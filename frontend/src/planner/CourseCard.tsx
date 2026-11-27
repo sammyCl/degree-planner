@@ -1,6 +1,7 @@
 import type { Flag, PlannedCourse } from '../types.ts'
 import { categoryOf, type CourseLabel } from './courseLabel.ts'
 import { flagKind, formatCredits, subjectColor } from './graph.ts'
+import { cardWarning, plainAlert } from './plainFlags.ts'
 
 export type CardState = 'idle' | 'in-chain' | 'focus' | 'dim'
 
@@ -36,7 +37,7 @@ export function CourseCard({ course, flag, label, state, col, row, setRef, onEnt
     (label ? `, ${label.primary}${label.also ? ` and ${label.also}` : ''}` : '') +
     (course.status === 'completed' ? ', completed' : '') +
     (attachedTo ? `, lab taken together with ${attachedTo}` : '') +
-    (flag ? `. Problem: ${flag.message}` : '')
+    (flag ? `. Problem: ${plainAlert(flag).text}` : '')
   const classes = ['card', kind === 'error' ? 'flagged' : '', kind === 'warning' ? 'warned' : '', kind === 'confirm' ? 'confirm' : '', course.status === 'completed' ? 'completed' : '', state, pulse ? 'pulse' : '', dragging ? 'dragging' : '', attachedTo ? 'attached' : '']
     .filter(Boolean)
     .join(' ')
@@ -82,7 +83,7 @@ export function CourseCard({ course, flag, label, state, col, row, setRef, onEnt
             <path d="M12 3l10 18H2z" />
             <path d="M12 10v4m0 3h.01" />
           </svg>
-          {flag.type === 'broken_prerequisite' ? 'Prerequisite out of order' : kind === 'confirm' ? 'To confirm' : kind === 'warning' ? 'Check this' : 'Needs attention'}
+          {cardWarning(flag.type, flagKind(flag))}
         </div>
       )}
       {label?.also && <div className="card-also cat-minor">+ also counts for {label.also}</div>}

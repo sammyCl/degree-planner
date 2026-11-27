@@ -232,7 +232,7 @@ describe('SetupPage', () => {
     setup()
     pick(program(), /Petroleum Engineering/)
     fireEvent.click(screen.getByLabelText('Include summer terms'))
-    expect(screen.getByRole('alert')).toHaveTextContent('not fit')
+    expect(screen.getByRole('alert')).toHaveTextContent('Include summers so it fits')
     fireEvent.click(screen.getByRole('button', { name: 'Include summers and plan 11 semesters' }))
     expect(screen.getByLabelText('Include summer terms')).toBeChecked()
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()

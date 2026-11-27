@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Dropdown } from '../setup/Dropdown.tsx'
 import type { Flag, Plan } from '../types.ts'
 import { flagKind, formatCredits, togetherWith, type PlanIndex } from './graph.ts'
+import { plainAlert } from './plainFlags.ts'
 import { describeRequirement } from './requirement.ts'
 
 interface Props {
@@ -91,7 +92,7 @@ export function CoursePopover({ plan, index, courseId, anchor, flags, onMove, on
       </div>
       {flags.map((f) => (
         <div key={f.flag_id} className={`pop-msg ${flagKind(f)}`}>
-          {f.message}
+          <b>{plainAlert(f).title}.</b> {plainAlert(f).text}
         </div>
       ))}
       {description && (

@@ -58,7 +58,7 @@ describe('buildChecklist', () => {
     const whole = buildChecklist(samplePlan).at(-1)!
     expect(whole.title).toBe('Whole plan')
     expect(whole.rows.find((r) => r.name === 'Total credits')).toMatchObject({ met: false, detail: '114/130 credits' })
-    expect(whole.rows.find((r) => r.name === 'Prerequisites in order')).toMatchObject({ met: false, detail: '1 course out of order' })
+    expect(whole.rows.find((r) => r.name === 'Prerequisites in order')).toMatchObject({ met: false, detail: '1 course taken too early' })
   })
 
   it('still gives the plan-wide checks for an older plan without statuses', () => {
@@ -79,7 +79,7 @@ describe('buildChecks', () => {
   it('names the course by title and says what to confirm, without the number', () => {
     const plan = { ...withoutAssumedEquivalents(samplePlan), flags: [flag({})] } as Plan
     expect(buildChecks(plan)).toEqual([
-      { title: 'Computer Science for STEM', text: 'needs instructor consent; confirm it still applies', kind: 'confirm' },
+      { title: 'Computer Science for STEM', text: "CSCI128 may need the instructor's OK. Ask them before you sign up.", kind: 'confirm' },
     ])
   })
 
@@ -112,7 +112,7 @@ describe('buildChecks: assumed equivalents and the minor credit note', () => {
     const item = checks.find((c) => c.title === 'Earth Materials')!
     expect(item.kind).toBe('confirm')
     expect(item.text).toContain('GEOL310')
-    expect(item.text).toMatch(/^Counted as the same course as GEOL310; confirm with your advisor./)
+    expect(item.text).toMatch(/^We counted \w+ as the same course as GEOL310. Ask your advisor/)
     expect(buildChecks(withCourses([['MATH111', 'Calculus']], ['mining-bs'])).some((c) => c.kind === 'confirm')).toBe(false)
   })
 
@@ -120,7 +120,7 @@ describe('buildChecks: assumed equivalents and the minor credit note', () => {
     const checks = buildChecks(withCourses([['MATH111', 'Calculus']], ['mining-bs', 'biology-minor']))
     const note = checks.find((c) => c.title === 'Credits')!
     expect(note.kind).toBe('info')
-    expect(note.text).toContain('A minor adds about 9 credits beyond your degree')
+    expect(note.text).toContain('A minor adds about 9 extra credits')
     expect(note.text).toContain('142 credits')
     expect(note.text).toContain('131')
     expect(buildChecks(withCourses([['MATH111', 'Calculus']], ['mining-bs'])).some((c) => c.title === 'Credits')).toBe(false)

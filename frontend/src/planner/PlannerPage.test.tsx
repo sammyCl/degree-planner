@@ -36,7 +36,7 @@ describe('PlannerPage', () => {
     setup()
     const flagged = card('CSCI400')
     expect(flagged).toHaveClass('flagged')
-    expect(flagged).toHaveAccessibleName(/Problem: CSCI400 requires CSCI306/)
+    expect(flagged).toHaveAccessibleName(/Problem: Take CSCI306 before CSCI400/)
     expect(card('CSCI306')).not.toHaveClass('flagged')
   })
 
@@ -70,7 +70,7 @@ describe('PlannerPage', () => {
     setup()
     fireEvent.click(card('CSCI400'))
     const dialog = screen.getByRole('dialog', { name: 'CSCI400 details' })
-    expect(within(dialog).getByText(/CSCI400 requires CSCI306 to be completed/)).toBeInTheDocument()
+    expect(within(dialog).getByText(/Take CSCI306 before CSCI400/)).toBeInTheDocument()
     expect(within(dialog).getByText(/CSCI306 · Fall 2028/)).toBeInTheDocument() // needs, same semester
     expect(within(dialog).getByText(/CSCI358 · Fall 2027/)).toBeInTheDocument()
     expect(within(dialog).getByText('Nothing in this plan')).toBeInTheDocument() // unlocks nothing
@@ -99,7 +99,7 @@ describe('PlannerPage', () => {
     const items = screen.getAllByRole('menuitem')
     expect(items).toHaveLength(samplePlan.flags.filter((f) => f.severity === 'error').length)
     expect(items.some((i) => /credit/i.test(i.textContent ?? '') && /warning|short/i.test(i.textContent ?? ''))).toBe(false)
-    fireEvent.click(items.find((i) => /out of order/i.test(i.textContent ?? ''))!)
+    fireEvent.click(items.find((i) => /too early/i.test(i.textContent ?? ''))!)
     expect(screen.queryByRole('menu')).not.toBeInTheDocument()
     expect(card('CSCI400')).toHaveClass('pulse')
   })
@@ -110,19 +110,19 @@ describe('PlannerPage', () => {
       type: 'exception_claimed' as const,
       severity: 'warning' as const,
       course_id: 'sem-2-csci200',
-      message: 'CSCI200 relies on a claimed exception; confirm it still applies.',
+      message: 'CSCI200 relies on a claimed exception (instructor consent); confirm it still applies.',
       overridable: true,
       overridden: false,
     }
     render(<PlannerPage plan={{ ...samplePlan, flags: [...samplePlan.flags, confirm] }} onBack={vi.fn()} />)
-    fireEvent.click(screen.getByRole('button', { name: '1 to confirm' }))
-    expect(screen.getByRole('menu', { name: 'To confirm' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: '1 to check' }))
+    expect(screen.getByRole('menu', { name: 'To check' })).toBeInTheDocument()
     expect(screen.getAllByRole('menuitem')).toHaveLength(1)
-    expect(screen.getByRole('menuitem')).toHaveTextContent('claimed exception')
+    expect(screen.getByRole('menuitem')).toHaveTextContent("may need the instructor's OK")
     fireEvent.click(screen.getByRole('button', { name: '1 warning' }))
     expect(screen.getByRole('menu', { name: 'Warnings' })).toBeInTheDocument()
     expect(screen.getAllByRole('menuitem')).toHaveLength(1)
-    expect(screen.getByRole('menuitem')).not.toHaveTextContent('claimed exception')
+    expect(screen.getByRole('menuitem')).not.toHaveTextContent("may need the instructor's OK")
     fireEvent.click(screen.getByRole('button', { name: '2 errors' }))
     expect(screen.getAllByRole('menuitem')).toHaveLength(2)
   })
@@ -149,7 +149,7 @@ describe('PlannerPage', () => {
   it('lists the problems when the assistant could not finish a valid plan', () => {
     setup(vi.fn(), { problems: ['CSCI400 cannot be placed after CSCI306.', 'Not enough credits.'] })
     const alert = screen.getByRole('alert')
-    expect(alert).toHaveTextContent('could not build a plan that passes every rule')
+    expect(alert).toHaveTextContent('This plan still has problems')
     expect(within(alert).getAllByRole('listitem')).toHaveLength(2)
   })
 
@@ -168,15 +168,14 @@ describe('PlannerPage', () => {
     expect(req.textContent).not.toMatch(/[A-Z]{3,4}\d{3}/)
   })
 
-  it('lists what to check by course title, and says so when there is nothing', () => {
+  it('lists what to check under the course title, and says so when there is nothing', () => {
     const flag = { flag_id: 'x', type: 'exception_claimed' as const, severity: 'warning' as const, course_id: 'sem-1-csci128', message: 'CSCI128 relies on a claimed exception (instructor consent); confirm it still applies.', overridable: true, overridden: false }
     // CSCI303 is treated as the same course as DSCI403, which adds its own note; leave it out here
     const plain = { ...samplePlan, semesters: samplePlan.semesters.map((s) => ({ ...s, courses: s.courses.filter((c) => c.code !== 'CSCI303') })) }
     const { unmount } = render(<PlannerPage plan={{ ...plain, flags: [flag] }} onBack={vi.fn()} />)
     fireEvent.click(screen.getByRole('button', { name: 'Show' }))
     const card = screen.getByRole('heading', { name: 'Things to check' }).closest('.about-card') as HTMLElement
-    expect(card).toHaveTextContent('Computer Science for STEM: needs instructor consent; confirm it still applies')
-    expect(card.textContent).not.toMatch(/CSCI128/)
+    expect(card).toHaveTextContent("Computer Science for STEM: CSCI128 may need the instructor's OK. Ask them before you sign up.")
     unmount()
     render(<PlannerPage plan={{ ...plain, flags: [] }} onBack={vi.fn()} />)
     fireEvent.click(screen.getByRole('button', { name: 'Show' }))
@@ -218,8 +217,8 @@ describe('PlannerPage', () => {
     const asi = PROGRAMS.find((p) => p.level === 'asi')!
     render(<PlannerPage plan={{ ...samplePlan, student: { ...samplePlan.student, programs: [...samplePlan.student.programs, asi.id] } }} onBack={vi.fn()} />)
     const note = screen.getByRole('note')
-    expect(note).toHaveTextContent('may not be up to date')
-    expect(note).toHaveTextContent(`from the ${asi.catalog_year} catalog, not 2026-2027`)
+    expect(note).toHaveTextContent('may be out of date')
+    expect(note).toHaveTextContent(`uses ${asi.catalog_year} rules`)
   })
 
   it('keeps the "could not finish" alert above the board, where it is seen first', () => {
@@ -281,14 +280,14 @@ describe('PlannerPage', () => {
     expect(checks).not.toHaveTextContent('explanation')
   })
 
-  it('draws an error in red, a warning in amber, and a claimed exception as a calm "to confirm"', () => {
+  it('draws an error in red, a warning in amber, and a claimed exception as a calm "to check"', () => {
     const withFlag = (type: 'exception_claimed' | 'credit_shortfall', severity: 'warning' | 'error') =>
       ({ ...samplePlan, flags: [{ ...samplePlan.flags[0], type, severity }] })
     const { unmount } = render(<PlannerPage plan={withFlag('exception_claimed', 'warning')} onBack={vi.fn()} />)
     expect(card('CSCI400')).toHaveClass('confirm')
     expect(card('CSCI400')).not.toHaveClass('warned')
     expect(card('CSCI400')).not.toHaveClass('flagged')
-    expect(screen.getByRole('button', { name: '1 to confirm' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '1 to check' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /warning/ })).not.toBeInTheDocument()
     unmount()
 

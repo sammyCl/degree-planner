@@ -63,11 +63,11 @@ export function Legend() {
           <div className="key-sec">Card outline</div>
           <div className="key-row">
             <i className="key-swatch err" />
-            <span>Red: needs attention, such as a prerequisite out of order</span>
+            <span>Red: fix this, such as a course taken too early</span>
           </div>
           <div className="key-row">
             <i className="key-swatch warn" />
-            <span>Amber: check this</span>
+            <span>Amber: please check this</span>
           </div>
           <div className="key-row">
             <i className="key-swatch dashed" />

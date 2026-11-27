@@ -343,6 +343,60 @@
   outline-offset: 2px;
 }
 
+/* the plan as a file: at the right end of the notice, quieter than Edit setup */
+/* on a narrow screen the sentence keeps a readable width and the buttons wrap around it */
+.planner-notice {
+  flex-wrap: wrap;
+}
+
+.planner-notice > span:not(.download) {
+  flex: 1 1 260px;
+}
+
+/* while the flowchart is being copied into a picture, nothing moves */
+.cols.exporting * {
+  animation: none !important;
+  transition: none !important;
+}
+
+.download {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid var(--acc);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--acc);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.download-btn:hover:not(:disabled) {
+  background: var(--acc-tint);
+}
+
+.download-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.download-btn:focus-visible {
+  outline: 3px solid var(--acc-tint);
+  outline-offset: 2px;
+}
+
 .link {
   border: 0;
   background: none;

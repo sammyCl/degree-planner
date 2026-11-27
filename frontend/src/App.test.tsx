@@ -108,7 +108,7 @@ describe('building a plan', () => {
     }))
     render(<App />)
     chooseProgramAndBuild()
-    expect(await screen.findByRole('heading', { name: 'Cannot reach the backend' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: "Can't reach the server" })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument()
   })
 
@@ -116,8 +116,8 @@ describe('building a plan', () => {
     stubBackend(() => fail(422, { detail: [{ loc: ['body', 'semesters'], msg: 'too many' }] }))
     render(<App />)
     chooseProgramAndBuild()
-    expect(await screen.findByRole('heading', { name: 'The backend did not accept this setup' })).toBeInTheDocument()
-    expect(screen.getByText('semesters: too many')).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Check your setup' })).toBeInTheDocument()
+    expect(screen.getByText(/semesters: too many/)).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Try again' })).not.toBeInTheDocument()
   })
 

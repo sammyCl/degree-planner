@@ -50,8 +50,8 @@ async function readDetail(response: Response): Promise<string | null> {
   return `The backend returned ${response.status}.`
 }
 
-const UNREACHABLE = 'Could not reach the backend. Check that it is running.'
-const unreadable = () => new ApiError('server', 'The backend sent an answer this page could not read.')
+const UNREACHABLE = "Can't reach the server. Make sure it is running, then try again."
+const unreadable = () => new ApiError('server', 'The server sent an answer this page could not read.')
 
 type Fields = Record<string, unknown>
 const isObject = (value: unknown): value is Fields => typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -116,7 +116,7 @@ async function post(url: string, init: { headers?: Record<string, string>; body:
   const detail = await readDetail(response)
   // The development server (and any proxy) answers like this, with no JSON, when the backend is not there.
   if (detail === null && (response.status === 502 || response.status === 504)) throw new ApiError('network', UNREACHABLE, response.status)
-  const message = detail ?? `The backend returned ${response.status}.`
+  const message = detail ?? `Something went wrong (error ${response.status}). Try again.`
   if (response.status === 503) throw new ApiError('agent_unavailable', message, 503)
   if (response.status === 400 || response.status === 422) throw new ApiError('invalid_request', message, response.status)
   throw new ApiError('server', message, response.status)
@@ -140,7 +140,7 @@ async function withTimeout<T>(ms: number, signal: AbortSignal | undefined, reque
   try {
     return await request(abort.signal)
   } catch (error) {
-    if (late) throw new ApiError('server', 'The backend took too long to answer.')
+    if (late) throw new ApiError('server', 'This is taking too long. Try again.')
     throw error
   } finally {
     clearTimeout(timer)

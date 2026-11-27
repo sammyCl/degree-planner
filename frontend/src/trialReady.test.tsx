@@ -64,7 +64,7 @@ describe('answers the page cannot read', () => {
     stubSubmit(() => ok(body))
     render(<App />)
     build()
-    expect(await screen.findByRole('heading', { name: 'Something went wrong on the backend' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Something went wrong' })).toBeInTheDocument()
     expect(screen.getByText(/could not read/)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument()
   })
@@ -91,7 +91,7 @@ describe('answers the page cannot read', () => {
     stubSubmit(() => notJson(status))
     render(<App />)
     build()
-    expect(await screen.findByRole('heading', { name: 'Cannot reach the backend' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: "Can't reach the server" })).toBeInTheDocument()
   })
 
   it('still shows the backend\'s own words for its 500', async () => {
@@ -105,7 +105,7 @@ describe('a page that fails to draw', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {})
     const broken: Plan = {
       ...samplePlan,
-      flags: [{ flag_id: 'x', type: 'unlisted_course', severity: 'warning', course_id: null, overridable: false, overridden: false } as never],
+      flags: [{ flag_id: 'x', type: 'unlisted_course', severity: 'warning', course_id: null, message: {}, overridable: false, overridden: false } as never],
     }
     stubSubmit(() => ok({ ...good, plan: broken }))
     render(<App />)

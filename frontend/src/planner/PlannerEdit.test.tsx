@@ -82,7 +82,7 @@ describe('moving a course', () => {
 
     drag('CSM101', 'Spring 2027')
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('Could not reach the backend, so your change was undone.')
+    expect(await screen.findByRole('alert')).toHaveTextContent("Can't reach the server, so we undid your change.")
     expect(codesIn('Fall 2026')).toContain('CSM101')
     expect(codesIn('Spring 2027')).not.toContain('CSM101')
     fireEvent.click(screen.getByRole('button', { name: 'Dismiss' }))
@@ -93,7 +93,7 @@ describe('moving a course', () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 422, json: async () => ({ detail: 'bad plan' }) }))
     render(<PlannerPage plan={samplePlan} onBack={vi.fn()} />)
     drag('CSM101', 'Spring 2027')
-    expect(await screen.findByRole('alert')).toHaveTextContent('could not re-check the plan, so your change was undone. bad plan')
+    expect(await screen.findByRole('alert')).toHaveTextContent("couldn't check your change, so we undid it")
     expect(codesIn('Fall 2026')).toContain('CSM101')
   })
 

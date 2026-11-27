@@ -3,6 +3,7 @@ import type { Flag, Plan } from '../types.ts'
 import { completedCredits, remainingCredits } from './completed.ts'
 import { flagCounts, flagKind, formatCredits } from './graph.ts'
 import { Legend } from './Legend.tsx'
+import { plainAlert } from './plainFlags.ts'
 import { useCountUp } from './useCountUp.ts'
 
 const R = 19
@@ -26,7 +27,7 @@ const CheckIcon = () => (
   </svg>
 )
 
-const MENU_NAMES = { error: 'Errors', warning: 'Warnings', confirm: 'To confirm' } as const
+const MENU_NAMES = { error: 'Errors', warning: 'Warnings', confirm: 'To check' } as const
 type FlagKind = keyof typeof MENU_NAMES
 
 interface Props {
@@ -139,7 +140,7 @@ export function SummaryBar({ plan, programName, onSelectFlag, checking }: Props)
         {confirm > 0 && (
           <button type="button" className="badge c" aria-expanded={menu === 'confirm'} aria-haspopup="true" onClick={() => toggle('confirm')}>
             <InfoIcon />
-            {confirm} to confirm
+            {confirm} to check
           </button>
         )}
         {menu && (
@@ -158,8 +159,8 @@ export function SummaryBar({ plan, programName, onSelectFlag, checking }: Props)
               >
                 <span className="flag-ic">{flagKind(f) === 'error' ? <WarnIcon /> : <InfoIcon />}</span>
                 <span>
-                  <b>{flagTitle(f)}</b>
-                  <span>{f.message}</span>
+                  <b>{plainAlert(f).title}</b>
+                  <span>{plainAlert(f).text}</span>
                 </span>
               </button>
             ))}
@@ -175,29 +176,13 @@ export function SummaryBar({ plan, programName, onSelectFlag, checking }: Props)
       <span className="grow" />
       <div className="legend" aria-hidden="true">
         <span>
-          <i /> prerequisite
+          <i /> needed first
         </span>
         <span>
-          <i className="bad" /> out of order
+          <i className="bad" /> taken too early
         </span>
       </div>
       <Legend />
     </div>
   )
 }
-
-const TITLES: Record<Flag['type'], string> = {
-  broken_prerequisite: 'Prerequisite out of order',
-  credit_shortfall: 'Credit load',
-  requirement_unmet: 'Requirement not met',
-  double_count_exceeded: 'Too many shared courses',
-  exception_claimed: 'To confirm',
-  ineligible_course: 'Course not allowed here',
-  semester_overload: 'Too many credits in a semester',
-  stale_program_year: 'Older catalog data',
-  assumed_equivalent: 'Confirm equivalent course',
-  unlisted_course: 'Confirm with your advisor',
-  undergraduate_prerequisite: 'Confirm your background',
-  summer_course: 'Summer course',
-}
-const flagTitle = (f: Flag): string => TITLES[f.type] ?? 'Needs attention'

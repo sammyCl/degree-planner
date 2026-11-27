@@ -41,20 +41,20 @@ function describeError(error: unknown): { title: string; message: string; canRet
   if (error instanceof ApiError) {
     switch (error.kind) {
       case 'network':
-        return { title: 'Cannot reach the backend', message: error.message, canRetry: true }
+        return { title: "Can't reach the server", message: error.message, canRetry: true }
       case 'agent_unavailable':
         return {
           title: 'The planning assistant is not available',
-          message: `The backend could not start the assistant, so no plan was built. ${error.message}`,
+          message: `We couldn't start it, so there's no plan yet. Try again in a few minutes. Details: ${error.message}`,
           canRetry: true,
         }
       case 'invalid_request':
-        return { title: 'The backend did not accept this setup', message: error.message, canRetry: false }
+        return { title: 'Check your setup', message: `Go back to setup and fix this: ${error.message}`, canRetry: false }
       default:
-        return { title: 'Something went wrong on the backend', message: error.message, canRetry: true }
+        return { title: 'Something went wrong', message: error.message, canRetry: true }
     }
   }
-  return { title: 'Something went wrong', message: 'An unexpected error stopped the plan from being built.', canRetry: true }
+  return { title: 'Something went wrong', message: 'No plan was built. Try again.', canRetry: true }
 }
 
 function App() {
