@@ -15,6 +15,46 @@ Add an entry whenever the team picks between real options; copy the template bel
 
 ## Entries
 
+### Transcripts: Mines layout read by rules, other layouts by Claude
+
+- Date: 2026-11-26
+- Owner: Abdallah Salhi (frontend)
+- Decision: Mines transcripts are read by rules on our backend; other schools' transcripts are read by Claude with personal details removed. A Mines PDF goes to Claude (also redacted) only if the rules read fewer than 3 courses from it.
+- Options considered: Sending every transcript to Claude (including Mines transcripts), parsing all transcripts locally, or having students type every course in by hand.
+- Why: Mines transcripts follow a known local format that can be parsed deterministically without sending them to Claude, while external transcripts vary widely in layout and benefit from LLM extraction. Stripping personal details first reduces privacy exposure when sending external files to Claude.
+
+### Transfer equivalents: Claude suggests from a shortlist, the student accepts
+
+- Date: 2026-11-26
+- Owner: Abdallah Salhi (frontend)
+- Decision: Claude suggests transfer equivalents from a shortlist, and the student accepts them.
+- Options considered: Auto-applying transfer credits without review, Claude inventing course equivalents freely from scratch, or forcing students to look up and match every transfer course manually.
+- Why: Constraining Claude to a shortlist keeps suggestions grounded in valid catalog/equivalency options, while requiring student acceptance prevents silent errors on degree requirements and keeps the student in control.
+
+### Summer terms switch on automatically, and only used summers show
+
+- Date: 2026-11-26
+- Owner: Abdallah Salhi (frontend)
+- Decision: Summer terms switch on automatically for degrees that need a summer course, and the planner shows only the summers that have a course.
+- Options considered: Showing empty summer columns for every year by default, requiring a manual toggle before any summer term appears, or omitting summer terms completely.
+- Why: Automatically revealing a summer term when used reduces clicks and captures non-standard pacing, while hiding unused summers keeps the standard academic-year grid clean and uncluttered.
+
+### One entry per major, with a track picker
+
+- Date: 2026-11-26
+- Owner: Abdallah Salhi (frontend)
+- Decision: The setup page lists each major once, with a track picker.
+- Options considered: Listing every major-plus-track combination as a separate top-level major entry, or treating tracks as free-text notes rather than structured options.
+- Why: Grouping tracks under a single major entry keeps major selection clean and scannable while still letting students pick a specialization that shapes course or requirement rules.
+
+### Plan download is a PDF (for now; not built yet)
+
+- Date: 2026-11-26
+- Owner: Abdallah Salhi (frontend)
+- Decision: The plan download will be a PDF.
+- Options considered: Exporting only JSON/CSV, printing directly from the browser stylesheet, building a shareable web link first, or delaying export planning altogether.
+- Why: A PDF gives students a portable, advisor-friendly snapshot of their plan in a familiar format, while keeping it as a planned scope item avoids spending build time on export formatting before core planning flows settle.
+
 ### Validation strictness: reject or clean malformed data at load, don't just warn about it later
 
 - Date: 2026-11-25
@@ -22,6 +62,14 @@ Add an entry whenever the team picks between real options; copy the template bel
 - Decision: Genuinely malformed data (NaN/infinite/negative numbers, an empty required list, a prompt-injection-shaped catalog year, a prerequisite/corequisite referencing a course code that doesn't exist and has no safe alternative) is rejected at load, or cleaned to a safe value, instead of loading successfully with a tool-side `data_warning`. A value kept as literal, uncorrected text stays that way only when correcting it would mean guessing (a catalog typo like `CSC128` with no single obvious fix); a dead reference with no safe fallback becomes an overridable `exception` instead, so it's visible and actionable rather than a silent permanent failure.
 - Options considered: Keep the agent tool's existing leniency (load anything, add a warning the agent reads) vs. move the check to the data format itself, so every consumer (validator, frontend, future tools, not just today's agent tool) gets the same guarantee.
 - Why: The stricter checks were first tried back when models.py/plan_models.py were built, then held back after they collided with the agent tool's existing lenient behavior and its tests (bugs.txt BUG-010, 014, 017, 022, 023(a), 026(c), 028). Raised to Samantha directly rather than guessed at; she agreed none of these are legitimate cases, only broken ones, so rejecting or cleaning them at load is strictly better than relying on every future consumer to re-implement the same tool-side warning. The same principle later caught BUG-050 (most "code not in the catalog" prerequisite references were a dead end, not an overridable exception), but was applied carefully there: the 21 cases with a working OR fallback are left untouched, since converting those too would make the validator always flag them (BUG-026(d)) even though nothing is actually wrong with the plan.
+
+### Frontend: React, Vite and TypeScript
+
+- Date: 2026-11-17
+- Owner: Abdallah Salhi (frontend)
+- Decision: The frontend uses React, Vite and TypeScript.
+- Options considered: Plain JavaScript with React, a full-stack framework like Next.js, or another frontend framework such as Vue or Svelte.
+- Why: TypeScript catches state and data-model bugs early in a rule-heavy degree planner, React fits interactive schedule and requirement state well, and Vite keeps local development and builds fast for a client-focused frontend.
 
 ### Stack: Python 3.12, uv, FastAPI, SQLite
 
