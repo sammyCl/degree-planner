@@ -125,6 +125,7 @@ describe('ChatPanel', () => {
   it.each([
     [503, 'The assistant is not available right now.'],
     [500, 'The assistant could not answer.'],
+    [422, "The assistant can't work with this plan yet. x"],
     [502, "Can't reach the server"],
   ])('puts the message back and says why after a %i', async (status, words) => {
     backend(() => (status === 502 ? ({ ok: false, status, json: async () => Promise.reject(new Error('x')) }) as unknown as Response : reply(status, { detail: 'x' })))

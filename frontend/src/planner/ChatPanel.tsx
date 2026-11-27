@@ -133,7 +133,9 @@ export function ChatPanel({ plan, busy, onApply }: Props) {
           ? error.message
           : error instanceof ApiError && error.kind === 'agent_unavailable'
             ? 'The assistant is not available right now. Try again in a few minutes.'
-            : 'The assistant could not answer. Try again.',
+            : error instanceof ApiError && error.kind === 'invalid_request'
+              ? `The assistant can't work with this plan yet. ${error.message}`
+              : 'The assistant could not answer. Try again.',
       )
     } finally {
       if (request.current === abort) setWaiting(false)
