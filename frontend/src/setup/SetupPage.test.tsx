@@ -205,7 +205,7 @@ describe('SetupPage', () => {
     pick(program(), /Petroleum Engineering/)
     expect(screen.getByLabelText('Include summer terms')).toBeChecked()
     expect(semesters()).toHaveValue(11)
-    expect(screen.getByRole('note')).toHaveTextContent('Summer terms are on')
+    expect(screen.getByRole('note')).toHaveTextContent('only the summers that')
     pick(program(), CS)
     expect(screen.getByLabelText('Include summer terms')).not.toBeChecked()
     expect(semesters()).toHaveValue(8)

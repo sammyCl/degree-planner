@@ -111,6 +111,15 @@ export function creditLevel(credits: number, label = '', overloaded = false, ful
   return 'ok'
 }
 
+/**
+ * A summer with nothing in it is not shown: summer terms are only there for the courses that need them (a summer field
+ * session). The student can still add a summer back with the + between two semesters.
+ */
+export function withoutEmptySummers(plan: Plan): Plan {
+  const semesters = plan.semesters.filter((s) => s.courses.length > 0 || !s.label.startsWith('Summer'))
+  return semesters.length === plan.semesters.length ? plan : { ...plan, semesters }
+}
+
 export const formatCredits = (n: number): string => String(Math.round(n * 10) / 10)
 
 /** Course subject colours; anything else is grey. */

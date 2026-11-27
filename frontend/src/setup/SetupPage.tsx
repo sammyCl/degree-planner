@@ -237,8 +237,8 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
             </label>
             {summerCount !== undefined && !needsSummer && (
               <p className="summer-hint ok" role="note">
-                Summer terms are on and the plan has {form.semesters} semesters, because this degree has a summer field
-                session.
+                Summer terms are on because this degree has a summer field session. Your plan shows only the summers that
+                have a course in them.
               </p>
             )}
             {needsSummer && (

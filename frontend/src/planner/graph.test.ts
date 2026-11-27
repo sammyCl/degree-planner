@@ -18,8 +18,7 @@ import {
   removeSemester,
   subjectColor,
   summerSlots,
-  termAfter,
-} from './graph.ts'
+  termAfter, withoutEmptySummers } from './graph.ts'
 
 describe('indexPlan', () => {
   const index = indexPlan(samplePlan)
@@ -205,5 +204,21 @@ describe('labs that go with a lecture', () => {
     const plan = movePlanned(withLab('completed'), 'c-CHGN221', 1)
     expect(plan.semesters[0].courses.map((c) => c.code)).toContain('CHGN223')
     expect(plan.semesters[1].courses.map((c) => c.code)).toContain('CHGN221')
+  })
+})
+
+describe('withoutEmptySummers', () => {
+  const term = (label: string, courses: number) => ({
+    semester_id: label,
+    label,
+    total_credits: courses,
+    courses: Array.from({ length: courses }, (_, i) => ({ course_id: `${label}-${i}`, code: 'PEGN315', title: 'x', credits: 1, status: 'planned' as const })),
+  })
+  it('drops only the summers with no course, keeping empty fall and spring terms', () => {
+    const plan = { ...samplePlan, semesters: [term('Spring 2028', 2), term('Summer 2028', 0), term('Fall 2028', 0), term('Summer 2029', 1)] }
+    expect(withoutEmptySummers(plan).semesters.map((s) => s.label)).toEqual(['Spring 2028', 'Fall 2028', 'Summer 2029'])
+  })
+  it('returns the same plan when there is nothing to drop', () => {
+    expect(withoutEmptySummers(samplePlan)).toBe(samplePlan)
   })
 })
