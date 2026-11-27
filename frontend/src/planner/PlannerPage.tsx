@@ -41,6 +41,8 @@ interface Props {
   /** why it could not finish a valid plan, if it could not */
   problems?: string[]
   onBack: () => void
+  /** the plan after each change the backend has checked, so it can be kept when the student leaves this page */
+  onChange?: (plan: Plan) => void
 }
 
 const HISTORY_LIMIT = 50
@@ -55,7 +57,9 @@ const undoMessage = (error: unknown): string =>
     ? "Can't reach the server, so we undid your change. Try again."
     : "We couldn't check your change, so we undid it. Try again."
 
-export function PlannerPage({ plan: initialPlan, explanation, choices, checks, problems, onBack }: Props) {
+export function PlannerPage({ plan: openedWith, explanation, choices, checks, problems, onBack, onChange }: Props) {
+  // the plan this page opened with; later changes to the prop are our own edits coming back, and are ignored
+  const [initialPlan] = useState(openedWith)
   // The plan on screen. After every change the backend re-checks it and its answer replaces this, so the flags,
   // arrows and totals are always the validator's, never the page's own.
   const [plan, setPlan] = useState(initialPlan)
@@ -164,6 +168,7 @@ export function PlannerPage({ plan: initialPlan, explanation, choices, checks, p
         confirmed.current = { plan: result, past: nextPast, future: nextFuture }
         setPlan(result)
         setChecking(false)
+        onChange?.(result)
       })
       .catch((error) => {
         if (latest.current !== mine) return

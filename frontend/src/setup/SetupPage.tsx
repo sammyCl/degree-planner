@@ -1,4 +1,4 @@
-import { useId, useMemo, useRef, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { AgentRequest } from '../types.ts'
 import { AddOnPicker } from './AddOnPicker.tsx'
 import { Dropdown } from './Dropdown.tsx'
@@ -33,11 +33,15 @@ interface Props {
   onSubmit: (request: AgentRequest, form: SetupForm) => void
   /** The student's earlier choices, when they come back from the planner or an error. */
   initial?: SetupForm
+  /** Goes back to the plan the student already has, with their changes; absent when there is none. */
+  onResume?: () => void
+  /** every change to the form, so it is kept across a reload or a trip back to the plan */
+  onFormChange?: (form: SetupForm) => void
   /** Injectable for tests; the current date is used otherwise. */
   today?: Date
 }
 
-export function SetupPage({ onSubmit, initial, today }: Props) {
+export function SetupPage({ onSubmit, initial, onResume, onFormChange, today }: Props) {
   const [now] = useState(() => today ?? new Date())
   const ids = { major: useId(), semesters: useId(), completed: useId() }
   const start = useMemo(() => defaultStart(now), [now])
@@ -60,9 +64,17 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
       },
   )
   const [submitted, setSubmitted] = useState(false)
+  const report = useRef(onFormChange)
+  useEffect(() => {
+    report.current = onFormChange
+  })
+  useEffect(() => report.current?.(form), [form])
   // a transcript still being read: building now would leave its courses out of the plan
   const [reading, setReading] = useState(false)
   const [mustWait, setMustWait] = useState(false)
+  // courses from another school still without a Mines course: the student is told once before they are left out
+  const unmatched = form.hasCompleted ? form.files.reduce((sum, f) => sum + (f.unmatched?.length ?? 0), 0) : 0
+  const [warnedAbout, setWarnedAbout] = useState(0)
   const errors = validateSetup(form)
   const shown = submitted ? errors : {}
   /**
@@ -131,6 +143,10 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
       setMustWait(true)
       return
     }
+    if (unmatched > 0 && unmatched !== warnedAbout) {
+      setWarnedAbout(unmatched)
+      return
+    }
     onSubmit(buildRequest(form), form)
   }
 
@@ -148,6 +164,15 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
           </h2>
           <p>Tell us your program and when you start. We lay out every semester and check every prerequisite.</p>
         </div>
+
+        {onResume && (
+          <div className="resume" role="note">
+            <span>You already have a plan. Building a new one replaces it.</span>
+            <button type="button" className="btn primary" onClick={onResume}>
+              Back to my plan
+            </button>
+          </div>
+        )}
 
         <form className="panel form" onSubmit={submit} noValidate aria-label="Plan setup">
           <div className="field">
@@ -348,6 +373,14 @@ export function SetupPage({ onSubmit, initial, today }: Props) {
           {mustWait && (
             <p className="err" role="alert">
               Wait for your transcript to finish reading, so its courses are in your plan.
+            </p>
+          )}
+
+          {unmatched > 0 && unmatched === warnedAbout && (
+            <p className="err" role="alert">
+              {unmatched === 1 ? '1 course from another school is' : `${unmatched} courses from another school are`} not in your plan yet.
+              Match {unmatched === 1 ? 'it' : 'them'} under Completed courses, or press Build my plan again to leave{' '}
+              {unmatched === 1 ? 'it' : 'them'} out.
             </p>
           )}
 

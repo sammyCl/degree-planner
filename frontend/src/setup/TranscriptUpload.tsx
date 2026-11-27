@@ -122,7 +122,10 @@ export function TranscriptUpload({ courses, files = [], onChange, thisYear, onRe
           : `Found ${found} ${found === 1 ? 'course' : 'courses'}${added < result.courses.length ? `, ${added} new` : ''}.${result.unmatched.length ? ` ${result.unmatched.length} still need a Mines equivalent.` : ''} Check the list below.`
       setNote(ignored.length ? `${said} One file at a time: add ${ignored.join(', ')} next.` : said)
     } catch (error) {
-      if (error instanceof ApiError && error.kind === 'aborted') return
+      if (error instanceof ApiError && error.kind === 'aborted') {
+        setNote(`Stopped reading ${file.name}. Nothing was added.`)
+        return
+      }
       setProblem(
         error instanceof ApiError && error.kind === 'invalid_request'
           ? `We could not read that file: ${error.message}`
@@ -236,6 +239,11 @@ export function TranscriptUpload({ courses, files = [], onChange, thisYear, onRe
           {reading ? 'Reading your transcript...' : 'Upload transcript'}
         </button>
         <span className="tu-or">or drop a .csv or .pdf here</span>
+        {reading && (
+          <button type="button" className="link" onClick={() => controller.current?.abort()}>
+            Stop reading
+          </button>
+        )}
         <input
           ref={fileInput}
           type="file"

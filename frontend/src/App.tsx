@@ -5,6 +5,7 @@ import { ProblemScreen } from './building/ProblemScreen.tsx'
 import { ErrorBoundary } from './ErrorBoundary.tsx'
 import { withoutEmptySummers } from './planner/graph.ts'
 import { PlannerPage } from './planner/PlannerPage.tsx'
+import { loadSession, saveSession } from './session.ts'
 import { SetupPage } from './setup/SetupPage.tsx'
 import type { SetupForm } from './setup/validate.ts'
 import type { AgentRequest, AgentResponse } from './types.ts'
@@ -15,7 +16,7 @@ type BackendStatus = 'checking' | 'up' | 'down'
 type Screen =
   | { name: 'setup' }
   | { name: 'building'; request: AgentRequest }
-  | { name: 'planner'; response: AgentResponse }
+  | { name: 'planner' }
   | { name: 'problem'; request: AgentRequest; title: string; message: string; problems: string[]; canRetry: boolean }
 
 function toggleTheme() {
@@ -59,9 +60,15 @@ function describeError(error: unknown): { title: string; message: string; canRet
 
 function App() {
   const [backend, setBackend] = useState<BackendStatus>('checking')
-  const [screen, setScreen] = useState<Screen>({ name: 'setup' })
+  const [saved] = useState(loadSession) // what was on screen before a reload
+  const [screen, setScreen] = useState<Screen>(saved.screen === 'planner' ? { name: 'planner' } : { name: 'setup' })
   // What the student chose, kept so that coming back from the planner or an error does not lose it.
-  const [form, setForm] = useState<SetupForm | undefined>()
+  const [form, setForm] = useState<SetupForm | undefined>(saved.form)
+  // The latest plan, with the student's changes, kept so they can leave the planner and come back to it.
+  const [response, setResponse] = useState<AgentResponse | undefined>(saved.response)
+  useEffect(() => {
+    saveSession({ screen: screen.name === 'planner' ? 'planner' : 'setup', form, response })
+  }, [screen.name, form, response])
   // Each submit gets a number; a late answer to an older submit is ignored.
   const run = useRef(0)
   const controller = useRef<AbortController | null>(null)
@@ -112,7 +119,8 @@ function App() {
             canRetry: true,
           })
         } else {
-          setScreen({ name: 'planner', response: { ...response, plan: withoutEmptySummers(response.plan) } })
+          setResponse({ ...response, plan: withoutEmptySummers(response.plan) })
+          setScreen({ name: 'planner' })
         }
       })
       .catch((error) => {
@@ -151,10 +159,18 @@ function App() {
         </button>
       </header>
 
-      <ErrorBoundary key={screen.name} onReset={() => setScreen({ name: 'setup' })}>
+      <ErrorBoundary
+        key={screen.name}
+        onReset={() => {
+          if (screen.name === 'planner') setResponse(undefined) // a plan that cannot be drawn is not offered again
+          setScreen({ name: 'setup' })
+        }}
+      >
         {screen.name === 'setup' && (
           <SetupPage
             initial={form}
+            onFormChange={setForm}
+            onResume={response ? () => setScreen({ name: 'planner' }) : undefined}
             onSubmit={(request, submitted) => {
               setForm(submitted)
               build(request)
@@ -162,13 +178,14 @@ function App() {
           />
         )}
         {screen.name === 'building' && <BuildingScreen request={screen.request} onCancel={cancel} />}
-        {screen.name === 'planner' && (
+        {screen.name === 'planner' && response && (
           <PlannerPage
-            plan={screen.response.plan!}
-            explanation={screen.response.explanation}
-            choices={screen.response.choices}
-            checks={screen.response.checks}
-            problems={screen.response.status === 'cannot_work' ? screen.response.problems : []}
+            plan={response.plan!}
+            explanation={response.explanation}
+            choices={response.choices}
+            checks={response.checks}
+            problems={response.status === 'cannot_work' ? response.problems : []}
+            onChange={(plan) => setResponse((r) => r && { ...r, plan })}
             onBack={() => setScreen({ name: 'setup' })}
           />
         )}

@@ -61,7 +61,7 @@ const isCourseList = (value: unknown): boolean =>
 const textList = (value: unknown): string[] => (Array.isArray(value) ? value.filter((v): v is string => typeof v === 'string') : [])
 
 /** Checks only what the planner page cannot draw without; the optional parts of a plan stay optional. */
-function readPlan(value: unknown): Plan {
+export function readPlan(value: unknown): Plan {
   const ok =
     isObject(value) &&
     isObject(value.student) &&
