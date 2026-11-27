@@ -141,6 +141,38 @@ export interface Plan {
   requirement_status?: RequirementStatus[]
 }
 
+// The chatbot, POST /plans/chat (docs/chat-format.md, owner: Samantha).
+export interface ChatMessage {
+  role: 'student' | 'assistant'
+  text: string
+}
+
+export interface ChatRequest {
+  plan: Plan
+  overrides: Override[]
+  messages: ChatMessage[]
+}
+
+export interface PlanChange {
+  kind: 'add' | 'remove' | 'move'
+  code: string
+  from_label: string | null
+  to_label: string | null
+}
+
+export interface ChatResponse {
+  reply: string
+  /** null when nothing is proposed; the board changes only when the student clicks Apply */
+  proposed_plan: Plan | null
+  changes: PlanChange[]
+  accepted_overrides: Override[]
+  still_open: string[]
+  /** course codes whose exception the student has not decided yet */
+  open_exceptions: string[]
+  /** why the run stopped early */
+  problems: string[]
+}
+
 // What the backend's POST /plans/submit-setup takes (docs/agent-request-format.md, owner: Midhat and Samantha).
 export interface Override {
   type: 'exception_claimed'

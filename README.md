@@ -34,6 +34,18 @@ The backend is a FastAPI app over SQLite (Python 3.12, `uv`); Pydantic models do
 - **API** (`main.py`): `POST /plans/check` re-validates a plan (used after a drag-and-drop move); `POST /plans` / `PUT /plans/{plan_id}` / `GET /plans/{plan_id}` are the plan store, always re-running the validator before saving so a client can't forge a passing plan into storage; `POST /plans/submit-setup` and `POST /plans/chat` call the agent loop and chat loop; `POST /transcripts/parse` turns an uploaded `.csv` or `.pdf` transcript into completed courses. Validation errors return 422 without echoing request internals back; an unexpected server error returns one fixed, non-revealing 500 message, with the real exception only in the server log.
 - **Tests:** `uv run pytest` from `backend/` (1027 tests); `uv run pytest ../data/tools` for the data-conversion scripts (45 tests).
 
+## Frontend
+
+React, TypeScript and Vite (`frontend/`). It draws what the backend decides: whether a plan is valid is always the validator's answer, never the page's.
+
+- **Setup page.** Degree level, major (with a track picker), minors and ASIs, starting term, summer terms and number of semesters. Completed and transfer courses come from an uploaded `.csv` or `.pdf` transcript, or are typed in, and the student reviews the list before it is used. A course from another school without a Mines match gets a suggested equivalent that counts only after the student accepts it.
+- **Planner page.** One column per semester with prerequisite arrows. Courses can be dragged (or moved from their details) to another semester, with undo and redo; every change is sent to `POST /plans/check` and the answer replaces the plan. Completed courses sit in their own columns, and "About this plan" shows the requirement checklist, things to check and the assistant's choices.
+- **Alerts.** Validator messages are reworded into short sentences that say what to do (`planner/plainFlags.ts`).
+- **Chat assistant.** Suggests changes through `POST /plans/chat`; the board changes only when the student clicks Apply, and Undo takes it back.
+- **Downloads.** The plan as a PDF, or the flowchart as a PNG image. Both are made in the browser.
+- **Reloads.** The setup and plan are kept for the browser tab (`sessionStorage`) and gone when it is closed.
+- **Tests:** `npm test` from `frontend/`.
+
 ## Team and who owns what
 
 All three members share data collection; each also owns one part.

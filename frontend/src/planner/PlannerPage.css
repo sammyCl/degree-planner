@@ -942,6 +942,7 @@
   display: flex;
   align-items: center;
   gap: 14px;
+  width: max-content; /* centred with left: 50%, it would otherwise be squeezed into half the screen */
   max-width: min(560px, calc(100vw - 32px));
   padding: 10px 14px;
   border-radius: 12px;
@@ -1950,4 +1951,9 @@
   background: var(--acc-tint);
   color: var(--acc);
   font: 700 11px/1 Inter, sans-serif;
+}
+
+/* room under the page so the assistant button never covers the last line */
+.planner {
+  padding-bottom: 76px;
 }

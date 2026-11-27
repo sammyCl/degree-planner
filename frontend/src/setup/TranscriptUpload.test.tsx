@@ -62,6 +62,21 @@ describe('TranscriptUpload', () => {
     expect(screen.getByText(/file itself is not saved/)).toBeInTheDocument()
   })
 
+  it('can stop a read, and adds nothing', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((_url: string, init: RequestInit) =>
+        new Promise((_resolve, reject) => init.signal!.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError'))))),
+    )
+    const latest = setup()
+    upload()
+    fireEvent.click(screen.getByRole('button', { name: 'Stop reading' }))
+    expect(await screen.findByText(/Stopped reading transcript.csv. Nothing was added./)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Upload transcript' })).toBeEnabled()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(latest.current).toEqual([])
+  })
+
   it('sends the file to the backend and lists what it found, with transfer credit worded plainly', async () => {
     const fetchMock = vi.fn().mockResolvedValue(reply(200, reading(found)))
     vi.stubGlobal('fetch', fetchMock)
@@ -287,7 +302,7 @@ describe('TranscriptUpload', () => {
       vi.fn().mockResolvedValue(reply(200, reading([], { school: 'Example State University', from_mines: false, read_by: 'claude', unmatched: [] }))),
     )
     setup()
-    expect(screen.getByText(/read by Claude \(Anthropic's AI\) after\s+your name, student ID, birth date/)).toBeInTheDocument()
+    expect(screen.getByText(/read by Claude \(Anthropic's AI\)\. We\s+first try to remove your name, student ID, birth date[\s\S]*can miss\s+some/)).toBeInTheDocument()
     upload('esu.pdf')
     expect(await screen.findByText(/read by Claude/, { selector: '.tu-claude' })).toBeInTheDocument()
   })
