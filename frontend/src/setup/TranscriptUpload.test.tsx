@@ -302,7 +302,7 @@ describe('TranscriptUpload', () => {
       vi.fn().mockResolvedValue(reply(200, reading([], { school: 'Example State University', from_mines: false, read_by: 'claude', unmatched: [] }))),
     )
     setup()
-    expect(screen.getByText(/read by Claude \(Anthropic's AI\) after\s+your name, student ID, birth date/)).toBeInTheDocument()
+    expect(screen.getByText(/read by Claude \(Anthropic's AI\)\. We\s+first try to remove your name, student ID, birth date[\s\S]*can miss\s+some/)).toBeInTheDocument()
     upload('esu.pdf')
     expect(await screen.findByText(/read by Claude/, { selector: '.tu-claude' })).toBeInTheDocument()
   })
