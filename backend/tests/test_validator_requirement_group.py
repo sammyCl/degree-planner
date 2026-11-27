@@ -43,7 +43,12 @@ def connection(tmp_path: Path) -> sqlite3.Connection:
             ],
         },
     ]
-    (tmp_path / "programs.json").write_text(json.dumps({"programs": programs}))
+    # the courses must be in the catalog: a code the data does not have is "confirm with your advisor" instead
+    courses = [
+        {"code": code, "subject": code[:4], "number": code[4:], "title": code, "description": "", "credits": 3, "catalog_year": "2026-2027"}
+        for code in ("HASS100", "EDNS151", "HNRS105", "HNRS115")
+    ]
+    (tmp_path / "programs.json").write_text(json.dumps({"courses": courses, "programs": programs}))
     conn = sqlite3.connect(":memory:")
     assert refresh_database(tmp_path, conn).ok
     return conn

@@ -196,5 +196,6 @@ const TITLES: Record<Flag['type'], string> = {
   semester_overload: 'Too many credits in a semester',
   stale_program_year: 'Older catalog data',
   assumed_equivalent: 'Confirm equivalent course',
+  unlisted_course: 'Confirm with your advisor',
 }
 const flagTitle = (f: Flag): string => TITLES[f.type] ?? 'Needs attention'

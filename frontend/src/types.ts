@@ -84,6 +84,7 @@ export type FlagType =
   | 'semester_overload'
   | 'stale_program_year'
   | 'assumed_equivalent'
+  | 'unlisted_course'
 
 export interface Flag {
   flag_id: string
@@ -105,6 +106,8 @@ export interface RequirementStatus {
   credits_required: number | null
   credits_earned: number | null
   missing_count: number
+  /** not met only because the course data cannot fill it: confirm with an advisor (absent on older plans) */
+  confirm?: boolean
 }
 
 /** One requirement group a planned course fills (computed by the backend's validator). */

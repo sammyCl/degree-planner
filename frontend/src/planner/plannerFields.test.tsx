@@ -96,3 +96,23 @@ describe('certificate courses', () => {
     expect(courseLabel(plan, 'x')).toEqual({ primary: 'Certificate core' })
   })
 })
+
+describe('a requirement the data cannot fill', () => {
+  it('is shown as something to confirm, not as unmet', () => {
+    const note = flag('unlisted_course', null, 'Some ASI requires GONE401, which the course catalog data does not have. Confirm with your advisor how to meet it.')
+    expect(flagKind(note)).toBe('confirm')
+    const plan: Plan = {
+      ...samplePlan,
+      flags: [note],
+      requirement_status: [
+        { program_id: 'x-asi', group_id: 'required', label: 'Required', kind: 'all', met: false, credits_required: null, credits_earned: 0, missing_count: 1, confirm: true },
+      ],
+    }
+    render(<PlannerPage plan={plan} onBack={vi.fn()} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Show' }))
+    const card = screen.getByRole('heading', { name: 'Degree requirements' }).closest('.about-card') as HTMLElement
+    expect(within(card).getByRole('img', { name: 'Confirm with your advisor' })).toBeInTheDocument()
+    expect(card).toHaveTextContent('confirm with advisor')
+    expect(screen.getByRole('button', { name: '1 to confirm' })).toBeInTheDocument()
+  })
+})

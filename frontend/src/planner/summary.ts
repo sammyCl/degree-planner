@@ -14,6 +14,8 @@ export interface ChecklistRow {
   met: boolean
   /** "12/18 credits" or "3 courses missing"; empty when there is nothing useful to add */
   detail: string
+  /** not met only because the data cannot fill it: the student confirms it with an advisor */
+  confirm?: boolean
   /** the requirement groups behind this row ("program|group"), to list the courses that fill it */
   groups?: string[]
 }
@@ -69,10 +71,12 @@ function rowsFor(statuses: RequirementStatus[]): ChecklistRow[] {
     const required = group.reduce((sum, s) => sum + (s.kind === 'choose_credits' ? (s.credits_required ?? 0) : 0), 0)
     const earned = group.reduce((sum, s) => sum + (s.kind === 'choose_credits' ? (s.credits_earned ?? 0) : 0), 0)
     const missing = group.reduce((sum, s) => sum + s.missing_count, 0)
+    const confirm = !met && group.every((s) => s.met || s.confirm)
     let detail = ''
-    if (required > 0) detail = `${formatCredits(Math.min(earned, required))}/${formatCredits(required)} credits`
+    if (confirm) detail = 'confirm with advisor'
+    else if (required > 0) detail = `${formatCredits(Math.min(earned, required))}/${formatCredits(required)} credits`
     else if (!met && missing > 0) detail = `${missing} ${missing === 1 ? 'course' : 'courses'} missing`
-    return { name, category, met, detail, groups: group.map(groupKey) }
+    return { name, category, met, detail, confirm, groups: group.map(groupKey) }
   })
 }
 

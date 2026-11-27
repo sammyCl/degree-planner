@@ -1880,3 +1880,15 @@
   font-size: 13px;
   line-height: 1.45;
 }
+
+/* a requirement the course data cannot fill: a question to take to the advisor, not a failure */
+.req-icon.ask {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--acc-tint);
+  color: var(--acc);
+  font: 700 11px/1 Inter, sans-serif;
+}

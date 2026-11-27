@@ -79,6 +79,9 @@ FlagType = Literal[
     "semester_overload",
     "stale_program_year",
     "assumed_equivalent",
+    # a requirement the course data cannot fill (a required course missing from the catalog, or a course that
+    # would have to be repeated): the student confirms it with their advisor instead of the plan failing
+    "unlisted_course",
 ]
 FlagSeverity = Literal["error", "warning"]
 
@@ -128,6 +131,8 @@ class RequirementStatus(BaseModel):
     credits_earned: float | None = None
     # an "all" group: how many of its fixed courses the plan lacks
     missing_count: int = 0
+    # not met only because the data cannot fill it (see the unlisted_course flag): confirm with an advisor
+    confirm: bool = False
 
 
 class Plan(BaseModel):

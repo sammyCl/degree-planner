@@ -91,9 +91,17 @@ function RequirementRow({ row, plan, partial }: { row: ChecklistRow; plan: Plan 
   const [open, setOpen] = useState(false)
   const courses = plan ? coursesFor(plan, row) : []
   return (
-    <li className={`req-row ${row.met ? 'met' : partial ? 'part' : 'unmet'}`}>
+    <li className={`req-row ${row.met ? 'met' : partial ? 'part' : row.confirm ? 'ask' : 'unmet'}`}>
       <span className="req-line">
-        {row.met || !partial ? <Tick ok={row.met} /> : <span className="req-icon part" aria-hidden="true" />}
+        {row.confirm && !partial ? (
+          <span className="req-icon ask" role="img" aria-label="Confirm with your advisor">
+            ?
+          </span>
+        ) : row.met || !partial ? (
+          <Tick ok={row.met} />
+        ) : (
+          <span className="req-icon part" aria-hidden="true" />
+        )}
         <span className={`req-dot cat-${row.category}`} aria-hidden="true" />
         {courses.length > 0 ? (
           <button
