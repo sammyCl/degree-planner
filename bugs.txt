@@ -1461,7 +1461,7 @@ BUG-047  CSCI478's prerequisite is stored as an exception, so every plan
 
 BUG-048  get_forms has no course substitution form, so the chatbot cannot
          point a student to one
-  Status:    Open
+  Status:    Fixed
   Owner:     Abdallah Salhi (forms data)
   Where:     data/json/forms-policies.json
   Found:     2026-11-24 by the chatbot's real-model test runs (a student
@@ -1479,6 +1479,17 @@ BUG-048  get_forms has no course substitution form, so the chatbot cannot
              petition form and add it to forms-policies.json in the data
              format; if Mines has none, note that, and the chatbot will keep
              saying to ask the advisor
+  Fixed in:  2026-11-26, branch data/bug-056-048 (forms data: Abdallah).
+             Added course-substitution to forms-policies.json from data/
+             Policies/Academic Regulations and Standards.pdf, "Course
+             Substitutions": the approvals needed, and that the forms are
+             available in the Registrar's Office. No form PDF or link was
+             collected (so no url) and the catalog prints no form title (the
+             entry's name is descriptive). No requirement waiver form was
+             found, and none was added. Covered by test_bug_048_course_
+             substitution_form_is_listed in data/tools/
+             test_course_data_fixes.py; the pinned form count in backend/
+             tests/test_agent_tools.py went 12 -> 13
 
 BUG-049  The validator does not check corequisites
   Status:    Fixed
@@ -1826,4 +1837,9 @@ BUG-056  courses.REVIEW.md's free-text prerequisite list shows the previous
   Fix idea:  move line 314 (original = " ".join(r["prerequisites"].split()))
              above the "if pre.fallback:" block, rebuild, and add a test
              that a free-text note's text matches its own course's row
-  Fixed in:
+  Fixed in:  2026-11-26, branch data/bug-056-048 (course data converter:
+             Abdallah), the fix idea above. In courses.REVIEW.md, 220 of
+             the 232 free-text lines changed to their own course's text;
+             courses.json and courses.dropped-info.csv are unchanged.
+             Covered by test_bug_056_free_text_notes_show_each_courses_own_
+             prerequisite_text in data/tools/test_build_courses_json.py
