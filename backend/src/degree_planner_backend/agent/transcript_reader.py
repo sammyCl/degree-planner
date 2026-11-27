@@ -96,6 +96,48 @@ _DATE = re.compile(
     re.IGNORECASE,
 )
 _COURSE_LINE = re.compile(r"^[A-Z]{2,5}\s?\d{3,4}[A-Z]?\b|^[A-Z]{2,5}\s?\dXX\b")
+# Labels that put a person's name before the value; the value is then removed wherever else it appears.
+_NAME_LABEL = re.compile(
+    r"^\s*((student\s+|legal\s+|full\s+|preferred\s+)?name|record\s+of|student|issued\s+to|prepared\s+for|recipient)"
+    r"\s*[:#]\s*",
+    re.IGNORECASE,
+)
+# "123 Example Street" and "Denver, CO 80000": a home address often has no label.
+_STREET = re.compile(
+    r"^\d{1,6}\s+[A-Za-z0-9 .'-]+?\s(street|st|avenue|ave|road|rd|drive|dr|lane|ln|boulevard|blvd|court|ct|circle|"
+    r"cir|place|pl|way|terrace|parkway|pkwy|trail)\b\.?(\s*(#|apt|unit|suite)\s*[\w-]+)?\s*$",
+    re.IGNORECASE,
+)
+_CITY_STATE_ZIP = re.compile(r"^[A-Za-z .'-]+,?\s+[A-Z]{2}\s+\d{5}(-\d{4})?$")
+# A line of two to four capitalised words ("Jordan Q Sample", "Sample, Jordan"). Only trusted at the top of the
+# transcript, before the first course, and never for a line that reads like a school, a heading or a term.
+_BARE_NAME = re.compile(r"^[A-Z][A-Za-z'-]*,?(\s+[A-Z][A-Za-z'.-]*){1,3}$")
+_NOT_A_NAME = re.compile(
+    r"universit|college|school|institut|academy|polytechnic|campus|state|community|technical|transcript|record|"
+    r"official|credit|course|term|semester|quarter|fall|spring|summer|winter|transfer|academic|undergraduate|"
+    r"graduate|program|major|minor|degree|grade|hours|points|history|summary|report|office|registrar|system|"
+    r"science|engineering|arts|mathematics|test|exam|placement|advanced|dual|enrollment|total|page",
+    re.IGNORECASE,
+)
+_HEADER_LINES = 15
+
+
+def _names(lines: list[str]) -> set[str]:
+    """Names given after a label, as written and with "Last, First" turned around."""
+    found: set[str] = set()
+    for i, raw in enumerate(lines):
+        line = raw.strip()
+        label = _NAME_LABEL.match(line)
+        value = line[label.end():].strip() if label else ""
+        if not label and re.fullmatch(r"(student\s+|legal\s+|full\s+)?name|record of|student", line, re.IGNORECASE):
+            value = lines[i + 1].strip() if i + 1 < len(lines) else ""
+        if not _BARE_NAME.match(value) or _NOT_A_NAME.search(value):
+            continue
+        found.add(value)
+        if "," in value:
+            last, first = value.split(",", 1)
+            found.add(f"{first.strip()} {last.strip()}")
+    return found
 
 
 def redact(lines: list[str]) -> tuple[list[str], int]:
@@ -103,8 +145,12 @@ def redact(lines: list[str]) -> tuple[list[str], int]:
     kept: list[str] = []
     changed = 0
     skip_next = False
-    for raw in lines:
+    names = _names(lines)
+    name = re.compile("|".join(map(re.escape, sorted(names, key=len, reverse=True))), re.IGNORECASE) if names else None
+    header = True
+    for position, raw in enumerate(lines):
         line = raw.strip()
+        header = header and position < _HEADER_LINES and not _COURSE_LINE.match(line)
         if skip_next:
             skip_next = False
             if line and not _COURSE_LINE.match(line):
@@ -118,7 +164,13 @@ def redact(lines: list[str]) -> tuple[list[str], int]:
             # "Name" alone on its line: the value is on the next line
             skip_next = len(line[label.end():].strip()) == 0
             continue
+        unlabelled = _STREET.match(line) or _CITY_STATE_ZIP.match(line)
+        if unlabelled or (header and _BARE_NAME.match(line) and not _NOT_A_NAME.search(line)):
+            changed += 1
+            continue
         masked = _DATE.sub("[date]", _LONG_NUMBER.sub("[number]", _EMAIL.sub("[email]", line)))
+        if name:
+            masked = name.sub("[name]", masked)
         changed += masked != line
         kept.append(masked)
     return kept, changed

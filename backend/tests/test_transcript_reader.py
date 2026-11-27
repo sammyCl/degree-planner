@@ -39,6 +39,23 @@ def test_redact_removes_personal_details_and_keeps_courses_and_the_school() -> N
     assert changed >= 9
 
 
+def test_redact_removes_a_name_and_address_that_have_no_label() -> None:
+    lines = [
+        "State University of Example", "Official Transcript", "Jordan Q Sample", "123 Example Street Apt 4",
+        "Denver, CO 80000", "Fall Quarter", "MATH 1401 Calculus I A 4.000", "Linear Algebra",
+    ]
+    kept, changed = redact(lines)
+    assert kept == ["State University of Example", "Official Transcript", "Fall Quarter", "MATH 1401 Calculus I A 4.000", "Linear Algebra"]
+    assert changed == 3
+
+
+def test_redact_removes_a_labelled_name_wherever_else_it_appears() -> None:
+    lines = ["Fall 2023", "MATH 1401 Calculus I A 4.000", "Record of: Sample, Jordan", "Page 2 for JORDAN SAMPLE"]
+    kept, _ = redact(lines)
+    assert "jordan" not in "\n".join(kept).lower()
+    assert kept[-1] == "Page 2 for [name]"
+
+
 def test_the_command_has_no_tools_and_a_strict_schema() -> None:
     command = claude_command()
     assert command[command.index("--tools") + 1] == ""
