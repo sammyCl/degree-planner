@@ -40,3 +40,17 @@ def test_mining_bs_special_topics_slot_is_only_mngn298():
     slot = next(g for g in mining["requirement_groups"] if g["group_id"] == "mngn-2xx")
     assert slot["courses"] == ["MNGN298"]
     assert slot["credits_required"] == 3
+
+
+def test_bug_048_course_substitution_form_is_listed():
+    # Source: data/Policies/Academic Regulations and Standards.pdf, "Course Substitutions". The catalog says the
+    # forms are available in the Registrar's Office and prints no link or form title, so the entry has no url.
+    forms = json.loads((COURSES.parent / "forms-policies.json").read_text(encoding="utf-8"))["forms"]
+    matches = [f for f in forms if f["form_id"] == "course-substitution"]
+    assert len(matches) == 1
+    form = matches[0]
+    assert form["applies_to"] == ["any"]
+    for approver in ("Registrar", "heads of departments of the two courses", "option department"):
+        assert approver in form["requires"]
+    assert "Registrar's Office" in form["notes"]
+    assert "url" not in form

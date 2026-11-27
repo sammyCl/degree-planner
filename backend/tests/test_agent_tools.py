@@ -626,7 +626,7 @@ def test_forms_real_data_file(tmp_path: Path) -> None:
     report = refresh_database(tmp_path, conn)
     assert report.errors == {}
     result = get_forms(conn, {})
-    assert result["count"] == 12
+    assert result["count"] == 13
     assert "independent-study-credit" in form_ids(result)
     assert form_ids(result) == sorted(form_ids(result))
     for form in result["forms"]:
@@ -794,10 +794,10 @@ def real_data_connection(tmp_path: Path) -> sqlite3.Connection:
 def test_forms_real_programs(real_data_connection: sqlite3.Connection) -> None:
     minor = get_forms(real_data_connection, {"program_id": "computer-science-minor"})
     assert minor["program_found"] is True
-    assert minor["count"] == 12
+    assert minor["count"] == 13
     bachelors = get_forms(real_data_connection, {"program_id": "computer-science-bs"})
     assert bachelors["program_found"] is False
-    assert bachelors["count"] == 12
+    assert bachelors["count"] == 13
 
 
 def test_forms_real_values(real_data_connection: sqlite3.Connection) -> None:

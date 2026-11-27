@@ -1,11 +1,32 @@
-"""Tests for build_courses_json.py's _resolve_unknown_refs. Run from backend/: uv run pytest ../data/tools"""
+"""Tests for build_courses_json.py. Run from backend/: uv run pytest ../data/tools"""
 
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
+import build_courses_json  # noqa: E402
 from build_courses_json import _resolve_unknown_refs  # noqa: E402
+
+
+def test_bug_056_free_text_notes_show_each_courses_own_prerequisite_text(tmp_path, monkeypatch):
+    # build() also writes the frontend's inferred-equivalents file; keep the test from touching the repo.
+    monkeypatch.setattr(build_courses_json, "INFERRED_JSON", tmp_path / "inferredEquivalents.json")
+    own = {
+        r["course_number"].strip(): " ".join(r["prerequisites"].split())
+        for r in build_courses_json.merge(build_courses_json.load_rows(), build_courses_json.defaultdict(list))
+    }
+    _, notes, _ = build_courses_json.build()
+    items = notes["free-text prerequisites"]
+    assert items
+    wrong = []
+    for item in items:
+        head, text = item.split(": ", 1)
+        code = head.removesuffix(" (mixed)")
+        if text != own[code]:
+            wrong.append(code)
+    assert wrong == []
+
 
 KNOWN = {"CSCI128", "CSCI102", "HASS100", "HASS327"}
 
