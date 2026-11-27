@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { Flag, Plan } from '../types.ts'
 import { completedCredits, remainingCredits } from './completed.ts'
-import { flagCounts, flagKind, formatCredits } from './graph.ts'
+import { flagCounts, flagKind, flagTitle, formatCredits } from './graph.ts'
 import { Legend } from './Legend.tsx'
 import { useCountUp } from './useCountUp.ts'
 
@@ -185,19 +185,3 @@ export function SummaryBar({ plan, programName, onSelectFlag, checking }: Props)
     </div>
   )
 }
-
-const TITLES: Record<Flag['type'], string> = {
-  broken_prerequisite: 'Prerequisite out of order',
-  credit_shortfall: 'Credit load',
-  requirement_unmet: 'Requirement not met',
-  double_count_exceeded: 'Too many shared courses',
-  exception_claimed: 'To confirm',
-  ineligible_course: 'Course not allowed here',
-  semester_overload: 'Too many credits in a semester',
-  stale_program_year: 'Older catalog data',
-  assumed_equivalent: 'Confirm equivalent course',
-  unlisted_course: 'Confirm with your advisor',
-  undergraduate_prerequisite: 'Confirm your background',
-  summer_course: 'Summer course',
-}
-const flagTitle = (f: Flag): string => TITLES[f.type] ?? 'Needs attention'

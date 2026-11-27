@@ -7,6 +7,7 @@ import { CompletedColumns } from './CompletedColumns.tsx'
 import { completedColumns, completedOnlyPlan, startsCollapsed } from './completed.ts'
 import { CourseCard, type CardState } from './CourseCard.tsx'
 import { CoursePopover } from './CoursePopover.tsx'
+import { DownloadPdf } from './DownloadPdf.tsx'
 import { PlanSummary } from './PlanSummary.tsx'
 import { courseLabel } from './courseLabel.ts'
 import {
@@ -244,6 +245,15 @@ export function PlannerPage({ plan: initialPlan, explanation, choices, checks, p
           {plan.semesters.length} semesters, starting {plan.semesters[0]?.label}
           {doneColumns.length > 0 ? ', with your completed courses on the left' : ''}. Drag a course to another semester to move it.
         </span>
+        <DownloadPdf
+          plan={plan}
+          donePlan={donePlan}
+          explanation={explanation}
+          checks={checks}
+          choices={choices}
+          // not while a change is being checked (its flags are not in yet), nor before the completed courses are labelled
+          waiting={checking || (doneColumns.length > 0 && doneState === 'loading')}
+        />
       </div>
       {problems && problems.length > 0 && (
         <div className="note-problems planner-problems" role="alert">
