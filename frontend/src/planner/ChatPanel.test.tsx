@@ -94,6 +94,23 @@ describe('ChatPanel', () => {
     expect(await within(card).findByRole('button', { name: 'Apply' })).toBeInTheDocument()
   })
 
+  it('remembers a suggestion was applied after the plan changes again', async () => {
+    backend(() => reply(200, answer()))
+    const chat = openChat()
+    say('Move it')
+    const card = await within(chat).findByRole('group', { name: 'Suggested change' })
+    fireEvent.click(within(card).getByRole('button', { name: 'Apply' }))
+    await within(card).findByText(/^Applied/)
+    const dataTransfer = { setData: vi.fn(), effectAllowed: '', dropEffect: '' }
+    const column = screen.getByRole('region', { name: plan.semesters[2].label })
+    fireEvent.dragStart(inSemester(plan.semesters[1].label)!, { dataTransfer })
+    fireEvent.dragOver(column, { dataTransfer })
+    fireEvent.drop(column, { dataTransfer })
+    fireEvent.click(screen.getByRole('button', { name: 'Close the assistant' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Ask the assistant' }))
+    expect(screen.getByText('You applied this. Your plan has changed since.')).toBeInTheDocument()
+  })
+
   it('does not apply a suggestion to a board that has changed since', async () => {
     backend(() => reply(200, answer({ proposed_plan: movePlanned(plan, plan.semesters[0].courses[0].course_id, 2) })))
     const chat = openChat()

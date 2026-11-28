@@ -286,7 +286,7 @@ export function PlanSummary({ plan, explanation, choices, checks, donePlan, done
               <ul className="choice-list">
                 <ShowMore items={notes.choices} limit={4} noun="choices" render={(text, i) => <Choice key={i} text={text} />} />
               </ul>
-              <p className="choice-foot">You can change any of these: drag courses on the board, or edit your setup.</p>
+              <p className="choice-foot">Written when your plan was first built, so later changes are not included. You can change any of these on the board.</p>
             </div>
           )}
         </div>

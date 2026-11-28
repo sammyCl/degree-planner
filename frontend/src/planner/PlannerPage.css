@@ -353,10 +353,10 @@
   flex: 1 1 260px;
 }
 
-/* while the flowchart is being copied into a picture, nothing moves */
-.cols.exporting * {
+/* once the flowchart has been copied into a picture the entrance animations stay off (a data attribute, so React
+   redrawing the class names cannot undo it); the highlight on a clicked flag and the red arrows still move */
+.cols[data-settled] *:not(.pulse):not(.edge) {
   animation: none !important;
-  transition: none !important;
 }
 
 .download {

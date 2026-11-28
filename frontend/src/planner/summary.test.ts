@@ -120,7 +120,7 @@ describe('buildChecks: assumed equivalents and the minor credit note', () => {
     const checks = buildChecks(withCourses([['MATH111', 'Calculus']], ['mining-bs', 'biology-minor']))
     const note = checks.find((c) => c.title === 'Credits')!
     expect(note.kind).toBe('info')
-    expect(note.text).toContain('A minor adds about 9 extra credits')
+    expect(note.text).toContain('A minor can add extra credits')
     expect(note.text).toContain('142 credits')
     expect(note.text).toContain('131')
     expect(buildChecks(withCourses([['MATH111', 'Calculus']], ['mining-bs'])).some((c) => c.title === 'Credits')).toBe(false)
