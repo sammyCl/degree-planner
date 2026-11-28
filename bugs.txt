@@ -1843,3 +1843,32 @@ BUG-056  courses.REVIEW.md's free-text prerequisite list shows the previous
              courses.json and courses.dropped-info.csv are unchanged.
              Covered by test_bug_056_free_text_notes_show_each_courses_own_
              prerequisite_text in data/tools/test_build_courses_json.py
+
+BUG-057  A graduate fall or spring semester with no credit-bearing course
+         is not flagged
+  Status:    Open
+  Owner:     Midhat Sajad (validator)
+  Where:     backend/src/degree_planner_backend/validator.py, the
+             per-semester checks (next to the semester_overload loop)
+  Found:     2026-11-27 by Samantha with Claude, from the eval (Example 2,
+             backend/eval/results/2026-11-27T13-33-14/ex2-run1.json; the
+             results folder is gitignored)
+  Steps:     from backend/, uv run eval-examples --example 2. In that run
+             the agent planned Fall 2026 with only EENG500 (0 credits) and
+             the 24 credits in Spring 2027 to Spring 2028. check_plan
+             returned requirements_met true; the eval's checker found it
+  Actual:    no flag. A master's semester of 0 credits passes, and so
+             would a graduate semester of a combined BS+MS plan
+  Expected:  an error for each fall or spring graduate semester (master's
+             or PhD, or after the bachelor's part of a combined plan) whose
+             credits add up to less than 1. 2026-2027 Graduate Catalog,
+             p. 8: graduate students must register for at least 1 credit
+             every fall and spring, or their degree program is terminated
+             unless they file a Leave of Absence. Summers are not covered
+  Fix idea:  in the loop that picks the graduate limit for semester_overload,
+             add a flag (for example semester_underload, error) when a
+             Fall/Spring graduate semester has total_credits < 1. If it gets
+             a new flag type, the frontend (Abdallah) needs a title for it,
+             and agent/planner.md's "check_plan does not flag this yet"
+             line (Samantha) can then go
+  Fixed in:
