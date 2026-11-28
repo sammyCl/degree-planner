@@ -87,7 +87,7 @@ function App() {
   // A file dropped beside the upload box would be opened by the browser, replacing the page and losing the setup.
   useEffect(() => {
     const keep = (e: DragEvent) => {
-      if (!e.dataTransfer?.types.includes('Files')) return
+      if (!e.dataTransfer?.types?.includes('Files')) return
       // over the upload box, its own handlers have already claimed the drag
       if (!e.defaultPrevented) e.dataTransfer.dropEffect = 'none'
       e.preventDefault()
