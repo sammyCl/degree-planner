@@ -2,6 +2,7 @@ import { useMemo, useState, type ReactNode } from 'react'
 import { catalogCourse, completedTitle, displayCode } from '../setup/transcript.ts'
 import type { Plan } from '../types.ts'
 import { completedCredits } from './completed.ts'
+import { FormsCard } from './FormsCard.tsx'
 import { formatCredits } from './graph.ts'
 import {
   buildChecklist,
@@ -276,6 +277,8 @@ export function PlanSummary({ plan, explanation, choices, checks, donePlan, done
               </ul>
             )}
           </div>
+
+          <FormsCard plan={plan} />
 
           {notes.choices.length > 0 && (
             <div className="about-card c-choice">

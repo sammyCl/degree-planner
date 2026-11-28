@@ -132,10 +132,10 @@ describe('the backend status', () => {
       }),
     )
     render(<App />)
-    await waitFor(() => expect(screen.getByTestId('backend-status')).toHaveTextContent('not running'))
+    await waitFor(() => expect(screen.getByTestId('backend-status')).toHaveTextContent("Can't reach the server"))
     up = true
     build()
-    await waitFor(() => expect(screen.getByTestId('backend-status')).toHaveTextContent('connected'))
+    await waitFor(() => expect(screen.queryByTestId('backend-status')).not.toBeInTheDocument())
   })
 })
 

@@ -5,6 +5,7 @@ import { ADD_ON_NAMES, LEVELS, PROGRAMS, staleInPlan } from '../setup/validate.t
 import type { Plan } from '../types.ts'
 import { completedColumns, completedCredits, completedId, remainingCredits } from './completed.ts'
 import { courseLabel } from './courseLabel.ts'
+import { formsFor } from './forms.ts'
 import { flagKind, formatCredits, isOpen } from './graph.ts'
 import { plainAlert } from './plainFlags.ts'
 import { buildChecklist, buildChecks, readExplanation } from './summary.ts'
@@ -124,6 +125,11 @@ export function buildPdfDocument({ plan, donePlan, explanation, checks, choices 
       heading: 'To ask your advisor (written when the plan was first built)',
       items: fromAssistant.map((text) => text.replace(/\*\*/g, '')),
     })
+  }
+
+  const forms = formsFor(plan).needed
+  if (forms.length) {
+    notes.push({ heading: 'Forms your plan needs', items: forms.map((x) => `${x.name}: ${x.because} ${x.todo}${x.url ? ` ${x.url}` : ''}`) })
   }
 
   const names = plan.student.programs.map(programName)

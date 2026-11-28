@@ -1957,3 +1957,61 @@
 .planner {
   padding-bottom: 76px;
 }
+
+.about-card.c-forms { --accent: var(--acc); }
+
+.form-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+}
+
+.form-item {
+  padding: 6px 0;
+}
+
+.form-item + .form-item {
+  border-top: 1px solid var(--border);
+}
+
+.form-item.needed {
+  padding-left: 10px;
+  border-left: 3px solid var(--acc);
+}
+
+.form-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: 600 13px Inter, sans-serif;
+  text-align: left;
+  cursor: pointer;
+}
+
+.form-why,
+.form-todo {
+  margin: 3px 0 0;
+  color: var(--mut);
+}
+
+.form-todo {
+  color: var(--text);
+}
+
+.form-todo a {
+  color: var(--acc);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

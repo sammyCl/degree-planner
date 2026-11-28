@@ -63,23 +63,13 @@
   color: #cfdce9;
 }
 
-.status-up::before,
-.status-down::before,
-.status-checking::before {
+.status-down::before {
   content: '';
   display: inline-block;
   width: 7px;
   height: 7px;
   margin-right: 6px;
   border-radius: 50%;
-  background: #cfdce9;
-}
-
-.status-up::before {
-  background: #4ade9a;
-}
-
-.status-down::before {
   background: #f87171;
 }
 
