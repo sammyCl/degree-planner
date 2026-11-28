@@ -20,14 +20,24 @@ interface Suggestion {
   plan: Plan
   /** the board the suggestion was made for */
   base: string
+  /** the student has applied it at some point */
+  used?: boolean
 }
 
 type Entry = ChatMessage & { suggestion?: Suggestion; stopped?: string[] }
 
 const STARTERS = ['Suggest a different free elective', 'Make my busiest semester lighter', 'What do I need to check with my advisor?']
 
-function SuggestionCard({ suggestion, current, busy, onApply }: { suggestion: Suggestion; current: string; busy: boolean; onApply: (next: Plan) => void }) {
-  const { response, plan, base } = suggestion
+interface CardProps {
+  suggestion: Suggestion
+  current: string
+  busy: boolean
+  onApply: (next: Plan) => void
+  onUsed: () => void
+}
+
+function SuggestionCard({ suggestion, current, busy, onApply, onUsed }: CardProps) {
+  const { response, plan, base, used } = suggestion // `used`: so one the student applied is not later called missed
   const applied = current === boardKey(plan)
   const outdated = !applied && current !== base
   const problems = plan.flags.filter((f) => isOpen(f) && flagKind(f) === 'error')
@@ -64,10 +74,20 @@ function SuggestionCard({ suggestion, current, busy, onApply }: { suggestion: Su
         <p className="chat-state" role="status">
           Applied. Use Undo on the board to take it back.
         </p>
+      ) : outdated && used ? (
+        <p className="chat-state">You applied this. Your plan has changed since.</p>
       ) : outdated ? (
         <p className="chat-state">Your plan changed since this suggestion. Ask again.</p>
       ) : (
-        <button type="button" className="btn primary" disabled={busy} onClick={() => onApply(plan)}>
+        <button
+          type="button"
+          className="btn primary"
+          disabled={busy}
+          onClick={() => {
+            onUsed()
+            onApply(plan)
+          }}
+        >
           Apply
         </button>
       )}
@@ -185,7 +205,15 @@ export function ChatPanel({ plan, busy, onApply }: Props) {
             {/* plain text: the backend takes the markdown out, and its line breaks are kept */}
             <p className="chat-text">{m.text}</p>
             {m.stopped && m.stopped.length > 0 && <p className="chat-ask">I stopped before finishing, so nothing changed. Try asking again.</p>}
-            {m.suggestion && <SuggestionCard suggestion={m.suggestion} current={current} busy={busy} onApply={onApply} />}
+            {m.suggestion && (
+              <SuggestionCard
+                suggestion={m.suggestion}
+                current={current}
+                busy={busy}
+                onApply={onApply}
+                onUsed={() => setEntries((all) => all.map((e, j) => (j === i ? { ...e, suggestion: { ...e.suggestion!, used: true } } : e)))}
+              />
+            )}
           </div>
         ))}
         {waiting && (

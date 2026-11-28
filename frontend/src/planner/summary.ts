@@ -237,7 +237,7 @@ function addOnCreditNote(plan: Plan): CheckItem[] {
   return [
     {
       title: 'Credits',
-      text: `${addOn === 'ASI' ? 'An' : 'A'} ${addOn} adds about 9 extra credits. This plan has ${formatCredits(total)} credits; your degree alone needs ${formatCredits(required)}.`,
+      text: `${addOn === 'ASI' ? 'An' : 'A'} ${addOn} can add extra credits. This plan has ${formatCredits(total)} credits; your degree alone needs ${formatCredits(required)}.`,
       kind: 'info',
     },
   ]

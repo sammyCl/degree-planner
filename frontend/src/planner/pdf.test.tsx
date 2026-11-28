@@ -153,7 +153,7 @@ describe('flowchart image', () => {
     fireEvent.click(button)
     expect(await screen.findByText('The image could not be made. Try again.', {}, { timeout: 10000 })).toHaveAttribute('role', 'alert')
     expect(pictured.toCanvas).toHaveBeenCalledWith(screen.getByTestId('board'), expect.anything())
-    expect(screen.getByTestId('board')).not.toHaveClass('exporting')
+    expect(screen.getByTestId('board')).toHaveAttribute('data-settled')
     vi.unstubAllGlobals()
   }, 15000)
 })

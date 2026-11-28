@@ -75,8 +75,9 @@ export function fixArrowStyles(board: HTMLElement): () => void {
 }
 
 export async function makeBoardImage(board: HTMLElement, content: PdfDocument): Promise<Blob> {
-  // the cards slide in when the page opens: switch that off, or the copy is taken before they appear
-  board.classList.add('exporting')
+  // the cards slide in when the page opens: switch that off, or the copy is taken before they appear. It stays off
+  // afterwards, because switching it back on would make the whole board slide in again on screen.
+  board.dataset.settled = 'true'
   let restore = () => {}
   try {
     restore = fixArrowStyles(board)
@@ -125,7 +126,6 @@ export async function makeBoardImage(board: HTMLElement, content: PdfDocument): 
     )
   } finally {
     restore()
-    board.classList.remove('exporting')
   }
 }
 
